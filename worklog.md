@@ -94,3 +94,33 @@ KEY FILES TO CARRY OVER:
 - From Lumina: src/app/globals.css, src/components/lumina/*, src/app/layout.tsx, src/app/page.tsx (tab shell), src/lib/store.ts, src/lib/ai-tarot.ts, prisma/schema.prisma.
 - From GURU web: components/{ChatApp,BirthChartTool,InsightsPanel,AuthPanel,BirthDataForm,PartnerBirthForm,PricingSection}.tsx, lib/{api,stream,store,natal,geocode}.ts, app/{chat,birth-chart,insights}/page.tsx.
 - From GURU services (as backend, not ported into Next): services/contracts/src/route-policy.ts (the API contract), services/docker-compose.yml, services/.env.example.
+
+---
+Task ID: 5
+Agent: Orchestrator (Z.ai Code)
+Task: Build merged Baydin app — ChatGPT-style astrologer + Lumina frontend + GURU backend + Luck economy + reseller + admin
+
+Work Log:
+- Designed unified Prisma schema (User+Luck, Conversation, Message, LuckTransaction, LuckPurchase, LuckTransfer, DailyReward, TarotReading, Goal, Confirmation, MoodEntry, RitualLog) — pushed to SQLite.
+- Ported Lumina design system (globals.css with themeable tokens, primitives.tsx with GlassCard/ShellCard/GoldButton/GradientButton/Pill). Configured tailwind.config.ts with brand color mapping.
+- Built core libs: auth.ts (bcrypt + HMAC-signed cookie session), luck.ts (6 regular tiers 5K-150K MMK + 4 reseller tiers 50K-500K MMK, feature costs, spend/credit ledger, daily reward, reseller transfer), astrology/index.ts (full TS port of planetary calculation via Schlyter/Meeus algorithms — Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn/Rahu/Ketu/Ascendant, Lahiri ayanamsa, nakshatras, Vimshottari dasha, panchanga, Mahabote, transits, SVG-ready), llm.ts (GURU shared persona + chat + horoscope skills ported verbatim, prompt renderer with labeled data blocks, Gemini via z-ai-web-dev-sdk, simulated streaming), ai-tarot.ts (Lumina tarot system prompt + fallback).
+- Copied 78-card Rider-Waite tarot deck + draw logic from Lumina.
+- Built 23 API routes: auth (register/login/logout), me, conversations (CRUD), conversations/[id]/messages, conversations/[id]/stream (SSE), luck (tiers/purchase/transactions/daily-reward), tarot (read/history/card-of-day), horoscope, astrology/chart, reseller (transfer/inventory), admin (grant/whitelist/users/stats).
+- Built ChatGPT-style app shell: collapsible sidebar with nav + conversation picker + daily reward card, desktop top bar with Luck balance, main view router, auth modal (login/register with referral), profile sheet (birth data form + language + referral link).
+- Built 7 feature views: chat-view (SSE streaming, mode selector vedic/western/mahabote, guidance cards, markdown rendering), tarot-view (6 spreads, card faces, AI interpretation), birth-chart-view (SVG natal wheel + planet table + dasha + panchanga + Mahabote), horoscope-view (12 signs, daily/weekly/monthly), luck-store-view (6 tiers + payment panel + referral), reseller-view (pool stats + transfer + history), admin-view (stats + grant + whitelist + users table).
+- Fixed streaming: z-ai-web-dev-sdk's stream:true yields raw SSE bytes not parsed objects → rewrote to non-streaming call + word-chunk simulated streaming.
+- Fixed missing icon in chat suggestions (Heart import).
+- Fixed tarot drawCards returning plain DrawnCard without .card (added attachMeta call).
+
+Stage Summary:
+- MERGED APP "Baydin" is live and verified working via agent-browser:
+  * Registration flow works (email/password → 5 Luck signup bonus → session cookie).
+  * Astrologer chat streams real Gemini responses in Myanmar (Burmese) script, addressing user as သား/သမီး per GURU persona.
+  * Tarot readings generate full narrative interpretations (Queen of Swords + Page of Pentacles + reversed Five of Swords example) with TL;DR + Summary.
+  * Luck store renders all 6 tiers + margin explainer.
+- Tech: Next.js 16 + React 19 + TS 5 + Tailwind 4 + shadcn/ui + Prisma 6 (SQLite) + z-ai-web-dev-sdk (Gemini/glm-4-plus) + Zustand + TanStack Query.
+- Profit model verified: astrologer chat = 2 Luck (~134-200 MMK) vs ~2 MMK LLM cost = ~98% margin. Life report 15 Luck (~1,005 MMK) vs ~19 MMK = ~98% margin. All >90% target.
+- Pay-as-you-go model implemented: freebies (2 tarot/day, daily Luck reward), all GURU features cost Luck, reseller wholesale (min 50K MMK, hidden unless whitelisted).
+- Lumina dark-first theme uniform across all views (gold #C5A87C, glass surfaces, aurora backdrop). Themeable via CSS vars for future design changes.
+- Reseller system: admin whitelists users → reseller buys wholesale Luck into pool → transfers to end users (resell action) → off-platform pricing recorded.
+- Virality: referral codes (10 Luck per signup bonus), daily Luck streak reward, share link.

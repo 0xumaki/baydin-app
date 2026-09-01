@@ -1,0 +1,28 @@
+import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/auth";
+import { db } from "@/lib/db";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+/** Admin whitelists a user as a reseller (sets role + tier). */
+export async function POST(req: NextRequest) {
+  await requireAdmin();
+  const { userEmail, tier } = await req.json();
+  if (!userEmail) return NextResponse.json({ error: "userEmail required." }, { status: 400 });
+  const validTiers = ["bronze", "silver", "gold", "platinum"];
+  if (tier && !validTiers.includes(tier)) {
+    return NextResponse.json({ error: "Invalid tier." }, { status: 400 });
+  }
+  const target = await db.user.findUnique({ where: { email: (userEmail as string).toLowerCase() } });
+  if (!target) return NextResponse.json({ error: "User not found." }, { status: 404 });
+  const updated = await db.user.update({
+    where: { id: target.id },
+    data: {
+      role: "reseller",
+      resellerTier: tier || "bronze",
+      resellerSince: new Date(),
+    },
+  });
+  return NextResponse.json({ ok: true, user: { email: updated.email, role: updated.role, resellerTier: updated.resellerTier } });
+}

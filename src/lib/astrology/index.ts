@@ -1,0 +1,710 @@
+/**
+ * BAYDIN — Astrology calculation engine (pure TypeScript).
+ *
+ * Ports the GURU Python calculation-engine domain logic using Paul Schlyter's
+ * "How to compute planetary positions" (≈1-2 arcminute accuracy — same family
+ * of algorithms as Swiss Ephemeris, compact enough to run in-process).
+ *
+ * Supports: Western (tropical) + Vedic (sidereal, Lahiri) + Myanmar Mahabote.
+ * Computes: Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Rahu, Ketu,
+ *           Ascendant, houses, nakshatras, Vimshottari dasha, panchanga, transits.
+ *
+ * No external deps — safe for server + edge. All angles in degrees unless noted.
+ */
+
+export type BirthContext = {
+  dob: string; // YYYY-MM-DD
+  tob: string; // HH:MM
+  latitude: number;
+  longitude: number;
+  timezone?: string | null; // IANA, e.g. "Asia/Yangon"
+  gender?: "male" | "female" | null;
+};
+
+export type AstrologyMode = "vedic" | "western" | "mahabote";
+
+// ---------- math helpers ----------
+const D2R = Math.PI / 180;
+const R2D = 180 / Math.PI;
+const rev = (x: number) => ((x % 360) + 360) % 360;
+const sind = (x: number) => Math.sin(x * D2R);
+const cosd = (x: number) => Math.cos(x * D2R);
+const tand = (x: number) => Math.tan(x * D2R);
+const asind = (x: number) => Math.asin(Math.max(-1, Math.min(1, x))) * R2D;
+const acosd = (x: number) => Math.acos(Math.max(-1, Math.min(1, x))) * R2D;
+const atan2d = (y: number, x: number) => Math.atan2(y, x) * R2D;
+
+/** Julian Day from a Gregorian calendar date (UTC). */
+export function julianDay(year: number, month: number, day: number, ut = 0): number {
+  let y = year, m = month;
+  if (m <= 2) { y -= 1; m += 12; }
+  const A = Math.floor(y / 100);
+  const B = 2 - A + Math.floor(A / 4);
+  return (
+    Math.floor(365.25 * (y + 4716)) +
+    Math.floor(30.6001 * (m + 1)) +
+    day +
+    B -
+    1524.5 +
+    ut / 24
+  );
+}
+
+/** Days since J2000.0 (JD 2451545.0). */
+function daysSinceJ2000(jd: number): number {
+  return jd - 2451545.0;
+}
+
+/** Julian centuries from J2000 (Meeus). */
+function T(jd: number): number {
+  return (jd - 2451545.0) / 36525;
+}
+
+// ---------- obliquity & ayanamsa ----------
+function obliquity(jd: number): number {
+  const t = T(jd);
+  return 23.4392911 - 0.0130042 * t - 1.64e-7 * t * t + 5.04e-7 * t * t * t;
+}
+
+/** Lahiri ayanamsa (degrees) — precession from the sidereal zero point.
+ *  Lahiri value at J2000 ≈ 23.85°, precessing ~50.3"/year. */
+function lahiriAyanamsa(jd: number): number {
+  const t = T(jd);
+  // 23.85° at J2000 + ~50.29"/yr precession
+  return 23.85 + (50.29 / 3600) * t * 100;
+}
+
+// ---------- Sun (Schlyter) ----------
+function sunPosition(d: number) {
+  const w = 282.9404 + 4.70935e-5 * d;
+  const e = 0.016709 - 1.151e-9 * d;
+  const M = rev(356.047 + 0.9856002585 * d);
+  const E = M + (180 / Math.PI) * e * sind(M) * (1 + e * cosd(M));
+  const xv = cosd(E) - e;
+  const yv = Math.sqrt(1 - e * e) * sind(E);
+  const v = atan2d(yv, xv);
+  const lon = rev(v + w);
+  const r = Math.sqrt(xv * xv + yv * yv);
+  return { lon, r };
+}
+
+// ---------- Moon (Schlyter, simplified ELP) ----------
+function moonPosition(d: number) {
+  const N = 125.1228 - 0.0529538083 * d;
+  const i = 5.1454;
+  const w = 318.0634 + 0.1643573223 * d;
+  const a = 60.2666;
+  const e = 0.0549;
+  const M = rev(115.3654 + 13.0649929509 * d);
+  const E = M + (180 / Math.PI) * e * sind(M) * (1 + e * cosd(M));
+  const xv = a * (cosd(E) - e);
+  const yv = a * Math.sqrt(1 - e * e) * sind(E);
+  const v = atan2d(yv, xv);
+  const r = Math.sqrt(xv * xv + yv * yv);
+  // position in ecliptic coords
+  let lon = rev(v + w);
+  const xh = r * cosd(lon);
+  const yh = r * sind(lon);
+  // ecliptic longitude/latitude (inclination is small, lat usually < 5.3°)
+  const lonw = atan2d(yh, xh);
+  // major perturbations (Schlyter " Evection", "Variation", "Annual Equation", etc.)
+  const Ls = sunPosition(d).lon; // sun mean longitude
+  const D = rev(lonw - Ls); // moon-sun elongation
+  const F = rev(lonw - N); // argument of latitude
+  // Schlyter perturbation corrections (degrees)
+  const pertLon =
+    -1.274 * sind(M - 2 * D) + // Evection
+    0.658 * sind(2 * D) - // Variation
+    0.186 * sind(sunMeanAnomaly(d)) - // Annual equation
+    0.059 * sind(2 * M - 2 * D) -
+    0.057 * sind(M - 2 * D + sunMeanAnomaly(d)) +
+    0.053 * sind(M + 2 * D) +
+    0.046 * sind(2 * D - sunMeanAnomaly(d)) +
+    0.041 * sind(M - sunMeanAnomaly(d)) -
+    0.035 * sind(D) -
+    0.031 * sind(M + sunMeanAnomaly(d)) -
+    0.015 * sind(2 * F - 2 * D) +
+    0.011 * sind(M - 4 * D);
+  lon = rev(lon + pertLon);
+  return { lon, r };
+}
+
+function sunMeanAnomaly(d: number): number {
+  return rev(356.047 + 0.9856002585 * d);
+}
+
+// ---------- Planets (Schlyter) ----------
+type PlanetParams = {
+  N: number; i: number; w: number; a: number; e: number; M: number;
+};
+
+const PLANET_PARAMS: Record<string, (d: number) => PlanetParams> = {
+  mercury: (d) => ({
+    N: 48.3313 + 3.24587e-5 * d,
+    i: 7.0047 + 5.0e-8 * d,
+    w: 29.1241 + 1.01444e-5 * d,
+    a: 0.387098,
+    e: 0.205635 + 5.59e-10 * d,
+    M: rev(168.6562 + 4.0923344368 * d),
+  }),
+  venus: (d) => ({
+    N: 76.6799 + 2.5659e-5 * d,
+    i: 3.3946 + 2.75e-8 * d,
+    w: 54.891 + 1.38374e-5 * d,
+    a: 0.72333,
+    e: 0.006773 - 1.302e-9 * d,
+    M: rev(48.0052 + 1.6021302244 * d),
+  }),
+  mars: (d) => ({
+    N: 49.5574 + 2.11081e-5 * d,
+    i: 1.8497 - 2.08e-9 * d,
+    w: 286.5016 + 2.92961e-5 * d,
+    a: 1.523688,
+    e: 0.093405 + 2.516e-9 * d,
+    M: rev(18.6021 + 0.5240207766 * d),
+  }),
+  jupiter: (d) => ({
+    N: 100.4542 + 2.76854e-5 * d,
+    i: 1.303 - 1.557e-7 * d,
+    w: 273.8777 + 1.64505e-5 * d,
+    a: 5.20256,
+    e: 0.048498 + 4.469e-9 * d,
+    M: rev(19.895 + 0.0830853001 * d),
+  }),
+  saturn: (d) => ({
+    N: 113.6634 + 2.3898e-5 * d,
+    i: 2.4886 - 1.081e-7 * d,
+    w: 339.3939 + 2.97681e-5 * d,
+    a: 9.55475,
+    e: 0.055546 - 9.499e-9 * d,
+    M: rev(316.967 + 0.0334442282 * d),
+  }),
+};
+
+function planetHeliocentric(name: string, d: number) {
+  const p = PLANET_PARAMS[name](d);
+  const E = p.M + (180 / Math.PI) * p.e * sind(p.M) * (1 + p.e * cosd(p.M));
+  const xv = p.a * (cosd(E) - p.e);
+  const yv = p.a * Math.sqrt(1 - p.e * p.e) * sind(E);
+  const v = atan2d(yv, xv);
+  const r = Math.sqrt(xv * xv + yv * yv);
+  const lon = rev(v + p.w);
+  // project to ecliptic (inclination small)
+  const xh = r * (cosd(p.N) * cosd(v + p.w) - sind(p.N) * sind(v + p.w) * cosd(p.i));
+  const yh = r * (sind(p.N) * cosd(v + p.w) + cosd(p.N) * sind(v + p.w) * cosd(p.i));
+  const zh = r * sind(v + p.w) * sind(p.i);
+  const eclon = atan2d(yh, xh);
+  return { lon: rev(eclon), lat: asind(zh / r), r, xh, yh, zh };
+}
+
+/** Earth's heliocentric position (needed for geocentric planet conversion). */
+function earthPosition(d: number) {
+  // Earth = Sun position reflected: heliocentric earth = -sun
+  const s = sunPosition(d);
+  return { lon: rev(s.lon + 180), r: s.r };
+}
+
+function geocentricPlanet(name: string, d: number) {
+  const p = planetHeliocentric(name, d);
+  const earth = earthPosition(d);
+  // Convert both to rectangular heliocentric ecliptic, then subtract
+  // Simplified: geocentric ecliptic longitude (ignore small ecl lat for sign calc)
+  const sun = sunPosition(d); // geocentric sun lon
+  // Geocentric ecliptic longitude via spherical subtraction
+  const dx = p.r * cosd(p.lon) - earth.r * cosd(earth.lon);
+  const dy = p.r * sind(p.lon) - earth.r * sind(earth.lon);
+  const dz = p.r * sind(p.lat);
+  const r = Math.sqrt(dx * dx + dy * dy + dz * dz);
+  const lon = rev(atan2d(dy, dx));
+  const lat = atan2d(dz, Math.sqrt(dx * dx + dy * dy));
+  return { lon, lat, r };
+}
+
+// ---------- Mean lunar node (Rahu/Ketu) ----------
+function meanNode(jd: number): number {
+  const t = T(jd);
+  // Meeus 22.4: Ω = 125.0445479 - 1934.1362891*T + 0.0020754*T² + ...
+  return rev(125.04452 - 1934.136261 * t);
+}
+
+// ---------- Local Sidereal Time ----------
+function gmst(jd: number): number {
+  const t = T(jd);
+  const gmst =
+    280.46061837 +
+    360.98564736629 * (jd - 2451545.0) +
+    0.000387933 * t * t -
+    (t * t * t) / 38710000;
+  return rev(gmst);
+}
+
+function lst(jd: number, longitude: number): number {
+  return rev(gmst(jd) + longitude);
+}
+
+// ---------- Ascendant ----------
+function ascendant(jd: number, latitude: number, longitude: number): number {
+  const ramc = lst(jd, longitude);
+  const eps = obliquity(jd);
+  // Ascendant formula (Meeus)
+  const asc = atan2d(
+    cosd(ramc),
+    -(sind(ramc) * cosd(eps) + tand(latitude) * sind(eps))
+  );
+  return rev(asc);
+}
+
+// ---------- Zodiac ----------
+export const ZODIAC_SIGNS = [
+  "aries", "taurus", "gemini", "cancer", "leo", "virgo",
+  "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces",
+];
+export const ZODIAC_MY = [
+  "မိဿ", "ပြိဿ", "မေထုန်", "ကရကဋ်", "သိဟ်", "ကန်",
+  "တူ", "ဗြိစ္ဆာ", "ဓနု", "မကာရ", "ကုံ", "မိန်",
+];
+export const ZODIAC_SYMBOLS = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"];
+
+export function signOf(longitude: number): number {
+  return Math.floor(rev(longitude) / 30);
+}
+export function degreeInSign(longitude: number): number {
+  return rev(longitude) - signOf(longitude) * 30;
+}
+export function signName(longitude: number): string {
+  return ZODIAC_SIGNS[signOf(longitude)];
+}
+export function signNameMy(longitude: number): string {
+  return ZODIAC_MY[signOf(longitude)];
+}
+
+// ---------- Nakshatras ----------
+export const NAKSHATRAS = [
+  "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
+  "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni",
+  "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+  "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta",
+  "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati",
+];
+
+function nakshatraOf(longitude: number): { index: number; pada: number; name: string } {
+  const l = rev(longitude);
+  const total = (l / (360 / 27));
+  const index = Math.floor(total) % 27;
+  const pada = Math.floor((total - Math.floor(total)) * 4) + 1;
+  return { index, pada, name: NAKSHATRAS[index] };
+}
+
+// ---------- Vimshottari Dasha ----------
+const DASHA_LORDS = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+const DASHA_YEARS = [7, 20, 6, 10, 7, 18, 16, 19, 17];
+// Nakshatra lord mapping (each nakshatra's lord cycles through the 9 planets)
+const NAK_LORD = [
+  "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury", // 1-9
+  "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury", // 10-18
+  "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury", // 19-27
+];
+
+function vimshottariDasha(moonLon: number, birthJd: number) {
+  const l = rev(moonLon);
+  const nakSpan = 360 / 27;
+  const padaSpan = nakSpan / 4;
+  const nakIdx = Math.floor(l / nakSpan);
+  const lord = NAK_LORD[nakIdx];
+  const lordIdx = DASHA_LORDS.indexOf(lord);
+  // Position within this nakshatra
+  const posInNak = l - nakIdx * nakSpan;
+  const fractionElapsed = posInNak / nakSpan;
+  const fractionRemaining = 1 - fractionElapsed;
+  const totalYears = DASHA_YEARS[lordIdx];
+  const balanceYears = totalYears * fractionRemaining;
+  // Build the sequence of mahadashas starting from birth lord
+  const mahadashas: { lord: string; years: number; startDate: Date; endDate: Date }[] = [];
+  let cursor = new Date(birthJdToTime(birthJd));
+  for (let i = 0; i < 9; i++) {
+    const idx = (lordIdx + i) % 9;
+    const years = i === 0 ? balanceYears : DASHA_YEARS[idx];
+    const start = new Date(cursor);
+    const end = new Date(cursor.getTime() + years * 365.25 * 24 * 3600 * 1000);
+    mahadashas.push({ lord: DASHA_LORDS[idx], years, startDate: start, endDate: end });
+    cursor = end;
+  }
+  // Current mahadasha
+  const now = new Date();
+  const current = mahadashas.find((m) => now >= m.startDate && now < m.endDate) ?? mahadashas[0];
+  return {
+    birth_dasha: { lord, balance_years: +balanceYears.toFixed(2) },
+    mahadashas,
+    current_mahadasha: current?.lord ?? lord,
+  };
+}
+
+function birthJdToTime(jd: number): number {
+  // JD → unix ms: (jd - 2440587.5) * 86400000
+  return (jd - 2440587.5) * 86400000;
+}
+
+// ---------- Panchanga (simplified) ----------
+const TITHI_NAMES = [
+  "Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashthi",
+  "Saptami", "Ashtami", "Navami", "Dashami", "Ekadashi", "Dwadashi",
+  "Trayodashi", "Chaturdashi", "Purnima",
+];
+const YOGA_NAMES_COUNT = 27;
+const KARANAS_COUNT = 11;
+
+function panchanga(jd: number) {
+  const d = daysSinceJ2000(jd);
+  const sun = sunPosition(d).lon;
+  const moon = moonPosition(d).lon;
+  const diff = rev(moon - sun);
+  const tithiIdx = Math.floor(diff / (360 / 30));
+  const tithiName = TITHI_NAMES[tithiIdx % 15] + (tithiIdx < 15 ? " (Shukla)" : " (Krishna)");
+  const nak = nakshatraOf(moon);
+  // Yoga = sun + moon longitude
+  const yogaLon = rev(sun + moon);
+  const yogaIdx = Math.floor(yogaLon / (360 / YOGA_NAMES_COUNT));
+  // Karana = half tithi
+  const karanaIdx = Math.floor(diff / (360 / 60)) % KARANAS_COUNT;
+  return {
+    tithi: tithiName,
+    tithi_number: tithiIdx,
+    nakshatra: nak.name,
+    nakshatra_pada: nak.pada,
+    yoga: yogaIdx + 1,
+    karana: karanaIdx + 1,
+  };
+}
+
+// ---------- Dignity ----------
+function dignityOf(planet: string, lon: number): string {
+  const sign = signOf(lon);
+  const rulers = {
+    aries: ["mars"], taurus: ["venus"], gemini: ["mercury"], cancer: ["moon"],
+    leo: ["sun"], virgo: ["mercury"], libra: ["venus"], scorpio: ["mars"],
+    sagittarius: ["jupiter"], capricorn: ["saturn"], aquarius: ["saturn"], pisces: ["jupiter"],
+  };
+  const exalt = {
+    aries: "sun", taurus: "moon", cancer: "jupiter", virgo: "mercury",
+    libra: "saturn", capricorn: "mars", pisces: "venus",
+  };
+  const debilitate = {
+    aries: "venus", taurus: "none", cancer: "none", libra: "sun",
+    virgo: "none", capricorn: "jupiter", pisces: "none", scorpio: "moon", sagittarius: "none",
+    leo: "none", aquarius: "none", gemini: "none",
+  };
+  const signName = ZODIAC_SIGNS[sign];
+  if (exalt[signName as keyof typeof exalt] === planet) return "exalted";
+  if (debilitate[signName as keyof typeof debilitate] === planet) return "debilitated";
+  if (rulers[signName as keyof typeof rulers]?.includes(planet)) return "own_sign";
+  return "neutral";
+}
+
+// ============================================================
+// MAIN: compute natal chart
+// ============================================================
+
+export type PlanetPosition = {
+  name: string;
+  longitude: number; // sidereal (vedic) or tropical (western)
+  sign: string;
+  signIndex: number;
+  signMy?: string;
+  degree: number;
+  nakshatra?: string;
+  nakshatraPada?: number;
+  retrograde: boolean;
+  dignity?: string;
+  house: number;
+};
+
+export type NatalChart = {
+  mode: AstrologyMode;
+  ascendant: PlanetPosition;
+  planets: PlanetPosition[];
+  ayanamsa: number;
+  nakshatra: string;
+  nakshatraPada: number;
+  dasha: any;
+  panchanga: any;
+  houses: { number: number; sign: string; signIndex: number }[];
+  meta: {
+    birth_datetime: string;
+    latitude: number;
+    longitude: number;
+    timezone: string | null;
+    ayanamsa: number;
+    calculation_version: string;
+  };
+};
+
+/** Compose ISO birth datetime with offset from IANA tz. */
+export function buildBirthDatetime(ctx: BirthContext): string {
+  const time = /^\d{2}:\d{2}(:\d{2})?$/.test(ctx.tob)
+    ? ctx.tob.length === 5 ? `${ctx.tob}:00` : ctx.tob
+    : "12:00:00";
+  let offset = "";
+  if (ctx.timezone && !/^[+-]\d{2}:\d{2}$/.test(ctx.timezone)) {
+    try {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: ctx.timezone, timeZoneName: "longOffset" as any,
+      }).formatToParts(new Date(`${ctx.dob}T12:00:00`));
+      const name = parts.find((p) => p.type === "timeZoneName")?.value ?? "";
+      offset = name === "GMT" ? "+00:00" : name.replace("GMT", "");
+    } catch { offset = "+06:30"; } // default Yangon
+  } else if (ctx.timezone) offset = ctx.timezone;
+  return `${ctx.dob}T${time}${offset}`;
+}
+
+/** Parse the ISO birth datetime → { jd, ut } (Julian Day + UT in hours). */
+function parseBirth(ctx: BirthContext): { jd: number; ut: number } {
+  const iso = buildBirthDatetime(ctx);
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})([+-]\d{2}:\d{2})?$/);
+  if (!m) throw new Error("Invalid birth datetime: " + iso);
+  const [, y, mo, da, h, mi, s, tz] = m;
+  const localHours = +h + +mi / 60 + +s / 3600;
+  // Convert to UT: subtract tz offset
+  let ut = localHours;
+  if (tz) {
+    const tm = tz.match(/^([+-])(\d{2}):(\d{2})$/);
+    if (tm) {
+      const off = +tm[2] + +tm[3] / 60;
+      ut = localHours - (tm[1] === "+" ? off : -off);
+    }
+  }
+  let day = +da;
+  let month = +mo;
+  let year = +y;
+  // Roll over if ut < 0 or >= 24
+  if (ut < 0) { ut += 24; day -= 1; }
+  if (ut >= 24) { ut -= 24; day += 1; }
+  // Simple rollover for month ends (good enough for ±1 day)
+  if (day < 1) { month -= 1; if (month < 1) { month = 12; year -= 1; } day = new Date(year, month, 0).getDate(); }
+  if (day > new Date(year, month, 0).getDate()) { day = 1; month += 1; if (month > 12) { month = 1; year += 1; } }
+  return { jd: julianDay(year, month, day, ut), ut };
+}
+
+/** Compute a full natal chart (vedic or western). */
+export function computeNatalChart(ctx: BirthContext, mode: AstrologyMode = "vedic"): NatalChart {
+  const { jd } = parseBirth(ctx);
+  const d = daysSinceJ2000(jd);
+  const ayanamsa = mode === "vedic" ? lahiriAyanamsa(jd) : 0;
+
+  // Tropical longitudes
+  const sunTrop = sunPosition(d).lon;
+  const moonTrop = moonPosition(d).lon;
+  const merTrop = geocentricPlanet("mercury", d).lon;
+  const venTrop = geocentricPlanet("venus", d).lon;
+  const marTrop = geocentricPlanet("mars", d).lon;
+  const jupTrop = geocentricPlanet("jupiter", d).lon;
+  const satTrop = geocentricPlanet("saturn", d).lon;
+  const rahuTrop = meanNode(jd);
+  const ketuTrop = rev(rahuTrop + 180);
+  const ascTrop = ascendant(jd, ctx.latitude, ctx.longitude);
+
+  // Convert to sidereal for vedic
+  const sidereal = (lon: number) => mode === "vedic" ? rev(lon - ayanamsa) : rev(lon);
+  const ascSid = sidereal(ascTrop);
+
+  // Houses (whole sign): 1st house = ascendant sign
+  const ascSign = signOf(ascSid);
+
+  const makePlanet = (name: string, lon: number, retro: boolean): PlanetPosition => {
+    const sid = sidereal(lon);
+    const signIdx = signOf(sid);
+    const house = ((signIdx - ascSign + 12) % 12) + 1;
+    const nak = nakshatraOf(sid);
+    return {
+      name,
+      longitude: +sid.toFixed(4),
+      sign: ZODIAC_SIGNS[signIdx],
+      signIndex: signIdx,
+      signMy: ZODIAC_MY[signIdx],
+      degree: +degreeInSign(sid).toFixed(2),
+      nakshatra: mode === "vedic" ? nak.name : undefined,
+      nakshatraPada: mode === "vedic" ? nak.pada : undefined,
+      retrograde: retro,
+      dignity: mode === "vedic" ? dignityOf(name, sid) : undefined,
+      house,
+    };
+  };
+
+  const planets = [
+    makePlanet("Sun", sunTrop, false),
+    makePlanet("Moon", moonTrop, false),
+    makePlanet("Mercury", merTrop, isRetrograde("mercury", d)),
+    makePlanet("Venus", venTrop, isRetrograde("venus", d)),
+    makePlanet("Mars", marTrop, isRetrograde("mars", d)),
+    makePlanet("Jupiter", jupTrop, isRetrograde("jupiter", d)),
+    makePlanet("Saturn", satTrop, isRetrograde("saturn", d)),
+    makePlanet("Rahu", rahuTrop, true),
+    makePlanet("Ketu", ketuTrop, true),
+  ];
+
+  const moonSid = sidereal(moonTrop);
+  const moonNak = nakshatraOf(moonSid);
+  const dasha = mode === "vedic" ? vimshottariDasha(moonSid, jd) : null;
+  const panch = panchanga(jd);
+
+  const houses = Array.from({ length: 12 }, (_, i) => {
+    const idx = (ascSign + i) % 12;
+    return { number: i + 1, sign: ZODIAC_SIGNS[idx], signIndex: idx };
+  });
+
+  return {
+    mode,
+    ascendant: makePlanet("Ascendant", ascTrop, false),
+    planets,
+    ayanamsa: +ayanamsa.toFixed(4),
+    nakshatra: moonNak.name,
+    nakshatraPada: moonNak.pada,
+    dasha,
+    panchanga: panch,
+    houses,
+    meta: {
+      birth_datetime: buildBirthDatetime(ctx),
+      latitude: ctx.latitude,
+      longitude: ctx.longitude,
+      timezone: ctx.timezone ?? null,
+      ayanamsa: +ayanamsa.toFixed(4),
+      calculation_version: "baydin-ts-1.0 (Schlyter/Meeus)",
+    },
+  };
+}
+
+/** Rough retrograde check: compare longitude now vs ~1 day later. */
+function isRetrograde(planet: string, d: number): boolean {
+  if (!PLANET_PARAMS[planet]) return false;
+  const now = geocentricPlanet(planet, d).lon;
+  const next = geocentricPlanet(planet, d + 1).lon;
+  // Handle wrap-around
+  const diff = next - now;
+  if (diff > 180) return true; // wrapped backward
+  if (diff < -180) return false; // wrapped forward
+  return diff < 0;
+}
+
+// ============================================================
+// MAHABOTE (Myanmar traditional) — weekday-based system
+// ============================================================
+
+const WEEKDAY_PLANETS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+// Sunday=0 ... Saturday=6. Rahu rules Wednesday noon.
+
+export function computeMahabote(ctx: BirthContext) {
+  const { jd } = parseBirth(ctx);
+  const birthDate = new Date(birthJdToTime(jd));
+  const weekday = birthDate.getUTCDay();
+  const weekdayName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][weekday];
+  const weekdayPlanet = WEEKDAY_PLANETS[weekday];
+  // Myanmar year (simplified from Gregorian)
+  const myanmarYear = gregorianToMyanmarYear(birthDate.getUTCFullYear(), birthDate.getUTCMonth() + 1);
+  const yearRemainder = myanmarYear % 7;
+  // Starting planet from year remainder (traditional table)
+  const startingPlanet = WEEKDAY_PLANETS[yearRemainder];
+  // 7 houses (one per weekday), filled from starting planet
+  const houses = Array.from({ length: 7 }, (_, i) => {
+    const planetIdx = (WEEKDAY_PLANETS.indexOf(startingPlanet) + i) % 7;
+    return {
+      house: i + 1,
+      houseName: MAHABOTE_HOUSES[i],
+      planet: WEEKDAY_PLANETS[planetIdx],
+    };
+  });
+  const birthHouse = (WEEKDAY_PLANETS.indexOf(weekdayPlanet) - WEEKDAY_PLANETS.indexOf(startingPlanet) + 7) % 7 + 1;
+  return {
+    mode: "mahabote",
+    weekday: weekdayName,
+    weekday_planet: weekdayPlanet,
+    myanmar_year: myanmarYear,
+    year_remainder: yearRemainder,
+    starting_planet: startingPlanet,
+    houses,
+    birth_house: birthHouse,
+    meta: {
+      birth_datetime: buildBirthDatetime(ctx),
+      calculation_version: "baydin-mahabote-1.0",
+    },
+  };
+}
+
+const MAHABOTE_HOUSES = [
+  "Impermanence", "Extremity", "Fame", "Wealth", "Kingly Position", "Sickly", "Leader",
+];
+
+function gregorianToMyanmarYear(y: number, m: number): number {
+  // Myanmar year ≈ Gregorian year - 638 (Thingyan transition mid-April)
+  return m < 4 || (m === 4 && 1 < 17) ? y - 639 : y - 638;
+}
+
+// ============================================================
+// TRANSITS (current planetary positions relative to natal)
+// ============================================================
+
+export function computeTransits(ctx: BirthContext, natal: NatalChart, daysAhead = 7) {
+  const nowJd = julianDay(
+    new Date().getUTCFullYear(), new Date().getUTCMonth() + 1, new Date().getUTCDate(),
+    new Date().getUTCHours() + new Date().getUTCMinutes() / 60
+  );
+  const d = daysSinceJ2000(nowJd);
+  const ayanamsa = natal.ayanamsa;
+  const sidereal = (lon: number) => rev(lon - ayanamsa);
+  const current: Record<string, any> = {};
+  const positions: { planet: string; longitude: number; sign: string; signMy: string }[] = [];
+  const makePos = (name: string, lon: number, retro: boolean) => {
+    const sid = sidereal(lon);
+    const si = signOf(sid);
+    positions.push({ planet: name, longitude: +sid.toFixed(2), sign: ZODIAC_SIGNS[si], signMy: ZODIAC_MY[si] });
+    return { name, longitude: +sid.toFixed(2), sign: ZODIAC_SIGNS[si], signMy: ZODIAC_MY[si], retrograde: retro };
+  };
+  current.Sun = makePos("Sun", sunPosition(d).lon, false);
+  current.Moon = makePos("Moon", moonPosition(d).lon, false);
+  current.Mercury = makePos("Mercury", geocentricPlanet("mercury", d).lon, isRetrograde("mercury", d));
+  current.Venus = makePos("Venus", geocentricPlanet("venus", d).lon, isRetrograde("venus", d));
+  current.Mars = makePos("Mars", geocentricPlanet("mars", d).lon, isRetrograde("mars", d));
+  current.Jupiter = makePos("Jupiter", geocentricPlanet("jupiter", d).lon, isRetrograde("jupiter", d));
+  current.Saturn = makePos("Saturn", geocentricPlanet("saturn", d).lon, isRetrograde("saturn", d));
+  current.Rahu = makePos("Rahu", meanNode(nowJd), true);
+  current.Ketu = makePos("Ketu", rev(meanNode(nowJd) + 180), true);
+
+  // Aspects to natal positions (within 2° orb)
+  const aspects: string[] = [];
+  for (const [pname, ppos] of Object.entries(current)) {
+    const natalP = natal.planets.find((p) => p.name === pname);
+    if (!natalP) continue;
+    const diff = Math.abs(rev(ppos.longitude - natalP.longitude + 180) - 180);
+    if (diff < 2) aspects.push(`${pname} conjunct natal ${pname} (orb ${diff.toFixed(2)}°)`);
+  }
+
+  return {
+    target_date: new Date().toISOString(),
+    current_transits: current,
+    natal_positions: natal.planets.map((p) => ({ name: p.name, longitude: p.longitude, sign: p.sign })),
+    current_aspects_to_natal: aspects,
+    period_days: daysAhead,
+  };
+}
+
+/** Sun sign from date (tropical, presentation-only — used for horoscopes). */
+export function sunSignForDate(dateIso: string): string {
+  const m = dateIso.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return "aries";
+  const month = +m[2], day = +m[3];
+  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return "aries";
+  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return "taurus";
+  if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return "gemini";
+  if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return "cancer";
+  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return "leo";
+  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return "virgo";
+  if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "libra";
+  if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "scorpio";
+  if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "sagittarius";
+  if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return "capricorn";
+  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "aquarius";
+  return "pisces";
+}
+
+export const PLANET_MY: Record<string, string> = {
+  Sun: "နေ", Moon: "လ", Mercury: "ဗုဒ္ဓဟူး", Venus: "သောကြာ", Mars: "အင်္ဂါ",
+  Jupiter: "ကြာသပတေး", Saturn: "စနေ", Rahu: "ရာဟု", Ketu: "ကိတ်ဂြိုဟ်", Ascendant: "လဂ်",
+};

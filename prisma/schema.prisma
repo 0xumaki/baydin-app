@@ -1,8 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// ============================================================
+// BAYDIN — Unified Prisma Schema
+// Merges Lumina (tarot/manifest/frequency) + GURU (astrology/chat/horoscope)
+// + Luck credit economy + reseller + referral system.
+// Provider: SQLite (per project scaffold).
+// ============================================================
 
 generator client {
   provider = "prisma-client-js"
@@ -13,20 +14,276 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ============================================================
+// AUTH & IDENTITY
+// ============================================================
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String    @id @default(cuid())
+  email          String    @unique
+  hashedPassword String
+  name           String?
+  // Role: "user" | "reseller" | "admin"
+  role           String    @default("user")
+  // Preferred language (GURU 5-language support): my, en, th, kh, lo
+  language       String    @default("my")
+  // Birth data for astrology (JSON: { dob, tob, latitude, longitude, timezone, gender, place })
+  birthData      String?
+  // Referral system
+  referralCode   String    @unique
+  referredById   String?   @map("referred_by")
+  referredBy     User?     @relation("Referrals", fields: [referredById], references: [id])
+  referrals      User[]    @relation("Referrals")
+  // Gamification / virality
+  streak         Int       @default(0)
+  lastDailyAt    DateTime? @map("last_daily_at")
+  totalLuckEarned Int      @default(0) @map("total_luck_earned")
+  totalLuckSpent Int       @default(0) @map("total_luck_spent")
+  // Reseller system (admin-whitelisted)
+  resellerTier   String?   @map("reseller_tier") // bronze|silver|gold|platinum
+  resellerSince  DateTime? @map("reseller_since")
+  resellerPool   Int       @default(0) @map("reseller_pool") // sellable inventory (wholesale Luck)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  luckBalance     Int       @default(0) @map("luck_balance")
+
+  conversations   Conversation[]
+  tarotReadings   TarotReading[]
+  goals           Goal[]
+  transactions    LuckTransaction[]
+  purchases       LuckPurchase[]
+  dailyRewards    DailyReward[]
+  transfersOut    LuckTransfer[] @relation("TransferFrom")
+  transfersIn      LuckTransfer[] @relation("TransferTo")
+
+  @@index([referredById])
+  @@index([role])
+  @@map("users")
 }
 
-model Post {
+// ============================================================
+// CONVERSATIONS & MESSAGES (ChatGPT-style astrologer chat)
+// ============================================================
+
+model Conversation {
+  id              String    @id @default(cuid())
+  userId          String    @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title           String    @default("New consultation")
+  // mode: "astrologer" | "tarot" | "horoscope" | "birth-chart" | "insight"
+  mode            String    @default("astrologer")
+  // astrology mode for astrologer conversations: "vedic" | "western" | "mahabote"
+  astrologyMode   String?   @map("astrology_mode")
+  // Cached birth context JSON used for this conversation
+  birthContext    String?   @map("birth_context")
+  // Cached chart data JSON (so we don't recompute every turn)
+  chartData       String?   @map("chart_data")
+  // Running totals for this conversation
+  messageCount    Int       @default(0) @map("message_count")
+  totalLuckCost   Int       @default(0) @map("total_luck_cost")
+  pinned          Boolean   @default(false)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  messages        Message[]
+
+  @@index([userId, updatedAt])
+  @@map("conversations")
+}
+
+model Message {
+  id              String    @id @default(cuid())
+  conversationId  String    @map("conversation_id")
+  conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role            String    // "user" | "assistant" | "system"
+  content         String
+  // metadata JSON: { highlights, guidance, interpretationType, luckCost, tokensUsed, model, chartUsed, skill }
+  metadata        String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+// ============================================================
+// LUCK CREDIT ECONOMY
+// ============================================================
+
+// Immutable ledger of every Luck movement (purchase, spend, reward, grant, transfer).
+model LuckTransaction {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount       Int      // positive = credit, negative = debit
+  balanceAfter Int      @map("balance_after")
+  // type: "purchase" | "spend" | "daily_reward" | "referral_bonus" | "admin_grant" | "reseller_transfer_in" | "reseller_transfer_out" | "signup_bonus"
+  type         String
+  // feature that was paid for (for spend): "astrologer_chat" | "tarot" | "birth_chart" | "insight" | "life_report" | "compatibility" | "horoscope" | "mahabote"
+  feature      String?
+  description  String?
+  referenceId  String?  @map("reference_id") // purchaseId or conversationId
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([type])
+  @@map("luck_transactions")
+}
+
+// A Luck purchase order (regular or reseller).
+model LuckPurchase {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // tier id from config, e.g. "spark", "basic", "popular", "value", "premium", "luminary"
+  // or reseller tiers: "reseller_bronze" etc.
+  tierId        String    @map("tier_id")
+  tierKind      String    @default("regular") @map("tier_kind") // "regular" | "reseller"
+  mmkAmount     Int       @map("mmk_amount")
+  luckAmount    Int       @map("luck_amount") // base luck
+  bonusLuck     Int       @default(0) @map("bonus_luck")
+  totalLuck     Int       @map("total_luck") // luck + bonus
+  // status: "pending" | "completed" | "failed" | "refunded"
+  status        String    @default("pending")
+  paymentMethod String?   @map("payment_method") // "kbz" | "wave" | "aya" | "cash" | "card" | "manual"
+  paymentRef    String?   @map("payment_ref") // user-submitted transaction id / screenshot ref
+  notes         String?
+  // For reseller purchases, where the luck was allocated:
+  //   - "balance" → added to reseller's spendable luckBalance (can use for self)
+  //   - "pool"    → added to resellerPool (wholesale inventory to resell)
+  allocationTarget String? @map("allocation_target") // "balance" | "pool"
+  completedAt   DateTime? @map("completed_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("luck_purchases")
+}
+
+// Reseller → end-user Luck transfer (the "resell" action).
+model LuckTransfer {
+  id            String   @id @default(cuid())
+  fromUserId    String   @map("from_user_id") // reseller
+  fromUser      User     @relation("TransferFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId      String   @map("to_user_id") // recipient
+  toUser        User     @relation("TransferTo", fields: [toUserId], references: [id], onDelete: Cascade)
+  amount        Int      // Luck transferred
+  // Reseller's recorded sale price in MMK (what they charged the buyer, off-platform)
+  saleMmk       Int?     @map("sale_mmk")
+  note          String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@map("luck_transfers")
+}
+
+// Tracks daily reward claims (1 free Luck per day streak mechanic).
+model DailyReward {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // date in YYYY-MM-DD (server timezone) — one reward per user per day
+  date      String
+  amount    Int      // Luck granted
+  dayNumber Int      @map("day_number") // streak day number
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@map("daily_rewards")
+}
+
+// ============================================================
+// LUMINA — TAROT (free feature, kept as legacy data)
+// ============================================================
+
+model TarotReading {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question      String
+  // spreadType: "yes-no" | "single" | "three-card" | "celtic-cross" | "relationship" | "career" | "card-of-day"
+  spreadType    String   @map("spread_type")
+  // JSON array of { id, reversed, position }
+  cardsJson     String   @map("cards_json")
+  interpretation String
+  saved         Boolean  @default(false)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([userId, saved])
+  @@map("tarot_readings")
+}
+
+// ============================================================
+// LUMINA — MANIFESTATION (free feature)
+// ============================================================
+
+model Goal {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  intention    String   // e.g. "abundance", "love"
+  statement    String   // full affirmation
+  reminderTime String?  @map("reminder_time") // "HH:mm"
+  targetDate   String?  @map("target_date")
+  status       String   @default("active") // "active" | "achieved" | "archived"
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  confirmations Confirmation[]
+
+  @@index([userId, status])
+  @@map("goals")
+}
+
+model Confirmation {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  goalId    String   @map("goal_id")
+  goal      Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  date      String   // YYYY-MM-DD
+  note      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([goalId, date])
+  @@index([userId, date])
+  @@map("confirmations")
+}
+
+// ============================================================
+// LUMINA — MOOD + RITUAL (free features, light)
+// ============================================================
+
+model MoodEntry {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  date      String   // YYYY-MM-DD
+  mood      Int      // 1-5
+  note      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@map("mood_entries")
+}
+
+model RitualLog {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  date          String   // YYYY-MM-DD
+  step1Cleanse  Boolean  @default(false) @map("step1_cleanse")
+  step2Manifest Boolean  @default(false) @map("step2_manifest")
+  step3Tarot    Boolean  @default(false) @map("step3_tarot")
+  step4Balance  Boolean  @default(false) @map("step4_balance")
+  completed     Boolean  @default(false)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@map("ritual_logs")
 }
