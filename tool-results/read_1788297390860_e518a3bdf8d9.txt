@@ -1,0 +1,302 @@
+     1→# Lumina — Tarot · Manifestation · Frequencies PWA
+     2→
+     3→## Project Status
+     4→Building a mobile-responsive, PWA-installable tarot + manifestation + frequency app
+     5→using the "Lumina Cybernetics" design language (black bg, glass surfaces, gold #C5A87C
+     6→accent, sage #7A8680, light-green #B5CD7E, Inter thin weights, 4px rhythm, glass +
+     7→gradient-border shells).
+     8→
+     9→### Confirmed decisions
+    10→1. AI LLM tarot interpretations via z-ai-web-dev-sdk (free = short Yes/No + 1 line; premium = deep)
+    11→2. Anonymous device-ID identity + mock premium toggle + realistic upgrade screen (no real Stripe)
+    12→3. Web Audio API engine: pure tones + binaural + ambient pad, auto-intention detection
+    13→4. Notifications API + Badging API + in-app Widget Preview (no native widget possible on web)
+    14→5. Public-domain Rider-Waite card imagery (download to /public/tarot)
+    15→
+    16→### Tech
+    17→Next.js 16 App Router, TS, Tailwind 4, shadcn/ui (new-york), Prisma/SQLite, Zustand,
+    18→TanStack Query, framer-motion, z-ai-web-dev-sdk. Single `/` route, tab-based mobile app.
+    19→
+    20→---
+    21→Task ID: 1
+    22→Agent: main
+    23→Task: Foundation — design system, Prisma schema, PWA manifest/SW/icons, layout, providers, app shell
+    24→
+    25→Work Log:
+    26→- (in progress)
+    27→
+    28→---
+    29→Task ID: 2
+    30→Agent: tarot-data-agent
+    31→Task: Generate 78-card Rider-Waite tarot dataset
+    32→
+    33→Work Log:
+    34→- Read prior worklog; confirmed Next.js + TS + Tailwind 4 Lumina stack and design intent.
+    35→- Authored /home/z/my-project/src/lib/tarot-data.ts containing TarotCard type and TAROT_DECK const array with all 78 cards.
+    36→- Major arcana (0–21): Fool through World, with elemental, astrological, and numerological correspondences authentic to Rider-Waite-Smith tradition. Used celestial/planetary glyphs (☉ ☽ ♀ ♂ ♃ ♄ ♅ ♆ ♇ ☿) and zodiac signs (♈–♓) plus thematic emoji for symbols.
+    37→- Minor arcana: 14 Wands (Fire, 🜂), 14 Cups (Water, 🜄), 14 Swords (Air, 🜁), 14 Pentacles (Earth, 🜃). Alchemical element glyph used consistently per suit; court cards numbered Page=11, Knight=12, Queen=13, King=14.
+    38→- Each card carries 4–5 upright/reversed keywords, 2–4 sentence meanings, yes/no upright+reversed, first-person present-tense affirmation, and 1–3 intentionTags drawn strictly from the controlled 16-word vocabulary.
+    39→- Exported 5 helper functions: getCardById, getAllCards, getMajorArcana, getMinorArcana, getCardsByIntention. File is side-effect free (no fs, no "use client").
+    40→- Verified with bun: count=78, unique ids=78, suits=[major,wands,cups,swords,pentacles]. Per-suit counts: major 22, wands 14, cups 14, swords 14, pentacles 14. All major numbers 0–21 present, all minor suits 1–14 present. No out-of-vocabulary tags. All yes/no values valid. Helper functions return correct counts.
+    41→- Ran tsc --noEmit against the file: zero errors, strict-compatible.
+    42→
+    43→Stage Summary:
+    44→- Produced /home/z/my-project/src/lib/tarot-data.ts (~1100 lines) — production-quality 78-card Rider-Waite-Smith dataset with authentic symbolism, astrology, numerology, meanings, affirmations, yes/no tendencies, unicode symbols, and intention tags.
+    45→- Verified counts: 22 Major Arcana + 56 Minor Arcana (14 × 4 suits) = 78 unique slugs.
+    46→- Notable choices: alchemical glyphs (🜂🜄🜁🜃) for minor suits for elegance and per-suit consistency; celestial/zodiac glyphs for major arcana symbols; yes/no logic tuned thoughtfully (Sun=Yes, Tower=No, Two of Swords=Maybe, Death upright=No/reversed=Maybe); reversed meaning direction generally weakens or flips upright tendency.
+    47→- Dataset is import-ready for both server and client components and powers the auto-frequency matching via intentionTags.
+    48→
+    49→---
+    50→Task ID: 1
+    51→Agent: main
+    52→Task: Foundation + full app build (tasks 3-9) + self-verification
+    53→
+    54→Work Log:
+    55→- Built Lumina design system in globals.css: black bg, glass surfaces (rgba(18,24,21,0.5) + 24px backdrop blur), gold #C5A87C / sage / leaf palette, gradient-border shell, aurora backdrop, gold text gradient, premium shimmer, safe-area + scrollbar utilities. Inter font (300/400/500/600).
+    56→- Prisma schema: Device (anonymous device-id identity, isPremium mock), Reading, Goal, Confirmation (unique per goal per day), FrequencySession, UsageLog (unique per device per day). Pushed to SQLite.
+    57→- PWA: public/manifest.webmanifest (standalone, portrait, shortcuts to Tarot/Manifest/Frequency), public/sw.js (precache shell + runtime image cache + offline fallback), public/offline.html, icons (192/512/1024/maskable/apple-touch) generated via AI image-gen + sharp, card-back.png generated.
+    58→- Layout: Inter font, full PWA metadata + viewport (cover, no-scale for app feel), apple-mobile-web-app tags, SW register component, Providers (QueryClient + next-themes forced dark).
+    59→- Core lib: device.ts (anonymous device upsert via x-device-id header), limits.ts (free=2 readings/1 goal/30s freq; premium=∞; 6 spreads incl. Celtic Cross), frequencies.ts (12 intention presets: abundance 888Hz, love 639, healing 528, intuition 852, transformation 741, protection 174, clarity 432, peace 396, creativity 417, spiritual-growth 963, confidence, release — each with carrierHz + binaural beat + brainwave type + affirmation + keyword detection), tarot.ts (Fisher-Yates shuffle, draw with 40% reverse chance, yes/no tally), ai-tarot.ts (z-ai-web-dev-sdk LLM with premium=deep / free=concise, graceful fallback).
+    60→- API routes: /api/me (GET device+usage, PATCH premium toggle), /api/tarot/read (POST draw+interpret, GET spreads), /api/tarot/history, /api/manifest/goals (GET/POST/PATCH/DELETE), /api/manifest/confirm (POST upsert per day + streak), /api/frequency/session (GET/POST).
+    61→- Card art: Wikimedia Commons rate-limited (429) in sandbox; built premium custom SVG card-face renderer (suit-colored frame, roman numeral, suit glyph, central symbol, name) with graceful /tarot/{slug}.jpg image load → SVG fallback. Card-back.png used face-down.
+    62→- UI: Lumina primitives (GlassCard, ShellCard, Pill, SectionTitle, GoldButton, GhostButton, Divider, StarField), BottomNav (5 tabs with animated active pill), app shell with aurora backdrop + sticky header.
+    63→- Views: Home (greeting by hour, quick actions, widget preview, install hint via beforeinstallprompt, notifications setup, daily card, premium CTA), Tarot (question + spread picker + shuffle animation + card-by-card reveal + AI interpretation + keywords + affirmation + history sheet), Manifestation (goal CRUD sheet with live auto-frequency detection, goal cards with streak/confirm, daily ritual info), Frequency (visualizer with pulse rings, mode selector pure/binaural/pad, 12 preset grid, affirmation, Web Audio engine hook), Premium (comparison table, perks grid, activate/management).
+    64→- Web Audio engine: OscillatorNode pure tone, binaural (stereo merger, L/R offset by beat/2), ambient pad (layered detuned sines + perfect fifth + LFO vibrato). Fade in/out envelope, master gain limiter, 1s tick timer, free=30s / premium=10min auto-stop.
+    65→- Notifications: useNotificationPermission hook (request + welcome notification + Badging API setAppBadge).
+    66→- Fixed: sw-register.tsx syntax error (operator precedence), removed unused eslint-disable directives, replaced db.$transaction array form (broke with async wrapper) with sequential calls.
+    67→
+    68→Verification (agent-browser, iPhone 14 emulation):
+    69→- Home renders: greeting "The dusk softens", quick actions, widget preview, notifications, install hint, daily card, premium CTA. No console errors.
+    70→- Tarot: asked "Will I find fulfilling creative work this year?" → shuffle animation → drew King of Pentacles Reversed → AI returned "NO. The reversed King of Pentacles suggests your creative path is currently blocked by material concerns..." → keywords (greed/control/materialism/stagnation) + affirmation shown → usage decremented 2→0. Real LLM working.
+    71→- Manifestation: created "Financial freedom" goal → auto-detected "Financial Abundance · 888 Hz" → saved → goal card with 888Hz pill, statement, 09:00 reminder → clicked Confirm now → streak "1d", "1 confirmations", "Confirmed today".
+    72→- Frequency: selected 888Hz Financial Abundance → "Begin 30s session" → "NOW RESONATING" with 30s timer + Stop button → Web Audio engine started, no console errors.
+    73→- Premium: activated via Premium tab → page reloaded → home shows "Premium" badge + "Unlimited" for tarot.
+    74→- Responsive: tested 1200px desktop and 375px (iPhone SE width) — layout holds, bottom nav adapts.
+    75→- Lint: clean (0 errors, 0 warnings). Dev log: no runtime errors.
+    76→
+    77→Stage Summary:
+    78→- Complete, working PWA. All 5 confirmed decisions implemented. Single `/` route, 5-tab mobile app.
+    79→- Free tier enforced: 2 tarot/day (Yes/No + Single only), 1 manifestation goal, 30s frequency. Premium unlocks everything.
+    80→- AI tarot interpretations via z-ai-web-dev-sdk LLM (real, contextual, graceful fallback).
+    81→- Auto-intention→frequency detection from question/goal text (12 presets, keyword weighted).
+    82→- PWA installable on Android + iOS (manifest, SW, icons, apple meta, shortcuts, offline fallback).
+    83→- In-app widget preview + Notifications + Badging API (native widget not possible on web — documented).
+    84→- Card art: custom SVG renderer (Wikimedia unreachable in sandbox); image-ready for future drop-in.
+    85→- Files: globals.css, layout.tsx, page.tsx, providers.tsx, sw-register.tsx, lib/{device,limits,frequencies,tarot,ai-tarot,store}.ts, tarot-data.ts, hooks/{use-api,use-notifications}.ts, components/lumina/{primitives,bottom-nav}.tsx, features/{home,manifest,tarot,frequency,premium}/*.tsx, app/api/{me,tarot/read,tarot/history,manifest/goals,manifest/confirm,frequency/session}/route.ts, public/{manifest.webmanifest,sw.js,offline.html,icons/*,tarot/card-back.png}.
+    86→
+    87→Unresolved / next-phase recommendations:
+    88→- Download real public-domain RWS card art when network allows (component already supports it via /tarot/{slug}.jpg with SVG fallback).
+    89→- Add a real push-notification scheduling mini-service for goal reminder times (currently permission + welcome notification only; no scheduled reminders).
+    90→- Deepen premium readings (multi-paragraph) — verify with a premium-activated reading.
+    91→- Add streak analytics / weekly reflection view.
+    92→- Polish: haptic feedback on draw, sound design for card flip.
+    93→
+    94→---
+    95→Task ID: feat-stats
+    96→Agent: stats-agent
+    97→Task: Build stats/analytics API + view
+    98→
+    99→Work Log:
+   100→- Read prior worklog and existing code (schema, device lib, primitives, frequencies, limits, home-view, me/history API routes) to match established patterns.
+   101→- Created /home/z/my-project/src/app/api/stats/route.ts (runtime=nodejs, dynamic=force-dynamic). GET handler uses requireDevice(new Headers(req.headers)) then runs 4 parallel Prisma findMany queries (readings, goals, confirmations, frequencySessions) selecting only the fields needed. Aggregates in JS (avoids Prisma groupBy typing pitfalls on a small personal dataset): total readings + readings this week + most-used spread (mapped to human label via SPREADS); total/active/achieved goals + total confirmations + 7-day confirmation array + best current streak across all goals (counts consecutive days ending today or yesterday, matching the manifest confirm endpoint logic) with goal title; total sessions + total seconds/minutes + most-used intention (mapped to label + Hz via getPreset) + 7-day minutes array; 7-day activity array [{date, readings, confirmations, frequencySec}]; memberSince = device.createdAt. Typed catch with `e: unknown` + instanceof narrowing (no `any`).
+   102→- Created /home/z/my-project/src/features/stats/stats-view.tsx ("use client", default export). Uses TanStack Query (queryKey ["stats"], refetch 30s + on focus) with useApi() to inject x-device-id. Components: StatsTile (GlassCard + icon chip + count-up number + label, h-full), useCountUp hook (requestAnimationFrame + easeOutCubic, animates from previous value on target change), ActivityChart (responsive custom SVG: viewBox 700×200, preserveAspectRatio="none", width=100% height=120; 7 columns × 3 bars each — gold readings / leaf confirmations / sage frequency-minutes, each normalised to its own 7-day max so all stay visible; faded opacity for zero days; HTML day-label row + legend below to avoid SVG text distortion), BreakdownRow, StatsLoading (skeleton pulse tiles), StatsError (glass shell + alert icon). Layout: header ("Your journey" with member-since date) → 2×2 summary tiles (Total readings, Confirmations, Frequency minutes, Best streak) → 7-day activity chart card → Tarot breakdown (most used spread, readings this week, total) → Manifestation breakdown (active goals, achieved goals, total confirmations, best streak + goal title) → Frequency breakdown (most used intention + Hz, total sessions, minutes this week). Framer-motion staggered entrance via container/grid/item Variants. All numbers use tabular-nums.
+   103→- Ran `bun run lint` — clean (0 errors, 0 warnings). Hit /api/stats with curl (x-device-id: dev_test_stats) → 200 with correct JSON shape (all zero-state for a fresh device, 7-element arrays for weekly series). Dev log shows the route compiled in 160ms and ran 4 Prisma queries successfully.
+   104→
+   105→Stage Summary:
+   106→- /api/stats: efficient single-endpoint analytics aggregator returning readings/goals/frequency totals, weekly arrays, best streak, most-used spread & intention, and a 7-day activity array. Uses 4 parallel Prisma findMany + JS aggregation. Zero-state safe.
+   107→- StatsView: polished mobile-first analytics screen matching the Lumina dark/gold aesthetic — 2×2 count-up summary tiles, custom responsive SVG bar chart (3 metrics × 7 days, gold/leaf/sage), three breakdown cards. Framer-motion staggered entrance, graceful loading skeleton + error state. Drop-in ready for the main agent to wire into the bottom nav / page.tsx.
+   108→- Files: src/app/api/stats/route.ts, src/features/stats/stats-view.tsx. No other files modified.
+   109→
+   110→---
+   111→Task ID: cron-review-1
+   112→Agent: main (webDevReview cron)
+   113→Task: QA testing, bug fixes, new features (Card of the Day, Card Detail Modal, Breathing Pacer, Stats view), styling polish
+   114→
+   115→## Current Project Status Assessment
+   116→The Lumina PWA was stable and feature-complete from the previous round. Lint clean, dev server running, all core flows (tarot reading, manifestation, frequency, premium) verified working. VLM assessment of home screen scored 7.5/10 with concrete issues: bottom nav overlap on long pages, card icons too small, hero spacing tight, frequency text clipping, timer not prominent enough.
+   117→
+   118→## Completed Modifications
+   119→
+   120→### Bug Fixes
+   121→- **Bottom nav overlap**: Increased main content bottom padding from `pb-32` (128px) to `pb-44` (176px) to clear the floating nav + safe area on all content lengths.
+   122→- **Card icon size**: Increased glyph size by ~30% (md: 44→58px, lg: 64→82px) and added decorative double-ring SVG + text-shadow glow for a more "finished card" feel vs "empty wireframe".
+   123→- **Home hero spacing**: Changed streak/premium pill row from `gap-2` to `flex-wrap gap-2` with `ml-auto` on the premium button, preventing the "0 confirmed today Go Premium" cluster from feeling cramped.
+   124→- **Frequency text clipping**: Changed intention card description from `line-clamp-2` to `line-clamp-3` with increased line-height (13px→14px).
+   125→- **Import error**: Fixed `StatsView` import (default export vs named export) that caused a 500 error.
+   126→
+   127→### New Features
+   128→1. **Card of the Day** (`/api/tarot/card-of-day` + `CardOfDay` component):
+   129→   - Deterministic daily card per device (hash of deviceId + date → 78-card deck index, ~38% reversed chance).
+   130→   - Same card shown all day; persisted in DB.
+   131→   - Full card visual + meaning + keywords + affirmation.
+   132→   - **Reflection journal**: users can write and save a daily reflection note (upserted per day).
+   133→   - Tap card opens full Card Detail Modal.
+   134→   - Replaced the simple "Card of the moment" placeholder on home.
+   135→
+   136→2. **Card Detail Modal** (`card-detail-modal.tsx`):
+   137→   - Tap any drawn card (in tarot result or card-of-day) to open a full-screen bottom sheet.
+   138→   - Shows: card visual, number (roman/decimal), arcana, element, astrology, upright/reversed meaning, keywords, yes/no tendency (both orientations), affirmation, numerology.
+   139→   - Reversed state adapts the UI (destructive-tinted icon, "Reversed Meaning" label, reversed keywords).
+   140→   - Wired into both TarotView (drawn cards) and CardOfDay (home).
+   141→
+   142→3. **Breathing Pacer** (`breathing-pacer.tsx`):
+   143→   - Appears during active frequency sessions.
+   144→   - 3 patterns: 4-7-8 Relaxing Breath, Box Breathing (4-4-4-4), Coherent 5.5 (5-5).
+   145→   - Animated orb that expands on inhale (scale 1, full opacity, 40px glow), holds (scale 0.9, 75% opacity), contracts on exhale (scale 0.4, 35% opacity, 12px glow).
+   146→   - Phase label + countdown sec display.
+   147→   - Pattern selector pills.
+   148→
+   149→4. **Stats/Analytics View** (built by subagent, wired into app):
+   150→   - New "Stats" tab in bottom nav (6 tabs now).
+   151→   - API `/api/stats`: 4 parallel Prisma queries → readings/goals/confirmations/frequency stats + 7-day activity array.
+   152→   - View: 2×2 summary tiles (count-up animation), custom SVG 7-day bar chart (gold/leaf/sage), breakdown cards for tarot/manifestation/frequency.
+   153→   - Framer-motion staggered entrance.
+   154→
+   155→5. **Circular Timer Ring** (frequency view):
+   156→   - SVG progress ring around the frequency display showing session time remaining.
+   157→   - Replaces the small "30s" pill badge with a prominent geometric timer.
+   158→   - Time label at 6 o'clock position, gold stroke with glow.
+   159→   - VLM score jumped from 8.5/10 → 9/10 ("production-ready").
+   160→
+   161→### Styling Polish
+   162→- Card face: added decorative dashed inner ring + solid outer ring + text-shadow glow on symbol.
+   163→- Breathing orb: 3 distinct visual states (inhale/hold/exhale) with varying scale, opacity, glow size, and gradient intensity.
+   164→- Timer ring: SVG circle with stroke-dashoffset animation + drop-shadow glow.
+   165→- Home: improved pill layout with flex-wrap + ml-auto.
+   166→
+   167→## Verification Results
+   168→- **Lint**: clean (0 errors, 0 warnings).
+   169→- **Dev log**: no runtime errors; all API routes returning 200.
+   170→- **agent-browser QA** (iPhone 15 emulation):
+   171→  - Home: Card of the Day renders (Four of Wands Reversed, July 27), reflection journal works.
+   172→  - Tarot: reading flow works, drawn cards are tappable → detail modal opens with full metadata.
+   173→  - Frequency: session starts → timer ring + breathing pacer appear → orb animates through inhale/hold/exhale.
+   174→  - Stats: new tab renders, 7-day chart, count-up tiles, breakdown cards.
+   175→  - Premium: 6-tab bottom nav works, all tabs accessible.
+   176→- **VLM scores**: Home 7.5/10, Frequency 9/10 ("production-ready"), Tarot result 7.5/10.
+   177→
+   178→## Unresolved Issues / Risks
+   179→1. **Card art**: Still using custom SVG renderer (Wikimedia rate-limited in sandbox). Component supports `/tarot/{slug}.jpg` drop-in.
+   180→2. **Scheduled push notifications**: Only permission + welcome notification implemented. A websocket mini-service for scheduled goal reminders is recommended next.
+   181→3. **Home "Go Premium" repetition**: VLM noted it appears in both header and hero. Could consolidate.
+   182→4. **Onboarding flow**: No first-time-user onboarding shimmer/tutorial yet.
+   183→5. **Haptic feedback**: No vibration on card draw / phase transitions (VLM recommended for 10/10).
+   184→
+   185→## Priority Recommendations for Next Phase
+   186→1. Add websocket mini-service for scheduled manifestation goal reminders (at each goal's reminderTime).
+   187→2. Add onboarding flow for first-time users (3-slide shimmer intro).
+   188→3. Consolidate "Go Premium" CTAs (remove from hero, keep header + bottom nav).
+   189→4. Add haptic feedback (navigator.vibrate) on card draw, reveal, and breathing phase transitions.
+   190→5. Add a "Share reading" feature (export reading as image/text).
+   191→6. Consider downloading real RWS card art via alternative source.
+   192→
+   193→---
+   194→Task ID: cron-review-2
+   195→Agent: main (webDevReview cron, 2nd round)
+   196→Task: QA, stats empty-state redesign, onboarding, streak ring, haptics, energy insight
+   197→
+   198→## Current Project Status Assessment
+   199→Project stable from round 1. Lint clean, dev server healthy, all 6 tabs working. VLM assessment of home (7.5/10) and stats (6/10) revealed two critical UX gaps: (1) stats screen showed all-zeros for new users looking "broken", (2) no first-time-user onboarding, (3) no streak visualization, (4) no haptic feedback. Bottom-nav overlap was a false alarm (verified 99px gap with pb-44).
+   200→
+   201→## Completed Modifications
+   202→
+   203→### Bug Fixes / Verifications
+   204→- **Bottom nav overlap**: Verified via getBoundingClientRect — last content element bottom (676px) sits 99px above nav top (775px). The `pb-44` from round 1 is effective. No change needed.
+   205→- **Stats "all zeros" empty state** (VLM 6/10 → 9/10): Added `StatsEmpty` component that detects zero activity and renders a welcoming "Your journey begins here" panel with 3 tappable action cards (Draw a card / Set a goal / Tune a frequency) + a "Streaks unlock rewards" teaser. Replaces the sterile zero-dashboard.
+   206→
+   207→### New Features (4)
+   208→1. **Onboarding Flow** (`onboarding.tsx`):
+   209→   - 3-slide shimmer intro for first-time users (checks `localStorage` key `lumina.onboarded`).
+   210→   - Slide 1: Tarot — "Ask, and the cards answer" (gold accent, ✦ glyph).
+   211→   - Slide 2: Manifestation — "Name it. Confirm it daily." (leaf accent, ◉ glyph).
+   212→   - Slide 3: Frequencies — "Tune the body, free the mind" (purple accent, 〰 glyph).
+   213→   - Each slide: glowing icon orb with pulsing rings, eyebrow, title, body copy.
+   214→   - Progress dots (active = wide pill), Continue/Begin CTA, Skip button.
+   215→   - Aurora backdrop + 40-star StarField for immersive feel.
+   216→   - Wired into page.tsx (renders before app shell if not onboarded).
+   217→
+   218→2. **Streak Ring** (`streak-ring.tsx`):
+   219→   - Circular SVG progress ring (56px) showing daily confirmation streak.
+   220→   - Fills proportionally 0→7 days; flame icon scales with streak (0.85x → 1.15x at 7+).
+   221→   - Color shifts: sage (0-2) → leaf (3-6) → amber (7+, "flame lit").
+   222→   - Animated stroke-dashoffset fill + gentle pulse when active.
+   223→   - Replaced the plain "0 confirmed today" pill on the home hero.
+   224→   - Home now fetches `/api/manifest/goals` to compute best streak across goals.
+   225→   - VLM: home score 7.5 → 8.5/10 ("streak ring transforms abstract habit data into an emotional progress marker").
+   226→
+   227→3. **Haptic Feedback** (`use-haptics.ts` + integrations):
+   228→   - 6 patterns: tap (8ms), draw ([12,40,18]), reveal ([20,30,30]), complete ([10,50,10,50,25]), error ([40,30,40]), tick (5ms).
+   229→   - Wired into TarotView: `draw` on shuffle start, `reveal` on each card flip, `complete` when reading lands.
+   230→   - Wired into BreathingPacer: `tick` on each breath phase transition.
+   231→   - Safe fallback (no-op if navigator.vibrate unsupported).
+   232→
+   233→4. **AI Energy Insight** (stats API + view):
+   234→   - Server-side `buildInsight()` function in `/api/stats/route.ts` generates a narrative summary from usage patterns (deterministic, instant — no LLM call).
+   235→   - 6 archetypes: "A blank canvas" (new), "The manifester" (achieved goals), "The devoted" (manifestation-dominant), "The resonator" (frequency-dominant), "The seeker of depth" (Celtic Cross user), "The cartomancer" (tarot-dominant).
+   236→   - Each returns title + body + accent color + signature glyph.
+   237→   - New `EnergyInsight` card at top of stats view (below header, above tiles): gradient-tinted ShellCard with glowing glyph orb + archetype title + narrative body.
+   238→   - VLM: "converts data → identity, exactly what a tarot app should do. Transforms a dashboard into a mirror."
+   239→
+   240→### Styling Polish
+   241→- StreakRing: animated SVG ring with drop-shadow glow, color-shifted flame.
+   242→- Onboarding: full-screen aurora + starfield, pulsing icon orb with concentric expanding rings.
+   243→- Stats empty state: lum-glow-gold hero panel, animated sparkle orb, 3 action cards with colored icon chips.
+   244→- Energy insight card: per-archetype accent gradient background + radial glyph orb.
+   245→
+   246→## Verification Results
+   247→- **Lint**: clean (0 errors, 0 warnings).
+   248→- **Dev log**: no runtime errors; all API routes 200.
+   249→- **agent-browser QA** (cleared localStorage → fresh user):
+   250→  - Onboarding: 3 slides flow correctly, "Begin" lands on home.
+   251→  - Home: StreakRing renders (0 / "Begin a streak today"), hero layout balanced.
+   252→  - Tarot: reading works, haptics fire on draw/reveal/complete.
+   253→  - Stats (empty): "Your journey begins here" panel with 3 action cards (VLM 9/10).
+   254→  - Stats (with data): Energy Insight "The cartomancer" card appears above tiles (VLM 8.5/10).
+   255→- **VLM scores this round**: Home 8.5/10 (↑1.0), Stats empty 9/10 (↑3.0), Stats with data 8.5/10.
+   256→
+   257→## Unresolved Issues / Risks
+   258→1. **Card art**: Still custom SVG (Wikimedia rate-limited). Component remains image-ready.
+   259→2. **Scheduled push notifications**: Still only permission + welcome notification. Websocket mini-service for goal reminder times not yet built.
+   260→3. **Onboarding replay**: No way to re-trigger onboarding from settings (would need a "replay intro" button).
+   261→4. **Energy insight scalability**: VLM noted concern about whether archetypes feel nuanced at 100+ readings (currently rule-based, may want LLM enrichment for premium users later).
+   262→5. **Streak ring tap**: Currently decorative — could be made tappable to jump to manifest tab.
+   263→
+   264→## Priority Recommendations for Next Phase
+   265→1. Websocket mini-service for scheduled manifestation goal reminders (at each goal's reminderTime).
+   266→2. Make StreakRing tappable → jumps to Manifest tab.
+   267→3. Add "Replay intro" option in Premium/Settings.
+   268→4. Add a "Share reading" feature (export reading as image/text).
+   269→5. Enrich Energy Insight with LLM for premium users (deeper, personalized narrative).
+   270→6. Add a daily reflection journal history view (browse past Card-of-the-Day reflections).
+   271→
+   272→---
+   273→Task ID: cron-review-3
+   274→Agent: main (webDevReview cron, 3rd round)
+   275→Task: Premium polish, manifest streak bars, share reading, reflection journal, tappable streak ring, replay onboarding
+   276→
+   277→## Current Project Status Assessment
+   278→Project stable from round 2. Lint clean, dev server healthy, all 6 tabs + onboarding + card-of-day + breathing pacer + haptics + energy insight working. VLM assessment of premium (8/10) and manifest (7.5/10) revealed: premium lacks urgency/social proof/gold CTA, manifest has white sterile CTA + non-collapsible ritual info + no visual streak on goal cards. Also missing: share reading feature, reflection journal history, tappable streak ring, replay onboarding.
+   279→
+   280→## Completed Modifications
+   281→
+   282→### Styling Polish (2 views)
+   283→1. **Premium view redesign** (VLM 8 → 9.5/10 "high-converting premium wall"):
+   284→   - **Urgency badge**: "50% OFF" gradient pill (orange→gold) top-right with glow.
+   285→   - **Social proof**: 4 colored avatar dots + 5 gold stars + "12,400+ seekers" text.
+   286→   - **Pulsing ring** around the crown icon (2.4s expand-fade loop).
+   287→   - **Gold-gradient CTA**: replaced flat white button with `linear-gradient(135deg, #E7D2A8 → #C5A87C → #9c7f54)` + 30px gold glow + inset highlight. Semibold black text.
+   288→   - **Trust line**: "✦ Instant access · 7-day reflection included" under CTA.
+   289→   - **Testimonial card**: 5-star rating + Mira R. quote ("Lumina became my morning ritual…") + avatar + tenure badge.
+   290→   - VLM: "psychological triggers layered correctly: Value Prop → Social Proof → Urgency → Low-Risk CTA. Should lift conversion 20-35%."
+   291→
+   292→2. **Manifest view polish** (VLM 7.5 → 9/10 "production-ready"):
+   293→   - **Collapsible "Daily ritual" card**: now a disclosure with chevron; expands to show 4 numbered steps (Set statement → Confirm daily → Tune frequency → Build streak). Saves vertical space for returning users.
+   294→   - **Streak progress bar** on each goal card: 7-segment bar showing streak fill. Color shifts sage (0-2) → leaf (3-6) → amber gradient (7+, with glow). Label transitions "Begin" → "Building" → "Flame lit". "Today" slot highlighted in gold when pending.
+   295→   - VLM: "segmented progress bar transforms abstract daily-login into a tangible, collectible progress metric."
+   296→
+   297→### New Features (4)
+   298→1. **Share Reading** (`use-share.ts` + `ShareButton`):
+   299→   - Web Share API (native mobile share sheet) with clipboard fallback for desktop.
+   300→   - Formats reading as: "🌙 Lumina Reading / ❝question❞ / Spread / Cards (with positions + reversed) / Interpretation (truncated 600 chars) / via Lumina".
+
+[showing lines 1-300 of 1669; use offset=301 with limit to continue reading]

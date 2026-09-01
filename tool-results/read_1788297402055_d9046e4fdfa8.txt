@@ -1,0 +1,402 @@
+   300→   - Formats reading as: "🌙 Lumina Reading / ❝question❞ / Spread / Cards (with positions + reversed) / Interpretation (truncated 600 chars) / via Lumina".
+   301→   - Wired into TarotView result: "Share this reading" button below History. Shows "Copied!" confirmation with check icon + haptic + toast.
+   302→   - Verified working (clipboard fallback in headless browser).
+   303→
+   304→2. **Reflection Journal** (`/api/tarot/reflections` + `JournalSheet`):
+   305→   - API returns last 30 card-of-day reflections with card data + reflection text + affirmation.
+   306→   - JournalSheet: bottom sheet with "Reflection Journal" header, list of reflection cards (card symbol + name + date + reflection text + affirmation), empty state with book icon + guidance.
+   307→   - Accessed via "Journal" button on Card of the Day (split with "Ask the cards" into a 2-button row).
+   308→   - Verified: saved reflection "I feel called to trust the turning of the wheel today." → appears in journal as Five of Cups / Jul 27 / affirmation.
+   309→
+   310→3. **Tappable Streak Ring**:
+   311→   - Both the StreakRing and the streak text label on home hero are now buttons that navigate to the Manifest tab.
+   312→   - aria-label "View your manifestation goals" for accessibility.
+   313→
+   314→4. **Replay Onboarding**:
+   315→   - "Replay the intro" button at bottom of Premium view (non-premium state).
+   316→   - Clears `lumina.onboarded` localStorage key + reloads → onboarding shows again.
+   317→   - RotateCcw icon + toast confirmation.
+   318→
+   319→## Verification Results
+   320→- **Lint**: clean (0 errors, 0 warnings).
+   321→- **Dev log**: no runtime errors; all API routes 200.
+   322→- **agent-browser QA** (iPhone 15):
+   323→  - Premium: urgency badge, social proof, testimonial, gold CTA all render (VLM 9.5/10).
+   324→  - Manifest: created "Deep inner peace" goal → 396Hz auto-tune → streak bar shows 0/7d → confirmed → 1/7d with first segment filled sage.
+   325→  - Tarot: reading works → "Share this reading" button → clipboard copy → "Copied!" feedback.
+   326→  - Home: streak ring shows "1-day streak" → tappable → jumps to Manifest.
+   327→  - Card of Day: "Add a reflection" → saved → "Journal" button opens sheet → reflection appears with card + date + affirmation.
+   328→- **VLM scores this round**: Premium 9.5/10 (↑1.5), Manifest 9/10 (↑1.5).
+   329→
+   330→## Cumulative VLM Scorecard
+   331→| View | Round 1 | Round 2 | Round 3 |
+   332→|------|---------|---------|---------|
+   333→| Home | 7.5 | 8.5 | 8.5 |
+   334→| Tarot result | 7.5 | 7.5 | 7.5 |
+   335→| Manifest | — | 7.5 | 9.0 |
+   336→| Frequency | 9.0 | 9.0 | 9.0 |
+   337→| Stats (empty) | 6.0 | 9.0 | 9.0 |
+   338→| Stats (data) | — | 8.5 | 8.5 |
+   339→| Premium | 8.0 | 8.0 | 9.5 |
+   340→
+   341→## Unresolved Issues / Risks
+   342→1. **Card art**: Still custom SVG (Wikimedia rate-limited). Component remains image-ready.
+   343→2. **Scheduled push notifications**: Still only permission + welcome notification. Websocket mini-service for goal reminder times not yet built.
+   344→3. **Tarot result view**: Still at 7.5/10 — VLM noted "THE ANSWER" section feels squeezed between card and reading box. Could use better vertical rhythm.
+   345→4. **Energy insight scalability**: Still rule-based (6 archetypes). LLM enrichment for premium users is a future enhancement.
+   346→5. **Frequency text clipping**: Improved but some long descriptions may still truncate on very small screens.
+   347→
+   348→## Priority Recommendations for Next Phase
+   349→1. Polish tarot result view layout (better vertical rhythm, larger card, breathing room around "THE ANSWER").
+   350→2. Websocket mini-service for scheduled manifestation goal reminders.
+   351→3. LLM-enriched Energy Insight for premium users (deeper, personalized narrative).
+   352→4. Download real RWS card art via alternative source (component supports drop-in).
+   353→5. Add reading "save/favorite" feature (bookmark meaningful readings).
+   354→6. Add a daily mood check-in (track emotional state alongside readings).
+   355→
+   356→---
+   357→Task ID: cron-review-4
+   358→Agent: main (webDevReview cron, 4th round)
+   359→Task: Tarot result view redesign, reversed card fix, tappable keywords, save/favorite reading, copy affirmation
+   360→
+   361→## Current Project Status Assessment
+   362→Project stable from round 3. All views scoring 8.5-9.5/10 except tarot result (stuck at 7.5/10 since round 1). VLM critical assessment identified: (1) card too small/floating in void, (2) "THE ANSWER" orphaned between card and reading box, (3) reversed card text upside-down (unreadable), (4) static keyword tags. Features wanted: tappable keyword tooltips, save/copy affirmation. Prisma client cache issue required .next cache clear + db:generate to pick up new `saved` column.
+   363→
+   364→## Completed Modifications
+   365→
+   366→### Bug Fix: Reversed Card Readability
+   367→- **Before**: Entire card flipped with `rotateY: 180` → all text (name, numerals) upside-down and unreadable.
+   368→- **After**: Only the central symbol rotates 180° (via `motion.span animate={{rotate: reversed ? 180 : 0}}`); all typography stays upright. RX badge upgraded: gold gradient pill with glow + spring entrance animation (was small flat black badge).
+   369→
+   370→### Tarot Result View Redesign (VLM 7.5 → 9.0/10 "substantial upgrade")
+   371→1. **Larger hero card**: Single-card spreads now use `size="lg"` (200×300px) instead of `md` (140×210px) — card now commands ~40% screen height as the dominant focal point.
+   372→2. **Yes/No answer banner**: New prominent verdict banner for yes-no spread — colored glyph circle (✓ green / ✕ amber / ? gold) + "THE CARDS SAY" label + large answer word. Spring-animated entrance.
+   373→3. **Merged card title into reading header**: Removed orphaned "THE ANSWER" section. Card name + arcana/suit now sits as a header row inside "THE READING" container with a divider beneath, creating a logical card→interpretation bridge.
+   374→4. **Interpretation cleanup**: For yes-no spread, strips the leading "YES/NO/MAYBE" from the interpretation text (it's now in the banner) to avoid duplication.
+   375→5. **Tighter vertical rhythm**: Increased spacing from `space-y-4` to `space-y-5`, card-to-content gap from 4 to 5.
+   376→
+   377→### New Features (3)
+   378→1. **Tappable Keyword Chips** (`KeywordChip` component):
+   379→   - Keywords are now interactive buttons (not static pills).
+   380→   - Tap → popover appears with card symbol + name + keyword label + the card's full meaning text.
+   381→   - Gold-highlighted active state, glass-float popover with backdrop dismiss.
+   382→   - Verified: tapping "imbalance" on Temperance Reversed shows "Temperance / IMBALANCE / Reversed, Temperance signals excess, impatience..."
+   383→
+   384→2. **Save/Favorite Reading** (`SaveButton` + `/api/tarot/save` + DB `saved` column):
+   385→   - New `saved Boolean @default(false)` column on Reading model + index.
+   386→   - POST /api/tarot/save toggles the saved state (findFirst by id+deviceId for ownership, then update).
+   387→   - SaveButton: bookmark icon, toggles to "Saved" with gold fill + BookmarkCheck icon. Haptic feedback (complete pattern on save). Toast confirmation.
+   388→   - Verified: POST /api/tarot/save 200, reading.saved updated to true.
+   389→
+   390→3. **Copy Affirmation** (`AffirmationCard` component):
+   391→   - Affirmation card now has a "Copy" button (top-right) that copies `"<affirmation>" — via Lumina` to clipboard.
+   392→   - Shows "Copied" with check icon for 2.5s. Sparkles icon + gold-tinted card.
+   393→
+   394→### Infrastructure
+   395→- Added `saved` column to Reading model (Prisma schema + db:push + db:generate).
+   396→- Cleared stale `.next` Turbopack cache that held old Prisma client without `saved` field.
+   397→- Restarted dev server after cache clear.
+   398→
+   399→## Verification Results
+   400→- **Lint**: clean (0 errors, 0 warnings).
+   401→- **Dev log**: POST /api/tarot/save 200 confirmed; Prisma queries selecting `saved` field working.
+   402→- **agent-browser QA** (iPhone 15, premium activated):
+   403→  - Reading: "Is now the right time to begin?" → Yes/No spread → drew Nine of Wands → Yes/No banner "YES" with green ✓ glyph → interpretation with merged card title → tappable keywords → affirmation with Copy button → Save button toggled to "Saved".
+   404→  - Keyword chip: tapped "imbalance" → popover with card meaning appeared.
+   405→  - Save: clicked Save → toggled to "Saved" → POST 200 → DB updated.
+   406→- **VLM scores**: Tarot result 7.5 → **9.0/10** ("substantial upgrade, clear F-pattern: Hero → Answer → Context → Details").
+   407→
+   408→## Cumulative VLM Scorecard
+   409→| View | R1 | R2 | R3 | R4 |
+   410→|------|-----|-----|-----|-----|
+   411→| Home | 7.5 | 8.5 | 8.5 | 8.5 |
+   412→| Tarot result | 7.5 | 7.5 | 7.5 | **9.0** |
+   413→| Manifest | — | 7.5 | 9.0 | 9.0 |
+   414→| Frequency | 9.0 | 9.0 | 9.0 | 9.0 |
+   415→| Stats (empty) | 6.0 | 9.0 | 9.0 | 9.0 |
+   416→| Stats (data) | — | 8.5 | 8.5 | 8.5 |
+   417→| Premium | 8.0 | 8.0 | 9.5 | 9.5 |
+   418→
+   419→## Unresolved Issues / Risks
+   420→1. **Card art**: Still custom SVG (Wikimedia rate-limited). Component remains image-ready.
+   421→2. **Scheduled push notifications**: Websocket mini-service for goal reminder times not yet built.
+   422→3. **Energy insight scalability**: Still rule-based (6 archetypes). LLM enrichment for premium is future.
+   423→4. **Saved readings view**: Save works but there's no dedicated "Saved readings" filter in History yet (would need a tab/filter toggle).
+   424→5. **Dev server stability**: Required manual restart after .next cache clear; system auto-restart should handle this in production.
+   425→
+   426→## Priority Recommendations for Next Phase
+   427→1. Add "Saved" filter tab in Reading History sheet (show only saved=true readings).
+   428→2. Websocket mini-service for scheduled manifestation goal reminders.
+   429→3. LLM-enriched Energy Insight for premium users.
+   430→4. Daily mood check-in feature (track emotional state alongside readings).
+   431→5. Download real RWS card art via alternative source.
+   432→6. Add reading "re-read" from history (load a past reading back into the result view).
+   433→
+   434→---
+   435→Task ID: cron-review-5
+   436→Agent: main (webDevReview cron, 5th round)
+   437→Task: Tarot setup polish, saved filter + re-read in history, daily mood check-in, home breathing glow
+   438→
+   439→## Current Project Status Assessment
+   440→Project stable from round 4. All views scoring 8.5-9.5/10. VLM assessment of tarot setup (8/10) found: active state ambiguity (gold border too subtle), inconsistent lock placement, no question validation. Stats (7/10) wanted a daily hook. Priority items from worklog: saved filter in history, reading re-read, daily mood check-in.
+   441→
+   442→## Completed Modifications
+   443→
+   444→### Fix: Tarot Setup Polish (VLM 8 → 9/10)
+   445→1. **Clearer active state**: Selected spread now has gold checkmark badge (top-right, consistent position), stronger border (`border-gold/60`), gold-tinted background (`bg-gold/[0.12]`), and box-shadow ring. Name text turns gold when selected.
+   446→2. **Consistent lock placement**: Lock icon now always top-right (same position as the checkmark), never inline with text. Selected = checkmark, locked = lock, neither = empty.
+   447→3. **Question char count/guidance**: Shows `N/8 min` while typing (< 8 chars), switches to `✓ focused` at 8+ chars. Gold when focused, muted when too short. Encourages thoughtful questions.
+   448→
+   449→### New Features (3)
+   450→1. **Saved Filter in History** (History API + HistorySheet):
+   451→   - History API now supports `?saved=true` query param + excludes `card-of-day` readings by default.
+   452→   - Returns `saved` boolean per reading.
+   453→   - HistorySheet has All/Saved tab toggle (gold active state). Saved tab shows only bookmarked readings.
+   454→   - Saved items show a gold BookmarkCheck icon.
+   455→   - Dedicated empty states per tab ("No saved readings" vs "No readings yet") with guidance.
+   456→
+   457→2. **Reading Re-read from History**:
+   458→   - Tapping any history item loads the full reading back into the result view (cards + interpretation + all sections).
+   459→   - `onReread` callback sets reading state, reveals all cards, jumps to result phase.
+   460→   - "Tap to re-read" hint on each history item.
+   461→   - Verified: tapped saved reading → full result view loaded with Page of Swords reading.
+   462→
+   463→3. **Daily Mood Check-in** (`/api/mood` + `MoodCheckIn` component):
+   464→   - New `Mood` model in Prisma (1-5 scale, optional note, unique per device per day).
+   465→   - GET /api/mood returns today's mood + last 7 days.
+   466→   - POST /api/mood upserts today's mood.
+   467→   - `MoodCheckIn` component on home: 5-moon scale (🌑 Heavy → 🌕 Bright) with color-coded selection. Auto-saves on first tap. "Logged" indicator. Optional note input ("Add note" / "Edit note"). Haptic feedback.
+   468→   - Verified: selected "Light" (4) → auto-saved → "Logged" + "● Light / Add note" shown.
+   469→
+   470→### Styling Polish
+   471→- **Home hero breathing glow**: Added a slow-pulsing radial gradient layer (5s loop, opacity 0.5→0.9, scale 0.95→1.05) behind the hero content. Gives the hero a "living" quality.
+   472→
+   473→### Infrastructure
+   474→- Added `Mood` model to Prisma schema + Device.moods relation.
+   475→- db:push + db:generate for new model.
+   476→- Cleared .next cache + restarted dev server for Prisma client refresh.
+   477→
+   478→## Verification Results
+   479→- **Lint**: clean (0 errors, 0 warnings).
+   480→- **Dev log**: all API routes 200; mood POST confirmed.
+   481→- **agent-browser QA** (iPhone 15):
+   482→  - Home: Mood check-in renders with 5 moons, "How are you feeling today?". Selected "Light" → auto-saved → "Logged". Breathing glow visible on hero.
+   483→  - Tarot setup: char count shows "2/8 min" for short input, "✓ focused" for 8+ chars. Selected spread has checkmark badge. Locks consistent top-right.
+   484→  - Tarot reading: "What energy should I bring?" → Page of Swords → saved via Save button.
+   485→  - History: All tab shows reading, Saved tab shows saved reading. Tapped history item → re-read loaded full result view.
+   486→- **VLM scores**: Tarot setup 8 → **9/10** ("all three previously identified UX failures resolved").
+   487→
+   488→## Cumulative VLM Scorecard
+   489→| View | R1 | R2 | R3 | R4 | R5 |
+   490→|------|-----|-----|-----|-----|-----|
+   491→| Home | 7.5 | 8.5 | 8.5 | 8.5 | 8.5+ |
+   492→| Tarot setup | — | — | — | 8.0 | **9.0** |
+   493→| Tarot result | 7.5 | 7.5 | 7.5 | 9.0 | 9.0 |
+   494→| Manifest | — | 7.5 | 9.0 | 9.0 | 9.0 |
+   495→| Frequency | 9.0 | 9.0 | 9.0 | 9.0 | 9.0 |
+   496→| Stats (empty) | 6.0 | 9.0 | 9.0 | 9.0 | 9.0 |
+   497→| Stats (data) | — | 8.5 | 8.5 | 8.5 | 8.5 |
+   498→| Premium | 8.0 | 8.0 | 9.5 | 9.5 | 9.5 |
+   499→
+   500→## Unresolved Issues / Risks
+   501→1. **Card art**: Still custom SVG (Wikimedia rate-limited). Component remains image-ready.
+   502→2. **Scheduled push notifications**: Websocket mini-service for goal reminder times not yet built.
+   503→3. **Mood trend in stats**: Mood data is collected but not yet visualized in the Stats view (would need a 7-day mood chart).
+   504→4. **Energy insight scalability**: Still rule-based (6 archetypes). LLM enrichment for premium is future.
+   505→5. **Dev server stability**: Required restart after .next cache clear.
+   506→
+   507→## Priority Recommendations for Next Phase
+   508→1. Add 7-day mood trend chart to Stats view (gold line on the existing activity chart).
+   509→2. Websocket mini-service for scheduled manifestation goal reminders.
+   510→3. LLM-enriched Energy Insight for premium users.
+   511→4. Add mood-reading correlation insight ("Your brightest moods follow abundance readings").
+   512→5. Download real RWS card art via alternative source.
+   513→6. Add a "Today's energy" mini-forecast on Stats (card-of-day snippet).
+   514→
+   515→---
+   516→Task ID: cron-review-6
+   517→Agent: main (webDevReview cron, 6th round)
+   518→Task: Mood trend in stats, today's energy forecast, mood-reading correlation insight
+   519→
+   520→## Current Project Status Assessment
+   521→Project stable from round 5. All views 8.5-9.5/10. Top priorities from worklog: mood trend in stats, websocket reminders, LLM insights. VLM assessment of stats (8.5/10 with data) recommended Option C (inline mood sparkline under Energy Signature) as the best placement — connecting the qualitative archetype with quantitative mood proof. Also wanted a "today's energy" daily hook on stats.
+   522→
+   523→## Completed Modifications
+   524→
+   525→### Feature 1: 7-Day Mood Trend in Stats (Option C — inline sparkline)
+   526→- **Stats API** (`/api/stats`): Added `mood` object to response — `week` (7-day array of mood values or null), `average` (0-5 rounded to 1 decimal), `daysLogged` (count), `correlation` ({withReadings, withoutReadings} averages). Queries the Mood model in parallel with other data.
+   527→- **MoodSparkline component**: 7 vertical bars with moon glyphs (🌑→🌕) color-coded by mood level. Animated height fill (staggered 0.05s delay). Day labels (S/M/T/W/T/F/S). Glow on filled bars. Shows "This week's tone · [label] · avg X.X/5 · N/7 days".
+   528→- **Placement**: Inline card directly under the Energy Insight signature (VLM's recommended Option C) — creates a narrative: "You are [archetype] and here's your mood evidence this week."
+   529→- Only shows when `daysLogged > 0` (graceful absence for new users).
+   530→
+   531→### Feature 2: Today's Energy Mini-Forecast
+   532→- **TodaysEnergy component**: Fetches `/api/tarot/card-of-day` and shows a compact card at the top of Stats (right after the header). Displays the card's symbol in a gold orb + "TODAY'S ENERGY" label + card name (+ "Reversed" if applicable) + top 3 keywords.
+   533→- Gives users an instant daily hook when they open Stats — a reason to return.
+   534→- Loading state: pulsing skeleton.
+   535→
+   536→### Feature 3: Mood-Reading Correlation Insight
+   537→- **Stats API**: Computes correlation — averages mood on days with readings vs days without readings (over the last 7 days).
+   538→- **Pattern card** at the bottom of Stats (after frequency breakdown): Shows a narrative insight based on the correlation:
+   539→  - If mood is ~0.3+ points higher on reading days: "On days you read the cards, your mood averages X/5 — Y points brighter. The cards lift you."
+   540→  - If mood is ~0.3+ points lower: "You may be seeking the cards when you need them most."
+   541→  - If steady (< 0.3 diff): "The ritual is a companion, not a crutch."
+   542→- Only shows when `daysLogged >= 2` AND both correlation averages exist (needs at least one reading day + one non-reading day with mood data).
+   543→
+   544→### Infrastructure
+   545→- Stats API now runs 5 parallel Prisma queries (added Mood).
+   546→- All mood data flows through the existing anonymous device-auth pattern.
+   547→
+   548→## Verification Results
+   549→- **Lint**: clean (0 errors, 0 warnings).
+   550→- **Dev log**: `SELECT main.Mood ... IN (7 days)` + `GET /api/stats 200` confirmed.
+   551→- **agent-browser QA** (iPhone 15, premium + data populated):
+   552→  - Stats shows: "TODAY'S ENERGY / King of Pentacles / abundance · mastery · stability" (card-of-day snippet).
+   553→  - "THIS WEEK'S TONE / Light · avg 4.0/5 / 1/7 days" with moon sparkline (🌔 on today, · on empty days).
+   554→  - "YOUR ENERGY SIGNATURE / The devoted" (manifestation-dominant archetype).
+   555→  - Summary tiles, activity chart, breakdown cards all render.
+   556→- **VLM**: "excellent cohesion, psychologically sound — users feel their daily draw is both personal and statistically meaningful."
+   557→
+   558→## Cumulative VLM Scorecard
+   559→| View | R1 | R2 | R3 | R4 | R5 | R6 |
+   560→|------|-----|-----|-----|-----|-----|-----|
+   561→| Home | 7.5 | 8.5 | 8.5 | 8.5 | 8.5 | 8.5 |
+   562→| Tarot setup | — | — | — | 8.0 | 9.0 | 9.0 |
+   563→| Tarot result | 7.5 | 7.5 | 7.5 | 9.0 | 9.0 | 9.0 |
+   564→| Manifest | — | 7.5 | 9.0 | 9.0 | 9.0 | 9.0 |
+   565→| Frequency | 9.0 | 9.0 | 9.0 | 9.0 | 9.0 | 9.0 |
+   566→| Stats (empty) | 6.0 | 9.0 | 9.0 | 9.0 | 9.0 | 9.0 |
+   567→| Stats (data) | — | 8.5 | 8.5 | 8.5 | 8.5 | 8.5 |
+   568→| Premium | 8.0 | 8.0 | 9.5 | 9.5 | 9.5 | 9.5 |
+   569→
+   570→## Unresolved Issues / Risks
+   571→1. **Card art**: Still custom SVG (Wikimedia rate-limited). Component remains image-ready.
+   572→2. **Scheduled push notifications**: Websocket mini-service for goal reminder times not yet built.
+   573→3. **Mood sparkline sparse with 1 day**: Looks empty until 3+ days logged (expected — the feature is designed for ongoing use).
+   574→4. **Energy insight scalability**: Still rule-based (6 archetypes). LLM enrichment for premium is future.
+   575→5. **Dev server stability**: Required restart after .next cache clear (recurring issue).
+   576→
+   577→## Priority Recommendations for Next Phase
+   578→1. Websocket mini-service for scheduled manifestation goal reminders (at each goal's reminderTime).
+   579→2. LLM-enriched Energy Insight for premium users (deeper, personalized narrative using z-ai-web-dev-sdk).
+   580→3. Add a 30-day mood history view (tappable from the 7-day sparkline).
+   581→4. Add "streak milestone" celebrations (confetti/haptic at 3, 7, 14, 30 days).
+   582→5. Download real RWS card art via alternative source.
+   583→6. Add a "weekly reflection" auto-generated summary (Sundays) combining mood + readings + goals.
+   584→
+   585→---
+   586→Task ID: cron-review-7
+   587→Agent: main (webDevReview cron, 7th round)
+   588→Task: LLM-enriched Energy Insight for premium, streak milestone celebrations
+   589→
+   590→## Current Project Status Assessment
+   591→Project stable from round 6. All views 8.5-9.5/10. Top priorities from worklog: LLM-enriched Energy Insight, streak milestone celebrations, weekly reflection. The Energy Insight was rule-based (6 archetypes) — upgrading to LLM-generated narratives using actual user data would make it deeply personal and premium-worthy. Streak milestones add gamified retention.
+   592→
+   593→## Completed Modifications
+   594→
+   595→### Feature 1: LLM-Enriched Energy Insight (Premium)
+   596→- **New API endpoint** `/api/stats/insight` (runtime=nodejs, maxDuration=30):
+   597→  - Gathers the user's actual data: recent tarot questions, active/achieved goals, best streak, total confirmations, frequency minutes + top intentions, mood average, member-since date.
+   598→  - Builds a compact data summary and sends it to z-ai-web-dev-sdk LLM with a system prompt that positions Lumina as "an insightful mystical guide who reads patterns like an astrologer reads a birth chart."
+   599→  - LLM generates a 2-3 sentence "energy signature" with a named archetype + specific details from the user's data + an actionable invitation.
+   600→  - Parses the **bold** archetype name from the response.
+   601→  - Graceful fallback: returns null if LLM fails (stats view falls back to rule-based insight).
+   602→  - Only accessible to premium users (403 for free tier).
+   603→
+   604→- **Stats view update**:
+   605→  - Fetches `/api/me` for premium status.
+   606→  - If premium + has data, fetches `/api/stats/insight` (5-min staleTime cache — LLM doesn't need to refresh often).
+   607→  - Uses `effectiveInsight = llmInsightData?.insight ?? data?.insight` (LLM if available, rule-based fallback).
+   608→  - "AI" badge (gold pill) appears next to "YOUR ENERGY SIGNATURE" when LLM insight is used.
+   609→  - All accent colors/glyphs flow through from the insight response.
+   610→
+   611→- **Verified**: Premium user with 1 reading + 1 goal + mood 4 → LLM returned:
+   612→  - Title: "The Seeker"
+   613→  - Body: "You're at the threshold of abundance, asking 'what to focus on' yet standing just one day from your manifestation streak. Your high mood reveals you're ready to commit beyond questioning. Invite one small action today that aligns with abundance."
+   614→  - The LLM used the user's actual question, goal title, mood value, and streak count to craft the narrative.
+   615→
+   616→- **VLM assessment** (8.5/10): "more valuable for engagement, creates narrative investment — users develop a relationship with their archetype. The specific reference to 'standing just one day from your manifestation streak' suggests it's pulling real behavioral data, which justifies the AI label."
+   617→
+   618→### Feature 2: Streak Milestone Celebrations
+   619→- **MilestoneCelebration component** (`milestone-celebration.tsx`):
+   620→  - Full-screen overlay with confetti particles (24 gold/leaf/sage/purple/amber dots bursting outward + falling with gravity + rotation).
+   621→  - Center card: pulsing glyph orb (milestone-specific), streak number with flame icon, milestone title + description.
+   622→  - 6 milestones: 3 days ("Three days kindled" 🔥), 7 ("The flame is lit" ✦), 14 ("A fortnight of devotion" ◉), 30 ("Thirty days sealed" 🌟), 60 ("Two moons" ☽), 90 ("A season of practice" ☀).
+   623→  - Auto-closes after 4.5s or on tap.
+   624→  - Spring-animated entrance, glow shadow matching milestone color.
+   625→
+   626→- **Manifest view integration**:
+   627→  - `confirmMutation.onSuccess` checks `isMilestone(res.streak)` — if the new streak is a milestone, sets `milestoneStreak` state.
+   628→  - `MilestoneCelebration` renders with the streak number, triggers the overlay.
+   629→  - `isMilestone()` helper exported for reuse.
+   630→
+   631→- **Verified**: Confirm API returns `streak` field. Code properly wired (lint clean, no runtime errors). Will trigger on 3rd, 7th, 14th, 30th, 60th, 90th consecutive confirmation.
+   632→
+   633→## Verification Results
+   634→- **Lint**: clean (0 errors, 0 warnings).
+   635→- **Dev log**: `/api/stats/insight` compiling + returning 200; LLM response confirmed.
+   636→- **agent-browser QA** (iPhone 15, premium + data):
+   637→  - Stats: "YOUR ENERGY SIGNATURE / AI" badge + "The Seeker" archetype with personalized LLM narrative referencing actual user data.
+   638→  - Manifest: goal cards render, confirm works, milestone celebration code wired (will trigger at 3-day streak).
+   639→- **VLM**: 8.5/10 — "contextual depth, actionable specificity, emotional resonance. Creates narrative investment."
+   640→
+   641→## Cumulative VLM Scorecard
+   642→| View | R1 | R2 | R3 | R4 | R5 | R6 | R7 |
+   643→|------|-----|-----|-----|-----|-----|-----|-----|
+   644→| Home | 7.5 | 8.5 | 8.5 | 8.5 | 8.5 | 8.5 | 8.5 |
+   645→| Tarot setup | — | — | — | 8.0 | 9.0 | 9.0 | 9.0 |
+   646→| Tarot result | 7.5 | 7.5 | 7.5 | 9.0 | 9.0 | 9.0 | 9.0 |
+   647→| Manifest | — | 7.5 | 9.0 | 9.0 | 9.0 | 9.0 | 9.0 |
+   648→| Frequency | 9.0 | 9.0 | 9.0 | 9.0 | 9.0 | 9.0 | 9.0 |
+   649→| Stats (empty) | 6.0 | 9.0 | 9.0 | 9.0 | 9.0 | 9.0 | 9.0 |
+   650→| Stats (data) | — | 8.5 | 8.5 | 8.5 | 8.5 | 8.5 | 8.5+ |
+   651→| Premium | 8.0 | 8.0 | 9.5 | 9.5 | 9.5 | 9.5 | 9.5 |
+   652→
+   653→## Unresolved Issues / Risks
+   654→1. **Card art**: Still custom SVG (Wikimedia rate-limited). Component remains image-ready.
+   655→2. **Scheduled push notifications**: Websocket mini-service for goal reminder times not yet built.
+   656→3. **Milestone testing**: Can't test 3-day milestone in a single session (confirmations are 1/day). Code is wired but untested in production.
+   657→4. **LLM insight latency**: Takes ~2-3s to generate. Currently loads after the rule-based insight (graceful fallback). Could add a loading shimmer.
+   658→5. **LLM insight cost**: Each premium stats view triggers an LLM call (5-min cache mitigates this).
+   659→
+   660→## Priority Recommendations for Next Phase
+   661→1. Add LLM insight loading state (shimmer while waiting for AI response).
+   662→2. Websocket mini-service for scheduled manifestation goal reminders.
+   663→3. Add "Why this?" expandable tooltip on AI insight (show 2-3 data points that generated the archetype — VLM recommended for transparency).
+   664→4. Weekly reflection auto-summary (Sundays) combining mood + readings + goals.
+   665→5. 30-day mood history view (tappable from the 7-day sparkline).
+   666→6. Download real RWS card art via alternative source.
+   667→
+   668→---
+   669→Task ID: cron-review-8
+   670→Agent: main (webDevReview cron, 8th round)
+   671→Task: LLM insight loading state, Why this? transparency tooltip, weekly reflection digest
+   672→
+   673→## Current Project Status Assessment
+   674→Project stable from round 7. All views 8.5-9.5/10. Top priorities from worklog: LLM insight loading state (shimmer), "Why this?" transparency tooltip, weekly reflection auto-summary. The LLM Energy Insight had a 2-3s latency with no loading feedback, and users couldn't see why the AI chose a particular archetype (black-box trust issue). Weekly reflection was a missing retention feature.
+   675→
+   676→## Completed Modifications
+   677→
+   678→### Feature 1: LLM Insight Loading State
+   679→- Added `isLoading: llmLoading` from the `useQuery` hook for `/api/stats/insight`.
+   680→- While loading: the glyph orb shows a spinning ✦ (2s linear rotation), the label changes to "Reading your pattern…", and 3 pulsing skeleton bars replace the title/body.
+   681→- `llmActive` flag ensures the "AI" badge only shows once the LLM response arrives (not during loading).
+   682→- Eliminates the "flash of rule-based insight → swap to LLM" jarring effect.
+   683→
+   684→### Feature 2: "Why this?" Transparency Tooltip
+   685→- **WhyThisTooltip component**: Small "Why this?" button (Info icon) below the AI insight body.
+   686→- Tap → glass-float popover showing "Based on your pattern" with 4 data triggers:
+   687→  - Readings: N total
+   688→  - Goals: N active
+   689→  - Streak: Nd
+   690→  - Mood: X.X/5
+   691→- Closes with backdrop tap. Italic footnote: "The AI weaves these signals into your archetype."
+   692→- Only shows when `llmActive` (AI insight is in use, not rule-based).
+   693→- **VLM**: "the MVP feature — transforms the AI from oracle to analyst. Addresses the black-box problem directly."
+   694→
+   695→### Feature 3: Weekly Reflection Auto-Summary
+   696→- **New API endpoint** `/api/stats/weekly` (runtime=nodejs, maxDuration=30):
+   697→  - Gathers last-7-days data: readings (with questions), confirmations, frequency sessions, moods (with notes), active goals.
+   698→  - Returns early with `{ reflection: null, reason: "no-activity" }` if no data.
+   699→  - Builds a compact summary and sends to z-ai-web-dev-sdk LLM with a "Sunday-evening reflective guide" system prompt.
+
+[showing lines 300-699 of 1669; use offset=700 with limit to continue reading]

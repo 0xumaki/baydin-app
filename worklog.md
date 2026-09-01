@@ -1,0 +1,96 @@
+---
+Task ID: 3
+Agent: Explore (GURU analyzer)
+Task: Deep analysis of GURU repo
+
+Work Log:
+- Read /home/z/my-project/worklog.md (absent — first writer).
+- Read README.md, AGENTS.md, Architecture.md fully for high-level architecture, ports, and conventions.
+- Mapped top-level layout: services/ (8 microservices + shared + contracts + db-migrations), web/ (Next.js 14), docs/, monitoring/, scripts/, archive/, .github/workflows/services.yml.
+- Read services/package.json, tsconfig.base.json, docker-compose.yml, Dockerfile.ts-service, pyrightconfig.json — confirmed Fastify (TS) + FastAPI (Python) + Postgres 14 + Redis 7 + RabbitMQ 3 stack, npm workspaces, one Dockerfile per TS service.
+- Read every TS service's server.ts + app/routes + db.ts + key client (api-gateway app/enforcer/proxy/middleware/orchestration/privacy-routes, identity server/app/users/db/blacklist/pii, subscription server/routes/db/maintenance/adapters/{apple,google}, notification server/routes/db/consumer/scheduler/messaging/delivery-worker/fcm/quiet-hours, horoscope server/routes/assembly/cache, chat-bff server/routes/sessions/memory/stream/chart-context).
+- Read shared/* (config, errors, service-client, jwt, fernet, publisher, metrics, tracing) and contracts/* (index, route-policy, gateway-user, astrologer, birth, zodiac, languages, openapi).
+- Read calculation-engine Python: app/main.py, core/config.py, schemas/calculations.py, routers/{meta,western,vedic,mahabote,compatibility,panchanga,transits,muhurta,chart_viz,helpers}, services/calculations/{western,vedic,mahabote,compatibility/core,yadaya,naming} top-level + ephemeris/ listing.
+- Read ai-interpreter Python: app/main.py, api/{endpoints,deps,chat_stream,admin,schemas}, llm/{config,client}, skills/{registry,renderer}, services/{interpretation_service,chat_service,life_report_service}; skimed skills/SKILL.md (shared persona v2.3.0), skills/vedic-natal/SKILL.md, skills/chat/SKILL.md, skills/life-report/SKILL.md, skills/horoscope/SKILL.md. Listed all 25 skills directories.
+- Read db-migrations/README.md + 5 SQL files (001_identity, 002_identity_gender, 002_notification, 003_subscription, 004_notification_panchanga) and each service's ensureSchema() DDL.
+- Read services/.env.example, services/ai-interpreter/.env.example, services/calculation-engine/.env.example, web/.env.example — captured every env var name.
+- Read web/package.json, web/next.config.mjs, web/app/{layout,globals.css,page,chat/page,birth-chart/page,insights/page,sitemap,robots}. Read web/lib/{api,useAuth,stream,site,store,subscription,purchase,natal,geocode,birth,sunSign,astro}. Skimmed components/{ChatApp,BirthChartTool,InsightsPanel,AuthPanel}.tsx top sections.
+- Read scripts/smoke-check.mjs, .github/workflows/services.yml, monitoring/prometheus/prometheus.yml.
+- Confirmed "BAYDIN" is the actual product brand in code/docs; "GURU" is just the repo-scan directory alias.
+
+Stage Summary:
+- Repo is internally branded BAYDIN (not GURU); the user's "GURU" label refers to this same astrology platform.
+- 8 microservices (6 TS Fastify + 2 Python FastAPI) behind a single api-gateway on :8000, all routed via /api/v1/*.
+- TS stack: Fastify 5, Node 20, npm workspaces, pg/ioredis/bcryptjs/zod, custom Fernet, jsonwebtoken, amqplib, firebase-admin. Python stack: FastAPI, Swiss Ephemeris (pyswisseph), redis, svgwrite, reportlab, Pillow, CairoSVG, httpx (no provider SDK for LLM).
+- Auth model: ROUTE_POLICY table (free / raw_or_premium / premium / admin) enforced only at gateway via identity's POST /internal/auth/introspect (cached 30s). Services trust X-User-Id/X-User-Premium/X-User-Tier/X-Language headers.
+- Language model: NO ?lang= anywhere. Gateway negotiates Accept-Language → X-Language header → LLM writes natively. 5 supported languages: my, en, th, kh, lo.
+- Data layer: single PostgreSQL 14 instance, schema-per-service (identity.users, notification.{devices,preferences,logs,templates}, subscription.subscriptions). Fernet-encrypted PII (dob/tob/pob/lat/lon). Redis db0=calc-cache, db1=identity-blacklist, db2=horoscope-cache, db3=chat-sessions, db4=gateway-rate-limit.
+- Calculation engine exposes ~17 endpoints across western/vedic/mahabote/compatibility/panchanga/transits/muhurta/chart-viz with Swiss Ephemeris ±0.001° accuracy, cached in Redis, returns RawDataWrapper{meta, calculation}.
+- AI interpreter exposes /interpret/chart (skill-based), /life-report (7 parallel sections), /chat/message, /chat/stream (SSE), /gemstones, /career, /dasha, /horoscope/daily, /skills, /skills/version, /internal/llm/config (admin). 24 skills in skills/ dir + shared SKILL.md persona.
+- Chat-bff orchestrates the heaviest flow: session create → vedic natal + dasha + yogas + panchanga + transits + per-topic vargas captured; chat streams through to LLM via SSE with phase/reasoning/writing/done events.
+- Notification service runs daily 06:00 Asia/Yangon scheduler: fans out horoscope/panchanga/transit_alerts/weekly_horoscope jobs onto horoscope.deliver queue, consumed by delivery-worker that calls horoscope service + ai-interpreter + FCM push.
+- Web frontend (Next.js 14 App Router, React 18): 4 routes (/, /chat, /birth-chart, /insights) + ~35 components, ~3000-line globals.css with "ember glass" celestial dark theme (Cormorant Garamond + Jost fonts, accent #e4572e ember-orange). Auth via JWT pair in localStorage with silent 401→refresh. SSE consumer in lib/stream.ts. Astrology charts fetched directly from /chart-viz endpoints via authorizedFetch; insights via gateway's /chart/interpretation orchestration.
+- One Docker image (Dockerfile.ts-service) for all 6 TS services via SERVICE_NAME env selecting which dist/server.js boots.
+
+---
+Task ID: 2
+Agent: Explore (Lumina Tarot analyzer)
+Task: Deep analysis of lumina-tarot-app repo
+
+Work Log:
+- Cloned lumina-tarot-app (public, 1538 files). Read package.json, next.config.ts, tsconfig.json, tailwind.config.ts, components.json, Caddyfile, vercel.json, prisma/schema.prisma, src/middleware.ts.
+- Read src/app/layout.tsx + page.tsx + globals.css (412 lines, full design tokens) to map the Lumina theme.
+- Mapped src/ (app/api/* 20 routes, components/ui 47 shadcn primitives, components/lumina 15 design-system components, features 7 modules, hooks 11, lib 14).
+- Read prisma/schema.prisma fully (10 models: Device, Reading, Goal, Confirmation, FrequencySession, UsageLog, Mood, InsightFeedback, RitualLog, PositivitySession).
+- Read mini-services/reminder-service (socket.io on :3003), Caddyfile (XTransformPort gateway on :81).
+- Read worklog.md first/last 300 lines to trace build history. Confirmed skills/ folder (71 dirs) is ClawHub/ZAI agent tooling, NOT runtime code.
+
+Stage Summary:
+- Lumina = Next.js 16.1.1 (App Router, standalone) + React 19 + TS 5 + Tailwind 4 + shadcn/ui (new-york) + Prisma 6 (PostgreSQL/Neon) + Zustand 5 + TanStack Query 5 + framer-motion 12 + Tone.js 15 + socket.io-client 4 + z-ai-web-dev-sdk 0.0.18 + OpenRouter free LLMs. Runtime: bun.
+- SINGLE route "/"; everything is client-side tab state (5 tabs: Today/Tarot/Manifest/Frequency/Settings + Premium overlay). PWA installable.
+- Theme = dark-first, never light. Tokens: bg #000000, ink/foreground #E8EBE9, accent/gold #C5A87C, sage #9CA8A3, leaf #B5CD7E, surface #121815. Glass cards (backdrop blur 24px), gradient-border shells, animated aurora backdrop, gold-tinted scrollbar. Inter font. Hidden "Luminary" warm-gold theme unlock at 36 achievements.
+- Auth = anonymous device-based (NO real auth). x-device-id header (localStorage UUID "dev_<uuid>"). next-auth installed but UNUSED. Premium is MOCK-toggled via PATCH /api/me.
+- AI = 3-tier LLM fallback: Tier1 OpenRouter free (nemotron/gemma) → Tier2 z-ai-web-dev-sdk → Tier3 deterministic template. Used in tarot read + weekly reflection + premium energy insight.
+- 20 API routes under /api (all force-dynamic, all require x-device-id). Core domains: tarot (read/save/history/card-of-day/reflections), manifest (goals/confirm), frequency (sessions), stats (analytics/weekly/insight), mood, xp, ritual, positivity, export, feedback.
+- Features: AI tarot (6 spreads), card-of-day, reflection journal, manifestation goals+streaks, 12 Solfeggio frequencies (Tone.js) + breathing pacer, positivity generator (11 categories), daily mood, 4-step daily ritual, 36-level XP journey (Seeker→Luminary), 36 achievement badges, stats analytics, LLM weekly reflection + premium energy insight, data export, PWA, rate limiting, mock premium.
+- Mini-service: reminder-service (socket.io :3003) polls DB every 30s for goal reminder times → emits "reminder" event. Frontend connects io("/?XTransformPort=3003").
+- Deployment: Vercel (sin1) for production; packaged Caddy+bun build via .zscripts for self-host. Caddyfile on :81 is the XTransformPort gateway (same convention as my current project scaffold).
+- CRITICAL merge assets: globals.css (Lumina tokens), src/components/lumina/primitives.tsx (GlassCard/ShellCard/GoldButton/Pill/SectionTitle), bottom-nav.tsx, src/lib/ai-tarot.ts (3-tier fallback pattern), src/lib/store.ts (Zustand), src/hooks/use-api.ts (fetch+x-device-id).
+
+---
+Task ID: 4
+Agent: Orchestrator (Z.ai Code)
+Task: Synthesize both repo analyses into a unified summary + produce a merge plan for combining Lumina Tarot (frontend+theme) with GURU/BAYDIN (backend microservices + re-themed frontend)
+
+Work Log:
+- Dispatched two parallel Explore subagents (Task 2 Lumina, Task 3 GURU) to deep-scan each repo. Both returned comprehensive reports.
+- Cross-referenced stacks, auth models, data layers, API conventions, AI integrations, themes, and deployment models.
+- Identified incompatibilities and integration seams between the two codebases.
+- Designed a phased merge plan that preserves Lumina's frontend/theme identity and GURU's backend capability without a full rewrite.
+
+Stage Summary (UNIFIED LEARNINGS):
+- Both repos are spiritual/mystical platforms but at different layers. Lumina is a polished dark-first PWA tarot companion (frontend-heavy, single-route Next 16, mock everything). GURU/BAYDIN is an enterprise-grade astrology backend (8 microservices, real JWT auth, IAP payments, Swiss Ephemeris math, 24 LLM skills, push notifications) with a thin Next 14 sample web frontend.
+- STACK MISMATCHES that block a naive merge:
+  * Lumina: Next 16 + React 19 + Prisma 6 (Postgres) + Tailwind 4 + shadcn/ui + anonymous device auth + bun.
+  * GURU web: Next 14 + React 18 + raw CSS (no Tailwind/shadcn) + JWT auth (localStorage) + npm.
+  * GURU services: Fastify 5 (TS) + FastAPI (Python) + raw pg SQL (no Prisma) + Redis + RabbitMQ + Fernet PII + docker-compose.
+- AUTH MISMATCH (the biggest seam): Lumina = anonymous x-device-id; GURU = JWT email/password pair with refresh + blacklist + introspect. A merge must pick ONE auth model. Recommended: adopt GURU's JWT auth for the astrology features (they need real user accounts for birth data + subscriptions), and keep Lumina's anonymous device flow for the tarot/manifest/frequency features that don't need accounts — OR migrate Lumina's data to be user-scoped.
+- AI INTEGRATION overlap: Lumina uses z-ai-web-dev-sdk + OpenRouter (3-tier fallback, English tarot). GURU uses plain httpx to OpenRouter/Gemini (24 skill prompts, multi-language incl Burmese). They can coexist: keep Lumina's tarot AI as-is for the tarot tab; route astrology reads through GURU's ai-interpreter.
+- GATEWAY CONVENTION ALIGNMENT: Both already use the same Caddy XTransformPort gateway pattern (Lumina Caddyfile :81, my scaffold uses it too). GURU services run on :8001-:8014 + :8000 gateway. We can front GURU's :8000 gateway through the single external port via XTransformPort, OR run GURU services as mini-services reachable through the existing gateway.
+
+MERGE PLAN (proposed, awaiting user confirmation):
+Phase 0 — Decision & scaffolding (needs user input):
+  Q1. Auth model: keep anonymous device (Lumina) vs adopt JWT (GURU) vs hybrid (device for tarot, JWT for astrology)?
+  Q2. Data layer: keep Lumina Prisma Postgres + GURU raw pg in same DB instance (separate schemas) vs merge?
+  Q3. Run GURU services in-process (port each via XTransformPort) vs full docker-compose vs rewrite hot services in Next API routes?
+Phase 1 — Theme port: Re-skin GURU web's 4 routes (/, /chat, /birth-chart, /insights) into Lumina dark theme (tokens #000/#E8EBE9/#C5A87C gold, Inter font, glass cards, gold hero nav). Reuse Lumina primitives (GlassCard/ShellCard/GoldButton/Pill).
+Phase 2 — Auth bridge: Add a GURU JWT client into Lumina's lib; adapt useApi() to attach Bearer when logged in, x-device-id when anonymous.
+Phase 3 — Feature wiring: Add Astrology tab to Lumina's bottom nav (6th tab) hosting re-themed GURU views: BirthChartTool, InsightsPanel, ChatApp (astrologer), Horoscope daily.
+Phase 4 — Backend integration: Stand up GURU services (docker-compose or mini-service ports) reachable through the Caddy XTransformPort gateway from Lumina's frontend.
+Phase 5 — Identity merge: Decide whether Lumina Device <-> GURU User share a row (link device to JWT user) so XP/history carry across.
+Phase 6 — Premium unification: Replace Lumina mock premium with GURU subscription IAP (Apple/Google) so premium unlocks both tarot spreads AND astrology premium features.
+
+KEY FILES TO CARRY OVER:
+- From Lumina: src/app/globals.css, src/components/lumina/*, src/app/layout.tsx, src/app/page.tsx (tab shell), src/lib/store.ts, src/lib/ai-tarot.ts, prisma/schema.prisma.
+- From GURU web: components/{ChatApp,BirthChartTool,InsightsPanel,AuthPanel,BirthDataForm,PartnerBirthForm,PricingSection}.tsx, lib/{api,stream,store,natal,geocode}.ts, app/{chat,birth-chart,insights}/page.tsx.
+- From GURU services (as backend, not ported into Next): services/contracts/src/route-policy.ts (the API contract), services/docker-compose.yml, services/.env.example.

@@ -1,0 +1,826 @@
+     1→"""
+     2→Calculation Engine request/response schemas.
+     3→
+     4→Locale-neutral Pydantic models for Western (Zata), Vedic, Mahabote,
+     5→compatibility and chart visualization endpoints.
+     6→
+     7→The calculation engine returns raw, locale-neutral data only. Language
+     8→selection is handled by the gateway (via the `X-Language` header) and the
+     9→AI interpreter service.
+    10→"""
+    11→
+    12→from pydantic import ConfigDict, BaseModel, Field, field_validator
+    13→from datetime import datetime, date as Date, time
+    14→from typing import Optional, Dict, List, Literal, Any
+    15→
+    16→
+    17→# ============================================================================
+    18→# Base Models for Planetary Positions and Houses
+    19→# ============================================================================
+    20→
+    21→class PlanetPosition(BaseModel):
+    22→    """Western/Tropical planetary position (locale-neutral)."""
+    23→    longitude: float = Field(
+    24→        ...,
+    25→        description="Ecliptic longitude in degrees (0-360°). Measured from 0° Aries in tropical zodiac.",
+    26→        examples=[294.5],
+    27→        ge=0,
+    28→        lt=360
+    29→    )
+    30→    sign: str = Field(
+    31→        ...,
+    32→        description="Zodiac sign name in English (Aries, Taurus, Gemini, etc.)",
+    33→        examples=["Capricorn"]
+    34→    )
+    35→    degree: float = Field(
+    36→        ...,
+    37→        ge=0,
+    38→        lt=30,
+    39→        description="Degree within the zodiac sign (0-29.999°)",
+    40→        examples=[24.5]
+    41→    )
+    42→    retrograde: bool = Field(...,
+    43→        description="Whether planet appears to move backward from Earth's perspective.")
+    44→    speed: Optional[float] = Field(None,
+    45→        description="Longitudinal speed in degrees per day. Positive = direct motion, negative = retrograde.")
+    46→
+    47→
+    48→class VedicPlanetPosition(BaseModel):
+    49→    """Vedic/Sidereal planetary position with nakshatra and pada details."""
+    50→    longitude: float = Field(
+    51→        ...,
+    52→        description="Sidereal ecliptic longitude in degrees (0-360°). Adjusted for precession using ayanamsa.",
+    53→        examples=[270.5],
+    54→        ge=0,
+    55→        lt=360
+    56→    )
+    57→    sign: str = Field(...,
+    58→        description="Sidereal zodiac sign name", json_schema_extra={"example": "Capricorn"})
+    59→    degree: float = Field(
+    60→        ...,
+    61→        ge=0,
+    62→        lt=30,
+    63→        description="Degree within the sidereal zodiac sign (0-29.999°)",
+    64→        examples=[0.5]
+    65→    )
+    66→    nakshatra: str = Field(
+    67→        ...,
+    68→        description="Nakshatra (lunar mansion) name. One of 27 nakshatras, each spanning 13°20'.",
+    69→        examples=["Uttara Ashadha"]
+    70→    )
+    71→    pada: int = Field(
+    72→        ...,
+    73→        ge=1,
+    74→        le=4,
+    75→        description="Pada (quarter) within nakshatra (1-4)",
+    76→        examples=[1]
+    77→    )
+    78→    retrograde: bool = Field(...,
+    79→        description="Whether planet is in retrograde motion from Earth's perspective")
+    80→
+    81→
+    82→class HouseCusp(BaseModel):
+    83→    """House cusp position."""
+    84→    house_number: int = Field(..., ge=1, le=12, description="House number (1-12)")
+    85→    longitude: float = Field(...,
+    86→                             description="Ecliptic longitude of house cusp in degrees")
+    87→    sign: str = Field(..., description="Zodiac sign of house cusp")
+    88→
+    89→
+    90→# ============================================================================
+    91→# Calculation Metadata
+    92→# ============================================================================
+    93→
+    94→class CalculationMetadata(BaseModel):
+    95→    """Transparent calculation metadata for all astrological calculations."""
+    96→    coordinate_system: Literal['tropical', 'sidereal', 'traditional'] = Field(...,
+    97→        description="Coordinate system used: 'tropical' for Western, 'sidereal' for Vedic, 'traditional' for Mahabote")
+    98→    house_system: Optional[str] = Field(
+    99→        None,
+   100→        description="House system used for house cusp calculations (placidus, koch, equal, whole_sign).",
+   101→        examples=["placidus"]
+   102→    )
+   103→    ayanamsa: Optional[str] = Field(
+   104→        None,
+   105→        description="Ayanamsa used for sidereal calculations. Options: lahiri, krishnamurti, raman, yukteshwar",
+   106→        examples=["LAHIRI"]
+   107→    )
+   108→    ayanamsa_value: Optional[float] = Field(None,
+   109→        description="Ayanamsa value in degrees at the time of calculation.")
+   110→    ephemeris_version: str = Field(...,
+   111→        description="Swiss Ephemeris version used for astronomical calculations.")
+   112→    calculation_timestamp: datetime = Field(...,
+   113→        description="UTC timestamp when the calculation was performed.")
+   114→    geographic_coordinates: Dict[str, float] = Field(
+   115→        ...,
+   116→        description="Geographic coordinates used for the calculation. Format: {'latitude': float, 'longitude': float}"
+   117→    )
+   118→    timezone: str = Field(
+   119→        ...,
+   120→        description="Timezone identifier for the birth location (e.g., 'Asia/Yangon', 'UTC')"
+   121→    )
+   122→    documentation_url: str = Field(
+   123→        default="/api/v1/docs/calculations",
+   124→        description="URL to detailed calculation methodology documentation"
+   125→    )
+   126→
+   127→
+   128→# ============================================================================
+   129→# Western (Zata) Calculation Schemas
+   130→# ============================================================================
+   131→
+   132→class WesternNatalRequest(BaseModel):
+   133→    """Request schema for Western (tropical) natal chart calculation."""
+   134→    birth_datetime: datetime = Field(
+   135→        ...,
+   136→        description="Birth datetime with timezone in ISO 8601 format (e.g., '1990-01-15T14:30:00+06:30'). Must include timezone for accurate calculations.",
+   137→        examples=["1990-01-15T14:30:00+06:30"]
+   138→    )
+   139→    latitude: float = Field(...,
+   140→        ge=-90,
+   141→        le=90,
+   142→        description="Geographic latitude of birth location in decimal degrees. North is positive, South is negative.", json_schema_extra={"example": 16.8661})
+   143→    longitude: float = Field(...,
+   144→        ge=-180,
+   145→        le=180,
+   146→        description="Geographic longitude of birth location in decimal degrees. East is positive, West is negative.", json_schema_extra={"example": 96.1951})
+   147→    house_system: Literal['placidus', 'koch', 'equal', 'whole_sign'] = Field(default='placidus',
+   148→        description="House system to use for house cusp calculations.")
+   149→
+   150→    @field_validator('birth_datetime')
+   151→    @classmethod
+   152→    def validate_birth_datetime(cls, v):
+   153→        """Validate birth datetime is not in future and within reasonable range."""
+   154→        if v > datetime.now(v.tzinfo):
+   155→            raise ValueError("Birth datetime cannot be in the future")
+   156→        if v.year < 1900:
+   157→            raise ValueError(
+   158→                "Birth year must be 1900 or later for accurate calculations")
+   159→        if v.year > datetime.now().year:
+   160→            raise ValueError("Birth year cannot be in the future")
+   161→        return v
+   162→
+   163→    @field_validator('latitude', 'longitude')
+   164→    @classmethod
+   165→    def validate_coordinates(cls, v):
+   166→        """Validate coordinates are numeric and within valid range."""
+   167→        if not isinstance(v, (int, float)):
+   168→            raise ValueError("Coordinates must be numeric values")
+   169→        if not (-180 <= v <= 180):
+   170→            raise ValueError("Coordinate value out of valid range")
+   171→        return v
+   172→
+   173→
+   174→class AspectInfo(BaseModel):
+   175→    """Information about a planetary aspect."""
+   176→    planet1: str = Field(..., description="First planet name")
+   177→    planet2: str = Field(..., description="Second planet name")
+   178→    aspect: str = Field(..., description="Aspect name (Conjunction, Opposition, etc.)")
+   179→    angle: float = Field(..., description="Actual angle between planets")
+   180→    orb: float = Field(..., description="Orb (difference from exact aspect)")
+   181→    applying: bool = Field(..., description="Whether aspect is applying or separating")
+   182→    exact_angle: float = Field(..., description="Exact angle for this aspect type")
+   183→
+   184→
+   185→class WesternNatalResponse(BaseModel):
+   186→    """Response schema for Western natal chart calculation."""
+   187→    chart_type: str = Field(..., description="Chart type identifier (e.g., 'western_natal')")
+   188→    planets: Dict[str, PlanetPosition] = Field(
+   189→        ...,
+   190→        description="Planetary positions in tropical zodiac, keyed by planet name"
+   191→    )
+   192→    houses: List[HouseCusp] = Field(..., description="House cusp positions (12 houses)")
+   193→    ascendant: Dict[str, Any] = Field(..., description="Ascendant (Rising Sign) data")
+   194→    midheaven: Dict[str, Any] = Field(..., description="Midheaven (MC) data")
+   195→    aspects: List[AspectInfo] = Field(..., description="Planetary aspects")
+   196→    metadata: CalculationMetadata = Field(..., description="Calculation metadata")
+   197→
+   198→
+   199→# ============================================================================
+   200→# Vedic Calculation Schemas
+   201→# ============================================================================
+   202→
+   203→class VedicNatalRequest(BaseModel):
+   204→    """Request schema for Vedic (sidereal) natal chart calculation."""
+   205→    birth_datetime: datetime = Field(...,
+   206→        description="Birth datetime with timezone in ISO 8601 format.", json_schema_extra={"example": "1990-01-15T14:30:00+06:30"})
+   207→    latitude: float = Field(...,
+   208→        ge=-90,
+   209→        le=90,
+   210→        description="Geographic latitude of birth location in decimal degrees.", json_schema_extra={"example": 16.8661})
+   211→    longitude: float = Field(...,
+   212→        ge=-180,
+   213→        le=180,
+   214→        description="Geographic longitude of birth location in decimal degrees.", json_schema_extra={"example": 96.1951})
+   215→    ayanamsa: Literal['lahiri', 'krishnamurti', 'raman', 'yukteshwar'] = Field(
+   216→        default='lahiri',
+   217→        description="Ayanamsa (precession correction) system to use.",
+   218→        examples=["lahiri"]
+   219→    )
+   220→
+   221→    @field_validator('birth_datetime')
+   222→    @classmethod
+   223→    def validate_birth_datetime(cls, v):
+   224→        """Validate birth datetime is not in future and within reasonable range."""
+   225→        if v > datetime.now(v.tzinfo):
+   226→            raise ValueError("Birth datetime cannot be in the future")
+   227→        if v.year < 1900:
+   228→            raise ValueError(
+   229→                "Birth year must be 1900 or later for accurate calculations")
+   230→        return v
+   231→
+   232→    @field_validator('latitude', 'longitude')
+   233→    @classmethod
+   234→    def validate_coordinates(cls, v):
+   235→        """Validate coordinates are numeric and within valid range."""
+   236→        if not isinstance(v, (int, float)):
+   237→            raise ValueError("Coordinates must be numeric values")
+   238→        return v
+   239→
+   240→
+   241→class VedicNatalResponse(BaseModel):
+   242→    """Response schema for Vedic natal chart (D1) calculation."""
+   243→    chart_type: str = Field(..., description="Chart type identifier (e.g., 'vedic_natal')")
+   244→    division: str = Field(..., description="Division identifier (e.g., 'D1')")
+   245→    division_name: str = Field(..., description="Division name (e.g., 'Rasi')")
+   246→    planets: Dict[str, VedicPlanetPosition] = Field(
+   247→        ...,
+   248→        description="Planetary positions with nakshatra details, keyed by planet name"
+   249→    )
+   250→    houses: List[HouseCusp] = Field(..., description="House cusp positions (12 houses)")
+   251→    ascendant: Dict[str, Any] = Field(..., description="Ascendant (Lagna) data")
+   252→    ayanamsa: str = Field(..., description="Ayanamsa system used")
+   253→    ayanamsa_value: float = Field(..., description="Ayanamsa value in degrees")
+   254→    metadata: CalculationMetadata = Field(..., description="Calculation metadata")
+   255→
+   256→
+   257→class VargaChartRequest(BaseModel):
+   258→    """Request schema for Vedic divisional chart (Varga) calculation."""
+   259→    birth_datetime: datetime = Field(
+   260→        ...,
+   261→        description="Birth datetime with timezone (ISO 8601 format)"
+   262→    )
+   263→    latitude: float = Field(..., ge=-90, le=90, description="Geographic latitude")
+   264→    longitude: float = Field(..., ge=-180, le=180, description="Geographic longitude")
+   265→    ayanamsa: Literal['lahiri', 'krishnamurti', 'raman', 'yukteshwar'] = Field(
+   266→        default='lahiri',
+   267→        description="Ayanamsa to use for sidereal calculations"
+   268→    )
+   269→    division: Optional[int] = Field(
+   270→        None,
+   271→        description="Varga division number (path parameter is authoritative; kept for client compatibility)"
+   272→    )
+   273→
+   274→    @field_validator('birth_datetime')
+   275→    @classmethod
+   276→    def validate_birth_datetime(cls, v):
+   277→        """Validate birth datetime is not in future and within reasonable range."""
+   278→        if v > datetime.now(v.tzinfo):
+   279→            raise ValueError("Birth datetime cannot be in the future")
+   280→        if v.year < 1900:
+   281→            raise ValueError(
+   282→                "Birth year must be 1900 or later for accurate calculations")
+   283→        return v
+   284→
+   285→    @field_validator('division')
+   286→    @classmethod
+   287→    def validate_division(cls, v):
+   288→        """Validate division is a supported Varga when provided."""
+   289→        if v is None:
+   290→            return v
+   291→        valid_divisions = [2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60]
+   292→        if v not in valid_divisions:
+   293→            raise ValueError(f"Division must be one of: {valid_divisions}")
+   294→        return v
+   295→
+   296→
+   297→class VargaPlanetPosition(BaseModel):
+   298→    """Planetary position in a divisional chart."""
+   299→    varga_longitude: float = Field(...,
+   300→                                   description="Longitude in divisional chart (0-360)")
+   301→    varga_sign: str = Field(..., description="Sign in divisional chart")
+   302→    varga_degree: float = Field(..., ge=0, lt=30,
+   303→                                description="Degree within sign in divisional chart")
+   304→
+   305→
+   306→class VargaChartResponse(BaseModel):
+   307→    """Response schema for Vedic divisional chart calculation."""
+   308→    chart_type: str = Field(..., description="Chart type identifier (e.g., 'vedic_varga')")
+   309→    division: str = Field(..., description="Division identifier (e.g., 'D9', 'D10')")
+   310→    division_name: str = Field(...,
+   311→                               description="Traditional name (e.g., 'Navamsa', 'Dasamsa')")
+   312→    planets: Dict[str, VargaPlanetPosition] = Field(
+   313→        ...,
+   314→        description="Planetary positions in divisional chart, keyed by planet name"
+   315→    )
+   316→    ayanamsa: str = Field(..., description="Ayanamsa system used")
+   317→    ayanamsa_value: float = Field(..., description="Ayanamsa value in degrees")
+   318→    metadata: CalculationMetadata = Field(..., description="Calculation metadata")
+   319→
+   320→
+   321→# ============================================================================
+   322→# Dasha Calculation Schemas
+   323→# ============================================================================
+   324→
+   325→class DashaRequest(BaseModel):
+   326→    """Request schema for Vimshottari Dasha calculation."""
+   327→    birth_datetime: datetime = Field(
+   328→        ...,
+   329→        description="Birth datetime with timezone (ISO 8601 format)"
+   330→    )
+   331→    latitude: float = Field(..., ge=-90, le=90, description="Geographic latitude")
+   332→    longitude: float = Field(..., ge=-180, le=180, description="Geographic longitude")
+   333→    ayanamsa: Literal['lahiri', 'krishnamurti', 'raman', 'yukteshwar'] = Field(
+   334→        default='lahiri',
+   335→        description="Ayanamsa to use for sidereal calculations"
+   336→    )
+   337→
+   338→    @field_validator('birth_datetime')
+   339→    @classmethod
+   340→    def validate_birth_datetime(cls, v):
+   341→        """Validate birth datetime is not in future and within reasonable range."""
+   342→        if v > datetime.now(v.tzinfo):
+   343→            raise ValueError("Birth datetime cannot be in the future")
+   344→        if v.year < 1900:
+   345→            raise ValueError(
+   346→                "Birth year must be 1900 or later for accurate calculations")
+   347→        return v
+   348→
+   349→
+   350→class CurrentDashaResponse(BaseModel):
+   351→    """Response schema for current Dasha period."""
+   352→    mahadasha: Dict[str, Any] = Field(..., description="Current Mahadasha info")
+   353→    antardasha: Dict[str, Any] = Field(..., description="Current Antardasha info")
+   354→    pratyantardasha: Optional[Dict[str, Any]] = Field(
+   355→        None, description="Current Pratyantardasha info"
+   356→    )
+   357→    birth_julian_day: float = Field(..., description="Julian Day of birth")
+   358→
+   359→
+   360→# ============================================================================
+   361→# Mahabote (Myanmar Traditional) Calculation Schemas
+   362→# ============================================================================
+   363→
+   364→class MahaboteCalculationRequest(BaseModel):
+   365→    """Request schema for Mahabote (Myanmar traditional astrology) calculation."""
+   366→    birth_date: Date = Field(..., description="Birth date")
+   367→    birth_time: Optional[datetime] = Field(
+   368→        None,
+   369→        description="Optional birth time for Rahu rule (Wednesday afternoon). Accepts ISO 8601 format with timezone offset (e.g., '1987-12-04T03:40:00+06:30')"
+   370→    )
+   371→
+   372→    @field_validator('birth_date')
+   373→    @classmethod
+   374→    def validate_birth_date(cls, v):
+   375→        """Validate birth date is not in future."""
+   376→        if v > Date.today():
+   377→            raise ValueError("Birth date cannot be in the future")
+   378→        if v.year < 1900:
+   379→            raise ValueError("Birth year must be 1900 or later")
+   380→        return v
+   381→
+   382→    @field_validator('birth_time', mode='before')
+   383→    @classmethod
+   384→    def parse_birth_time(cls, v):
+   385→        """Parse birth time from ISO 8601 string or datetime object."""
+   386→        if v is None:
+   387→            return None
+   388→        if isinstance(v, datetime):
+   389→            return v
+   390→        if isinstance(v, str):
+   391→            try:
+   392→                import re
+   393→                match = re.match(r'(.+)([+-]\d{2}):(\d{2})$', v)
+   394→                if match:
+   395→                    v = f"{match.group(1)}{match.group(2)}{match.group(3)}"
+   396→                return datetime.fromisoformat(v)
+   397→            except ValueError as e:
+   398→                raise ValueError(f"Invalid datetime format: {str(e)}")
+   399→        raise ValueError(f"birth_time must be a datetime object or ISO 8601 string, got {type(v)}")
+   400→
+   401→
+   402→class MahaboteCurrentHouse(BaseModel):
+   403→    """Current house information in Mahabote chart."""
+   404→    house_number: int = Field(..., ge=1, le=7, description="House number (1-7)")
+   405→    house_meaning: str = Field(...,
+   406→                               description="House meaning")
+   407→    planet: str = Field(...,
+   408→                        description="Planet in current house")
+   409→    years_passed: int = Field(...,
+   410→                              description="Number of Myanmar years passed since birth")
+   411→
+   412→
+   413→class MahaboteHouseProgression(BaseModel):
+   414→    """House progression entry for a specific year."""
+   415→    myanmar_year: int = Field(..., description="Myanmar calendar year")
+   416→    age: int = Field(..., description="Age in that year (Myanmar calculation)")
+   417→    house_number: int = Field(..., ge=1, le=7, description="House number (1-7)")
+   418→    house_meaning: str = Field(...,
+   419→                               description="House meaning")
+   420→    planet: str = Field(..., description="Planet in house")
+   421→    is_current: bool = Field(..., description="Whether this is the current year")
+   422→
+   423→
+   424→class MahaboteChartHouse(BaseModel):
+   425→    """Chart structure for a single house."""
+   426→    house_meaning: str = Field(...,
+   427→                               description="House meaning")
+   428→    planet: str = Field(..., description="Planet in house")
+   429→
+   430→
+   431→class MahaboteCalculationResponse(BaseModel):
+   432→    """Response schema for Mahabote calculation."""
+   433→    birth_date: str = Field(..., description="Birth date (ISO format)")
+   434→    birth_time: Optional[str] = Field(
+   435→        None, description="Birth time (ISO format) if provided")
+   436→    birth_weekday: str = Field(...,
+   437→                               description="Weekday of birth")
+   438→    birth_planet: str = Field(...,
+   439→                              description="Birth planet")
+   440→    myanmar_birth_year: int = Field(..., description="Myanmar calendar year of birth")
+   441→    current_date: str = Field(..., description="Current date (ISO format)")
+   442→    current_myanmar_year: int = Field(..., description="Current Myanmar calendar year")
+   443→    age: int = Field(..., description="Current age (Myanmar age calculation)")
+   444→    current_house: MahaboteCurrentHouse = Field(...,
+   445→                                                description="Current house information")
+   446→    house_progression: List[MahaboteHouseProgression] = Field(
+   447→        ...,
+   448→        description="House progression for current and future years"
+   449→    )
+   450→    chart_structure: Dict[int, MahaboteChartHouse] = Field(
+   451→        ...,
+   452→        description="Complete chart structure with all 7 houses"
+   453→    )
+   454→    metadata: CalculationMetadata = Field(...,
+   455→                                          description="Calculation metadata")
+   456→
+   457→
+   458→# ============================================================================
+   459→# Compatibility Calculation Schemas
+   460→# ============================================================================
+   461→
+   462→class PersonBirthData(BaseModel):
+   463→    """Birth data for a person in compatibility analysis."""
+   464→    name: Optional[str] = Field(None, description="Person's name", max_length=100, json_schema_extra={"example": "Person A"})
+   465→    dob: Date = Field(..., description="Date of birth", json_schema_extra={"example": "1990-05-15"})
+   466→    tob: time = Field(..., description="Time of birth", json_schema_extra={"example": "10:30:00"})
+   467→    latitude: float = Field(..., ge=-90, le=90,
+   468→                            description="Birth latitude", json_schema_extra={"example": 16.8661})
+   469→    longitude: float = Field(..., ge=-180, le=180,
+   470→                             description="Birth longitude", json_schema_extra={"example": 96.1951})
+   471→    timezone: Optional[str] = Field('Asia/Yangon', description="Timezone", max_length=50, json_schema_extra={"example": "Asia/Yangon"})
+   472→
+   473→
+   474→class CompatibilityRequest(BaseModel):
+   475→    """Request schema for multi-system compatibility analysis."""
+   476→    person_a: PersonBirthData = Field(..., description="First person's birth data")
+   477→    person_b: PersonBirthData = Field(..., description="Second person's birth data")
+   478→    relationship_type: Literal['MARRIAGE', 'ROMANTIC', 'BUSINESS', 'FRIENDSHIP', 'FAMILY'] = Field(
+   479→        default='MARRIAGE',
+   480→        description="Type of relationship for compatibility analysis"
+   481→    )
+   482→
+   483→
+   484→class CompatibilityResponse(BaseModel):
+   485→    """Response schema for compatibility analysis."""
+   486→    person_a: PersonBirthData = Field(..., description="First person's birth data")
+   487→    person_b: PersonBirthData = Field(..., description="Second person's birth data")
+   488→    relationship_type: str = Field(..., description="Relationship type analyzed")
+   489→    overall_score: int = Field(..., ge=0, le=100, description="Overall compatibility score (0-100)")
+   490→    compatibility_level: str = Field(..., description="Compatibility level description")
+   491→    systems: Dict[str, Any] = Field(..., description="Per-system compatibility breakdown")
+   492→    metadata: CalculationMetadata = Field(..., description="Calculation metadata")
+   493→
+   494→
+   495→# ============================================================================
+   496→# Chart Visualization Schemas
+   497→# ============================================================================
+   498→
+   499→from enum import Enum
+   500→
+   501→
+   502→class OutputFormat(str, Enum):
+   503→    """Output format for chart visualization."""
+   504→    SVG = "svg"
+   505→    PNG = "png"
+   506→    PDF = "pdf"
+   507→
+   508→
+   509→class VedicChartStyle(str, Enum):
+   510→    """Style for Vedic chart visualization."""
+   511→    SOUTH_INDIAN = "south_indian"
+   512→    NORTH_INDIAN = "north_indian"
+   513→
+   514→
+   515→class ChartType(str, Enum):
+   516→    """Types of charts available."""
+   517→    WESTERN = "western"
+   518→    VEDIC = "vedic"
+   519→    MAHABOTE = "mahabote"
+   520→
+   521→
+   522→class ChartVizRequestBase(BaseModel):
+   523→    """Base request schema for chart visualization."""
+   524→    birth_datetime: datetime = Field(
+   525→        ...,
+   526→        description="Birth date and time with timezone (ISO 8601 format)"
+   527→    )
+   528→    latitude: float = Field(
+   529→        ...,
+   530→        ge=-90,
+   531→        le=90,
+   532→        description="Geographic latitude (-90 to 90)"
+   533→    )
+   534→    longitude: float = Field(
+   535→        ...,
+   536→        ge=-180,
+   537→        le=180,
+   538→        description="Geographic longitude (-180 to 180)"
+   539→    )
+   540→
+   541→
+   542→class WesternChartVizRequest(ChartVizRequestBase):
+   543→    """Request schema for Western chart visualization."""
+   544→    house_system: str = Field(
+   545→        default="placidus",
+   546→        description="House system to use (placidus, koch, equal, whole_sign)"
+   547→    )
+   548→    show_aspects: bool = Field(
+   549→        default=True,
+   550→        description="Whether to show aspect lines between planets"
+   551→    )
+   552→    show_degrees: bool = Field(
+   553→        default=True,
+   554→        description="Whether to show degree numbers on planets"
+   555→    )
+   556→
+   557→
+   558→class VedicChartVizRequest(ChartVizRequestBase):
+   559→    """Request schema for Vedic chart visualization."""
+   560→    ayanamsa: str = Field(
+   561→        default="lahiri",
+   562→        description="Ayanamsa to use (lahiri, krishnamurti, raman, yukteshwar)"
+   563→    )
+   564→    style: VedicChartStyle = Field(
+   565→        default=VedicChartStyle.SOUTH_INDIAN,
+   566→        description="Chart style (south_indian or north_indian)"
+   567→    )
+   568→    show_nakshatra: bool = Field(
+   569→        default=True,
+   570→        description="Whether to show nakshatra information"
+   571→    )
+   572→
+   573→
+   574→class MahaboteChartVizRequest(BaseModel):
+   575→    """Request schema for Mahabote chart visualization."""
+   576→    birth_date: str = Field(
+   577→        ...,
+   578→        description="Birth date in YYYY-MM-DD format"
+   579→    )
+   580→    birth_time: Optional[str] = Field(
+   581→        None,
+   582→        description="Birth time in HH:MM format or full ISO datetime (optional, used for Wednesday Rahu rule)"
+   583→    )
+   584→
+   585→    @field_validator('birth_time', mode='before')
+   586→    @classmethod
+   587→    def parse_birth_time(cls, v):
+   588→        """Parse birth time from various formats (HH:MM, HH:MM:SS, or ISO datetime)."""
+   589→        if v is None:
+   590→            return None
+   591→        if isinstance(v, str):
+   592→            if 'T' in v:
+   593→                time_part = v.split('T')[1]
+   594→                if '+' in time_part:
+   595→                    time_part = time_part.split('+')[0]
+   596→                if '-' in time_part and len(time_part) > 5:
+   597→                    time_part = time_part.split('-')[0]
+   598→                return time_part
+   599→            return v
+   600→        raise ValueError(f"birth_time must be a string, got {type(v)}")
+   601→
+   602→
+   603→class CombinedPdfRequest(ChartVizRequestBase):
+   604→    """Request schema for combined PDF export."""
+   605→    house_system: str = Field(
+   606→        default="placidus",
+   607→        description="House system for Western chart"
+   608→    )
+   609→    ayanamsa: str = Field(
+   610→        default="lahiri",
+   611→        description="Ayanamsa for Vedic chart"
+   612→    )
+   613→    include_charts: List[ChartType] = Field(
+   614→        default=[ChartType.WESTERN, ChartType.VEDIC, ChartType.MAHABOTE],
+   615→        description="List of chart types to include in PDF"
+   616→    )
+   617→    name: Optional[str] = Field(
+   618→        None,
+   619→        description="Name for the report cover page"
+   620→    )
+   621→
+   622→
+   623→class ChartVizMetadata(BaseModel):
+   624→    """Metadata for chart visualization response."""
+   625→    chart_type: str
+   626→    generation_timestamp: datetime
+   627→    width: int
+   628→    height: int
+   629→    format: OutputFormat
+   630→
+   631→
+   632→class ChartVizResponse(BaseModel):
+   633→    """Response schema for chart visualization (SVG format)."""
+   634→    svg_data: str = Field(
+   635→        ...,
+   636→        description="SVG content as string"
+   637→    )
+   638→    metadata: ChartVizMetadata
+   639→
+   640→
+   641→class BinaryResponse(BaseModel):
+   642→    """Response info for binary formats (PNG/PDF)."""
+   643→    content_type: str
+   644→    filename: str
+   645→    size_bytes: int
+   646→
+   647→
+   648→# ============================================================================
+   649→# Raw Data Wrapper (matching monolith RawDataWrapper contract, locale-neutral)
+   650→# ============================================================================
+   651→
+   652→class MetaInfo(BaseModel):
+   653→    """Standardized metadata for raw calculation responses."""
+   654→    ai_generated: bool = Field(
+   655→        default=False,
+   656→        description="Whether response contains AI-generated content"
+   657→    )
+   658→    generated_at: datetime = Field(
+   659→        description="UTC timestamp when response was generated"
+   660→    )
+   661→    interpretation_type: str = Field(
+   662→        description="Type: western_natal, vedic_natal, mahabote, etc."
+   663→    )
+   664→    calculation_engine: str = Field(
+   665→        default="swisseph-2.10.03",
+   666→        description="Ephemeris version used"
+   667→    )
+   668→
+   669→
+   670→class RawDataWrapper(BaseModel):
+   671→    """Wrapper for raw calculation data (no AI interpretation)."""
+   672→    meta: MetaInfo = Field(
+   673→        description="Metadata (ai_generated=false for raw data)"
+   674→    )
+   675→    calculation: Dict[str, Any] = Field(
+   676→        description="Raw calculation results"
+   677→    )
+   678→
+   679→
+   680→# ============================================================================
+   681→# Panchanga / Muhurta / Transit-to-natal / Solar Return requests
+   682→# ============================================================================
+   683→
+   684→AyanamsaName = Literal['lahiri', 'krishnamurti', 'raman', 'yukteshwar']
+   685→
+   686→
+   687→class PanchangaRequest(BaseModel):
+   688→    """Request schema for daily Panchanga (five-limb almanac)."""
+   689→    date: Optional[datetime] = Field(
+   690→        None,
+   691→        description="Moment to compute Panchanga for (default: now UTC)"
+   692→    )
+   693→    latitude: float = Field(..., ge=-90, le=90, description="Geographic latitude")
+   694→    longitude: float = Field(..., ge=-180, le=180, description="Geographic longitude")
+   695→    timezone: str = Field(
+   696→        default='UTC',
+   697→        description="IANA timezone for local calendar day and inauspicious periods",
+   698→        examples=["Asia/Yangon"]
+   699→    )
+   700→    ayanamsa: AyanamsaName = Field(
+   701→        default='lahiri',
+   702→        description="Ayanamsa to use for sidereal calculations"
+   703→    )
+   704→
+   705→
+   706→class MuhurtaRequest(BaseModel):
+   707→    """Request schema for Muhurta (electional) day-quality scan."""
+   708→    start_date: Optional[datetime] = Field(
+   709→        None,
+   710→        description="First day of the scan window (default: today UTC)"
+   711→    )
+   712→    days: int = Field(
+   713→        default=7, ge=1, le=45,
+   714→        description="Number of consecutive days to scan"
+   715→    )
+   716→    latitude: float = Field(..., ge=-90, le=90, description="Geographic latitude")
+   717→    longitude: float = Field(..., ge=-180, le=180, description="Geographic longitude")
+   718→    timezone: str = Field(
+   719→        default='UTC',
+   720→        description="IANA timezone for local calendar days",
+   721→        examples=["Asia/Yangon"]
+   722→    )
+   723→    ayanamsa: AyanamsaName = Field(
+   724→        default='lahiri',
+   725→        description="Ayanamsa to use for sidereal calculations"
+   726→    )
+   727→    birth_datetime: Optional[datetime] = Field(
+   728→        None,
+   729→        description="Birth datetime — when provided, enables Tarabala scoring"
+   730→    )
+   731→
+   732→
+   733→class TransitsToNatalRequest(BaseModel):
+   734→    """Request schema for current transits against a natal chart."""
+   735→    birth_datetime: datetime = Field(
+   736→        ...,
+   737→        description="Birth datetime with timezone (ISO 8601 format)"
+   738→    )
+   739→    latitude: float = Field(..., ge=-90, le=90, description="Geographic latitude")
+   740→    longitude: float = Field(..., ge=-180, le=180, description="Geographic longitude")
+   741→    ayanamsa: AyanamsaName = Field(
+   742→        default='lahiri',
+   743→        description="Ayanamsa to use for sidereal calculations"
+   744→    )
+   745→    target_date: Optional[datetime] = Field(
+   746→        None,
+   747→        description="Transit moment (default: now UTC)"
+   748→    )
+   749→    days_ahead: int = Field(
+   750→        default=30, ge=1, le=365,
+   751→        description="Days ahead to scan for important upcoming transits"
+   752→    )
+   753→
+   754→    @field_validator('birth_datetime')
+   755→    @classmethod
+   756→    def validate_birth_datetime(cls, v):
+   757→        """Validate birth datetime is not in future and within reasonable range."""
+   758→        if v > datetime.now(v.tzinfo):
+   759→            raise ValueError("Birth datetime cannot be in the future")
+   760→        if v.year < 1900:
+   761→            raise ValueError(
+   762→                "Birth year must be 1900 or later for accurate calculations")
+   763→        return v
+   764→
+   765→
+   766→class SolarReturnRequest(BaseModel):
+   767→    """Request schema for the solar return (Varshaphal) chart."""
+   768→    birth_datetime: datetime = Field(
+   769→        ...,
+   770→        description="Birth datetime with timezone (ISO 8601 format)"
+   771→    )
+   772→    latitude: float = Field(..., ge=-90, le=90, description="Geographic latitude")
+   773→    longitude: float = Field(..., ge=-180, le=180, description="Geographic longitude")
+   774→    ayanamsa: AyanamsaName = Field(
+   775→        default='lahiri',
+   776→        description="Ayanamsa to use for sidereal calculations"
+   777→    )
+   778→    year: Optional[int] = Field(
+   779→        None, ge=1900, le=2100,
+   780→        description="Year of the solar return (default: current year)"
+   781→    )
+   782→
+   783→    @field_validator('birth_datetime')
+   784→    @classmethod
+   785→    def validate_birth_datetime(cls, v):
+   786→        """Validate birth datetime is not in future and within reasonable range."""
+   787→        if v > datetime.now(v.tzinfo):
+   788→            raise ValueError("Birth datetime cannot be in the future")
+   789→        if v.year < 1900:
+   790→            raise ValueError(
+   791→                "Birth year must be 1900 or later for accurate calculations")
+   792→        return v
+   793→
+   794→
+   795→class LunarReturnRequest(BaseModel):
+   796→    """Request schema for the lunar return chart."""
+   797→    birth_datetime: datetime = Field(
+   798→        ...,
+   799→        description="Birth datetime with timezone (ISO 8601 format)"
+   800→    )
+   801→    latitude: float = Field(..., ge=-90, le=90, description="Geographic latitude")
+   802→    longitude: float = Field(..., ge=-180, le=180, description="Geographic longitude")
+   803→    ayanamsa: AyanamsaName = Field(
+   804→        default='lahiri',
+   805→        description="Ayanamsa to use for sidereal calculations"
+   806→    )
+   807→    year: Optional[int] = Field(
+   808→        None, ge=1900, le=2100,
+   809→        description="Year of the lunar return month (default: current year)"
+   810→    )
+   811→    month: Optional[int] = Field(
+   812→        None, ge=1, le=12,
+   813→        description="Month of the lunar return (default: current month)"
+   814→    )
+   815→
+   816→    @field_validator('birth_datetime')
+   817→    @classmethod
+   818→    def validate_birth_datetime(cls, v):
+   819→        """Validate birth datetime is not in future and within reasonable range."""
+   820→        if v > datetime.now(v.tzinfo):
+   821→            raise ValueError("Birth datetime cannot be in the future")
+   822→        if v.year < 1900:
+   823→            raise ValueError(
+   824→                "Birth year must be 1900 or later for accurate calculations")
+   825→        return v
+   826→
