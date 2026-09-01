@@ -35,6 +35,10 @@ export function ProfileSheet({ open, onOpenChange }: { open: boolean; onOpenChan
   if (!open || !user) return null;
 
   async function saveBirthData() {
+    if (birthData && !birthData.dob) {
+      toast.error("Birth date is required for astrology readings");
+      return;
+    }
     const res = await fetch("/api/me", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },

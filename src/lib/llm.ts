@@ -326,3 +326,104 @@ function parseLLMResult(raw: string): LLMResult {
   // Not JSON — treat raw as content
   return { content: raw, raw };
 }
+
+// ============================================================
+// INSIGHT SKILLS (GURU skills/* — ported methodology headers)
+// ============================================================
+
+export const INSIGHT_SKILLS: { id: string; name: string; description: string; icon: string; skill: string }[] = [
+  { id: "yogas", name: "Yogas", description: "Classical yoga combinations (Raja, Dhana, Mahapurusha)", icon: "🜂", skill: "yogas" },
+  { id: "transits", name: "Current Transits", description: "What the planets are doing to your chart right now", icon: "♽", skill: "transits" },
+  { id: "dasha", name: "Dasha Period", description: "Your current Vimshottari life chapter", icon: "⏳", skill: "dasha" },
+  { id: "career", name: "Career & Wealth", description: "Your 10th house, profession & money potential", icon: "⛨", skill: "career" },
+  { id: "gemstones", name: "Gemstones", description: "Beneficial gem remedies for weak planets", icon: "◆", skill: "gemstones" },
+  { id: "shadbala", name: "Planetary Strength", description: "Six-fold strength analysis of each planet", icon: "⚖", skill: "shadbala" },
+  { id: "ashtakavarga", name: "Ashtakavarga", description: "Bindu scores for each house", icon: "✦", skill: "ashtakavarga" },
+  { id: "solar-return", name: "Solar Return", description: "Your year ahead (Varshaphal)", icon: "☉", skill: "solar-return" },
+  { id: "lunar-return", name: "Lunar Return", description: "Your month ahead (Chandra Varshaphal)", icon: "☽", skill: "lunar-return" },
+  { id: "varga", name: "Divisional Charts", description: "D-9 Navamsa, D-10 Dasamsa & more", icon: "⊞", skill: "varga" },
+  { id: "panchanga", name: "Today's Panchanga", description: "Tithi, nakshatra, yoga & auspicious timing", icon: "🕉", skill: "panchanga" },
+  { id: "muhurta", name: "Auspicious Timing", description: "Best days ahead for your intentions", icon: "⌖", skill: "muhurta" },
+];
+
+const INSIGHT_SKILL_PROMPT = `# Insight Reading
+Use the shared BAYDIN persona and grounding rule. Interpret the calculation data for a specific astrological skill. The skill name and any extra context appear in the ADDITIONAL CONTEXT block.
+
+## Methodology
+1. Ground every claim in the CALCULATION DATA — never invent positions, degrees, or yogas not present.
+2. Be specific and actionable — concrete advice, not vague platitudes.
+3. Honor epistemic separation: calculation fact vs interpretation vs hedged prediction.
+4. Length: 600-900 words. Warm, wise, direct.
+
+## Output contract
+Return a single valid JSON object:
+{
+  "content": "the full interpretation (markdown allowed)",
+  "highlights": ["3-5 key findings"],
+  "guidance": { "recommendations": ["..."], "remedies": ["..."], "warnings": ["..."] }
+}`;
+
+export function renderInsightPrompt(params: {
+  language: string;
+  gender?: "male" | "female" | null;
+  skill: string;
+  query?: string;
+  chart: any;
+  transits?: any;
+  extraContext?: Record<string, any>;
+}) {
+  const { language, gender, skill, query, chart, transits, extraContext } = params;
+  const system = `${SHARED_PERSONA}\n\n${INSIGHT_SKILL_PROMPT}`;
+  let user = `Write ENTIRELY in language code "${language}". Address the client as ${gender === "male" ? "သား" : gender === "female" ? "သမီး" : "သား/သမီး"}.\n\n`;
+  user += `CALCULATION DATA:\n\`\`\`json\n${JSON.stringify(chart, null, 2)}\n\`\`\`\n\n`;
+  if (transits) user += `TRANSIT CALCULATION DATA:\n\`\`\`json\n${JSON.stringify(transits, null, 2)}\n\`\`\`\n\n`;
+  user += `ADDITIONAL CONTEXT: ${JSON.stringify({ skill, language, gender: gender ?? null, query: query ?? null, ...extraContext })}\n\n`;
+  user += `Return the JSON object per the output contract.`;
+  return { system, user };
+}
+
+// ============================================================
+// LIFE REPORT SKILL (GURU skills/life-report — 7 sections)
+// ============================================================
+
+const LIFE_REPORT_SKILL = `# Life Report
+Use the shared BAYDIN persona and grounding rule. Write ONE section of a comprehensive life report. The section_name appears in ADDITIONAL CONTEXT.
+
+## Sections (run separately, then compose):
+1. core_identity — Lagna, its lord, the soul's fundamental nature.
+2. chart_blueprint — The overall pattern of the chart; planetary strengths & weaknesses.
+3. strengths — Natural gifts, talents, supportive combinations.
+4. timeline — Current dasha, upcoming periods, key life windows.
+5. yogas — Classical yogas present and what they promise.
+6. life_areas — Career, relationships, wealth, health, spirituality.
+7. remedies — Practical, culturally appropriate remedial measures.
+
+## Methodology
+- Ground every claim in the CALCULATION DATA. Never invent.
+- 400-600 words per section. Warm, specific, actionable.
+- For remedies: gemstones, mantras, charitable acts, lifestyle — culturally appropriate.
+
+## Output contract
+Return a single valid JSON object:
+{
+  "content": "the section text (markdown allowed)",
+  "highlights": ["2-3 key points"],
+  "guidance": { "recommendations": ["..."] }
+}`;
+
+export function renderLifeReportSectionPrompt(params: {
+  language: string;
+  gender?: "male" | "female" | null;
+  sectionName: string;
+  chart: any;
+  enhancedData?: any;
+}) {
+  const { language, gender, sectionName, chart, enhancedData } = params;
+  const system = `${SHARED_PERSONA}\n\n${LIFE_REPORT_SKILL}`;
+  let user = `Write ENTIRELY in language code "${language}". Address the client as ${gender === "male" ? "သား" : gender === "female" ? "သမီး" : "သား/သမီး"}.\n\n`;
+  user += `CALCULATION DATA:\n\`\`\`json\n${JSON.stringify(chart, null, 2)}\n\`\`\`\n\n`;
+  if (enhancedData) user += `ENHANCED DATA (yogas, shadbala, dasha):\n\`\`\`json\n${JSON.stringify(enhancedData, null, 2)}\n\`\`\`\n\n`;
+  user += `ADDITIONAL CONTEXT: { "section_name": "${sectionName}", "language": "${language}", "gender": ${gender ? `"${gender}"` : "null"} }\n\n`;
+  user += `Return the JSON object per the output contract.`;
+  return { system, user };
+}

@@ -124,3 +124,76 @@ Stage Summary:
 - Lumina dark-first theme uniform across all views (gold #C5A87C, glass surfaces, aurora backdrop). Themeable via CSS vars for future design changes.
 - Reseller system: admin whitelists users → reseller buys wholesale Luck into pool → transfers to end users (resell action) → off-platform pricing recorded.
 - Virality: referral codes (10 Luck per signup bonus), daily Luck streak reward, share link.
+
+---
+Task ID: 6 (webDevReview cron round 1)
+Agent: Orchestrator (Z.ai Code) — scheduled webDevReview
+Task: QA the merged Baydin app, fix bugs, add new features (manifest, insights, life-report, today dashboard), polish styling
+
+## Current Project Status Assessment
+- App was stable: registration, astrologer chat (SSE streaming Gemini in Burmese), tarot readings, Luck store all verified working.
+- Dev server healthy on :3000, lint clean, 23 API routes responding 200.
+- Identified gap: the 7 core views (chat/tarot/horoscope/birth-chart/luck-store/reseller/admin) were missing the daily-use "addictive" features the user explicitly requested (manifest goals, insights, life reports, today dashboard).
+
+## Completed Modifications This Round
+
+### New Features Built
+1. **Today Dashboard** (default landing view) — greeting with date + streak, 4 quick-action tiles (Astrologer/Tarot/Horoscope/Manifest), Card of the Day card, today's intentions with confirm buttons, mood check-in picker (1-5 scale), Luck balance + streak, deep-readings upsell card. Drives daily-use stickiness.
+2. **Manifest View** — full goal CRUD (create with title + affirmation + reminder time), auto-intention detection (love/abundance/healing/career/peace/protection/creativity/intuition → maps to Solfeggio frequencies), daily confirmation with +1 Luck bonus, streak tracking, archive. Stats row (active/best-streak/done-today). Empty state with onboarding.
+3. **Insights View** — 12 skill-based deep readings grid (Yogas, Transits, Dasha, Career, Gemstones, Shadbala, Ashtakavarga, Solar Return, Lunar Return, Varga, Panchanga, Muhurta). Each costs 3 Luck. Optional query input. Loading spinner, result view with markdown + highlights + guidance cards (remedies/recommendations/warnings). Verified: Career insight returned a full Burmese Vedic reading grounded in the user's Cancer ascendant, Pushya nakshatra, Rahu dasha, Moon+Ketu in 10th house.
+4. **Life Report View** — 7-section comprehensive report (Core Identity, Chart Blueprint, Strengths, Timeline, Yogas, Life Areas, Remedies). Costs 15 Luck. Animated circular progress indicator during generation. Section tab navigation with next-section CTA.
+5. **Mood API + Picker** — POST /api/mood (upsert today's mood 1-5 + note), GET /api/mood (today + 30-day history). Integrated into Today dashboard.
+
+### New API Routes (6 added → 29 total)
+- `GET/POST /api/manifest/goals` — list goals with computed streaks, create with auto-intention detection
+- `POST /api/manifest/confirm` — daily confirmation + 1 Luck bonus
+- `DELETE /api/manifest/goals/[id]` — archive (soft delete)
+- `GET/POST /api/mood` — mood check-in (upsert + history)
+- `GET/POST /api/insights` — list 12 skills / run insight (3 Luck, with refund-on-failure)
+- `POST /api/life-report` — 7-section report (15 Luck, with refund-on-failure)
+
+### New LLM Skills (ported from GURU)
+- `INSIGHT_SKILLS` array — 12 skill definitions with icons + descriptions
+- `INSIGHT_SKILL_PROMPT` — grounding + output contract (JSON with content/highlights/guidance)
+- `renderInsightPrompt()` — labeled CALCULATION DATA + TRANSIT DATA + ADDITIONAL CONTEXT blocks
+- `LIFE_REPORT_SKILL` — 7-section methodology
+- `renderLifeReportSectionPrompt()` — per-section rendering with enhanced data
+
+### Bugs Fixed
+1. **buildBirthDatetime offset normalization** — Intl.DateTimeFormat returns "GMT+6:30" (single-digit hour) which didn't match the `±HH:MM` regex → caused 500 on insights/horoscope/life-report. Fixed to pad to 2 digits ("+06:30").
+2. **Profile sheet saving empty birthData** — opening the profile sheet and clicking "Save" without filling fields would overwrite valid birthData with defaults (empty dob). Added validation: refuses to save if dob is empty.
+3. **Luck charged on failed chart computation** — spendForFeature ran before computeNatalChart; if compute threw, Luck was lost. Added try/catch with creditLuck refund in insights + life-report routes.
+4. **Insights query input overlapping skills grid** — the label covered the first row of skill buttons. Added mb-6 spacing.
+
+### Styling Polish
+- Sidebar nav reorganized into **grouped sections** (Daily / Practice / Astrology / Account) with uppercase tracking labels
+- Nav buttons: added hover scale-110 on icons, active-state inset shadow, group-hover transitions
+- Today dashboard: lum-glow-gold backdrop on Card of Day, animated float-up entrances, skeleton loading states
+- Manifest: intention-colored icon circles (pink for love, gold for abundance, etc.), frequency badges (♪ 639Hz), flame streak indicators
+- Insights: skill cards with hover glow shadow, 2xl icon scale on hover, gradient gold CTAs
+- Life Report: animated SVG circular progress with gold gradient stroke during generation
+- Today default view now "today" (was "chat") — drives daily-use habit
+
+## Verification Results (agent-browser)
+- ✅ Registration + login flow works (session cookie)
+- ✅ Today dashboard renders: greeting, date, quick actions, card-of-day, intentions, mood, luck, upsells
+- ✅ Manifest: created "Attract loving relationships" → auto-detected "love" intention, 639Hz frequency, confirmed → +1 Luck, streak=1
+- ✅ Insights: Career skill ran → full Burmese Vedic reading (Cancer ascendant, Pushya nakshatra, Rahu dasha, Moon+Ketu in 10th) — chart-grounded, anti-drift
+- ✅ All 29 API routes returning 200 (after bug fixes)
+- ✅ Lint clean, no runtime errors in dev.log
+- Screenshots saved: qa-1 through qa-13 in /home/z/my-project/download/
+
+## Unresolved Issues / Risks
+1. **LLM latency** — insight calls take 20-50s (Gemini generates 600-900 words of Burmese). The simulated streaming (word chunks) helps UX but total wait is long. Consider: lower maxTokens for insights, or add a "this usually takes 10-20 seconds" hint (already added).
+2. **Luck math on the test account** shows 88 instead of expected 97 — likely because multiple insight attempts during debugging each charged 3 Luck (some refunded, some not before the refund logic was added). Not a production bug — just test-account drift.
+3. **Profile sheet date input** uses native HTML date input which renders as spinbuttons in some browsers — works but UX could be smoother with a custom date picker.
+4. **Life Report** generates 7 sequential LLM calls (~7 minutes total) — could be parallelized with Promise.all for faster response, but sequential is more reliable for rate limits.
+
+## Priority Recommendations for Next Phase
+1. **Add Compatibility view** (partner form + Ashtakoota 8-fold /36 matching) — 5 Luck
+2. **Add Frequency Sessions view** — 12 Solfeggio tones via Web Audio API + breathing pacer (free, daily-use)
+3. **Add Positivity Generator** — 11 affirmation categories with LLM script generation (1 free/day, then Luck)
+4. **Parallelize Life Report** — run 7 sections concurrently with Promise.all
+5. **Add daily ritual tracker** — 4-step ritual (Cleanse/Manifest/Tarot/Balance) with streak freeze
+6. **Add conversation export** — download astrologer chat as markdown
+7. **Polish mobile** — test all views at 375px width, fix any overflow

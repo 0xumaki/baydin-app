@@ -438,7 +438,7 @@ export type NatalChart = {
   };
 };
 
-/** Compose ISO birth datetime with offset from IANA tz. */
+/** Compose ISO birth datetime with offset from IANA tz. (v2 — padded offset) */
 export function buildBirthDatetime(ctx: BirthContext): string {
   const time = /^\d{2}:\d{2}(:\d{2})?$/.test(ctx.tob)
     ? ctx.tob.length === 5 ? `${ctx.tob}:00` : ctx.tob
@@ -450,7 +450,16 @@ export function buildBirthDatetime(ctx: BirthContext): string {
         timeZone: ctx.timezone, timeZoneName: "longOffset" as any,
       }).formatToParts(new Date(`${ctx.dob}T12:00:00`));
       const name = parts.find((p) => p.type === "timeZoneName")?.value ?? "";
-      offset = name === "GMT" ? "+00:00" : name.replace("GMT", "");
+      if (name === "GMT") {
+        offset = "+00:00";
+      } else if (name.startsWith("GMT")) {
+        // Normalize "GMT+6:30" / "GMT+9" → "+06:30" / "+09:00"
+        const raw = name.replace("GMT", "");
+        const sign = raw.startsWith("-") ? "-" : "+";
+        const body = raw.replace(/^[+-]/, "");
+        const [h, m] = body.split(":");
+        offset = `${sign}${(h || "0").padStart(2, "0")}:${(m || "0").padStart(2, "0")}`;
+      }
     } catch { offset = "+06:30"; } // default Yangon
   } else if (ctx.timezone) offset = ctx.timezone;
   return `${ctx.dob}T${time}${offset}`;

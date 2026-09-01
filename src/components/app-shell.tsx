@@ -10,23 +10,31 @@ import { ChatView } from "@/components/views/chat-view";
 import { TarotView } from "@/components/views/tarot-view";
 import { BirthChartView } from "@/components/views/birth-chart-view";
 import { HoroscopeView } from "@/components/views/horoscope-view";
+import { TodayView } from "@/components/views/today-view";
+import { ManifestView } from "@/components/views/manifest-view";
+import { InsightsView } from "@/components/views/insights-view";
+import { LifeReportView } from "@/components/views/life-report-view";
 import { LuckStoreView } from "@/components/views/luck-store-view";
 import { ResellerView } from "@/components/views/reseller-view";
 import { AdminView } from "@/components/views/admin-view";
 import { ProfileSheet } from "@/components/profile-sheet";
 import {
   Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
-  Menu, X, Plus, LogOut, Settings, Gift, ChevronRight,
+  Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
 } from "lucide-react";
 
-const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean }[] = [
-  { view: "chat", label: "Astrologer", icon: MessageCircle, needsAuth: true },
-  { view: "tarot", label: "Tarot", icon: Sparkles },
-  { view: "horoscope", label: "Horoscope", icon: Moon, needsAuth: true },
-  { view: "birth-chart", label: "Birth Chart", icon: Star, needsAuth: true },
-  { view: "luck-store", label: "Buy Luck", icon: Wallet, needsAuth: true },
-  { view: "reseller", label: "Reseller", icon: Store, resellerOnly: true, needsAuth: true },
-  { view: "admin", label: "Admin", icon: Shield, adminOnly: true, needsAuth: true },
+const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group?: string }[] = [
+  { view: "today", label: "Today", icon: CalendarDays, needsAuth: true, group: "Daily" },
+  { view: "chat", label: "Astrologer", icon: MessageCircle, needsAuth: true, group: "Daily" },
+  { view: "tarot", label: "Tarot", icon: Sparkles, group: "Daily" },
+  { view: "horoscope", label: "Horoscope", icon: Moon, needsAuth: true, group: "Daily" },
+  { view: "manifest", label: "Manifest", icon: Target, needsAuth: true, group: "Practice" },
+  { view: "birth-chart", label: "Birth Chart", icon: Star, needsAuth: true, group: "Astrology" },
+  { view: "insights", label: "Insights", icon: Compass, needsAuth: true, group: "Astrology" },
+  { view: "life-report", label: "Life Report", icon: BookOpen, needsAuth: true, group: "Astrology" },
+  { view: "luck-store", label: "Buy Luck", icon: Wallet, needsAuth: true, group: "Account" },
+  { view: "reseller", label: "Reseller", icon: Store, resellerOnly: true, needsAuth: true, group: "Account" },
+  { view: "admin", label: "Admin", icon: Shield, adminOnly: true, needsAuth: true, group: "Account" },
 ];
 
 export function AppShell() {
@@ -124,10 +132,14 @@ export function AppShell() {
 
           {/* View content */}
           <div className="flex-1 min-h-0 overflow-hidden">
+            {view === "today" && <TodayView onAuth={() => setAuthOpen(true)} />}
             {view === "chat" && <ChatView onAuth={() => setAuthOpen(true)} />}
             {view === "tarot" && <TarotView onAuth={() => setAuthOpen(true)} />}
             {view === "horoscope" && <HoroscopeView onAuth={() => setAuthOpen(true)} />}
+            {view === "manifest" && <ManifestView onAuth={() => setAuthOpen(true)} />}
             {view === "birth-chart" && <BirthChartView onAuth={() => setAuthOpen(true)} />}
+            {view === "insights" && <InsightsView onAuth={() => setAuthOpen(true)} />}
+            {view === "life-report" && <LifeReportView onAuth={() => setAuthOpen(true)} />}
             {view === "luck-store" && <LuckStoreView onAuth={() => setAuthOpen(true)} />}
             {view === "reseller" && <ResellerView onAuth={() => setAuthOpen(true)} />}
             {view === "admin" && <AdminView />}
@@ -187,23 +199,38 @@ function Sidebar(props: {
         </div>
 
         {/* Navigation */}
-        <nav className="px-2 flex-1 overflow-y-auto lumina-scroll space-y-0.5">
-          {props.navItems.map((item) => (
-            <button
-              key={item.view}
-              onClick={() => props.onNav(item)}
-              className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all",
-                props.currentView === item.view
-                  ? "bg-gold-soft text-gold border border-gold/20"
-                  : "text-ink-muted hover:text-ink hover:bg-white/[0.03] border border-transparent"
-              )}
-            >
-              <item.icon className="w-[18px] h-[18px] shrink-0" />
-              <span className="flex-1 text-left">{item.label}</span>
-              {props.currentView === item.view && <ChevronRight className="w-3.5 h-3.5" />}
-            </button>
-          ))}
+        <nav className="px-2 flex-1 overflow-y-auto lumina-scroll">
+          {(() => {
+            const groups: Record<string, typeof props.navItems> = {};
+            for (const item of props.navItems) {
+              const g = item.group || "Other";
+              (groups[g] ||= []).push(item);
+            }
+            const order = ["Daily", "Practice", "Astrology", "Account", "Other"];
+            return order.filter((g) => groups[g]).map((g) => (
+              <div key={g} className="mb-3">
+                <div className="px-3 pt-2 pb-1 text-[9px] uppercase tracking-[0.18em] text-ink-muted/60 font-medium">{g}</div>
+                <div className="space-y-0.5">
+                  {groups[g].map((item) => (
+                    <button
+                      key={item.view}
+                      onClick={() => props.onNav(item)}
+                      className={cn(
+                        "group w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] transition-all border",
+                        props.currentView === item.view
+                          ? "bg-gold-soft text-gold border-gold/20 shadow-[inset_0_0_0_1px_rgba(197,168,124,0.08)]"
+                          : "text-ink-muted hover:text-ink hover:bg-white/[0.03] border-transparent"
+                      )}
+                    >
+                      <item.icon className={cn("w-[17px] h-[17px] shrink-0 transition-transform group-hover:scale-110", props.currentView === item.view && "text-gold")} />
+                      <span className="flex-1 text-left">{item.label}</span>
+                      {props.currentView === item.view && <ChevronRight className="w-3.5 h-3.5" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ));
+          })()}
         </nav>
 
         {/* Daily reward CTA (always visible, addictive) */}

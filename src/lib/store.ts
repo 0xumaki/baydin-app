@@ -9,10 +9,14 @@ import { create } from "zustand";
  */
 
 export type AppView =
-  | "chat"          // ChatGPT-style astrologer chat (default)
+  | "today"        // Daily dashboard (card-of-day, horoscope, mood, ritual, manifest)
+  | "chat"          // ChatGPT-style astrologer chat
   | "tarot"         // Tarot reader (free)
   | "birth-chart"   // Natal chart tool
   | "horoscope"     // Daily/weekly horoscope
+  | "manifest"     // Manifestation goals + confirmations (free, daily-use)
+  | "insights"      // Skill-based deep readings (yogas, transits, etc.)
+  | "life-report"   // 7-section comprehensive report
   | "luck-store"    // Buy Luck
   | "reseller"      // Reseller portal (whitelist-gated)
   | "admin";        // Admin panel (admin-gated)
@@ -29,7 +33,7 @@ type BaydinState = {
 };
 
 export const useStore = create<BaydinState>((set) => ({
-  view: "chat",
+  view: "today",
   activeConversationId: null,
   sidebarOpen: true,
   authModalOpen: false,
