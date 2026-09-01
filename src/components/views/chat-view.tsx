@@ -6,7 +6,7 @@ import { GlassCard, GoldButton, GhostButton, Pill } from "@/components/lumina/pr
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { useMe, api } from "@/lib/api-client";
-import { MessageSquare, Send, Sparkles, Plus, Clock, ChevronDown, Star, Moon, Sun, Heart } from "lucide-react";
+import { MessageSquare, Send, Sparkles, Plus, Clock, ChevronDown, Star, Moon, Sun, Heart, Download } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
@@ -152,6 +152,15 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
             <Pill variant="leaf" className="text-[10px]">Birth data set</Pill>
           ) : (
             <Pill className="text-[10px] text-amber-400/80 border-amber-400/20 bg-amber-400/5">Add birth data in profile →</Pill>
+          )}
+          {activeConversationId && messages.length > 0 && (
+            <button
+              onClick={() => window.open(`/api/conversations/${activeConversationId}/export`, "_blank")}
+              className="px-2 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1"
+              title="Download this consultation as markdown"
+            >
+              <Download className="w-3 h-3" /> Export
+            </button>
           )}
         </div>
       </div>

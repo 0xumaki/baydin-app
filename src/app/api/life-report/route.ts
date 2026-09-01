@@ -57,27 +57,29 @@ export async function POST(req: NextRequest) {
     ayanamsa: chart.ayanamsa,
   };
 
-  const sections: { id: string; name: string; content: string; highlights: string[]; guidance: any }[] = [];
-  for (const section of SECTIONS) {
-    const { system, user: prompt } = renderLifeReportSectionPrompt({
-      language: user.language || "my",
-      gender: birthData.gender ?? null,
-      sectionName: section.id,
-      chart,
-      enhancedData,
-    });
-    const result = await callAstrologerLLM(system, prompt, {
-      temperature: 0.7,
-      maxTokens: 1200,
-    });
-    sections.push({
-      id: section.id,
-      name: section.name,
-      content: result.parsed?.content ?? result.content,
-      highlights: result.parsed?.highlights ?? [],
-      guidance: result.parsed?.guidance ?? null,
-    });
-  }
+  // Generate all 7 sections concurrently (was sequential ~7min → now ~1min)
+  const sectionResults = await Promise.all(
+    SECTIONS.map(async (section) => {
+      const { system, user: prompt } = renderLifeReportSectionPrompt({
+        language: user.language || "my",
+        gender: birthData.gender ?? null,
+        sectionName: section.id,
+        chart,
+        enhancedData,
+      });
+      const result = await callAstrologerLLM(system, prompt, {
+        temperature: 0.7,
+        maxTokens: 1200,
+      });
+      return {
+        id: section.id,
+        name: section.name,
+        content: result.parsed?.content ?? result.content,
+        highlights: result.parsed?.highlights ?? [],
+        guidance: result.parsed?.guidance ?? null,
+      };
+    })
+  );
 
   // Persist as a conversation so it shows in history
   const conv = await db.conversation.create({
@@ -93,15 +95,15 @@ export async function POST(req: NextRequest) {
     data: {
       conversationId: conv.id,
       role: "assistant",
-      content: JSON.stringify(sections, null, 2),
-      metadata: JSON.stringify({ interpretationType: "life_report", luckCost: res.cost, sections: sections.length }),
+      content: JSON.stringify(sectionResults, null, 2),
+      metadata: JSON.stringify({ interpretationType: "life_report", luckCost: res.cost, sections: sectionResults.length }),
     },
   });
 
   return NextResponse.json({
     lifeReport: {
       id: conv.id,
-      sections,
+      sections: sectionResults,
       luckSpent: res.cost,
       balance: res.balance,
       meta: { ai_generated: true, generated_at: new Date().toISOString(), interpretation_type: "life_report" },
