@@ -23,6 +23,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [mood, setMood] = React.useState<any>(null);
   const [goals, setGoals] = React.useState<any[]>([]);
   const [loadingCard, setLoadingCard] = React.useState(false);
+  const [activity, setActivity] = React.useState<boolean[]>(Array(7).fill(false));
 
   // Load card of day
   React.useEffect(() => {
@@ -31,6 +32,20 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/tarot/card-of-day").then((r) => r.json()).then((d) => setCardOfDay(d.reading)).catch(() => {}).finally(() => setLoadingCard(false));
     fetch("/api/mood").then((r) => r.json()).then((d) => { setMood(d.today); setGoals(d.goals || []); }).catch(() => {});
     fetch("/api/manifest/goals").then((r) => r.json()).then((d) => setGoals(d.goals || [])).catch(() => {});
+    // Load 7-day activity (ritual completions)
+    fetch("/api/ritual").then((r) => r.json()).then((d) => {
+      // We only have today's ritual from the API; build a simple 7-day visualization
+      // where today reflects ritual.completed and we show the streak as consecutive days
+      const today = d.ritual?.completed ?? false;
+      const streak = d.streak ?? 0;
+      const days = Array(7).fill(false);
+      // Mark the last `streak` days as active (ending today if completed)
+      for (let i = 0; i < Math.min(streak, 7); i++) {
+        days[6 - i] = true;
+      }
+      if (!today && streak === 0) days[6] = false;
+      setActivity(days);
+    }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -161,6 +176,32 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GradientButton onClick={() => setView("luck-store")} className="w-full py-2 text-[12px]">
                 Top up Luck
               </GradientButton>
+            </GlassCard>
+
+            {/* 7-day activity heatmap */}
+            <GlassCard className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">7-day practice</span>
+                <Flame className="w-3.5 h-3.5 text-leaf" />
+              </div>
+              <div className="flex items-end justify-between gap-1.5 h-16">
+                {activity.map((active, i) => {
+                  const dayLabel = ["M", "T", "W", "T", "F", "S", "S"][i];
+                  const isToday = i === 6;
+                  return (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                      <div
+                        className={`w-full rounded-md transition-all duration-500 ${active ? "bg-gradient-to-t from-leaf/40 to-leaf/80" : "bg-white/[0.04]"}`}
+                        style={{ height: active ? `${40 + (i / 6) * 20}%` : "20%" }}
+                      />
+                      <span className={`text-[9px] ${isToday ? "text-gold font-medium" : "text-ink-muted/60"}`}>{dayLabel}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="text-[10px] text-ink-muted mt-2 text-center">
+                {activity.filter(Boolean).length}/7 days active
+              </div>
             </GlassCard>
 
             {/* Deep dive upsell */}

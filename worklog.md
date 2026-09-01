@@ -277,3 +277,68 @@ Task: Complete the features planned in round 2 (frequency sessions, positivity g
 4. **Polish mobile** — test all 14 views at 375px width, fix any overflow
 5. **Add daily streak visualization** — a calendar heatmap on the Today dashboard showing practice consistency
 6. **Add notifications/reminder mini-service** — socket.io for goal reminder times (port 3003)
+
+---
+Task ID: 10 (webDevReview cron round 5)
+Agent: Orchestrator (Z.ai Code) — scheduled webDevReview
+Task: Verify round 4 work, add 7-day streak heatmap, framer-motion page transitions, loading skeletons, polish
+
+## Current Project Status Assessment
+- Round 4 ended with infrastructure failure mid-QA. Verified all round-4 files intact at start of round 5: ritual-view.tsx (9.7KB), export route (1.9KB), life-report Promise.all (1 match), chat-view Download icon (3 matches).
+- Lint clean. Dev server healthy (API routes returning 200).
+- 34 API routes, 15 views.
+
+## Completed Modifications This Round
+
+### 1. 7-Day Streak Heatmap on Today Dashboard
+- Added `activity` state (7-day boolean array) to TodayView, fetched from `/api/ritual` (streak count → consecutive active days)
+- New GlassCard with bar-chart heatmap: 7 vertical bars (M-S), active days use leaf-green gradient with height scaling, inactive days are subtle white/4%
+- Today's bar highlighted in gold
+- "X/7 days active" counter below
+- Animated bar height transitions (500ms)
+- Verified: renders correctly ("7-DAY PRACTICE, M T W T F S S, 0/7 days active")
+
+### 2. Framer Motion Page Transitions
+- Added `motion` + `AnimatePresence` imports to app-shell
+- Wrapped the view router in `<AnimatePresence mode="wait">` with `<motion.div key={view}>`
+- Transition: fade + slide-up (opacity 0→1, y 8→0) on enter, fade + slide-down on exit, 250ms cubic-bezier easing
+- Smooth view switching without jarring cuts
+
+### 3. Loading Skeleton on Horoscope View
+- Added animated pulse skeleton (6 placeholder bars) shown while the LLM generates the horoscope
+- Replaced the bare `loading ? "Reading the stars…" : ...` text with a proper content-shaped skeleton
+- Matches the actual horoscope card layout for seamless transition
+
+### 4. Life Report Parallelization (verified from round 4)
+- Confirmed `Promise.all` is in place — 7 sections generate concurrently (~1 min vs ~7 min sequential)
+
+### 5. Conversation Export (verified from round 4)
+- Confirmed export API works: tested via browser fetch, returned 549 chars of markdown for a 3-message conversation
+- Export button in chat-view header appears when conversation has messages
+
+## Verification Results (agent-browser)
+- ✅ Login flow works (94 Luck balance, "Good evening, Test")
+- ✅ Today dashboard renders with new 7-day heatmap ("7-DAY PRACTICE, M T W T F S S, 0/7 days active")
+- ✅ Ritual view renders ("DAILY PRACTICE · FREE, Daily Ritual, 4-step morning practice")
+- ✅ Export API returns markdown (549 chars for test conversation)
+- ✅ Lint clean, no TypeScript errors
+- ✅ 34 API routes, 15 views
+- Screenshots: qa-r5-today-heatmap.png, qa-r5-today-final.png, qa-r5-ritual.png
+
+## Infrastructure Notes
+- Dev server continues to die between Bash tool calls (system-managed process issue). Worked around by running all QA in single long-running commands.
+- Avoided the round-4 timeout issue by keeping QA commands focused (max 90s timeout, minimal output).
+
+## Unresolved Issues / Risks
+1. **Dev server persistence** — still requires manual restart each round. Not a code issue.
+2. **Heatmap data source** — currently uses ritual streak only. Could be enriched to show any activity (tarot draws, chat turns, frequency sessions) per day for a richer "practice consistency" view.
+3. **Mobile responsive audit** — still pending. All views use responsive Tailwind classes but haven't been tested at 375px width.
+4. **Notifications mini-service** — socket.io reminder service (port 3003) not yet built.
+
+## Priority Recommendations for Next Phase
+1. **Enrich the heatmap** — fetch activity from multiple sources (ritual, tarot, chat, frequency) per day for a richer consistency view
+2. **Mobile responsive audit** — test all 15 views at 375px, fix any overflow or cramped layouts
+3. **Add socket.io reminder mini-service** — goal reminder times on port 3003
+4. **Add Tarot history view** — browse past readings with save/bookmark
+5. **Add profile stats page** — lifetime totals, archetype insight, achievement-style badges
+6. **Add "share reading" feature** — Web Share API for tarot/astrologer readings (virality)

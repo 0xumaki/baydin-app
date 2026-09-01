@@ -53,7 +53,20 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
           {loading ? "Reading the stars…" : <><Moon className="w-4 h-4" /> {user?.birthData ? "Personalized · 2 Luck" : "Read horoscope"}</>}
         </GoldButton>
 
-        {horoscope && (
+        {loading && (
+          <GlassCard className="p-5">
+            <div className="animate-pulse space-y-3">
+              <div className="h-4 w-3/4 bg-white/5 rounded" />
+              <div className="h-3 w-full bg-white/5 rounded" />
+              <div className="h-3 w-full bg-white/5 rounded" />
+              <div className="h-3 w-5/6 bg-white/5 rounded" />
+              <div className="h-3 w-full bg-white/5 rounded" />
+              <div className="h-3 w-2/3 bg-white/5 rounded" />
+            </div>
+          </GlassCard>
+        )}
+
+        {horoscope && !loading && (
           <GlassCard className="p-5">
             {horoscope.personalized && <Pill variant="gold" className="mb-3">Personalized for your chart</Pill>}
             <div className="lum-prose text-[14px] text-ink/90">

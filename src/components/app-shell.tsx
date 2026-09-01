@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useStore, type AppView } from "@/lib/store";
 import { useMe } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
@@ -141,21 +142,32 @@ export function AppShell() {
 
           {/* View content */}
           <div className="flex-1 min-h-0 overflow-hidden">
-            {view === "today" && <TodayView onAuth={() => setAuthOpen(true)} />}
-            {view === "chat" && <ChatView onAuth={() => setAuthOpen(true)} />}
-            {view === "tarot" && <TarotView onAuth={() => setAuthOpen(true)} />}
-            {view === "horoscope" && <HoroscopeView onAuth={() => setAuthOpen(true)} />}
-            {view === "manifest" && <ManifestView onAuth={() => setAuthOpen(true)} />}
-            {view === "ritual" && <RitualView onAuth={() => setAuthOpen(true)} />}
-            {view === "frequency" && <FrequencyView onAuth={() => setAuthOpen(true)} />}
-            {view === "positivity" && <PositivityView onAuth={() => setAuthOpen(true)} />}
-            {view === "birth-chart" && <BirthChartView onAuth={() => setAuthOpen(true)} />}
-            {view === "insights" && <InsightsView onAuth={() => setAuthOpen(true)} />}
-            {view === "compatibility" && <CompatibilityView onAuth={() => setAuthOpen(true)} />}
-            {view === "life-report" && <LifeReportView onAuth={() => setAuthOpen(true)} />}
-            {view === "luck-store" && <LuckStoreView onAuth={() => setAuthOpen(true)} />}
-            {view === "reseller" && <ResellerView onAuth={() => setAuthOpen(true)} />}
-            {view === "admin" && <AdminView />}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={view}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.25, ease: [0.2, 0, 0, 1] }}
+                className="h-full"
+              >
+                {view === "today" && <TodayView onAuth={() => setAuthOpen(true)} />}
+                {view === "chat" && <ChatView onAuth={() => setAuthOpen(true)} />}
+                {view === "tarot" && <TarotView onAuth={() => setAuthOpen(true)} />}
+                {view === "horoscope" && <HoroscopeView onAuth={() => setAuthOpen(true)} />}
+                {view === "manifest" && <ManifestView onAuth={() => setAuthOpen(true)} />}
+                {view === "ritual" && <RitualView onAuth={() => setAuthOpen(true)} />}
+                {view === "frequency" && <FrequencyView onAuth={() => setAuthOpen(true)} />}
+                {view === "positivity" && <PositivityView onAuth={() => setAuthOpen(true)} />}
+                {view === "birth-chart" && <BirthChartView onAuth={() => setAuthOpen(true)} />}
+                {view === "insights" && <InsightsView onAuth={() => setAuthOpen(true)} />}
+                {view === "compatibility" && <CompatibilityView onAuth={() => setAuthOpen(true)} />}
+                {view === "life-report" && <LifeReportView onAuth={() => setAuthOpen(true)} />}
+                {view === "luck-store" && <LuckStoreView onAuth={() => setAuthOpen(true)} />}
+                {view === "reseller" && <ResellerView onAuth={() => setAuthOpen(true)} />}
+                {view === "admin" && <AdminView />}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </main>
       </div>
