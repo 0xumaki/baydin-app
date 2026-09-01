@@ -717,3 +717,130 @@ export const PLANET_MY: Record<string, string> = {
   Sun: "နေ", Moon: "လ", Mercury: "ဗုဒ္ဓဟူး", Venus: "သောကြာ", Mars: "အင်္ဂါ",
   Jupiter: "ကြာသပတေး", Saturn: "စနေ", Rahu: "ရာဟု", Ketu: "ကိတ်ဂြိုဟ်", Ascendant: "လဂ်",
 };
+
+// ============================================================
+// COMPATIBILITY — Vedic Ashtakoota 8-fold /36 + Western synastry
+// ============================================================
+
+/** Ashtakoota (8-fold Guna Milan) — max 36 points. */
+const ASHTAKOOT_WEIGHTS: { name: string; max: number }[] = [
+  { name: "Varna", max: 1 },
+  { name: "Vashya", max: 2 },
+  { name: "Tara", max: 3 },
+  { name: "Yoni", max: 4 },
+  { name: "Graha Maitri", max: 5 },
+  { name: "Gana", max: 6 },
+  { name: "Bhakoot", max: 7 },
+  { name: "Nadi", max: 8 },
+];
+
+const NAK_LORD_INDEX: Record<string, number> = {}; // filled lazily
+function nakLordIdx(nakName: string): number {
+  return NAKSHATRAS.indexOf(nakName) % 9;
+}
+
+/** Compute Ashtakoota score between two moon signs/nakshatras. */
+function ashtakoota(personA: { moonSign: number; moonNakshatra: string }, personB: { moonSign: number; moonNakshatra: string }): { total: number; max: number; breakdown: { name: string; score: number; max: number }[] } {
+  const breakdown: { name: string; score: number; max: number }[] = [];
+  let total = 0;
+
+  // 1. Varna (1) — based on moon sign element
+  const varnaScore = Math.abs(personA.moonSign - personB.moonSign) <= 3 ? 1 : 0;
+  breakdown.push({ name: "Varna", score: varnaScore, max: 1 });
+  total += varnaScore;
+
+  // 2. Vashya (2) — sign group compatibility
+  const vashyaPairs: Record<number, number[]> = {
+    0: [0, 2, 6, 8], 2: [0, 2, 6], 6: [0, 2, 6, 8], 8: [0, 6],
+  };
+  const vashyaScore = (vashyaPairs[personA.moonSign]?.includes(personB.moonSign) || personA.moonSign === personB.moonSign) ? 2 : 1;
+  breakdown.push({ name: "Vashya", score: vashyaScore, max: 2 });
+  total += vashyaScore;
+
+  // 3. Tara (3) — nakshatra count difference mod 9
+  const nakDiff = Math.abs(NAKSHATRAS.indexOf(personA.moonNakshatra) - NAKSHATRAS.indexOf(personB.moonNakshatra)) % 9;
+  const taraScore = nakDiff === 0 || nakDiff === 3 || nakDiff === 5 || nakDiff === 7 ? 3 : Math.max(0, 3 - Math.floor(nakDiff / 2));
+  breakdown.push({ name: "Tara", score: Math.min(taraScore, 3), max: 3 });
+  total += Math.min(taraScore, 3);
+
+  // 4. Yoni (4) — nakshatra lord combination
+  const yoniScore = Math.abs(nakLordIdx(personA.moonNakshatra) - nakLordIdx(personB.moonNakshatra)) <= 1 ? 4 : 2;
+  breakdown.push({ name: "Yoni", score: yoniScore, max: 4 });
+  total += yoniScore;
+
+  // 5. Graha Maitri (5) — moon sign lord friendship
+  const grahaMaitriScore = Math.abs(personA.moonSign - personB.moonSign) <= 2 ? 5 : 3;
+  breakdown.push({ name: "Graha Maitri", score: grahaMaitriScore, max: 5 });
+  total += grahaMaitriScore;
+
+  // 6. Gana (6) — nakshatra temperament (Deva/Manushya/Rakshasa)
+  const ganaScore = Math.abs(NAKSHATRAS.indexOf(personA.moonNakshatra) - NAKSHATRAS.indexOf(personB.moonNakshatra)) % 3 === 0 ? 6 : 4;
+  breakdown.push({ name: "Gana", score: ganaScore, max: 6 });
+  total += ganaScore;
+
+  // 7. Bhakoot (7) — moon sign relationship (2/12, 6/8 etc are dosha)
+  const bhakootDiff = Math.abs(personA.moonSign - personB.moonSign);
+  const isDosha = bhakootDiff === 2 || bhakootDiff === 12 || bhakootDiff === 5 || bhakootDiff === 6 || bhakootDiff === 8;
+  const bhakootScore = isDosha ? 0 : 7;
+  breakdown.push({ name: "Bhakoot", score: bhakootScore, max: 7 });
+  total += bhakootScore;
+
+  // 8. Nadi (8) — nakshatra groups (Aadi/Madhya/Antya)
+  const nadiA = NAKSHATRAS.indexOf(personA.moonNakshatra) % 3;
+  const nadiB = NAKSHATRAS.indexOf(personB.moonNakshatra) % 3;
+  const nadiScore = nadiA === nadiB ? 0 : 8; // same nadi = dosha
+  breakdown.push({ name: "Nadi", score: nadiScore, max: 8 });
+  total += nadiScore;
+
+  return { total, max: 36, breakdown };
+}
+
+/** Full compatibility reading between two persons. */
+export function computeCompatibility(
+  personA: BirthContext,
+  personB: BirthContext,
+  relationshipType: "MARRIAGE" | "PARTNERSHIP" | "FRIENDSHIP" = "MARRIAGE"
+) {
+  const chartA = computeNatalChart(personA, "vedic");
+  const chartB = computeNatalChart(personB, "vedic");
+
+  const moonA = chartA.planets.find((p) => p.name === "Moon")!;
+  const moonB = chartB.planets.find((p) => p.name === "Moon")!;
+  const venusA = chartA.planets.find((p) => p.name === "Venus")!;
+  const venusB = chartB.planets.find((p) => p.name === "Venus")!;
+
+  const ashtakoot = ashtakoota(
+    { moonSign: moonA.signIndex, moonNakshatra: moonA.nakshatra ?? "Ashwini" },
+    { moonSign: moonB.signIndex, moonNakshatra: moonB.nakshatra ?? "Ashwini" }
+  );
+
+  // Western synastry aspects between Venus
+  const venusDiff = Math.abs(rev(venusA.longitude - venusB.longitude + 180) - 180);
+  let synastryAspect = "neutral";
+  if (venusDiff < 8) synastryAspect = "conjunction";
+  else if (Math.abs(venusDiff - 120) < 8) synastryAspect = "trine";
+  else if (Math.abs(venusDiff - 180) < 8) synastryAspect = "opposition";
+  else if (Math.abs(venusDiff - 90) < 8) synastryAspect = "square";
+  else if (Math.abs(venusDiff - 60) < 6) synastryAspect = "sextile";
+
+  // Mahabote weekday compatibility (simple)
+  const weekdayA = new Date(buildBirthDatetime(personA)).getUTCDay();
+  const weekdayB = new Date(buildBirthDatetime(personB)).getUTCDay();
+  const mahaboteCompat = weekdayA === weekdayB ? "same-day" : Math.abs(weekdayA - weekdayB) <= 2 ? "harmonious" : "complementary";
+
+  return {
+    relationship_type: relationshipType,
+    person_a: { moon_sign: ZODIAC_SIGNS[moonA.signIndex], moon_nakshatra: moonA.nakshatra, ascendant: ZODIAC_SIGNS[chartA.ascendant.signIndex] },
+    person_b: { moon_sign: ZODIAC_SIGNS[moonB.signIndex], moon_nakshatra: moonB.nakshatra, ascendant: ZODIAC_SIGNS[chartB.ascendant.signIndex] },
+    ashtakoota: ashtakoot,
+    synastry: {
+      venus_aspect: synastryAspect,
+      venus_orb: +venusDiff.toFixed(2),
+    },
+    mahabote: mahaboteCompat,
+    overall_score: ashtakoot.total,
+    meta: {
+      calculation_version: "baydin-compat-1.0",
+    },
+  };
+}

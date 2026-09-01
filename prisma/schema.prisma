@@ -56,6 +56,9 @@ model User {
   dailyRewards    DailyReward[]
   transfersOut    LuckTransfer[] @relation("TransferFrom")
   transfersIn      LuckTransfer[] @relation("TransferTo")
+  frequencySessions FrequencySession[]
+  positivitySessions PositivitySession[]
+  compatibilityReadings CompatibilityReading[]
 
   @@index([referredById])
   @@index([role])
@@ -286,4 +289,64 @@ model RitualLog {
   @@unique([userId, date])
   @@index([userId, date])
   @@map("ritual_logs")
+}
+
+// ============================================================
+// FREQUENCY SESSIONS (Solfeggio tones — daily-use, free)
+// ============================================================
+
+model FrequencySession {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  intention     String   // e.g. "abundance", "love"
+  frequencyHz   Int      @map("frequency_hz")
+  baseHz        Float?   @map("base_hz")
+  beatHz        Float?   @map("beat_hz")
+  mode          String   @default("pure") // "pure" | "binaural" | "pad"
+  durationSec   Int      @map("duration_sec")
+  completed     Boolean  @default(true)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("frequency_sessions")
+}
+
+// ============================================================
+// POSITIVITY GENERATOR (affirmations — 1 free/day, then Luck)
+// ============================================================
+
+model PositivitySession {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date          String   // YYYY-MM-DD
+  category      String   // wealth, health, relationship, etc.
+  intention     String?
+  durationSec   Int      @map("duration_sec")
+  source        String   @default("template") // "llm" | "template"
+  script        String   // the affirmation script text
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([userId, date])
+  @@map("positivity_sessions")
+}
+
+// ============================================================
+// COMPATIBILITY READINGS (partner matching)
+// ============================================================
+
+model CompatibilityReading {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // JSON: { personA: BirthContext, personB: BirthContext, relationshipType }
+  partnerData     String   @map("partner_data")
+  // JSON: the full compatibility calculation result
+  calculation     String
+  interpretation  String
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("compatibility_readings")
 }
