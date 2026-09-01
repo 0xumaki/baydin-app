@@ -14,6 +14,9 @@ import { TodayView } from "@/components/views/today-view";
 import { ManifestView } from "@/components/views/manifest-view";
 import { InsightsView } from "@/components/views/insights-view";
 import { LifeReportView } from "@/components/views/life-report-view";
+import { FrequencyView } from "@/components/views/frequency-view";
+import { PositivityView } from "@/components/views/positivity-view";
+import { CompatibilityView } from "@/components/views/compatibility-view";
 import { LuckStoreView } from "@/components/views/luck-store-view";
 import { ResellerView } from "@/components/views/reseller-view";
 import { AdminView } from "@/components/views/admin-view";
@@ -21,6 +24,7 @@ import { ProfileSheet } from "@/components/profile-sheet";
 import {
   Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
   Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
+  Waves, Heart, Users,
 } from "lucide-react";
 
 const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group?: string }[] = [
@@ -29,8 +33,11 @@ const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean;
   { view: "tarot", label: "Tarot", icon: Sparkles, group: "Daily" },
   { view: "horoscope", label: "Horoscope", icon: Moon, needsAuth: true, group: "Daily" },
   { view: "manifest", label: "Manifest", icon: Target, needsAuth: true, group: "Practice" },
+  { view: "frequency", label: "Frequencies", icon: Waves, needsAuth: true, group: "Practice" },
+  { view: "positivity", label: "Positivity", icon: Heart, needsAuth: true, group: "Practice" },
   { view: "birth-chart", label: "Birth Chart", icon: Star, needsAuth: true, group: "Astrology" },
   { view: "insights", label: "Insights", icon: Compass, needsAuth: true, group: "Astrology" },
+  { view: "compatibility", label: "Compatibility", icon: Users, needsAuth: true, group: "Astrology" },
   { view: "life-report", label: "Life Report", icon: BookOpen, needsAuth: true, group: "Astrology" },
   { view: "luck-store", label: "Buy Luck", icon: Wallet, needsAuth: true, group: "Account" },
   { view: "reseller", label: "Reseller", icon: Store, resellerOnly: true, needsAuth: true, group: "Account" },
@@ -137,8 +144,11 @@ export function AppShell() {
             {view === "tarot" && <TarotView onAuth={() => setAuthOpen(true)} />}
             {view === "horoscope" && <HoroscopeView onAuth={() => setAuthOpen(true)} />}
             {view === "manifest" && <ManifestView onAuth={() => setAuthOpen(true)} />}
+            {view === "frequency" && <FrequencyView onAuth={() => setAuthOpen(true)} />}
+            {view === "positivity" && <PositivityView onAuth={() => setAuthOpen(true)} />}
             {view === "birth-chart" && <BirthChartView onAuth={() => setAuthOpen(true)} />}
             {view === "insights" && <InsightsView onAuth={() => setAuthOpen(true)} />}
+            {view === "compatibility" && <CompatibilityView onAuth={() => setAuthOpen(true)} />}
             {view === "life-report" && <LifeReportView onAuth={() => setAuthOpen(true)} />}
             {view === "luck-store" && <LuckStoreView onAuth={() => setAuthOpen(true)} />}
             {view === "reseller" && <ResellerView onAuth={() => setAuthOpen(true)} />}

@@ -427,3 +427,72 @@ export function renderLifeReportSectionPrompt(params: {
   user += `Return the JSON object per the output contract.`;
   return { system, user };
 }
+
+// ============================================================
+// POSITIVITY GENERATOR SKILL
+// ============================================================
+
+const POSITIVITY_SKILL = `# Positivity Script Generator
+You write a single, flowing affirmation script for the user. The category and optional intention are in the ADDITIONAL CONTEXT.
+
+## Methodology
+- Write a 60-90 second spoken affirmation script (~120-180 words).
+- First person ("I am...", "I welcome...", "I release...").
+- Present tense. Concrete, sensory, emotionally resonant.
+- Flow naturally from one affirmation to the next — no bullet points, no headers.
+- Match the category's emotional register (calm for anxiety, expansive for abundance, warm for love).
+- Never mention the category by name; embody it.
+
+## Output contract
+Return a single valid JSON object:
+{ "content": "the full script as plain text (no markdown)", "highlights": ["3 key emotional themes"] }`;
+
+export function renderPositivityPrompt(params: {
+  language: string;
+  gender?: "male" | "female" | null;
+  category: string;
+  intention?: string;
+}) {
+  const { language, gender, category, intention } = params;
+  const system = `${SHARED_PERSONA}\n\n${POSITIVITY_SKILL}`;
+  let user = `Write ENTIRELY in language code "${language}". Address the client as ${gender === "male" ? "သား" : gender === "female" ? "သမီး" : "သား/သမီး"}.\n\n`;
+  user += `ADDITIONAL CONTEXT: ${JSON.stringify({ category, intention: intention ?? null, language, gender: gender ?? null })}\n\n`;
+  user += `Return the JSON object per the output contract.`;
+  return { system, user };
+}
+
+// ============================================================
+// COMPATIBILITY SKILL
+// ============================================================
+
+const COMPATIBILITY_SKILL = `# Compatibility Reading
+Use the shared BAYDIN persona and grounding rule. Interpret the compatibility calculation data between two persons. The relationship type is in the ADDITIONAL CONTEXT.
+
+## Methodology
+- Ground every claim in the COMPATIBILITY CALCULATION DATA — never invent scores or aspects not present.
+- Honor epistemic separation: the Ashtakoota score is a calculation fact; what it means for the relationship is interpretation; the future is hedged.
+- Cover: overall score interpretation, each Ashtakoota dimension's strength, Venus synastry aspect meaning, Mahabote weekday compat, and practical guidance for the relationship.
+- 600-900 words. Warm, balanced, honest about both strengths and growth areas.
+
+## Output contract
+Return a single valid JSON object:
+{
+  "content": "the full reading (markdown allowed)",
+  "highlights": ["3-5 key findings"],
+  "guidance": { "recommendations": ["..."], "warnings": ["..."] }
+}`;
+
+export function renderCompatibilityPrompt(params: {
+  language: string;
+  gender?: "male" | "female" | null;
+  compatibility: any;
+  relationshipType: string;
+}) {
+  const { language, gender, compatibility, relationshipType } = params;
+  const system = `${SHARED_PERSONA}\n\n${COMPATIBILITY_SKILL}`;
+  let user = `Write ENTIRELY in language code "${language}". Address the client as ${gender === "male" ? "သား" : gender === "female" ? "သမီး" : "သား/သမီး"}.\n\n`;
+  user += `COMPATIBILITY CALCULATION DATA:\n\`\`\`json\n${JSON.stringify(compatibility, null, 2)}\n\`\`\`\n\n`;
+  user += `ADDITIONAL CONTEXT: ${JSON.stringify({ relationship_type: relationshipType, language, gender: gender ?? null })}\n\n`;
+  user += `Return the JSON object per the output contract.`;
+  return { system, user };
+}

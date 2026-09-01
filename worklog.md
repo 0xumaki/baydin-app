@@ -197,3 +197,83 @@ Task: QA the merged Baydin app, fix bugs, add new features (manifest, insights, 
 5. **Add daily ritual tracker** — 4-step ritual (Cleanse/Manifest/Tarot/Balance) with streak freeze
 6. **Add conversation export** — download astrologer chat as markdown
 7. **Polish mobile** — test all views at 375px width, fix any overflow
+
+---
+Task ID: 8 (webDevReview cron round 3)
+Agent: Orchestrator (Z.ai Code) — scheduled webDevReview
+Task: Complete the features planned in round 2 (frequency sessions, positivity generator, compatibility), fix infrastructure issues, QA all new views
+
+## Current Project Status Assessment
+- Round 2 ended mid-task due to infrastructure failure (all tools became unresponsive). Files written in round 2 (frequencies.ts, positivity.ts, compatibility in astrology/index.ts) were verified intact at start of round 3.
+- Dev server was healthy; lint clean; 29 API routes; 11 views.
+- llm.ts was intact (429 lines, ended cleanly at renderLifeReportSectionPrompt — the positivity/compatibility prompts were NOT appended in round 2).
+
+## Completed Modifications This Round
+
+### New LLM Skills (appended to llm.ts)
+- `POSITIVITY_SKILL` + `renderPositivityPrompt()` — 60-90s spoken affirmation script generator (first person, present tense, flowing, JSON output with content + highlights)
+- `COMPATIBILITY_SKILL` + `renderCompatibilityPrompt()` — compatibility reading grounded in Ashtakoota calculation data (600-900 words, JSON output with content + highlights + guidance)
+
+### New API Routes (4 added → 33 total)
+1. `GET/POST /api/frequency/session` — log Solfeggio tone sessions (free, no Luck cost)
+2. `GET/POST /api/positivity/generate` — list categories + generate affirmation script (1 free/day, then 1 Luck; LLM with template fallback)
+3. `POST /api/compatibility` — compute Ashtakoota + Venus synastry + Mahabote compat + LLM interpretation (5 Luck, with refund-on-failure)
+4. `GET/POST /api/ritual` — daily 4-step ritual tracker (Cleanse/Manifest/Tarot/Balance) with +1 Luck per step + 3 Luck completion bonus
+
+### New Views (3 added → 14 total)
+1. **FrequencyView** — Solfeggio frequency player using Tone.js (Web Audio API):
+   - 12 frequency presets with intention-colored dials (abundance 888Hz, love 639Hz, healing 528Hz, etc.)
+   - 3 modes: Pure Tone (sine oscillator), Binaural (dual oscillators with beat), Ambient Pad (polyphonic synth)
+   - Animated circular progress ring with frequency color
+   - Duration selector (2m/5m/10m/15m) with countdown timer
+   - Box Breathing pacer (4-4-4-4 pattern) with animated scaling orb
+   - Session logging on completion
+2. **PositivityView** — AI affirmation generator with word-by-word player:
+   - 11 category grid (wealth, money, health, relationship, power, career, stress-release, anxiety, worries, anti-negative, promotion)
+   - Optional intention input
+   - Word-by-word fade-in player (current word scales 1.15x + colored, surrounding words fade by distance)
+   - LLM-generated scripts with template fallback
+   - 1 free/day, then 1 Luck per script
+3. **CompatibilityView** — partner matching with Ashtakoota scoring:
+   - Partner birth details form (dob/tob/place/gender/lat/long + relationship type)
+   - Animated score ring (0-36 points) with color-coded verdict (excellent/good/average/challenging)
+   - 8-fold breakdown bars (Varna/Vashya/Tara/Yoni/Graha Maitri/Gana/Bhakoot/Nadi)
+   - Venus synastry aspect + Mahabote weekday compat cards
+   - Full LLM interpretation with markdown rendering + recommendations
+   - 5 Luck cost
+
+### New Dependencies
+- `tone@15.1.22` (Tone.js) — Web Audio synthesis for the frequency player
+
+### Nav + Store Updates
+- Added 3 new AppView types: `frequency`, `positivity`, `compatibility`
+- Nav items added to Practice group (Frequencies, Positivity) and Astrology group (Compatibility)
+- Icons: Waves (frequencies), Heart (positivity), Users (compatibility)
+
+## Verification Results (agent-browser)
+- ✅ All 3 new nav items appear in sidebar (Frequencies, Positivity, Compatibility)
+- ✅ FrequencyView renders: Solfeggio dial (888Hz Abundance), mode selectors, breathing pacer, 12-frequency grid
+- ✅ PositivityView renders: 11 category grid, "1 free today" badge, intention input
+- ✅ CompatibilityView renders: partner birth form, 5 Luck cost, relationship type selector
+- ✅ Login flow works (88 Luck balance, "Good evening, Test" greeting)
+- ✅ Lint clean, no TypeScript errors
+- ✅ 33 API routes, 14 views total
+- Screenshots saved: qa-r3-frequencies.png, qa-r3-positivity.png, qa-r3-compatibility.png
+
+## Infrastructure Issue Resolved
+- The dev server (managed by the system) had stopped. Could not keep a manually-started server alive between Bash tool calls (background processes get killed when the tool's shell session ends).
+- Workaround: ran all QA (server start + login + 3 view navigations + screenshots) in a single long-running Bash command with 180s timeout. This kept the server alive for the duration of the QA cycle.
+
+## Unresolved Issues / Risks
+1. **Dev server auto-restart** — the system-managed `bun run dev` process died and did not auto-restart. Required manual restart in each QA command. Not a code issue — infrastructure.
+2. **Tone.js dynamic import** — the frequency player uses `await import("tone")` which works but adds ~500ms latency on first play. Acceptable for a media feature.
+3. **Compatibility Ashtakoota algorithm** — uses simplified scoring heuristics (not full classical rules). Adequate for a pay-as-you-go platform; could be refined with a proper nakshatra lookup table.
+4. **Ritual view** — the API exists (`/api/ritual`) but no dedicated view was built yet. The ritual tracker is accessible via the Today dashboard's quick actions but doesn't have its own page.
+
+## Priority Recommendations for Next Phase
+1. **Add Ritual view** — dedicated 4-step ritual tracker page (Cleanse → Manifest → Tarot → Balance) with streak visualization
+2. **Parallelize Life Report** — run 7 sections concurrently with Promise.all (currently sequential ~7 min)
+3. **Add conversation export** — download astrologer chat as markdown
+4. **Polish mobile** — test all 14 views at 375px width, fix any overflow
+5. **Add daily streak visualization** — a calendar heatmap on the Today dashboard showing practice consistency
+6. **Add notifications/reminder mini-service** — socket.io for goal reminder times (port 3003)
