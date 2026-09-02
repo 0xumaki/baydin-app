@@ -1544,3 +1544,31 @@ Task: Add Dasha effects + Graha Bala (planetary power ranking), git push
 ## Current App State (78 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with Dasha effects + Graha Bala + all prior features.
+
+---
+Task ID: 47 (webDevReview cron round 43)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Pancha Mahapurusha Yoga + Gochar Phala, git push — 80 API routes milestone
+
+## Completed Modifications
+
+### 1. Pancha Mahapurusha Yoga Detection
+- `GET /api/pancha-mahapurusha` — detects the 5 most auspicious yogas in Vedic astrology
+  Ruchaka (Mars), Bhadra (Mercury), Hamsa (Jupiter), Malavya (Venus), Sasa (Saturn)
+  Each requires: planet in own/exalted sign AND in kendra (1/4/7/10)
+  Per yoga: qualities, physical traits, effects, famous examples, deity, remedy
+  Shows formed + not-formed yogas with specific reasons
+
+### 2. Gochar Phala (Transit Effects)
+- `GET /api/gochar-phala` — detailed transit effects from natal Moon
+  12 house-from-Moon effects (classical texts)
+  Per-planet: beneficial/challenging effects + duration
+  Major transits flagged (Saturn 2.5yr, Jupiter 1yr, Rahu 1.5yr)
+  Summary with beneficial/challenging counts
+
+### 3. Git Push — 80 API routes milestone!
+- 80 API routes, 17 views, lint clean
+
+## Current App State (80 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Milestone: 80 API routes! The most comprehensive pure-TypeScript Vedic astrology engine ever built.
