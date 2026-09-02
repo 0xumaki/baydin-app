@@ -40,6 +40,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [panchasara, setPanchasara] = React.useState<any>(null);
   const [forecast, setForecast] = React.useState<any>(null);
   const [shraaddha, setShraaddha] = React.useState<any>(null);
+  const [varshaphal, setVarshaphal] = React.useState<any>(null);
+  const [marriageMatch, setMarriageMatch] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -82,6 +84,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/weekly-forecast").then((r) => r.json()).then((d) => { setForecast(d.forecast); }).catch(() => {});
     // Load shraaddha recommendations
     fetch("/api/shraaddha").then((r) => r.json()).then((d) => { setShraaddha(d.shraaddha); }).catch(() => {});
+    // Load varshaphal (year ahead)
+    fetch("/api/varshaphal").then((r) => r.json()).then((d) => { setVarshaphal(d.varshaphal); }).catch(() => {});
+    // Load marriage match
+    fetch("/api/marriage-match").then((r) => r.json()).then((d) => { setMarriageMatch(d.match); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -429,6 +435,53 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                     <div key={i} className="p-2 rounded-lg bg-white/[0.02]">
                       <div className="text-[10px] text-gold font-medium">{r.name} <span className="text-[8px] text-ink-muted">({r.timing})</span></div>
                       <div className="text-[9px] text-ink-muted leading-relaxed">{r.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
+            {/* Varshaphal (year ahead) */}
+            {varshaphal && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sun className="w-4 h-4 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Varshaphal — Year Ahead</span>
+                </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-gold/20 flex items-center justify-center text-[16px] font-light text-gold shrink-0">
+                    {varshaphal.age}
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[13px] text-ink">Age {varshaphal.age} · Muntha in {varshaphal.munthaSign}</div>
+                    <div className="text-[10px] text-gold">Year Lord: {varshaphal.yearLord}</div>
+                    <div className="text-[10px] text-ink-muted">{varshaphal.effect}</div>
+                  </div>
+                </div>
+                <div className="space-y-0.5">
+                  {varshaphal.themes?.map((t: string, i: number) => (
+                    <div key={i} className="text-[10px] text-ink-muted">• {t}</div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
+            {/* Marriage matching */}
+            {marriageMatch && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Heart className="w-4 h-4 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Marriage Matching</span>
+                </div>
+                <div className="text-[11px] text-ink-muted mb-2">Based on {marriageMatch.yourNakshatra} nakshatra</div>
+                <div className="space-y-2">
+                  {Object.values(marriageMatch.checks || {}).map((check: any, i: number) => (
+                    <div key={i} className="p-2 rounded-lg bg-white/[0.02]">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-[11px] text-gold font-medium">{check.name}</span>
+                      </div>
+                      <div className="text-[9px] text-ink-muted mb-1">{check.desc}</div>
+                      <div className="text-[9px] text-ink-muted/70">{check.status}</div>
                     </div>
                   ))}
                 </div>
