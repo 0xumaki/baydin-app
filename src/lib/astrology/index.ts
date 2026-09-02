@@ -1206,6 +1206,167 @@ export function computeShashtiamsa(natal: NatalChart): { planets: { name: string
   return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
 }
 
+// ============================================================
+// ASHTAKAVARGA — 8-fold bindu (point) system, total 337 bindus
+// ============================================================
+
+// Simplified Ashtakavarga: each planet contributes bindus to signs based on
+// classical friendship tables. This is a heuristic approximation.
+const PLANET_BINDU_RULES: Record<string, number[]> = {};
+
+function initAshtakavargaRules() {
+  // Sun contributes bindus to signs where it is benefic
+  // Simplified: Sun favors signs 0,3,4,5,9,11 (own/exalted/friendly)
+  PLANET_BINDU_RULES["Sun"] = [1,0,0,1,1,1,0,0,0,1,0,1];
+  PLANET_BINDU_RULES["Moon"] = [0,1,1,1,1,0,0,1,0,0,0,1];
+  PLANET_BINDU_RULES["Mars"] = [1,0,0,0,1,1,1,0,0,1,0,1];
+  PLANET_BINDU_RULES["Mercury"] = [1,0,1,0,0,1,1,1,0,0,1,0];
+  PLANET_BINDU_RULES["Jupiter"] = [1,1,0,1,1,1,0,1,1,0,1,1];
+  PLANET_BINDU_RULES["Venus"] = [0,1,1,1,0,1,1,1,1,1,0,0];
+  PLANET_BINDU_RULES["Saturn"] = [1,0,0,0,0,0,1,0,0,1,1,1];
+}
+
+initAshtakavargaRules();
+
+/**
+ * Compute Ashtakavarga — BAV (Bhinnashtakavarga) per planet + SAV (Sarvashtakavarga).
+ * Returns bindu scores for each sign from each planet + totals.
+ */
+export function computeAshtakavarga(natal: NatalChart): {
+  bav: { planet: string; bindus: number[]; total: number }[];
+  sav: number[];
+  savTotal: number;
+  strong: { sign: string; signIndex: number; bindus: number }[];
+  weak: { sign: string; signIndex: number; bindus: number }[];
+} {
+  const planetsWithBindu = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+  const sav = Array(12).fill(0);
+
+  const bav = planetsWithBindu.map((planetName) => {
+    const rules = PLANET_BINDU_RULES[planetName] || Array(12).fill(0);
+    // Find the planet's natal sign and add its contribution
+    const natalPlanet = natal.planets.find((p) => p.name === planetName);
+    const bindus = [...rules];
+    if (natalPlanet) {
+      // The planet's own sign gets an extra bindu
+      bindus[natalPlanet.signIndex] = Math.min(bindus[natalPlanet.signIndex] + 1, 2);
+    }
+    // Also consider the ascendant contribution (Lagna is the 8th factor)
+    const ascSign = natal.ascendant.signIndex;
+    // Ascendant favors signs that are trines or kendra from it
+    [0, 3, 4, 6, 8, 9].forEach((offset) => {
+      const sign = (ascSign + offset) % 12;
+      bindus[sign] = Math.min(bindus[sign] + 1, 2);
+    });
+
+    const total = bindus.reduce((a, b) => a + b, 0);
+    // Add to SAV
+    bindus.forEach((b, i) => { sav[i] += b; });
+
+    return { planet: planetName, bindus, total };
+  });
+
+  const savTotal = sav.reduce((a, b) => a + b, 0);
+
+  // Find strong (>28 bindus) and weak (<25 bindus) signs
+  const signData = sav.map((bindus, signIndex) => ({ sign: ZODIAC_SIGNS[signIndex], signIndex, bindus }));
+  const strong = signData.filter((s) => s.bindus >= 28).sort((a, b) => b.bindus - a.bindus);
+  const weak = signData.filter((s) => s.bindus < 25).sort((a, b) => a.bindus - b.bindus);
+
+  return { bav, sav, savTotal, strong, weak };
+}
+
+// ============================================================
+// SHADBALA — 6-fold planetary strength (simplified)
+// ============================================================
+
+/**
+ * Compute Shadbala — the 6-fold strength of each planet.
+ * The 6 strengths are: Sthana (position), Dig (directional), Kala (temporal),
+ * Chesta (motional), Naisargika (innate), Drik (aspectual).
+ * Returns strength in Shashtiamsas (1/60 of a Rasi), total in Rasis.
+ */
+export function computeShadbala(natal: NatalChart): {
+  planets: {
+    name: string;
+    sthana: number; dig: number; kala: number; chesta: number; naisargika: number; drik: number;
+    total: number; // in Shashtiamsas
+    totalRasis: number; // in Rasis (total / 60)
+    strength: "excellent" | "good" | "average" | "weak";
+  }[];
+} {
+  const ascSign = natal.ascendant.signIndex;
+  const planets = natal.planets.filter((p) => p.name !== "Ketu" && p.name !== "Rahu" || true);
+
+  // Innate strength (Naisargika Bala) — fixed per planet
+  const INNATE_STRENGTH: Record<string, number> = {
+    Sun: 60, Moon: 60, Mars: 36, Mercury: 54, Jupiter: 42, Venus: 54, Saturn: 24, Rahu: 30, Ketu: 30,
+  };
+
+  // Directional strength (Dig Bala) — based on which house the planet occupies
+  const DIG_STRENGTH: Record<string, [number, number]> = {
+    // [best house, strength at best house] — houses 1 indexed
+    Sun: [10, 60], Moon: [4, 60], Mars: [10, 60], Mercury: [1, 60],
+    Jupiter: [1, 60], Venus: [4, 60], Saturn: [7, 60],
+  };
+
+  const results = planets.map((p) => {
+    // 1. Sthana Bala (positional) — based on degree in sign
+    const degreeInSign = p.degree;
+    const sthana = Math.round(degreeInSign * 2); // 0-60
+
+    // 2. Dig Bala (directional) — max at specific house, decreasing away
+    let dig = 0;
+    const digRule = DIG_STRENGTH[p.name];
+    if (digRule) {
+      const [bestHouse, maxStr] = digRule;
+      const houseDiff = Math.abs(p.house - bestHouse);
+      dig = Math.max(0, maxStr - houseDiff * 10);
+    }
+
+    // 3. Kala Bala (temporal) — simplified, based on day/night
+    const isDayBirth = natal.meta.birth_datetime.includes("T") &&
+      parseInt(natal.meta.birth_datetime.split("T")[1]?.slice(0, 2) || "12") >= 6 &&
+      parseInt(natal.meta.birth_datetime.split("T")[1]?.slice(0, 2) || "12") < 18;
+    const isDayPlanet = ["Sun", "Jupiter", "Mars"].includes(p.name);
+    const isNightPlanet = ["Moon", "Venus", "Saturn"].includes(p.name);
+    let kala = 30; // base
+    if ((isDayPlanet && isDayBirth) || (isNightPlanet && !isDayBirth)) {
+      kala = 60; // full strength
+    }
+
+    // 4. Chesta Bala (motional) — retrograde planets get different strength
+    const chesta = p.retrograde ? 30 : 45;
+
+    // 5. Naisargika Bala (innate) — fixed per planet
+    const naisargika = INNATE_STRENGTH[p.name] || 30;
+
+    // 6. Drik Bala (aspectual) — simplified: benefic aspects add, malefic subtract
+    let drik = 0;
+    for (const other of natal.planets) {
+      if (other.name === p.name) continue;
+      const diff = Math.abs(((other.signIndex - p.signIndex + 12) % 12) * 30);
+      if (diff === 0 || diff === 120 || diff === 180 || diff === 90 || diff === 60) {
+        // Aspected — benefic planets add, malefic subtract
+        const isBenefic = ["Jupiter", "Venus", "Mercury", "Moon"].includes(other.name);
+        drik += isBenefic ? 10 : -10;
+      }
+    }
+
+    const total = sthana + dig + kala + chesta + naisargika + drik;
+    const totalRasis = +(total / 60).toFixed(2);
+    const strength = total > 250 ? "excellent" : total > 200 ? "good" : total > 150 ? "average" : "weak";
+
+    return {
+      name: p.name,
+      sthana, dig, kala, chesta, naisargika, drik,
+      total, totalRasis, strength,
+    };
+  });
+
+  return { planets: results };
+}
+
 /**
  * Compute Solar Return (Varshaphal) chart — the year ahead.
  * Finds the moment when transit Sun returns to its natal longitude,

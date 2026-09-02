@@ -5,7 +5,7 @@ import { GlassCard, GoldButton, Pill, SectionTitle } from "@/components/lumina/p
 import { useMe, api } from "@/lib/api-client";
 import { Star, Wallet, Sparkles, MapPin, Sun } from "lucide-react";
 import { toast } from "sonner";
-import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn, computeShodasamsa, computeVimsamsa, computeChaturvimsamsa, computeTrimsamsa, computeKhavedamsa, computeAkshavedamsa, computeShashtiamsa } from "@/lib/astrology";
+import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn, computeShodasamsa, computeVimsamsa, computeChaturvimsamsa, computeTrimsamsa, computeKhavedamsa, computeAkshavedamsa, computeShashtiamsa, computeAshtakavarga, computeShadbala } from "@/lib/astrology";
 
 const PLANET_SYMBOLS: Record<string, string> = {
   Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
@@ -496,6 +496,74 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
             })()}
           </div>
           <div className="text-[10px] text-ink-muted/60 mt-1">D-60 reveals karma from past lives & all hidden matters. The most important chart after D-1.</div>
+        </GlassCard>
+      )}
+
+      {/* Ashtakavarga (BAV + SAV) */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Ashtakavarga — Bindu Scores (SAV total: {computeAshtakavarga(c).savTotal})
+          </div>
+          {(() => {
+            const av = computeAshtakavarga(c);
+            return (
+              <>
+                <div className="grid grid-cols-6 sm:grid-cols-12 gap-1 mb-3">
+                  {av.sav.map((bindus, i) => (
+                    <div key={i} className="text-center p-1 rounded bg-white/[0.02]">
+                      <div className="text-[8px] text-ink-muted">{ZODIAC_SYMBOLS[i]}</div>
+                      <div className={cn("text-[11px] font-medium", bindus >= 28 ? "text-leaf" : bindus < 25 ? "text-destructive" : "text-ink")}>{bindus}</div>
+                    </div>
+                  ))}
+                </div>
+                {av.strong.length > 0 && (
+                  <div className="text-[10px] text-leaf mb-1">Strong: {av.strong.map((s) => `${s.sign} (${s.bindus})`).join(", ")}</div>
+                )}
+                {av.weak.length > 0 && (
+                  <div className="text-[10px] text-destructive/70">Weak: {av.weak.map((s) => `${s.sign} (${s.bindus})`).join(", ")}</div>
+                )}
+                <div className="text-[9px] text-ink-muted/60 mt-1">SAV shows overall sign strength. 28+ = strong, below 25 = weak (out of 337 total bindus).</div>
+              </>
+            );
+          })()}
+        </GlassCard>
+      )}
+
+      {/* Shadbala (6-fold planetary strength) */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Shadbala — Planetary Strength (6-fold)
+          </div>
+          {(() => {
+            const sb = computeShadbala(c);
+            return (
+              <div className="space-y-1.5">
+                {sb.planets.map((p) => (
+                  <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                    <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                    <span className="text-ink w-16">{p.name}</span>
+                    <div className="flex-1 grid grid-cols-6 gap-0.5 text-center">
+                      <span className="text-[8px] text-ink-muted" title="Sthana">{p.sthana}</span>
+                      <span className="text-[8px] text-ink-muted" title="Dig">{p.dig}</span>
+                      <span className="text-[8px] text-ink-muted" title="Kala">{p.kala}</span>
+                      <span className="text-[8px] text-ink-muted" title="Chesta">{p.chesta}</span>
+                      <span className="text-[8px] text-ink-muted" title="Naisargika">{p.naisargika}</span>
+                      <span className="text-[8px] text-ink-muted" title="Drik">{p.drik}</span>
+                    </div>
+                    <span className="text-[10px] text-ink w-8 text-right">{p.totalRasis}R</span>
+                    <span className={cn("text-[8px] px-1.5 py-0.5 rounded-full", p.strength === "excellent" ? "bg-leaf/15 text-leaf" : p.strength === "good" ? "bg-gold/15 text-gold" : p.strength === "average" ? "bg-white/5 text-ink-muted" : "bg-destructive/15 text-destructive")}>{p.strength}</span>
+                  </div>
+                ))}
+                <div className="text-[9px] text-ink-muted/60 mt-1 grid grid-cols-6 gap-0.5 text-center pl-[88px]">
+                  <span>Sth</span><span>Dig</span><span>Kala</span><span>Che</span><span>Nai</span><span>Drik</span>
+                </div>
+              </div>
+            );
+          })()}
         </GlassCard>
       )}
 
