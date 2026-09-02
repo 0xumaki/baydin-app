@@ -827,3 +827,29 @@ Task: Add Muhurta widget, D-9/D-10/D-7 divisional charts, git push
 ## Current App State (45 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with D-1 (natal), D-9 (Navamsa), D-10 (Dasamsa), D-7 (Saptamsa) charts, Muhurta, Panchanga, moon phase, lucky numbers, plus all prior features.
+
+---
+Task ID: 24 (webDevReview cron round 20)
+Agent: Orchestrator (Z.ai Code)
+Task: Add today's planetary transits widget, D-2 Hora + D-12 Dwadasamsa divisional charts, git push
+
+## Completed Modifications
+
+### 1. Today's Planetary Transits Widget
+- `GET /api/transits` — computes current planetary positions + aspects to natal chart
+- Transits widget on Today dashboard: 3-5 col grid of planet symbols with sign names (Myanmar) + retrograde indicators
+- Aspects to natal chart listed below (up to 3)
+
+### 2. D-2 Hora (Wealth) + D-12 Dwadasamsa (Parents) Divisional Charts
+- `computeHora(D-2)` — wealth & resources (Sun/Moon Hora based on sign half)
+- `computeDwadasamsa(D-12)` — parents & ancestry (12 parts of 2°30' each)
+- Both displayed on birth-chart view in vedic mode
+
+### 3. Git Push
+- Committed and pushed to https://github.com/0xumaki/baydin-app
+- 46 API routes, 17 views
+- Total: 6 divisional charts (D-1 natal, D-2 Hora, D-7 Saptamsa, D-9 Navamsa, D-10 Dasamsa, D-12 Dwadasamsa)
+
+## Current App State (46 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with 6 divisional charts, Muhurta, Panchanga, transits, moon phase, lucky numbers, plus all prior features.
