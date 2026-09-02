@@ -1106,3 +1106,43 @@ The app now has all 5 Panchanga limbs:
 ## Current App State (54 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with Yadaya + full Panchanga + all prior features.
+
+---
+Task ID: 33 (webDevReview cron round 29)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Karana widget + Panchasara (5-fold remedy) system, git push
+
+## Completed Modifications
+
+### 1. Karana Widget (4th Panchanga limb)
+- `GET /api/karana` — computes today's Karana (half-tithi) from Moon-Sun elongation
+- 11 Karanas: 7 movable (Bava, Balava, Kaulava, Taitila, Gara, Vanija, Vishti) + 4 fixed (Shakuni, Chatushpada, Naga, Kimstughna)
+- Auspicious/inauspicious/mixed nature with descriptions
+- Vishti (Bhadra) flagged as inauspicious — avoid all auspicious work
+- Widget on Today dashboard (right column, after Yoga)
+
+### 2. Panchasara (5-Fold Remedy System)
+- `GET /api/panchasara` — analyzes natal chart for most afflicted planet
+- 5-fold remedy for the afflicted planet:
+  1. **Mantra** (मन्त्र) — chanting and japa
+  2. **Tantra** (तन्त्र) — ritual and worship
+  3. **Yantra** (यन्त्र) — talisman/sacred geometry
+  4. **Aushadha** (औषध) — herbal medicine
+  5. **Daan** (दान) — charity and donation
+- 9 planets with specific, culturally appropriate remedies
+- Shows "balanced" state when no afflictions found
+- Widget on Today dashboard (left column, after Yadaya)
+
+### 3. ALL 5 PANCHANGA LIMBS NOW ON DASHBOARD ✅
+1. **Vara** (weekday) — in greeting + muhurta
+2. **Tithi** (lunar day) — /api/tithi widget
+3. **Nakshatra** (lunar mansion) — /api/nakshatra widget
+4. **Yoga** (Sun+Moon sum) — /api/yoga-today widget
+5. **Karana** (half-tithi) — /api/karana widget
+
+### 4. Git Push
+- 56 API routes, 17 views, lint clean
+
+## Current App State (56 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with full Panchanga + Panchasara + Yadaya + all prior features.
