@@ -1042,3 +1042,32 @@ Task: Add Ashtakavarga (337 bindus) + Shadbala (6-fold planetary strength), git 
 - Mantra + Gemstone + Nakshatra + Muhurta + Transits + Moon phase + Lucky numbers
 - Ashtakoota compatibility + Mahabote + Panchanga
 Plus: streaming astrologer (Gemini), tarot, frequencies, positivity, manifest, ritual, Luck economy, achievements, reseller, admin
+
+---
+Task ID: 31 (webDevReview cron round 27)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Namkaran (naming) suggestions, today's tithi widget, git push
+
+## Completed Modifications
+
+### 1. Namkaran (Naming) Suggestions
+- `GET /api/namkaran` — Vedic Namkaran based on birth nakshatra pada
+- 27 nakshatras × 4 padas = 108 starting letter combinations
+- Sample names for common starting letters
+- Pada letter highlighted in gold on Today dashboard
+- Widget shows: nakshatra, pada, 4 starting letters (pada highlighted), sample names
+
+### 2. Today's Tithi Widget
+- `GET /api/tithi` — computes today's tithi from Moon-Sun sidereal elongation
+- 30 tithis (15 Shukla waxing + 15 Krishna waning)
+- Tithi names (Pratipada through Purnima/Amavasya)
+- Special tithi detection: Purnima (Full Moon), Amavasya (New Moon), Ekadashi, Ashtami
+- Paksha (waxing/waning) indication
+- Widget on Today dashboard with contextual emoji
+
+### 3. Git Push
+- 52 API routes, 17 views, lint clean
+
+## Current App State (52 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology engine with Namkaran + Tithi added to the full set.
