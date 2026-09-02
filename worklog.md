@@ -770,3 +770,34 @@ Task: Add moon phase widget, commit all work, push to GitHub
 ## Current App State (44 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 **Full feature set**: streaming astrologer (Gemini), tarot + history + reflections, 12 insights + bookmarking, compatibility, life report, frequencies, positivity, manifest, ritual, mood, 20 achievements + confetti, notification badges, conversation search/pin/rename/delete/export/share, referral, theme toggle, onboarding, activity heatmap, recommended practice, data export, delete account, streak freeze, saved insights, lucky numbers + share, moon phase
+
+---
+Task ID: 22 (webDevReview cron round 17)
+Agent: Orchestrator (Z.ai Code)
+Task: Add weekly practice summary widget, conversation delete confirmation modal, git push
+
+## Completed Modifications This Round
+
+### 1. Weekly Practice Summary Widget (Today dashboard)
+- New compact card at the top of the left column showing 7-day aggregate stats:
+  - Total actions (gold)
+  - Active days (leaf)
+  - Tarot readings (purple)
+  - Astrologer chats (blue)
+- Horizontal scroll on mobile (lum-no-scrollbar)
+- Only renders when activity data is available
+- WeeklyStat helper component with color-coded values
+
+### 2. Conversation Delete Confirmation Modal
+- Replaced browser `confirm()` with a proper Lumina-styled modal
+- Modal shows: destructive warning icon, title, description, Cancel + Delete buttons
+- Backdrop click to cancel
+- deleteId state controls visibility
+
+### 3. Git Push
+- Committed and pushed to https://github.com/0xumaki/baydin-app
+- 2 commits: moon phase + initial push, then weekly summary + delete modal
+
+## Current App State (44 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete feature set with weekly summary, moon phase, lucky numbers, achievements, conversation management, data export, theme toggle, onboarding, and all prior features.
