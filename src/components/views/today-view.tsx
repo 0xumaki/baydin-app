@@ -44,6 +44,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [marriageMatch, setMarriageMatch] = React.useState<any>(null);
   const [gochar, setGochar] = React.useState<any>(null);
   const [auspicious, setAuspicious] = React.useState<any>(null);
+  const [planetaryHours, setPlanetaryHours] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -94,6 +95,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/gochar").then((r) => r.json()).then((d) => { setGochar(d.gochar); }).catch(() => {});
     // Load auspicious activities
     fetch("/api/auspicious").then((r) => r.json()).then((d) => { setAuspicious(d.auspicious); }).catch(() => {});
+    // Load planetary hours
+    fetch("/api/planetary-hours").then((r) => r.json()).then((d) => { setPlanetaryHours(d.hours); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -685,6 +688,32 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                   <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Today's Karana</div>
                   <div className="text-[13px] text-ink">{karana.name} <span className="text-[10px] text-ink-muted">#{karana.index}/60</span></div>
                   <div className={cn("text-[10px]", karana.nature?.includes("Auspicious") ? "text-leaf" : karana.nature?.includes("Inauspicious") ? "text-destructive/70" : "text-ink-muted")}>{karana.nature}</div>
+                </div>
+              </GlassCard>
+            )}
+            {planetaryHours?.current && (
+              <GlassCard className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock className="w-3.5 h-3.5 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Planetary Hours</span>
+                </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0 border" style={{ borderColor: planetaryHours.current.color + "40", background: planetaryHours.current.color + "15", color: planetaryHours.current.color }}>
+                    {planetaryHours.current.symbol}
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[13px] text-ink">{planetaryHours.current.planet} hour <span className="text-[10px] text-ink-muted">({planetaryHours.current.hour}:00)</span></div>
+                    <div className="text-[10px] text-ink-muted">{planetaryHours.current.effect}</div>
+                  </div>
+                </div>
+                <div className="text-[9px] text-ink-muted mb-1">Day ruler: {planetaryHours.dayRuler} {planetaryHours.dayRulerSymbol}</div>
+                {/* Mini hour strip */}
+                <div className="flex gap-0.5 overflow-x-auto lum-no-scrollbar">
+                  {planetaryHours.all?.slice(0, 12).map((h: any, i: number) => (
+                    <div key={i} className={cn("shrink-0 px-1 py-0.5 rounded text-[8px] text-center transition", h.isCurrent ? "bg-gold/15 text-gold" : "bg-white/[0.02] text-ink-muted")} title={`${h.planet} hour`}>
+                      {h.symbol}
+                    </div>
+                  ))}
                 </div>
               </GlassCard>
             )}
