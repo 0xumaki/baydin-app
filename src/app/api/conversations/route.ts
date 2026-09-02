@@ -5,11 +5,15 @@ import { db } from "@/lib/db";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ conversations: [] });
+  const search = req.nextUrl.searchParams.get("q")?.trim();
   const conversations = await db.conversation.findMany({
-    where: { userId: user.id },
+    where: {
+      userId: user.id,
+      ...(search ? { title: { contains: search } } : {}),
+    },
     orderBy: [{ pinned: "desc" }, { updatedAt: "desc" }],
     take: 50,
     select: {

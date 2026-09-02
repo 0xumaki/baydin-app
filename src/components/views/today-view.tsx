@@ -76,6 +76,16 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
           </p>
         </div>
 
+        {/* Recommended practice (personalized) */}
+        <RecommendedPractice
+          ritualDone={activity[6]?.activities?.ritual ?? false}
+          moodDone={activity[6]?.activities?.mood ?? false}
+          manifestDone={goals.every((g) => g.confirmedToday) && goals.length > 0}
+          tarotDone={(activity[6]?.activities?.tarot ?? 0) > 0}
+          streak={user.streak}
+          onNavigate={setView}
+        />
+
         {/* Quick actions grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
           <QuickAction icon={Sparkles} label="Ask Astrologer" desc="Chat" onClick={() => setView("chat")} />
@@ -330,6 +340,53 @@ function UpsellRow({ icon: Icon, label, cost, desc, onClick }: { icon: any; labe
         <div className="text-[10px] text-ink-muted">{desc}</div>
       </div>
       <Pill variant="gold" className="text-[9px]">{cost} Luck</Pill>
+    </button>
+  );
+}
+
+function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, streak, onNavigate }: {
+  ritualDone: boolean; moodDone: boolean; manifestDone: boolean; tarotDone: boolean; streak: number; onNavigate: (v: any) => void;
+}) {
+  // Determine what's left to do today
+  const tasks: { label: string; desc: string; icon: any; view: string; done: boolean; color: string }[] = [
+    { label: "Check your mood", desc: "1 tap · +1 Luck", icon: Heart, view: "today", done: moodDone, color: "#D876A0" },
+    { label: "Confirm your intention", desc: "Daily manifest · +1 Luck", icon: Target, view: "manifest", done: manifestDone, color: "#B5CD7E" },
+    { label: "Draw a tarot card", desc: "Free daily reading", icon: Star, view: "tarot", done: tarotDone, color: "#C5A87C" },
+    { label: "Complete your ritual", desc: "4 steps · +7 Luck", icon: Flame, view: "ritual", done: ritualDone, color: "#F09A3D" },
+  ];
+  const next = tasks.find((t) => !t.done);
+
+  if (!next) {
+    return (
+      <ShellCard className="p-4 mb-5 lum-anim-float-up">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-leaf/15 border border-leaf/30 flex items-center justify-center shrink-0">
+            <Flame className="w-5 h-5 text-leaf" />
+          </div>
+          <div className="flex-1">
+            <div className="text-[13px] text-ink font-medium">Today's practice complete ✦</div>
+            <div className="text-[11px] text-ink-muted">You've done everything. Come back tomorrow to keep your {streak}-day streak alive.</div>
+          </div>
+        </div>
+      </ShellCard>
+    );
+  }
+
+  return (
+    <button onClick={() => onNavigate(next.view)} className="block w-full text-left mb-5 lum-anim-float-up group">
+      <ShellCard className="p-4 hover:border-gold/30 transition">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border" style={{ background: `${next.color}15`, borderColor: `${next.color}40` }}>
+            <next.icon className="w-5 h-5" style={{ color: next.color }} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Recommended next</div>
+            <div className="text-[14px] text-ink font-medium group-hover:text-gold transition">{next.label}</div>
+            <div className="text-[11px] text-ink-muted">{next.desc}</div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-ink-muted group-hover:text-gold group-hover:translate-x-0.5 transition shrink-0" />
+        </div>
+      </ShellCard>
     </button>
   );
 }
