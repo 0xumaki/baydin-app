@@ -748,3 +748,25 @@ Complete feature set: streaming astrologer, tarot + history + reflections, 12 in
 3. Add "Today's moon phase" widget
 4. Add weekly practice summary
 5. Add conversation delete confirmation modal (currently uses browser confirm())
+
+---
+Task ID: 21 (webDevReview cron round 16 + git push)
+Agent: Orchestrator (Z.ai Code)
+Task: Add moon phase widget, commit all work, push to GitHub
+
+## Completed Modifications This Round
+
+### 1. Moon Phase Widget (Today dashboard)
+- New `GET /api/moon` API — computes current moon phase (phase name, icon emoji, age in days, illumination %, zodiac sign)
+- Moon phase card on Today dashboard right column — large emoji icon + phase name + illumination/age/sign details
+- Free feature (no Luck cost)
+
+### 2. Git Push
+- Updated .gitignore to exclude /db/, /download/, /tool-results/, /upload/, /repo-scan/, /agent-ctx/
+- Created GitHub repo: https://github.com/0xumaki/baydin-app
+- Committed all work with comprehensive commit message
+- Pushed to origin/main successfully
+
+## Current App State (44 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+**Full feature set**: streaming astrologer (Gemini), tarot + history + reflections, 12 insights + bookmarking, compatibility, life report, frequencies, positivity, manifest, ritual, mood, 20 achievements + confetti, notification badges, conversation search/pin/rename/delete/export/share, referral, theme toggle, onboarding, activity heatmap, recommended practice, data export, delete account, streak freeze, saved insights, lucky numbers + share, moon phase
