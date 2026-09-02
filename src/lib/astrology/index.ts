@@ -844,3 +844,32 @@ export function computeCompatibility(
     },
   };
 }
+
+/**
+ * Compute Navamsa (D-9) divisional chart from a natal chart.
+ * Each sign is divided into 9 parts of 3°20' each.
+ */
+export function computeNavamsa(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  function navamsaSign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const pada = Math.floor(degreeInSign / (30 / 9));
+    const signType = signIdx % 3;
+    const startSign = signType === 0 ? signIdx : signType === 1 ? (signIdx + 8) % 12 : (signIdx + 4) % 12;
+    return (startSign + pada) % 12;
+  }
+
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: navamsaSign(p.longitude),
+    sign: ZODIAC_SIGNS[navamsaSign(p.longitude)],
+  }));
+
+  const ascendantSign = navamsaSign(natal.ascendant.longitude);
+
+  return {
+    planets,
+    ascendant: { signIndex: ascendantSign, sign: ZODIAC_SIGNS[ascendantSign] },
+  };
+}

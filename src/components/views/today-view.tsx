@@ -8,7 +8,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import {
   Sparkles, Moon, Star, Sun, Flame, Gift, ChevronRight, Heart, Calendar,
-  TrendingUp, Wallet, Target, Compass, BookOpen, Share2, Snowflake,
+  TrendingUp, Wallet, Target, Compass, BookOpen, Share2, Snowflake, Clock,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [activity, setActivity] = React.useState<any[]>([]);
   const [lucky, setLucky] = React.useState<any>(null);
   const [moon, setMoon] = React.useState<any>(null);
+  const [muhurta, setMuhurta] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -40,6 +41,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/lucky").then((r) => r.json()).then((d) => { setLucky(d.lucky); }).catch(() => {});
     // Load moon phase
     fetch("/api/moon").then((r) => r.json()).then((d) => { setMoon(d.moon); }).catch(() => {});
+    // Load muhurta (auspicious time)
+    fetch("/api/muhurta").then((r) => r.json()).then((d) => { setMuhurta(d.muhurta); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -291,6 +294,39 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                     <div className="text-ink">{lucky.time}</div>
                   </div>
                 </div>
+              </GlassCard>
+            )}
+
+            {/* Muhurta (auspicious time) */}
+            {muhurta && (
+              <GlassCard className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock className="w-3.5 h-3.5 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Auspicious Time</span>
+                </div>
+                {/* Inauspicious (active highlighted) */}
+                <div className="space-y-1.5 mb-3">
+                  {muhurta.inauspicious.map((per: any, i: number) => (
+                    <div key={i} className={cn("flex items-center gap-2 text-[11px]", per.active ? "text-destructive" : "text-ink-muted")}>
+                      <span className="text-sm">{per.icon}</span>
+                      <span className="flex-1">{per.name}</span>
+                      <span className={cn("font-mono", per.active && "font-medium")}>{per.time}</span>
+                      {per.active && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-destructive/15 text-destructive">NOW</span>}
+                    </div>
+                  ))}
+                </div>
+                {/* Upcoming auspicious */}
+                {muhurta.upcoming?.length > 0 && (
+                  <div className="pt-2 border-t border-white/5">
+                    <div className="text-[9px] uppercase tracking-wide text-ink-muted mb-1">Next favorable</div>
+                    {muhurta.upcoming.map((u: any, i: number) => (
+                      <div key={i} className={cn("flex items-center justify-between text-[11px]", u.note.includes("Current") ? "text-leaf" : "text-ink-muted")}>
+                        <span>{u.time}</span>
+                        <span className="text-[10px]">{u.note}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </GlassCard>
             )}
 
