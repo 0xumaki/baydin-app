@@ -38,6 +38,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [yogaToday, setYogaToday] = React.useState<any>(null);
   const [karana, setKarana] = React.useState<any>(null);
   const [panchasara, setPanchasara] = React.useState<any>(null);
+  const [forecast, setForecast] = React.useState<any>(null);
+  const [shraaddha, setShraaddha] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -76,6 +78,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/karana").then((r) => r.json()).then((d) => { setKarana(d.karana); }).catch(() => {});
     // Load panchasara (5-fold remedy)
     fetch("/api/panchasara").then((r) => r.json()).then((d) => { setPanchasara(d.panchasara); }).catch(() => {});
+    // Load weekly forecast
+    fetch("/api/weekly-forecast").then((r) => r.json()).then((d) => { setForecast(d.forecast); }).catch(() => {});
+    // Load shraaddha recommendations
+    fetch("/api/shraaddha").then((r) => r.json()).then((d) => { setShraaddha(d.shraaddha); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -370,6 +376,62 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                   <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Panchasara — Chart Balanced</span>
                 </div>
                 <div className="text-[12px] text-leaf leading-relaxed">{panchasara.message}</div>
+              </GlassCard>
+            )}
+
+            {/* Weekly forecast */}
+            {forecast?.days?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">7-Day Forecast</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px]">
+                    {forecast.bestDay && <span className="text-leaf">Best: {forecast.bestDay.dayName}</span>}
+                  </div>
+                </div>
+                <div className="grid grid-cols-7 gap-1">
+                  {forecast.days.map((day: any, i: number) => (
+                    <div key={i} className="text-center p-1.5 rounded-lg bg-white/[0.02]">
+                      <div className="text-[9px] text-ink-muted">{day.dayName.slice(0, 3)}</div>
+                      <div className={cn("text-[11px] font-medium my-0.5", day.rating >= 5 ? "text-leaf" : day.rating >= 4 ? "text-gold" : day.rating >= 3 ? "text-ink" : "text-destructive/70")}>
+                        {"★".repeat(Math.min(day.rating, 5))}
+                      </div>
+                      <div className="text-[8px] text-ink-muted leading-tight">{day.mood.split(" ")[0]}</div>
+                    </div>
+                  ))}
+                </div>
+                {forecast.challengingDay && (
+                  <div className="text-[10px] text-destructive/60 mt-2">Challenging: {forecast.challengingDay.dayName} — {forecast.challengingDay.mood}</div>
+                )}
+              </GlassCard>
+            )}
+
+            {/* Shraaddha (ancestral rites) */}
+            {shraaddha && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-4 h-4 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Shraaddha — Ancestral Rites</span>
+                </div>
+                <div className="text-[12px] text-ink mb-2 leading-relaxed">{shraaddha.practice}</div>
+                {shraaddha.indicators?.length > 0 && (
+                  <div className="space-y-0.5 mb-3">
+                    {shraaddha.indicators.slice(0, 2).map((ind: string, i: number) => (
+                      <div key={i} className="text-[10px] text-ink-muted">• {ind}</div>
+                    ))}
+                  </div>
+                )}
+                <div className="text-[10px] uppercase tracking-wide text-ink-muted mb-1.5">Simple remedies</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  {shraaddha.remedies?.slice(0, 4).map((r: any, i: number) => (
+                    <div key={i} className="p-2 rounded-lg bg-white/[0.02]">
+                      <div className="text-[10px] text-gold font-medium">{r.name} <span className="text-[8px] text-ink-muted">({r.timing})</span></div>
+                      <div className="text-[9px] text-ink-muted leading-relaxed">{r.desc}</div>
+                    </div>
+                  ))}
+                </div>
               </GlassCard>
             )}
 
