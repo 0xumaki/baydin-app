@@ -5,7 +5,7 @@ import { GlassCard, GoldButton, Pill, SectionTitle } from "@/components/lumina/p
 import { useMe, api } from "@/lib/api-client";
 import { Star, Wallet, Sparkles, MapPin } from "lucide-react";
 import { toast } from "sonner";
-import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa } from "@/lib/astrology";
+import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa } from "@/lib/astrology";
 
 const PLANET_SYMBOLS: Record<string, string> = {
   Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
@@ -197,6 +197,52 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
             Ascendant: {ZODIAC_SYMBOLS[computeNavamsa(c).ascendant.signIndex]} {computeNavamsa(c).ascendant.sign}
           </div>
           <div className="text-[10px] text-ink-muted/60 mt-1">The D-9 confirms the strength of the D-1 for marriage, relationships & dharma.</div>
+        </GlassCard>
+      )}
+
+      {/* Dasamsa (D-10) — career */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Dasamsa (D-10) — Career & Profession
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(() => {
+              const d10 = computeDasamsa(c);
+              return d10.planets.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="text-[10px] text-ink-muted/60 mt-1">D-10 reveals career potential, professional success & public standing.</div>
+        </GlassCard>
+      )}
+
+      {/* Saptamsa (D-7) — children */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Saptamsa (D-7) — Children & Progeny
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(() => {
+              const d7 = computeSaptamsa(c);
+              return d7.planets.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="text-[10px] text-ink-muted/60 mt-1">D-7 shows the promise and nature of children, creative output & legacy.</div>
         </GlassCard>
       )}
     </div>
