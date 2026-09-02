@@ -47,6 +47,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [planetaryHours, setPlanetaryHours] = React.useState<any>(null);
   const [taraBala, setTaraBala] = React.useState<any>(null);
   const [rahuKaal, setRahuKaal] = React.useState<any>(null);
+  const [choghadiya, setChoghadiya] = React.useState<any>(null);
+  const [nadi, setNadi] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -103,6 +105,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/tara-bala").then((r) => r.json()).then((d) => { setTaraBala(d.taraBala); }).catch(() => {});
     // Load rahu kaal
     fetch("/api/rahu-kaal").then((r) => r.json()).then((d) => { setRahuKaal(d.rahuKaal); }).catch(() => {});
+    // Load choghadiya
+    fetch("/api/choghadiya").then((r) => r.json()).then((d) => { setChoghadiya(d.choghadiya); }).catch(() => {});
+    // Load nadi
+    fetch("/api/nadi").then((r) => r.json()).then((d) => { setNadi(d.nadi); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -576,6 +582,27 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               </GlassCard>
             )}
 
+            {/* Nadi (pulse/dosha) */}
+            {nadi && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Nadi — {nadi.nadiName}</span>
+                  </div>
+                  <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full", nadi.dosha === "Vata" ? "bg-purple-500/15 text-purple-300" : nadi.dosha === "Pitta" ? "bg-destructive/15 text-destructive" : "bg-leaf/15 text-leaf")}>
+                    {nadi.dosha} · {nadi.element}
+                  </span>
+                </div>
+                <div className="text-[11px] text-ink mb-1">Nakshatra: {nadi.nakshatra} · Moon: {nadi.moonSign}</div>
+                <div className="text-[10px] text-ink-muted mb-2">{nadi.temperament}</div>
+                <div className="text-[10px] text-ink-muted mb-2"><span className="text-gold">Health:</span> {nadi.health}</div>
+                <div className="text-[10px] text-ink-muted mb-2"><span className="text-gold">Spiritual:</span> {nadi.spiritual}</div>
+                <div className="text-[10px] text-ink-muted mb-1"><span className="text-gold">Marriage:</span> {nadi.incompatible}</div>
+                <div className="text-[10px] text-ink-muted"><span className="text-gold">Remedies:</span> {nadi.remedies[0]}</div>
+              </GlassCard>
+            )}
+
             {/* Manifest confirmations */}
             <GlassCard className="p-5">
               <div className="flex items-center justify-between mb-3">
@@ -772,6 +799,30 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 {!rahuKaal.currentlyInauspicious && rahuKaal.nextStarting && (
                   <div className="text-[10px] text-gold mt-1">Next: {rahuKaal.nextStarting}</div>
                 )}
+              </GlassCard>
+            )}
+            {choghadiya?.current && (
+              <GlassCard className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Choghadiya</span>
+                  </div>
+                  <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full", choghadiya.current.nature === "auspicious" ? "bg-leaf/15 text-leaf" : "bg-destructive/15 text-destructive")}>
+                    {choghadiya.current.icon} {choghadiya.current.name}
+                  </span>
+                </div>
+                <div className="text-[10px] text-ink-muted mb-2">{choghadiya.current.start} – {choghadiya.current.end}</div>
+                <div className="text-[10px] text-ink-muted mb-3">{choghadiya.current.effect}</div>
+                <div className="text-[9px] text-ink-muted mb-1">Day periods</div>
+                <div className="flex flex-wrap gap-0.5 mb-2">
+                  {choghadiya.dayPeriods?.map((p: any, i: number) => (
+                    <div key={i} className={cn("shrink-0 px-1 py-0.5 rounded text-[8px] text-center", p.active ? "ring-1 ring-gold/40" : "", p.nature === "auspicious" ? "bg-leaf/[0.06] text-leaf" : "bg-destructive/[0.06] text-destructive/70")} title={`${p.name} ${p.start}-${p.end}`}>
+                      {p.icon}
+                    </div>
+                  ))}
+                </div>
+                <div className="text-[10px] text-gold">{choghadiya.nextAuspicious}</div>
               </GlassCard>
             )}
 
