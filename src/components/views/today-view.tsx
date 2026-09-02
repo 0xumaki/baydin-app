@@ -222,9 +222,26 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {/* Today's lucky numbers */}
             {lucky && (
               <GlassCard className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-3.5 h-3.5 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Luck</span>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Luck</span>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      const text = `My lucky numbers today: ${lucky.numbers.join(", ")}\nColor: ${lucky.color}\nTime: ${lucky.time}\n\n✦ Baydin — AI Astrologer`;
+                      if (navigator.share) {
+                        try { await navigator.share({ title: "My Baydin Lucky Numbers", text, url: window.location.origin }); } catch {}
+                      } else {
+                        await navigator.clipboard.writeText(text + "\n" + window.location.origin);
+                        toast.success("Lucky numbers copied ✦");
+                      }
+                    }}
+                    className="p-1 rounded-full text-ink-muted/50 hover:text-gold transition"
+                    title="Share lucky numbers"
+                  >
+                    <Share2 className="w-3 h-3" />
+                  </button>
                 </div>
                 <div className="flex items-center gap-2 mb-3">
                   {lucky.numbers.map((n: number, i: number) => (

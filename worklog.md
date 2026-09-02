@@ -713,3 +713,38 @@ Full feature set now includes: lucky numbers widget, streaming astrologer, tarot
 3. Add conversation delete confirmation modal (currently uses browser confirm())
 4. Add "share lucky numbers" feature (virality)
 5. Add weekly practice summary
+
+---
+Task ID: 20 (webDevReview cron round 15)
+Agent: Orchestrator (Z.ai Code)
+Task: Add share lucky numbers, mobile responsive fixes, QA
+
+## Completed Modifications This Round
+
+### 1. Share Lucky Numbers (virality)
+- Added Share2 icon button to the "Today's Luck" widget header on Today dashboard
+- Uses Web Share API with clipboard fallback
+- Shares: lucky numbers, color, time + "✦ Baydin — AI Astrologer" branding + app URL
+- Gold hover styling on the share button
+
+### 2. Mobile Responsive Fixes (chat-view header)
+- Birth data pills ("Birth data set" / "Add birth data") now `hidden sm:inline-flex` — hidden on mobile to prevent header overflow
+- Share/Export button labels now `hidden sm:inline` — icons-only on mobile, icons+text on desktop
+- ModeSelector labels now `hidden xs:inline sm:inline` — icons-only on very small screens
+- ModeSelector gap reduced from `gap-1` to `gap-0.5`, padding from `px-2.5` to `px-2`, added `shrink-0`
+- These changes prevent horizontal overflow on 375px screens while keeping all functionality accessible
+
+## Verification Results (agent-browser)
+- ✅ Login flow works (94 Luck balance)
+- ✅ Chat view renders (share/export buttons correctly hidden until conversation has messages)
+- ✅ Lint clean, 43 API routes, 17 views
+
+## Current App State (43 API routes, 17 views, 5 global components)
+Complete feature set: streaming astrologer, tarot + history + reflections, 12 insights + bookmarking, compatibility, life report, frequencies, positivity, manifest, ritual, mood, 20 achievements + confetti, notification badges, conversation search/pin/rename/delete/export/share, referral, theme toggle, onboarding, activity heatmap, recommended practice, data export, delete account, streak freeze, saved insights, lucky numbers + share
+
+## Priority Recommendations for Next Phase
+1. Full mobile responsive audit — test all 17 views at 375px systematically
+2. Socket.io reminder mini-service (port 3003)
+3. Add "Today's moon phase" widget
+4. Add weekly practice summary
+5. Add conversation delete confirmation modal (currently uses browser confirm())

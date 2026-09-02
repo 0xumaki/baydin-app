@@ -166,9 +166,9 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
         />
         <div className="ml-auto flex items-center gap-1.5">
           {hasBirthData ? (
-            <Pill variant="leaf" className="text-[10px]">Birth data set</Pill>
+            <Pill variant="leaf" className="text-[10px] hidden sm:inline-flex">Birth data set</Pill>
           ) : (
-            <Pill className="text-[10px] text-amber-400/80 border-amber-400/20 bg-amber-400/5">Add birth data in profile →</Pill>
+            <Pill className="text-[10px] text-amber-400/80 border-amber-400/20 bg-amber-400/5 hidden sm:inline-flex">Add birth data →</Pill>
           )}
           {activeConversationId && messages.length > 0 && (
             <>
@@ -177,14 +177,14 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
                 className="px-2 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1"
                 title="Share this consultation"
               >
-                <Share2 className="w-3 h-3" /> Share
+                <Share2 className="w-3 h-3" /> <span className="hidden sm:inline">Share</span>
               </button>
               <button
                 onClick={() => window.open(`/api/conversations/${activeConversationId}/export`, "_blank")}
                 className="px-2 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1"
                 title="Download this consultation as markdown"
               >
-                <Download className="w-3 h-3" /> Export
+                <Download className="w-3 h-3" /> <span className="hidden sm:inline">Export</span>
               </button>
             </>
           )}
@@ -295,10 +295,10 @@ function ModeSelector({ mode, onChange }: { mode: "vedic" | "western" | "mahabot
     { id: "mahabote" as const, label: "Mahabote", icon: Sun },
   ];
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-0.5 shrink-0">
       {modes.map((m) => (
-        <button key={m.id} onClick={() => onChange(m.id)} className={cn("flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] transition", mode === m.id ? "bg-gold/15 text-gold border border-gold/20" : "text-ink-muted hover:text-ink")}>
-          <m.icon className="w-3 h-3" /> {m.label}
+        <button key={m.id} onClick={() => onChange(m.id)} className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-[11px] transition", mode === m.id ? "bg-gold/15 text-gold border border-gold/20" : "text-ink-muted hover:text-ink")}>
+          <m.icon className="w-3 h-3" /> <span className="hidden xs:inline sm:inline">{m.label}</span>
         </button>
       ))}
     </div>
