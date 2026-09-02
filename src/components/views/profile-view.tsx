@@ -3,17 +3,22 @@
 import * as React from "react";
 import { GlassCard, GoldButton, Pill, SectionTitle, ShellCard } from "@/components/lumina/primitives";
 import { useMe, api } from "@/lib/api-client";
+import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   BarChart3, Sparkles, MessageCircle, Moon, Target, Flame, Wallet,
   Star, Heart, TrendingUp, Calendar, Award, Zap, Gift, Users, BookOpen, Lock,
+  Download, Trash2, X, AlertTriangle,
 } from "lucide-react";
 import { ACHIEVEMENTS, evaluateAchievements, tierColor } from "@/lib/achievements";
+import { Input } from "@/components/ui/input";
 
 export function ProfileView({ onAuth }: { onAuth: () => void }) {
   const { data } = useMe();
   const user = data?.user;
   const [activity, setActivity] = React.useState<any>(null);
+  const [showDelete, setShowDelete] = React.useState(false);
 
   React.useEffect(() => {
     if (!user) return;
@@ -172,7 +177,7 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
         {/* Account info */}
         <GlassCard className="p-5">
           <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2"><Award className="w-3.5 h-3.5 text-gold" /> Account</div>
-          <div className="grid grid-cols-2 gap-3 text-[12px]">
+          <div className="grid grid-cols-2 gap-3 text-[12px] mb-4">
             <div>
               <div className="text-ink-muted text-[10px] uppercase tracking-wide">Email</div>
               <div className="text-ink truncate">{user.email}</div>
@@ -190,7 +195,25 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
               <div className="text-gold font-mono">{user.referralCode}</div>
             </div>
           </div>
+          {/* Data export + delete */}
+          <div className="pt-4 border-t border-white/5 flex items-center gap-2">
+            <button
+              onClick={() => window.open("/api/export", "_blank")}
+              className="px-3 py-1.5 rounded-full text-[11px] border border-white/10 text-ink-muted hover:text-gold hover:border-gold/30 transition flex items-center gap-1.5"
+            >
+              <Download className="w-3 h-3" /> Export my data
+            </button>
+            <button
+              onClick={() => setShowDelete(true)}
+              className="px-3 py-1.5 rounded-full text-[11px] border border-destructive/20 text-destructive/70 hover:text-destructive hover:border-destructive/40 transition flex items-center gap-1.5"
+            >
+              <Trash2 className="w-3 h-3" /> Delete account
+            </button>
+          </div>
         </GlassCard>
+
+        {/* Delete account modal */}
+        {showDelete && <DeleteAccountModal onClose={() => setShowDelete(false)} />}
       </div>
     </div>
   );
@@ -224,5 +247,57 @@ function ActivityDot({ icon, title, count }: { icon: string; title: string; coun
     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white/[0.04] text-[10px] text-ink" title={title}>
       {icon}{count && count > 1 ? `×${count}` : ""}
     </span>
+  );
+}
+
+function DeleteAccountModal({ onClose }: { onClose: () => void }) {
+  const [password, setPassword] = React.useState("");
+  const [deleting, setDeleting] = React.useState(false);
+  const qc = useQueryClient();
+
+  async function confirm() {
+    if (!password) { toast.error("Enter your password to confirm"); return; }
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/account", {
+        method: "DELETE", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+      if (data.error) { toast.error(data.error); return; }
+      toast.success("Account deleted");
+      qc.clear();
+      setTimeout(() => window.location.reload(), 1000);
+    } catch { toast.error("Could not delete account"); }
+    finally { setDeleting(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={onClose}>
+      <GlassCard float className="max-w-sm w-full p-6 rounded-3xl" >
+        <div onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="w-5 h-5" />
+              <span className="text-[15px] font-medium">Delete account</span>
+            </div>
+            <button onClick={onClose} className="text-ink-muted hover:text-ink"><X className="w-5 h-5" /></button>
+          </div>
+          <div className="text-[12px] text-ink-muted mb-4 leading-relaxed">
+            This permanently deletes your account and all data — conversations, readings, Luck balance, achievements, and history. This cannot be undone.
+          </div>
+          <div className="mb-4">
+            <div className="text-[11px] text-ink-muted mb-1.5">Confirm your password to proceed</div>
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-white/[0.03] border-white/10 text-ink" placeholder="Your password" />
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={onClose} className="flex-1 py-2.5 rounded-full text-[12px] text-ink-muted border border-white/10 hover:text-ink transition">Cancel</button>
+            <button onClick={confirm} disabled={deleting || !password} className="flex-1 py-2.5 rounded-full text-[12px] bg-destructive text-white hover:brightness-110 active:scale-95 transition disabled:opacity-40">
+              {deleting ? "Deleting…" : "Delete forever"}
+            </button>
+          </div>
+        </div>
+      </GlassCard>
+    </div>
   );
 }

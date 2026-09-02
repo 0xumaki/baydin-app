@@ -6,7 +6,7 @@ import { GlassCard, GoldButton, GhostButton, Pill } from "@/components/lumina/pr
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { useMe, api } from "@/lib/api-client";
-import { MessageSquare, Send, Sparkles, Plus, Clock, ChevronDown, Star, Moon, Sun, Heart, Download, Share2, Search, Pin } from "lucide-react";
+import { MessageSquare, Send, Sparkles, Plus, Clock, ChevronDown, Star, Moon, Sun, Heart, Download, Share2, Search, Pin, Pencil } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
@@ -309,9 +309,10 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
   const qc = useQueryClient();
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
+  const [renameId, setRenameId] = React.useState<string | null>(null);
+  const [renameText, setRenameText] = React.useState("");
   const active = conversations.find((c) => c.id === activeId);
   const filtered = search ? conversations.filter((c) => c.title?.toLowerCase().includes(search.toLowerCase())) : conversations;
-  // Sort: pinned first
   const sorted = [...filtered].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 
   async function togglePin(id: string, pinned: boolean, e: React.MouseEvent) {
@@ -319,6 +320,21 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
     try {
       await api("/api/conversations", { method: "PATCH", json: { id, pinned: !pinned } });
       qc.invalidateQueries({ queryKey: ["conversations"] });
+    } catch {}
+  }
+
+  function startRename(id: string, title: string) {
+    setRenameId(id);
+    setRenameText(title);
+  }
+
+  async function confirmRename(e: React.KeyboardEvent) {
+    if (e.key !== "Enter" || !renameId || !renameText.trim()) return;
+    try {
+      await api("/api/conversations", { method: "PATCH", json: { id: renameId, title: renameText.trim() } });
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+      setRenameId(null);
+      toast.success("Renamed");
     } catch {}
   }
 
@@ -353,17 +369,37 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
               ) : (
                 sorted.map((c) => (
                   <div key={c.id} className="flex items-center gap-1 group">
-                    <button onClick={() => { onPick(c.id); setOpen(false); }} className={cn("flex-1 text-left px-2.5 py-2 rounded-lg text-[12px] hover:bg-white/5 transition truncate", c.id === activeId ? "text-gold bg-gold/5" : "text-ink-muted")}>
-                      {c.pinned && <Pin className="w-2.5 h-2.5 inline mr-1 text-gold/60" />}
-                      {c.title}
-                    </button>
-                    <button
-                      onClick={(e) => togglePin(c.id, c.pinned, e)}
-                      className={cn("p-1 rounded shrink-0 transition opacity-0 group-hover:opacity-100", c.pinned ? "text-gold opacity-100" : "text-ink-muted/40 hover:text-ink-muted")}
-                      title={c.pinned ? "Unpin" : "Pin to top"}
-                    >
-                      <Pin className="w-3 h-3" fill={c.pinned ? "currentColor" : "none"} />
-                    </button>
+                    {renameId === c.id ? (
+                      <input
+                        autoFocus
+                        value={renameText}
+                        onChange={(e) => setRenameText(e.target.value)}
+                        onKeyDown={confirmRename}
+                        onBlur={() => setRenameId(null)}
+                        className="flex-1 px-2.5 py-2 rounded-lg text-[12px] bg-white/[0.05] border border-gold/30 text-ink outline-none"
+                      />
+                    ) : (
+                      <>
+                        <button onClick={() => { onPick(c.id); setOpen(false); }} className={cn("flex-1 text-left px-2.5 py-2 rounded-lg text-[12px] hover:bg-white/5 transition truncate", c.id === activeId ? "text-gold bg-gold/5" : "text-ink-muted")}>
+                          {c.pinned && <Pin className="w-2.5 h-2.5 inline mr-1 text-gold/60" />}
+                          {c.title}
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); startRename(c.id, c.title); }}
+                          className="p-1 rounded shrink-0 transition opacity-0 group-hover:opacity-100 text-ink-muted/40 hover:text-ink-muted"
+                          title="Rename"
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={(e) => togglePin(c.id, c.pinned, e)}
+                          className={cn("p-1 rounded shrink-0 transition opacity-0 group-hover:opacity-100", c.pinned ? "text-gold opacity-100" : "text-ink-muted/40 hover:text-ink-muted")}
+                          title={c.pinned ? "Unpin" : "Pin to top"}
+                        >
+                          <Pin className="w-3 h-3" fill={c.pinned ? "currentColor" : "none"} />
+                        </button>
+                      </>
+                    )}
                   </div>
                 ))
               )}
