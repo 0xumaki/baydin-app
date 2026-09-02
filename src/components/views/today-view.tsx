@@ -45,6 +45,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [gochar, setGochar] = React.useState<any>(null);
   const [auspicious, setAuspicious] = React.useState<any>(null);
   const [planetaryHours, setPlanetaryHours] = React.useState<any>(null);
+  const [taraBala, setTaraBala] = React.useState<any>(null);
+  const [rahuKaal, setRahuKaal] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -97,6 +99,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/auspicious").then((r) => r.json()).then((d) => { setAuspicious(d.auspicious); }).catch(() => {});
     // Load planetary hours
     fetch("/api/planetary-hours").then((r) => r.json()).then((d) => { setPlanetaryHours(d.hours); }).catch(() => {});
+    // Load tara bala
+    fetch("/api/tara-bala").then((r) => r.json()).then((d) => { setTaraBala(d.taraBala); }).catch(() => {});
+    // Load rahu kaal
+    fetch("/api/rahu-kaal").then((r) => r.json()).then((d) => { setRahuKaal(d.rahuKaal); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -545,6 +551,31 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               </GlassCard>
             )}
 
+            {/* Tara Bala (9-fold nakshatra compatibility) */}
+            {taraBala?.currentTara && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Tara Bala</span>
+                  </div>
+                  <span className={cn("text-[10px] px-2 py-0.5 rounded-full", taraBala.currentTara.nature === "auspicious" ? "bg-leaf/15 text-leaf" : "bg-destructive/15 text-destructive")}>
+                    {taraBala.currentTara.name} (#{taraBala.currentTara.number}/9)
+                  </span>
+                </div>
+                <div className="text-[11px] text-ink mb-1">Birth: {taraBala.birthNakshatra} · Today: {taraBala.todayNakshatra}</div>
+                <div className="text-[10px] text-ink-muted mb-3">{taraBala.currentTara.effect}</div>
+                <div className="flex items-center gap-1 mb-2">
+                  {taraBala.dailyForecast?.slice(0, 9).map((d: any, i: number) => (
+                    <div key={i} className={cn("shrink-0 px-1.5 py-1 rounded text-[8px] text-center", i === 0 ? "ring-1 ring-gold/30" : "", d.nature === "auspicious" ? "bg-leaf/[0.06] text-leaf" : "bg-destructive/[0.06] text-destructive/70")} title={d.taraName}>
+                      {d.day.slice(0, 1)}
+                    </div>
+                  ))}
+                </div>
+                <div className="text-[10px] text-ink-muted">{taraBala.recommendation}</div>
+              </GlassCard>
+            )}
+
             {/* Manifest confirmations */}
             <GlassCard className="p-5">
               <div className="flex items-center justify-between mb-3">
@@ -715,6 +746,32 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                     </div>
                   ))}
                 </div>
+              </GlassCard>
+            )}
+            {rahuKaal?.periods?.length > 0 && (
+              <GlassCard className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock className="w-3.5 h-3.5 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Rahu Kaal Timings</span>
+                </div>
+                {rahuKaal.currentlyInauspicious && (
+                  <div className="px-2 py-1 rounded-full bg-destructive/15 text-destructive text-[10px] inline-block mb-2">
+                    ⚠ Currently in {rahuKaal.currentPeriod}
+                  </div>
+                )}
+                <div className="space-y-1">
+                  {rahuKaal.periods.map((p: any, i: number) => (
+                    <div key={i} className={cn("flex items-center gap-2 text-[10px]", p.active ? "text-destructive" : "text-ink-muted")}>
+                      <span className="text-sm">{p.icon}</span>
+                      <span className="flex-1">{p.name}</span>
+                      <span className={cn("font-mono", p.active && "font-medium")}>{p.start} – {p.end}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-[9px] text-ink-muted/60 mt-2">Sunrise: {rahuKaal.sunrise} · Sunset: {rahuKaal.sunset}</div>
+                {!rahuKaal.currentlyInauspicious && rahuKaal.nextStarting && (
+                  <div className="text-[10px] text-gold mt-1">Next: {rahuKaal.nextStarting}</div>
+                )}
               </GlassCard>
             )}
 
