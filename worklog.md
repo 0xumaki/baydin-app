@@ -801,3 +801,29 @@ Task: Add weekly practice summary widget, conversation delete confirmation modal
 ## Current App State (44 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete feature set with weekly summary, moon phase, lucky numbers, achievements, conversation management, data export, theme toggle, onboarding, and all prior features.
+
+---
+Task ID: 23 (webDevReview cron round 18 + 19)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Muhurta widget, D-9/D-10/D-7 divisional charts, git push
+
+## Completed Modifications
+
+### 1. Muhurta (Auspicious Time) Widget
+- `GET /api/muhurta` — computes Rahu Kala, Gulika Kala, Yamaganda (inauspicious periods) + upcoming favorable periods
+- Widget on Today dashboard: active inauspicious period highlighted red + "NOW" badge, upcoming favorable in green
+- Clock icon imported
+
+### 2. Divisional Charts (Vedic)
+- `computeNavamsa(D-9)` — marriage & dharma (9 parts per sign, movable/fixed/dual rules)
+- `computeDasamsa(D-10)` — career & profession (10 parts, odd/even sign rules)
+- `computeSaptamsa(D-7)` — children & progeny (7 parts, odd/even sign rules)
+- All 3 displayed on birth-chart view in vedic mode with planet grid + zodiac symbols
+
+### 3. Git Push
+- Committed and pushed to https://github.com/0xumaki/baydin-app
+- 45 API routes, 17 views
+
+## Current App State (45 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with D-1 (natal), D-9 (Navamsa), D-10 (Dasamsa), D-7 (Saptamsa) charts, Muhurta, Panchanga, moon phase, lucky numbers, plus all prior features.
