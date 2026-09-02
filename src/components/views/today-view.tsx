@@ -28,6 +28,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [moon, setMoon] = React.useState<any>(null);
   const [muhurta, setMuhurta] = React.useState<any>(null);
   const [transits, setTransits] = React.useState<any>(null);
+  const [gemstones, setGemstones] = React.useState<any>(null);
+  const [nakshatra, setNakshatra] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -46,6 +48,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/muhurta").then((r) => r.json()).then((d) => { setMuhurta(d.muhurta); }).catch(() => {});
     // Load transits
     fetch("/api/transits").then((r) => r.json()).then((d) => { setTransits(d.transits); }).catch(() => {});
+    // Load gemstone recommendations
+    fetch("/api/gemstones").then((r) => r.json()).then((d) => { setGemstones(d.gemstones); }).catch(() => {});
+    // Load today's nakshatra
+    fetch("/api/nakshatra").then((r) => r.json()).then((d) => { setNakshatra(d.nakshatra); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -182,6 +188,33 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               </GlassCard>
             )}
 
+            {/* Gemstone recommendations */}
+            {gemstones?.recommendations?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-4 h-4 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Your Gemstones</span>
+                </div>
+                <div className="space-y-2">
+                  {gemstones.recommendations.map((g: any, i: number) => (
+                    <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02]">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-gold/20 flex items-center justify-center text-[10px] text-gold shrink-0">
+                        {g.gem[0]}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[12px] text-ink">{g.gem} <span className="text-[9px] text-ink-muted">({g.color})</span></div>
+                        <div className="text-[10px] text-ink-muted">{g.benefit}</div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <div className="text-[9px] text-gold">{g.planet}</div>
+                        <div className="text-[8px] text-ink-muted">{g.finger}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
             {/* Manifest confirmations */}
             <GlassCard className="p-5">
               <div className="flex items-center justify-between mb-3">
@@ -276,7 +309,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               </div>
             </GlassCard>
 
-            {/* Moon phase */}
+            {/* Moon phase + Nakshatra */}
             {moon && (
               <GlassCard className="p-4 flex items-center gap-3">
                 <div className="text-3xl">{moon.icon}</div>
@@ -284,6 +317,16 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                   <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Moon Phase</div>
                   <div className="text-[13px] text-ink">{moon.phase}</div>
                   <div className="text-[10px] text-ink-muted">{moon.illumination}% illuminated · {moon.age}d old · in {moon.sign}</div>
+                </div>
+              </GlassCard>
+            )}
+            {nakshatra && (
+              <GlassCard className="p-4 flex items-center gap-3">
+                <div className="text-2xl">✦</div>
+                <div className="flex-1">
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Today's Nakshatra</div>
+                  <div className="text-[13px] text-ink">{nakshatra.name} <span className="text-[10px] text-gold">pada {nakshatra.pada}</span></div>
+                  <div className="text-[10px] text-ink-muted">Lord: {nakshatra.lord} · Deity: {nakshatra.deity}</div>
                 </div>
               </GlassCard>
             )}
