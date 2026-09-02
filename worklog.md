@@ -1301,3 +1301,34 @@ Task: Add planetary hours widget, git push
 ## Current App State (64 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with planetary hours + all prior features.
+
+---
+Task ID: 39 (webDevReview cron round 35)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Tara Bala + Rahu Kaal precise timings, git push
+
+## Completed Modifications
+
+### 1. Tara Bala (9-Fold Nakshatra Compatibility)
+- `GET /api/tara-bala` — 9 Taras based on birth nakshatra vs today's nakshatra
+  9 Taras: Janma, Sampat, Vipat, Kshema, Pratyari, Sadhaka, Vadha, Mitra, Ati-mitra
+  4 auspicious (Sampat, Kshema, Sadhaka, Mitra, Ati-mitra) + 4 inauspicious (Janma, Vipat, Pratyari, Vadha)
+  9-day forecast showing tara for each day
+  Specific effects per tara (e.g., "Wealth, prosperity" for Sampat)
+- Widget: current tara badge + birth/today nakshatra + 9-day mini strip + recommendation
+
+### 2. Rahu Kaal Precise Timings
+- `GET /api/rahu-kaal` — precise Rahu Kaal, Gulika Kaal, Yamaganda timings
+  Computed from sunrise (6 AM) / sunset (6 PM) and weekday
+  8 equal periods of ~90 minutes each
+  Active period highlighting with "⚠ Currently in Rahu Kaal" badge
+  Next starting period indicator
+  Sunrise/sunset display
+- Widget: all 3 timings with active highlighting + next starting indicator
+
+### 3. Git Push
+- 66 API routes, 17 views, lint clean
+
+## Current App State (66 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with Tara Bala + Rahu Kaal + all prior features.
