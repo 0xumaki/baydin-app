@@ -30,6 +30,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [transits, setTransits] = React.useState<any>(null);
   const [gemstones, setGemstones] = React.useState<any>(null);
   const [nakshatra, setNakshatra] = React.useState<any>(null);
+  const [mantras, setMantras] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -52,6 +53,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/gemstones").then((r) => r.json()).then((d) => { setGemstones(d.gemstones); }).catch(() => {});
     // Load today's nakshatra
     fetch("/api/nakshatra").then((r) => r.json()).then((d) => { setNakshatra(d.nakshatra); }).catch(() => {});
+    // Load mantra recommendations
+    fetch("/api/mantra").then((r) => r.json()).then((d) => { setMantras(d.mantras); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -209,6 +212,28 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                         <div className="text-[9px] text-gold">{g.planet}</div>
                         <div className="text-[8px] text-ink-muted">{g.finger}</div>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
+            {/* Mantra recommendations */}
+            {mantras?.recommendations?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-4 h-4 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Mantras</span>
+                </div>
+                <div className="space-y-2">
+                  {mantras.recommendations.slice(0, 3).map((m: any, i: number) => (
+                    <div key={i} className="p-2.5 rounded-lg bg-white/[0.02]">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-[12px] text-gold font-medium">{m.sanskrit}</span>
+                        <span className="text-[9px] text-ink-muted">{m.countMy}</span>
+                      </div>
+                      <div className="text-[10px] text-ink-muted">{m.meaning}</div>
+                      <div className="text-[9px] text-ink-muted/60 mt-0.5">{m.reason}</div>
                     </div>
                   ))}
                 </div>

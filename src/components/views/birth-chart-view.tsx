@@ -5,7 +5,7 @@ import { GlassCard, GoldButton, Pill, SectionTitle } from "@/components/lumina/p
 import { useMe, api } from "@/lib/api-client";
 import { Star, Wallet, Sparkles, MapPin, Sun } from "lucide-react";
 import { toast } from "sonner";
-import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn } from "@/lib/astrology";
+import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn, computeShodasamsa, computeVimsamsa } from "@/lib/astrology";
 
 const PLANET_SYMBOLS: Record<string, string> = {
   Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
@@ -335,6 +335,52 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
             })()}
           </div>
           <div className="text-[10px] text-ink-muted/60 mt-1">D-4 shows property, fixed assets, residence & land fortune.</div>
+        </GlassCard>
+      )}
+
+      {/* Shodasamsa (D-16) — vehicles */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Shodasamsa (D-16) — Vehicles & Comforts
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(() => {
+              const d16 = computeShodasamsa(c);
+              return d16.planets.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="text-[10px] text-ink-muted/60 mt-1">D-16 reveals vehicles, comforts, conveniences & material enjoyments.</div>
+        </GlassCard>
+      )}
+
+      {/* Vimsamsa (D-20) — spiritual */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Vimsamsa (D-20) — Spiritual Practices
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(() => {
+              const d20 = computeVimsamsa(c);
+              return d20.planets.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="text-[10px] text-ink-muted/60 mt-1">D-20 shows spiritual pursuits, religious inclinations & inner growth.</div>
         </GlassCard>
       )}
 

@@ -1014,6 +1014,54 @@ export function computeChaturthamsa(natal: NatalChart): { planets: { name: strin
 }
 
 /**
+ * Compute Shodasamsa (D-16) divisional chart — vehicles, comforts & conveniences.
+ * Each sign divided into 16 parts of 1°52'30" each.
+ * Starts from Aries for movable, Leo for fixed, Sagittarius for dual signs.
+ */
+export function computeShodasamsa(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  function d16Sign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const pada = Math.floor(degreeInSign / (30 / 16)); // 0-15
+    const signType = signIdx % 3;
+    // Movable: start from Aries (0), Fixed: Leo (4), Dual: Sagittarius (8)
+    const startSign = signType === 0 ? 0 : signType === 1 ? 4 : 8;
+    return (startSign + pada) % 12;
+  }
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: d16Sign(p.longitude),
+    sign: ZODIAC_SIGNS[d16Sign(p.longitude)],
+  }));
+  const ascSign = d16Sign(natal.ascendant.longitude);
+  return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
+}
+
+/**
+ * Compute Vimsamsa (D-20) divisional chart — spiritual practices & religious pursuits.
+ * Each sign divided into 20 parts of 1°30' each.
+ * Odd signs start from the same sign; even signs start from the 9th sign.
+ */
+export function computeVimsamsa(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  function d20Sign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const pada = Math.floor(degreeInSign / 1.5); // 0-19
+    const startSign = signIdx % 2 === 0 ? signIdx : (signIdx + 8) % 12;
+    return (startSign + pada) % 12;
+  }
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: d20Sign(p.longitude),
+    sign: ZODIAC_SIGNS[d20Sign(p.longitude)],
+  }));
+  const ascSign = d20Sign(natal.ascendant.longitude);
+  return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
+}
+
+/**
  * Compute Solar Return (Varshaphal) chart — the year ahead.
  * Finds the moment when transit Sun returns to its natal longitude,
  * then casts a chart for that instant.
