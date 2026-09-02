@@ -43,6 +43,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [varshaphal, setVarshaphal] = React.useState<any>(null);
   const [marriageMatch, setMarriageMatch] = React.useState<any>(null);
   const [gochar, setGochar] = React.useState<any>(null);
+  const [auspicious, setAuspicious] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -91,6 +92,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/marriage-match").then((r) => r.json()).then((d) => { setMarriageMatch(d.match); }).catch(() => {});
     // Load gochar (transit predictions)
     fetch("/api/gochar").then((r) => r.json()).then((d) => { setGochar(d.gochar); }).catch(() => {});
+    // Load auspicious activities
+    fetch("/api/auspicious").then((r) => r.json()).then((d) => { setAuspicious(d.auspicious); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -505,6 +508,33 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                       <div className="flex-1 min-w-0">
                         <div className="text-[10px] text-ink">House {p.houseFromAsc} · {p.sign}</div>
                         <div className="text-[9px] text-ink-muted leading-relaxed">{p.prediction}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
+            {/* Auspicious activities */}
+            {auspicious?.activities?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Activities</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[9px]">
+                    <span className="text-leaf">{auspicious.summary.favorable} favorable</span>
+                    <span className="text-destructive/70">{auspicious.summary.avoid} avoid</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  {auspicious.activities.map((a: any, i: number) => (
+                    <div key={i} className={cn("flex items-center gap-2 p-2 rounded-lg", a.status === "favorable" ? "bg-leaf/[0.04]" : a.status === "avoid" ? "bg-destructive/[0.04]" : "bg-white/[0.02]")}>
+                      <span className={cn("w-2 h-2 rounded-full shrink-0", a.status === "favorable" ? "bg-leaf" : a.status === "avoid" ? "bg-destructive" : "bg-white/20")} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[11px] text-ink truncate">{a.name}</div>
+                        <div className="text-[9px] text-ink-muted truncate">{a.note}</div>
                       </div>
                     </div>
                   ))}

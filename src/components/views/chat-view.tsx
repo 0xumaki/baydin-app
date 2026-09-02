@@ -6,7 +6,7 @@ import { GlassCard, GoldButton, GhostButton, Pill } from "@/components/lumina/pr
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { useMe, api } from "@/lib/api-client";
-import { MessageSquare, Send, Sparkles, Plus, Clock, ChevronDown, Star, Moon, Sun, Heart, Download, Share2, Search, Pin, Pencil, Trash2 } from "lucide-react";
+import { MessageSquare, Send, Sparkles, Plus, Clock, ChevronDown, Star, Moon, Sun, Heart, Download, Share2, Search, Pin, Pencil, Trash2, HelpCircle, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
@@ -28,6 +28,7 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
   const [streaming, setStreaming] = React.useState(false);
   const [streamText, setStreamText] = React.useState("");
   const [mode, setMode] = React.useState<"vedic" | "western" | "mahabote">("vedic");
+  const [showPrashna, setShowPrashna] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -165,6 +166,13 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
           onNew={() => setActiveConversation(null)}
         />
         <div className="ml-auto flex items-center gap-1.5">
+          <button
+            onClick={() => setShowPrashna(true)}
+            className="px-2 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1 shrink-0"
+            title="Ask a Yes/No question (Prashna)"
+          >
+            <HelpCircle className="w-3 h-3" /> <span className="hidden sm:inline">Prashna</span>
+          </button>
           {hasBirthData ? (
             <Pill variant="leaf" className="text-[10px] hidden sm:inline-flex">Birth data set</Pill>
           ) : (
@@ -214,6 +222,9 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
           </div>
         </div>
       </div>
+
+      {/* Prashna (horary) modal */}
+      {showPrashna && <PrashnaModal onClose={() => setShowPrashna(false)} />}
     </div>
   );
 }
@@ -530,6 +541,112 @@ function EmptyState({ onAuth }: { onAuth: () => void }) {
       </p>
       <GoldButton onClick={onAuth} className="px-8">Begin your consultation</GoldButton>
       <div className="mt-4 text-[11px] text-ink-muted">5 Luck free on signup · No card required</div>
+    </div>
+  );
+}
+
+function PrashnaModal({ onClose }: { onClose: () => void }) {
+  const [question, setQuestion] = React.useState("");
+  const [result, setResult] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(false);
+
+  async function ask() {
+    if (!question.trim()) return;
+    setLoading(true);
+    setResult(null);
+    try {
+      const res = await fetch("/api/prashna", {
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ question }),
+      });
+      const data = await res.json();
+      if (data.error) { toast.error(data.error); return; }
+      setResult(data.prashna);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  }
+
+  const answerColor = result?.answer === "yes" ? "#B5CD7E" : result?.answer === "no" ? "#b5463a" : "#C5A87C";
+  const answerIcon = result?.answer === "yes" ? "✓" : result?.answer === "no" ? "✕" : "?";
+
+  return (
+    <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={onClose}>
+      <div className="lum-glass-float rounded-2xl p-6 max-w-md w-full border border-gold/20" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <HelpCircle className="w-5 h-5 text-gold" />
+            <span className="text-[15px] font-medium text-ink">Prashna — Horary</span>
+          </div>
+          <button onClick={onClose} className="text-ink-muted hover:text-ink"><X className="w-5 h-5" /></button>
+        </div>
+
+        {!result && !loading && (
+          <>
+            <div className="text-[12px] text-ink-muted mb-3 leading-relaxed">
+              Ask a Yes/No question. The answer is determined by casting a chart at this exact moment.
+            </div>
+            <input
+              autoFocus
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && ask()}
+              placeholder="e.g. Will I get the job?"
+              className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[14px] text-ink placeholder:text-ink-muted/50 outline-none focus:border-gold/30 mb-3"
+            />
+            <GoldButton onClick={ask} disabled={!question.trim()} className="w-full">
+              <Sparkles className="w-4 h-4" /> Ask the stars
+            </GoldButton>
+          </>
+        )}
+
+        {loading && (
+          <div className="text-center py-8">
+            <Sparkles className="w-8 h-8 text-gold animate-pulse mx-auto mb-2" />
+            <div className="text-[13px] text-ink-muted">Casting the Prashna chart…</div>
+          </div>
+        )}
+
+        {result && !loading && (
+          <div>
+            <div className="text-center mb-4">
+              <div className="text-[11px] text-ink-muted mb-1">Your question</div>
+              <div className="text-[13px] text-ink mb-4">{result.question}</div>
+              <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-3xl font-light mb-2 border-2"
+                style={{ borderColor: answerColor, color: answerColor, background: `${answerColor}15` }}>
+                {answerIcon}
+              </div>
+              <div className="text-[24px] font-light capitalize" style={{ color: answerColor }}>{result.answer}</div>
+              <div className="text-[11px] text-ink-muted mt-1">{result.confidence}% confidence</div>
+            </div>
+            <div className="p-3 rounded-xl bg-white/[0.02] mb-3">
+              <div className="text-[10px] uppercase tracking-wide text-ink-muted mb-1">Reasoning</div>
+              <div className="text-[11px] text-ink-muted leading-relaxed">{result.reasoning}</div>
+            </div>
+            <div className="text-[11px] text-gold mb-3">{result.timing}</div>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              <div className="p-2 rounded-lg bg-white/[0.02]">
+                <div className="text-[9px] text-ink-muted">Lagna</div>
+                <div className="text-[12px] text-ink">{result.chart.lagnaSign}</div>
+              </div>
+              <div className="p-2 rounded-lg bg-white/[0.02]">
+                <div className="text-[9px] text-ink-muted">Moon</div>
+                <div className="text-[12px] text-ink">{result.chart.moonSign}</div>
+              </div>
+              <div className="p-2 rounded-lg bg-white/[0.02]">
+                <div className="text-[9px] text-ink-muted">Nakshatra</div>
+                <div className="text-[12px] text-ink">{result.chart.moonNakshatra}</div>
+              </div>
+              <div className="p-2 rounded-lg bg-white/[0.02]">
+                <div className="text-[9px] text-ink-muted">Nak Lord</div>
+                <div className="text-[12px] text-ink">{result.chart.nakshatraLord}</div>
+              </div>
+            </div>
+            <GhostButton onClick={() => { setResult(null); setQuestion(""); }} className="w-full">
+              Ask another question
+            </GhostButton>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
