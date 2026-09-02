@@ -1071,3 +1071,38 @@ Task: Add Namkaran (naming) suggestions, today's tithi widget, git push
 ## Current App State (52 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology engine with Namkaran + Tithi added to the full set.
+
+---
+Task ID: 32 (webDevReview cron round 28)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Yadaya (remedial measures), today's Yoga widget, git push
+
+## Completed Modifications
+
+### 1. Yadaya (Remedial Measures) Engine
+- `GET /api/yadaya` — analyzes natal chart for afflicted planets (debilitated, dusthana 6/8/12, retrograde, combust)
+- 4 remedy types per afflicted planet: Chanting (mantra japa), Charity (daan), Gemstone (ratna), Lifestyle
+- 9 planets covered with specific, culturally appropriate remedies
+- Widget on Today dashboard showing up to 3 afflicted planets with their remedies
+
+### 2. Today's Yoga Widget (Panchanga 3rd limb)
+- `GET /api/yoga-today` — computes today's Yoga from Sun+Moon sidereal longitude sum
+- 27 Yogas with classical names (Vishkambha through Vaidhriti)
+- Auspicious/inauspicious/mixed nature classification
+- Effect description per Yoga
+- Widget on Today dashboard with contextual icon
+
+### 3. Complete Panchanga Now Available
+The app now has all 5 Panchanga limbs:
+1. Vara (weekday) — in muhurta + lucky APIs
+2. Tithi (lunar day) — /api/tithi
+3. Nakshatra (lunar mansion) — /api/nakshatra
+4. Yoga (Sun+Moon sum) — /api/yoga-today
+5. Karana (half-tithi) — in natal chart panchanga
+
+### 4. Git Push
+- 54 API routes, 17 views, lint clean
+
+## Current App State (54 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with Yadaya + full Panchanga + all prior features.
