@@ -25,6 +25,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [loadingCard, setLoadingCard] = React.useState(false);
   const [activity, setActivity] = React.useState<any[]>([]);
   const [lucky, setLucky] = React.useState<any>(null);
+  const [moon, setMoon] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -37,6 +38,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/activity").then((r) => r.json()).then((d) => { setActivity(d.days || []); }).catch(() => {});
     // Load lucky numbers
     fetch("/api/lucky").then((r) => r.json()).then((d) => { setLucky(d.lucky); }).catch(() => {});
+    // Load moon phase
+    fetch("/api/moon").then((r) => r.json()).then((d) => { setMoon(d.moon); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -218,6 +221,18 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 {activity.reduce((sum: number, d: any) => sum + (d?.total ?? 0), 0)} actions this week
               </div>
             </GlassCard>
+
+            {/* Moon phase */}
+            {moon && (
+              <GlassCard className="p-4 flex items-center gap-3">
+                <div className="text-3xl">{moon.icon}</div>
+                <div className="flex-1">
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Moon Phase</div>
+                  <div className="text-[13px] text-ink">{moon.phase}</div>
+                  <div className="text-[10px] text-ink-muted">{moon.illumination}% illuminated · {moon.age}d old · in {moon.sign}</div>
+                </div>
+              </GlassCard>
+            )}
 
             {/* Today's lucky numbers */}
             {lucky && (
