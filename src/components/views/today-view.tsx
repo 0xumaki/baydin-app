@@ -8,7 +8,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import {
   Sparkles, Moon, Star, Sun, Flame, Gift, ChevronRight, Heart, Calendar,
-  TrendingUp, Wallet, Target, Compass, BookOpen,
+  TrendingUp, Wallet, Target, Compass, BookOpen, Share2,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
@@ -281,7 +281,24 @@ function CardOfDayCard({ reading }: { reading: any }) {
           <div className="text-[9px] text-ink px-1 text-center">{card.nameShort || card.id}</div>
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[13px] text-ink font-medium mb-0.5">{card.name || "Card of the Day"}</div>
+          <div className="flex items-center justify-between mb-0.5">
+            <div className="text-[13px] text-ink font-medium">{card.name || "Card of the Day"}</div>
+            <button
+              onClick={async () => {
+                const text = `${card.name || "Card of the Day"} (${card.reversed ? "Reversed" : "Upright"})\n\n${reading.interpretation?.replace(/[#*_`]/g, "").slice(0, 200)}`;
+                if (navigator.share) {
+                  try { await navigator.share({ title: "My Baydin Card of the Day", text, url: window.location.origin }); } catch {}
+                } else {
+                  await navigator.clipboard.writeText(text + "\n\n" + window.location.origin);
+                  toast.success("Card shared ✦");
+                }
+              }}
+              className="p-1 rounded-full text-ink-muted/60 hover:text-gold transition shrink-0"
+              title="Share this card"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
           <div className="text-[11px] text-gold mb-1.5">{card.reversed ? "Reversed" : "Upright"}</div>
           <div className="text-[12px] text-ink-muted line-clamp-3 leading-relaxed">{reading.interpretation?.replace(/\*\*/g, "").slice(0, 180)}…</div>
         </div>

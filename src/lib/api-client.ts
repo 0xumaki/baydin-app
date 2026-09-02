@@ -47,6 +47,16 @@ export function useMe() {
   });
 }
 
+/** Notification badge counts (pending confirmations, ritual, conversations). */
+export function useBadges() {
+  return useQuery({
+    queryKey: ["badges"],
+    queryFn: () => api<{ badges: { unconfirmedGoals: number; ritualIncomplete: boolean; recentConversations: number } }>("/api/notifications"),
+    staleTime: 30000,
+    retry: false,
+  });
+}
+
 /** Luck transactions history. */
 export function useTransactions() {
   return useQuery({

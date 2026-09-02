@@ -3,7 +3,7 @@
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore, type AppView } from "@/lib/store";
-import { useMe } from "@/lib/api-client";
+import { useMe, useBadges } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import { GlassCard, GoldButton, GhostButton, Pill, StarField } from "@/components/lumina/primitives";
 import { AuthModal } from "@/components/auth-modal";
@@ -56,7 +56,9 @@ const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean;
 export function AppShell() {
   const { view, setView, sidebarOpen, setSidebarOpen } = useStore();
   const { data, isLoading } = useMe();
+  const { data: badgeData } = useBadges();
   const user = data?.user ?? null;
+  const badges = badgeData?.badges;
   const [authOpen, setAuthOpen] = React.useState(false);
   const [profileOpen, setProfileOpen] = React.useState(false);
 
@@ -115,6 +117,7 @@ export function AppShell() {
           onNewChat={handleNewChat}
           onAuth={() => setAuthOpen(true)}
           onProfile={() => setProfileOpen(true)}
+          badges={badges}
         />
 
         {/* Main area */}
@@ -198,7 +201,15 @@ function Sidebar(props: {
   onNewChat: () => void;
   onAuth: () => void;
   onProfile: () => void;
+  badges?: { unconfirmedGoals: number; ritualIncomplete: boolean; recentConversations: number };
 }) {
+  // Helper to get badge count for a view
+  function badgeFor(view: AppView): number | null {
+    if (!props.badges) return null;
+    if (view === "manifest" && props.badges.unconfirmedGoals > 0) return props.badges.unconfirmedGoals;
+    if (view === "ritual" && props.badges.ritualIncomplete) return 1;
+    return null;
+  }
   return (
     <>
       {/* Mobile backdrop */}
@@ -259,6 +270,7 @@ function Sidebar(props: {
                     >
                       <item.icon className={cn("w-[17px] h-[17px] shrink-0 transition-transform group-hover:scale-110", props.currentView === item.view && "text-gold")} />
                       <span className="flex-1 text-left">{item.label}</span>
+                      {(() => { const b = badgeFor(item.view); return b ? <span className="px-1.5 py-0.5 rounded-full bg-gold/20 text-gold text-[9px] font-medium leading-none min-w-[16px] text-center">{b}</span> : null; })()}
                       {props.currentView === item.view && <ChevronRight className="w-3.5 h-3.5" />}
                     </button>
                   ))}
