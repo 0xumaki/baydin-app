@@ -8,7 +8,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import {
   Sparkles, Moon, Star, Sun, Flame, Gift, ChevronRight, Heart, Calendar,
-  TrendingUp, Wallet, Target, Compass, BookOpen, Share2,
+  TrendingUp, Wallet, Target, Compass, BookOpen, Share2, Snowflake,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
@@ -170,7 +170,19 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Your Luck</span>
               </div>
               <div className="text-[32px] font-light text-gold leading-none mb-1">{user.luckBalance}</div>
-              <div className="text-[11px] text-ink-muted mb-3">{user.streak}-day streak · {user.totalLuckEarned} earned lifetime</div>
+              <div className="text-[11px] text-ink-muted mb-2">
+                {user.streak}-day streak · {user.totalLuckEarned} earned lifetime
+              </div>
+              {/* Streak freeze indicator */}
+              {user.streak > 0 && (
+                <div className="flex items-center gap-1.5 mb-3 text-[10px] text-leaf/80">
+                  <Snowflake className="w-3 h-3" />
+                  Streak freeze active — miss 1 day without losing your streak
+                </div>
+              )}
+              {user.streak === 0 && (
+                <div className="mb-3" />
+              )}
               <GradientButton onClick={() => setView("luck-store")} className="w-full py-2 text-[12px]">
                 Top up Luck
               </GradientButton>

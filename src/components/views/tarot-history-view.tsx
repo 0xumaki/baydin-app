@@ -172,6 +172,54 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
             })}
           </div>
         )}
+
+        {/* Reflection journal history */}
+        <ReflectionsHistory />
+      </div>
+    </div>
+  );
+}
+
+function ReflectionsHistory() {
+  const [reflections, setReflections] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetch("/api/tarot/reflections", { credentials: "include" })
+      .then((r) => r.json())
+      .then((d) => setReflections(d.reflections || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return null;
+  if (reflections.length === 0) return null;
+
+  return (
+    <div className="mt-6">
+      <div className="flex items-center gap-2 mb-3">
+        <BookOpen className="w-4 h-4 text-gold" />
+        <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Reflection Journal</span>
+        <span className="text-[10px] text-ink-muted/50">· {reflections.length} entries</span>
+      </div>
+      <div className="space-y-2">
+        {reflections.map((r) => {
+          const card = r.card ? TAROT_DECK.find((t) => t.id === r.card.id) : null;
+          return (
+            <GlassCard key={r.id} className="p-3 flex items-start gap-3">
+              <div className={cn("w-8 h-12 rounded border border-gold/20 bg-gradient-to-br from-surface to-surface-2 flex items-center justify-center text-sm shrink-0", r.card?.reversed && "rotate-180")}>
+                {card?.symbol || "✦"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-[11px] text-ink">{card?.name || "Card of the Day"}</span>
+                  <span className="text-[9px] text-ink-muted">{new Date(r.date).toLocaleDateString()}</span>
+                </div>
+                <div className="text-[11px] text-ink-muted leading-relaxed line-clamp-2 italic">"{r.reflection}"</div>
+              </div>
+            </GlassCard>
+          );
+        })}
       </div>
     </div>
   );
