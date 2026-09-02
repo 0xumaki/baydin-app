@@ -1275,3 +1275,29 @@ Task: Add auspicious activities widget + Prashna modal in chat view, git push
 ## Current App State (63 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with Prashna + auspicious activities + all prior features.
+
+---
+Task ID: 38 (webDevReview cron round 34)
+Agent: Orchestrator (Z.ai Code)
+Task: Add planetary hours widget, git push
+
+## Completed Modifications
+
+### 1. Planetary Hours Widget
+- `GET /api/planetary-hours` — computes today's 24 planetary hours
+  7 classical planets (Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn) rule each hour
+  Chaldean order cycling: Saturn → Jupiter → Mars → Sun → Venus → Mercury → Moon
+  Day ruler determined by weekday (Sun=Sunday, Moon=Monday, etc.)
+  Each hour has: planet name, symbol, effect description, color, isCurrent flag
+  Simplified sunrise/sunset at 6 AM / 6 PM (12 day + 12 night hours)
+- Widget on Today dashboard (right column, after Karana):
+  Current hour: large planet-colored circle with symbol + planet name + effect
+  Day ruler indicator
+  Mini horizontal strip of 12 daytime hour symbols (current highlighted in gold)
+
+### 2. Git Push
+- 64 API routes, 17 views, lint clean
+
+## Current App State (64 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with planetary hours + all prior features.
