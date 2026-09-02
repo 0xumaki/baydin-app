@@ -1395,3 +1395,30 @@ Task: Add Choghadiya + Nadi widgets to Today dashboard + Graha Yuddha detection,
 ## Current App State (69 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with Choghadiya + Nadi + Graha Yuddha + all prior features.
+
+---
+Task ID: 42 (webDevReview cron round 38)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Vedic Drishti (planetary aspects) computation, git push
+
+## Completed Modifications
+
+### 1. Vedic Drishti (Planetary Aspects)
+- `GET /api/drishti` — computes all planetary aspects using classical Vedic rules:
+  - All planets: 7th house aspect (opposition)
+  - Mars: special 4th and 8th house aspects
+  - Jupiter: special 5th and 9th house aspects (trines)
+  - Saturn: special 3rd and 10th house aspects
+  - Rahu/Ketu: 5th, 7th, 9th (like Jupiter)
+- Detects planets in target signs/houses
+- Benefic/malefic classification per aspecting planet
+- Effect descriptions per aspect (e.g., "Jupiter 5th aspect on Mars — beneficial influence, enhances")
+- Grouped by planet for easy reading
+- Sorted: aspects hitting other planets first
+
+### 2. Git Push
+- 70 API routes (milestone!), 17 views, lint clean
+
+## Current App State (70 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Milestone: 70 API routes! Complete Vedic astrology platform with Drishti + all prior features.
