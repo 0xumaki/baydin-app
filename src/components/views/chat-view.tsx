@@ -338,15 +338,22 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
     } catch {}
   }
 
+  const [deleteId, setDeleteId] = React.useState<string | null>(null);
+
   async function deleteConv(id: string, e: React.MouseEvent) {
     e.stopPropagation();
-    if (!confirm("Delete this consultation? This cannot be undone.")) return;
+    setDeleteId(id);
+  }
+
+  async function confirmDelete() {
+    if (!deleteId) return;
     try {
-      await api(`/api/conversations?id=${id}`, { method: "DELETE" });
+      await api(`/api/conversations?id=${deleteId}`, { method: "DELETE" });
       qc.invalidateQueries({ queryKey: ["conversations"] });
-      if (activeId === id) onNew();
+      if (activeId === deleteId) onNew();
       toast.success("Conversation deleted");
     } catch (e: any) { toast.error(e.message); }
+    finally { setDeleteId(null); }
   }
 
   return (
@@ -424,6 +431,27 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
             </div>
           </div>
         </>
+      )}
+
+      {/* Delete confirmation modal */}
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={() => setDeleteId(null)}>
+          <div className="lum-glass-float rounded-2xl p-6 max-w-xs w-full border border-destructive/20" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2 mb-3 text-destructive">
+              <Trash2 className="w-5 h-5" />
+              <span className="text-[15px] font-medium">Delete consultation?</span>
+            </div>
+            <div className="text-[12px] text-ink-muted mb-5 leading-relaxed">
+              This will permanently delete this consultation and all its messages. This cannot be undone.
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 rounded-full text-[12px] text-ink-muted border border-white/10 hover:text-ink transition">Cancel</button>
+              <button onClick={confirmDelete} className="flex-1 py-2.5 rounded-full text-[12px] bg-destructive text-white hover:brightness-110 active:scale-95 transition">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

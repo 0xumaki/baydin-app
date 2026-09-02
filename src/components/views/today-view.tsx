@@ -103,6 +103,22 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Card of the Day — large left */}
           <div className="lg:col-span-2 space-y-4">
+            {/* Weekly practice summary */}
+            {activity.length > 0 && (
+              <GlassCard className="p-4 flex items-center gap-4">
+                <div className="flex items-center gap-2 shrink-0">
+                  <TrendingUp className="w-4 h-4 text-leaf" />
+                  <span className="text-[11px] uppercase tracking-[0.15em] text-ink-muted hidden sm:inline">This Week</span>
+                </div>
+                <div className="flex items-center gap-4 flex-1 overflow-x-auto lum-no-scrollbar">
+                  <WeeklyStat label="Actions" value={activity.reduce((s: number, d: any) => s + (d?.total ?? 0), 0)} color="#C5A87C" />
+                  <WeeklyStat label="Active days" value={activity.filter((d: any) => (d?.total ?? 0) > 0).length} color="#B5CD7E" />
+                  <WeeklyStat label="Tarot" value={activity.reduce((s: number, d: any) => s + (d?.activities?.tarot ?? 0), 0)} color="#9E8AC9" />
+                  <WeeklyStat label="Chat" value={activity.reduce((s: number, d: any) => s + (d?.activities?.chat ?? 0), 0)} color="#5FA9C7" />
+                </div>
+              </GlassCard>
+            )}
+
             {/* Card of the day */}
             <GlassCard className="p-5 relative overflow-hidden">
               <div className="lum-glow-gold absolute inset-0 opacity-30 pointer-events-none" />
@@ -528,5 +544,14 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
         </div>
       </ShellCard>
     </button>
+  );
+}
+
+function WeeklyStat({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div className="shrink-0 text-center">
+      <div className="text-[18px] font-light leading-none" style={{ color }}>{value}</div>
+      <div className="text-[9px] text-ink-muted mt-0.5">{label}</div>
+    </div>
   );
 }
