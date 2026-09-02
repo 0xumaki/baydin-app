@@ -1514,3 +1514,33 @@ Task: Add Vedic Avastha (planetary states) + remedy timing recommendations, git 
 ## Current App State (76 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with Avastha + remedy timing + all prior features.
+
+---
+Task ID: 46 (webDevReview cron round 42)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Dasha effects + Graha Bala (planetary power ranking), git push
+
+## Completed Modifications
+
+### 1. Dasha Effects Widget
+- `GET /api/dasha-effects` — current Vimshottari Dasha period analysis
+  9 Dasha lords (Ketu, Venus, Sun, Moon, Mars, Rahu, Jupiter, Saturn, Mercury)
+  Each with: general effect, beneficial outcomes, challenging outcomes, life areas, remedies
+  Natal placement analysis (dignity + house → beneficial/mixed/challenging)
+  Upcoming 3 Mahadasha periods with dates
+  Personalized summary prediction
+
+### 2. Graha Bala (Planetary Power Ranking)
+- `GET /api/graha-bala` — planetary power ranking
+  6-factor calculation: dignity (+30/-20), house (+20/-10), Avastha (+15/-10),
+  Dasha lord (+20), combustion (-15), retrograde (+5)
+  Power score 0-100 with rating: dominant/strong/moderate/weak/very weak
+  45 significations across 9 planets (5 each)
+  Identifies dominant and weakest planets with summaries
+
+### 3. Git Push
+- 78 API routes, 17 views, lint clean
+
+## Current App State (78 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with Dasha effects + Graha Bala + all prior features.
