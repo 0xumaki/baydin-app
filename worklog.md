@@ -853,3 +853,30 @@ Task: Add today's planetary transits widget, D-2 Hora + D-12 Dwadasamsa division
 ## Current App State (46 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with 6 divisional charts, Muhurta, Panchanga, transits, moon phase, lucky numbers, plus all prior features.
+
+---
+Task ID: 25 (webDevReview cron round 21)
+Agent: Orchestrator (Z.ai Code)
+Task: Add D-3 Drekkana, D-4 Chaturthamsa, Solar Return (Varshaphal) charts, git push
+
+## Completed Modifications
+
+### 1. D-3 Drekkana (Siblings & Courage)
+- `computeDrekkana(D-3)` — 3 parts of 10° per sign, movable/fixed/dual start rules
+- Displayed on birth-chart view in vedic mode
+
+### 2. D-4 Chaturthamsa (Property & Residence)
+- `computeChaturthamsa(D-4)` — 4 parts of 7°30' per sign, starts from same sign
+- Displayed on birth-chart view in vedic mode
+
+### 3. Solar Return (Varshaphal) — Year Ahead
+- `computeSolarReturn()` — computes planet positions at the birthday return moment
+- Shows return date, Sun sign, and all planet positions in their signs
+- Displayed on birth-chart view in vedic mode
+
+### 4. Git Push
+- Committed and pushed to https://github.com/0xumaki/baydin-app
+
+## Current App State (46 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+**8 divisional charts**: D-1 (natal), D-2 (Hora/wealth), D-3 (Drekkana/siblings), D-4 (Chaturthamsa/property), D-7 (Saptamsa/children), D-9 (Navamsa/marriage), D-10 (Dasamsa/career), D-12 (Dwadasamsa/parents) + Solar Return (Varshaphal/year ahead)
