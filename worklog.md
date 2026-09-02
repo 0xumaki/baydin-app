@@ -1361,3 +1361,37 @@ Task: Add Choghadiya + Vedic Nadi astrology, git push
 ## Current App State (68 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with Choghadiya + Nadi + all prior features.
+
+---
+Task ID: 41 (webDevReview cron round 37)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Choghadiya + Nadi widgets to Today dashboard + Graha Yuddha detection, git push
+
+## Completed Modifications
+
+### 1. Choghadiya Widget on Today Dashboard
+- Current period badge (auspicious green / inauspicious red)
+- Time range + effect description
+- Day period strip (8 periods with icons, current highlighted)
+- Next auspicious period indicator
+
+### 2. Nadi Widget on Today Dashboard
+- Dosha badge (Vata purple / Pitta red / Kapha green) + element
+- Nakshatra + Moon sign display
+- Temperament, health tendencies, spiritual path
+- Marriage compatibility note (Nadi Dosha)
+- First remedy shown
+
+### 3. Graha Yuddha (Planetary War) Detection
+- `GET /api/graha-yuddha` — detects planetary wars (within 1°) and close conjunctions (within 5°)
+  Winner determined by higher longitude
+  Loser's significations weakened with specific effects per planet
+  7 planets covered with unique war effect descriptions
+  Close conjunctions (1-5°) also detected with blending effects
+
+### 4. Git Push
+- 69 API routes, 17 views, lint clean
+
+## Current App State (69 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with Choghadiya + Nadi + Graha Yuddha + all prior features.
