@@ -36,6 +36,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [namkaran, setNamkaran] = React.useState<any>(null);
   const [yadaya, setYadaya] = React.useState<any>(null);
   const [yogaToday, setYogaToday] = React.useState<any>(null);
+  const [karana, setKarana] = React.useState<any>(null);
+  const [panchasara, setPanchasara] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -70,6 +72,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/yadaya").then((r) => r.json()).then((d) => { setYadaya(d.yadaya); }).catch(() => {});
     // Load today's yoga
     fetch("/api/yoga-today").then((r) => r.json()).then((d) => { setYogaToday(d.yoga); }).catch(() => {});
+    // Load today's karana
+    fetch("/api/karana").then((r) => r.json()).then((d) => { setKarana(d.karana); }).catch(() => {});
+    // Load panchasara (5-fold remedy)
+    fetch("/api/panchasara").then((r) => r.json()).then((d) => { setPanchasara(d.panchasara); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -332,6 +338,41 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               </GlassCard>
             )}
 
+            {/* Panchasara (5-fold remedy) */}
+            {panchasara && panchasara.status === "remedy_needed" && panchasara.remedies?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Panchasara — 5-Fold Remedy</span>
+                  </div>
+                  <span className="text-[10px] text-gold">for {panchasara.planet}</span>
+                </div>
+                <div className="text-[10px] text-ink-muted mb-3">{panchasara.problem}</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {panchasara.remedies.map((r: any, i: number) => (
+                    <div key={i} className="p-2.5 rounded-lg bg-white/[0.02]">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="text-base">{r.icon}</span>
+                        <span className="text-[11px] text-gold font-medium">{r.name}</span>
+                        <span className="text-[9px] text-ink-muted/60">{r.sanskrit}</span>
+                      </div>
+                      <div className="text-[10px] text-ink-muted leading-relaxed">{r.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+            {panchasara && panchasara.status === "balanced" && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Star className="w-4 h-4 text-leaf" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Panchasara — Chart Balanced</span>
+                </div>
+                <div className="text-[12px] text-leaf leading-relaxed">{panchasara.message}</div>
+              </GlassCard>
+            )}
+
             {/* Manifest confirmations */}
             <GlassCard className="p-5">
               <div className="flex items-center justify-between mb-3">
@@ -465,6 +506,16 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                   <div className="text-[13px] text-ink">{yogaToday.name} <span className="text-[10px] text-ink-muted">#{yogaToday.number}/27</span></div>
                   <div className={cn("text-[10px]", yogaToday.nature?.includes("Auspicious") ? "text-leaf" : yogaToday.nature?.includes("Inauspicious") ? "text-destructive/70" : "text-ink-muted")}>{yogaToday.nature}</div>
                   <div className="text-[9px] text-ink-muted/60 mt-0.5">{yogaToday.effect}</div>
+                </div>
+              </GlassCard>
+            )}
+            {karana && (
+              <GlassCard className="p-4 flex items-center gap-3">
+                <div className="text-2xl">{karana.nature?.includes("Auspicious") ? "✦" : karana.nature?.includes("Inauspicious") ? "⚠" : "◇"}</div>
+                <div className="flex-1">
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Today's Karana</div>
+                  <div className="text-[13px] text-ink">{karana.name} <span className="text-[10px] text-ink-muted">#{karana.index}/60</span></div>
+                  <div className={cn("text-[10px]", karana.nature?.includes("Auspicious") ? "text-leaf" : karana.nature?.includes("Inauspicious") ? "text-destructive/70" : "text-ink-muted")}>{karana.nature}</div>
                 </div>
               </GlassCard>
             )}
