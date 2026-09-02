@@ -1482,3 +1482,35 @@ Task: Add Ishta Devata + spiritual practice recommendations, git push
 ## Current App State (74 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with Ishta Devata + spiritual practice + all prior features.
+
+---
+Task ID: 45 (webDevReview cron round 41)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Vedic Avastha (planetary states) + remedy timing recommendations, git push
+
+## Completed Modifications
+
+### 1. Vedic Avastha (Planetary States)
+- `GET /api/avastha` — analyzes each planet's state/condition
+  5 Bala Avasthas (degree-based): Sanna (0-6°), Kumara (6-12°), Yuva (12-18° = strongest), Vriddha (18-24°), Mrita (24-30°)
+  3 consciousness states: Jagrad (awake, houses 1-3), Swapna (dreaming, 4-9), Susupta (asleep, 10-12)
+  Combined strength score with dignity bonus (exalted +20, debilitated -20)
+  Identifies strongest and weakest planets
+  Summary text per planet
+
+### 2. Remedy Timing Recommendations
+- `GET /api/remedy-timing` — best times today for specific remedies
+  Planetary hour-based: 7 planet hours mapped to mantras (Surya/Gayatri, Chandra/Shiva, etc.)
+  Tithi-specific: Ekadashi fasting, Amavasya tarpana
+  Nakshatra-specific: Pushya (all spiritual), Hasta (healing), Shravana (scriptures), etc.
+  Brahma Muhurta (4:24-6:00 AM) — highest cosmic energy
+  Sandhya Vandana (sunrise/sunset) — Gayatri Mantra
+  Priority sorting (high/medium/low)
+  Best overall recommendation
+
+### 3. Git Push
+- 76 API routes, 17 views, lint clean
+
+## Current App State (76 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with Avastha + remedy timing + all prior features.
