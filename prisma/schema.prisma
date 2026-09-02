@@ -41,6 +41,8 @@ model User {
   totalLuckSpent Int       @default(0) @map("total_luck_spent")
   // JSON array of achievement IDs the user has already seen (for unlock celebration)
   seenAchievements String   @default("[]") @map("seen_achievements")
+  // JSON array of saved insight results (bookmarked deep readings)
+  savedInsights    String   @default("[]") @map("saved_insights")
   // Reseller system (admin-whitelisted)
   resellerTier   String?   @map("reseller_tier") // bronze|silver|gold|platinum
   resellerSince  DateTime? @map("reseller_since")

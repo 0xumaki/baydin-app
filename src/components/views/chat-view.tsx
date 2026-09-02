@@ -6,7 +6,7 @@ import { GlassCard, GoldButton, GhostButton, Pill } from "@/components/lumina/pr
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { useMe, api } from "@/lib/api-client";
-import { MessageSquare, Send, Sparkles, Plus, Clock, ChevronDown, Star, Moon, Sun, Heart, Download, Share2, Search, Pin, Pencil } from "lucide-react";
+import { MessageSquare, Send, Sparkles, Plus, Clock, ChevronDown, Star, Moon, Sun, Heart, Download, Share2, Search, Pin, Pencil, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
@@ -338,6 +338,17 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
     } catch {}
   }
 
+  async function deleteConv(id: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!confirm("Delete this consultation? This cannot be undone.")) return;
+    try {
+      await api(`/api/conversations?id=${id}`, { method: "DELETE" });
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+      if (activeId === id) onNew();
+      toast.success("Conversation deleted");
+    } catch (e: any) { toast.error(e.message); }
+  }
+
   return (
     <div className="relative">
       <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-1.5 px-2 py-1 text-[12px] text-ink-muted hover:text-ink">
@@ -397,6 +408,13 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
                           title={c.pinned ? "Unpin" : "Pin to top"}
                         >
                           <Pin className="w-3 h-3" fill={c.pinned ? "currentColor" : "none"} />
+                        </button>
+                        <button
+                          onClick={(e) => deleteConv(c.id, e)}
+                          className="p-1 rounded shrink-0 transition opacity-0 group-hover:opacity-100 text-ink-muted/40 hover:text-destructive"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-3 h-3" />
                         </button>
                       </>
                     )}

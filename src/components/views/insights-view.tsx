@@ -4,7 +4,7 @@ import * as React from "react";
 import { GlassCard, GoldButton, Pill, SectionTitle, ShellCard, GradientButton } from "@/components/lumina/primitives";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
-import { Compass, Sparkles, Star, Wallet, ChevronRight, Loader2, ArrowLeft } from "lucide-react";
+import { Compass, Sparkles, Star, Wallet, ChevronRight, Loader2, ArrowLeft, Bookmark } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -101,6 +101,20 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
                   {result.guidance.warnings?.length > 0 && <GuidanceList title="Cautions" items={result.guidance.warnings} variant="default" />}
                 </div>
               )}
+              {/* Save bookmark */}
+              <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-2">
+                <button
+                  onClick={async () => {
+                    try {
+                      await api("/api/insights/save", { method: "POST", json: { skill: result.skill, skillName: result.skillName, content: result.content, highlights: result.highlights, guidance: result.guidance } });
+                      toast.success("Insight bookmarked ✦");
+                    } catch (e: any) { toast.error(e.message); }
+                  }}
+                  className="px-3 py-1.5 rounded-full text-[11px] border border-gold/20 bg-gold/10 text-gold hover:bg-gold/20 active:scale-95 transition flex items-center gap-1.5"
+                >
+                  <Bookmark className="w-3 h-3" /> Save this insight
+                </button>
+              </div>
             </GlassCard>
           ) : null}
         </div>
