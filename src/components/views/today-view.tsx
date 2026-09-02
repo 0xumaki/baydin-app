@@ -27,6 +27,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [lucky, setLucky] = React.useState<any>(null);
   const [moon, setMoon] = React.useState<any>(null);
   const [muhurta, setMuhurta] = React.useState<any>(null);
+  const [transits, setTransits] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -43,6 +44,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/moon").then((r) => r.json()).then((d) => { setMoon(d.moon); }).catch(() => {});
     // Load muhurta (auspicious time)
     fetch("/api/muhurta").then((r) => r.json()).then((d) => { setMuhurta(d.muhurta); }).catch(() => {});
+    // Load transits
+    fetch("/api/transits").then((r) => r.json()).then((d) => { setTransits(d.transits); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -146,6 +149,38 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 )}
               </div>
             </GlassCard>
+
+            {/* Today's planetary transits */}
+            {transits?.positions?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Sun className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Transits</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-3">
+                  {transits.positions.slice(0, 7).map((p: any, i: number) => (
+                    <div key={i} className="text-center p-1.5 rounded-lg bg-white/[0.02]">
+                      <div className="text-base">{p.symbol}</div>
+                      <div className="text-[8px] text-ink-muted uppercase">{p.name}</div>
+                      <div className="text-[10px] text-gold">{p.signMy || p.sign}</div>
+                      {p.retrograde && <span className="text-[8px] text-amber-400">℞</span>}
+                    </div>
+                  ))}
+                </div>
+                {transits.aspects?.length > 0 && (
+                  <div className="pt-2 border-t border-white/5">
+                    <div className="text-[9px] uppercase tracking-wide text-ink-muted mb-1">Aspects to your chart</div>
+                    <div className="space-y-0.5">
+                      {transits.aspects.slice(0, 3).map((a: string, i: number) => (
+                        <div key={i} className="text-[10px] text-ink-muted">• {a}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </GlassCard>
+            )}
 
             {/* Manifest confirmations */}
             <GlassCard className="p-5">

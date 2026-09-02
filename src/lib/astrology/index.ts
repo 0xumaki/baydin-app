@@ -919,3 +919,50 @@ export function computeSaptamsa(natal: NatalChart): { planets: { name: string; s
   const ascSign = saptamsaSign(natal.ascendant.longitude);
   return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
 }
+
+/**
+ * Compute Hora (D-2) divisional chart — wealth & resources.
+ * Odd signs: first half = Sun's Hora (Leo), second half = Moon's Hora (Cancer).
+ * Even signs: reversed.
+ */
+export function computeHora(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  function horaSign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const isOdd = signIdx % 2 === 0;
+    const firstHalf = degreeInSign < 15;
+    // Leo (index 4) = Sun's Hora, Cancer (index 3) = Moon's Hora
+    if (isOdd) return firstHalf ? 4 : 3;
+    return firstHalf ? 3 : 4;
+  }
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: horaSign(p.longitude),
+    sign: ZODIAC_SIGNS[horaSign(p.longitude)],
+  }));
+  const ascSign = horaSign(natal.ascendant.longitude);
+  return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
+}
+
+/**
+ * Compute Dwadasamsa (D-12) divisional chart — parents & ancestry.
+ * Each sign divided into 12 parts of 2°30' each.
+ * Starts from the same sign, moves through the 12 signs sequentially.
+ */
+export function computeDwadasamsa(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  function d12Sign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const pada = Math.floor(degreeInSign / 2.5); // 0-11
+    return (signIdx + pada) % 12;
+  }
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: d12Sign(p.longitude),
+    sign: ZODIAC_SIGNS[d12Sign(p.longitude)],
+  }));
+  const ascSign = d12Sign(natal.ascendant.longitude);
+  return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
+}
