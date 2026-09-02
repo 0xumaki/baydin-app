@@ -42,6 +42,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [shraaddha, setShraaddha] = React.useState<any>(null);
   const [varshaphal, setVarshaphal] = React.useState<any>(null);
   const [marriageMatch, setMarriageMatch] = React.useState<any>(null);
+  const [gochar, setGochar] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -88,6 +89,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/varshaphal").then((r) => r.json()).then((d) => { setVarshaphal(d.varshaphal); }).catch(() => {});
     // Load marriage match
     fetch("/api/marriage-match").then((r) => r.json()).then((d) => { setMarriageMatch(d.match); }).catch(() => {});
+    // Load gochar (transit predictions)
+    fetch("/api/gochar").then((r) => r.json()).then((d) => { setGochar(d.gochar); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -482,6 +485,27 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                       </div>
                       <div className="text-[9px] text-ink-muted mb-1">{check.desc}</div>
                       <div className="text-[9px] text-ink-muted/70">{check.status}</div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
+            {/* Gochar (transit predictions) */}
+            {gochar?.predictions?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sun className="w-4 h-4 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Gochar — Transit Predictions</span>
+                </div>
+                <div className="space-y-1.5">
+                  {gochar.keyTransits?.map((p: any, i: number) => (
+                    <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-white/[0.02]">
+                      <span className="text-gold text-[11px] font-medium shrink-0 w-16">{p.planet}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[10px] text-ink">House {p.houseFromAsc} · {p.sign}</div>
+                        <div className="text-[9px] text-ink-muted leading-relaxed">{p.prediction}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
