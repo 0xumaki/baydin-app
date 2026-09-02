@@ -5,7 +5,7 @@ import { GlassCard, GoldButton, Pill, SectionTitle } from "@/components/lumina/p
 import { useMe, api } from "@/lib/api-client";
 import { Star, Wallet, Sparkles, MapPin, Sun } from "lucide-react";
 import { toast } from "sonner";
-import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn, computeShodasamsa, computeVimsamsa } from "@/lib/astrology";
+import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn, computeShodasamsa, computeVimsamsa, computeChaturvimsamsa, computeTrimsamsa } from "@/lib/astrology";
 
 const PLANET_SYMBOLS: Record<string, string> = {
   Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
@@ -381,6 +381,52 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
             })()}
           </div>
           <div className="text-[10px] text-ink-muted/60 mt-1">D-20 shows spiritual pursuits, religious inclinations & inner growth.</div>
+        </GlassCard>
+      )}
+
+      {/* Chaturvimsamsa (D-24) — education */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Chaturvimsamsa (D-24) — Education & Knowledge
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(() => {
+              const d24 = computeChaturvimsamsa(c);
+              return d24.planets.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="text-[10px] text-ink-muted/60 mt-1">D-24 reveals education, learning, knowledge & intellectual pursuits.</div>
+        </GlassCard>
+      )}
+
+      {/* Trimsamsa (D-30) — misfortunes */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Trimsamsa (D-30) — Struggles & Hidden Matters
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(() => {
+              const d30 = computeTrimsamsa(c);
+              return d30.planets.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="text-[10px] text-ink-muted/60 mt-1">D-30 shows challenges, hidden forces & areas of potential difficulty to transform.</div>
         </GlassCard>
       )}
 

@@ -31,6 +31,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [gemstones, setGemstones] = React.useState<any>(null);
   const [nakshatra, setNakshatra] = React.useState<any>(null);
   const [mantras, setMantras] = React.useState<any>(null);
+  const [yogas, setYogas] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -55,6 +56,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/nakshatra").then((r) => r.json()).then((d) => { setNakshatra(d.nakshatra); }).catch(() => {});
     // Load mantra recommendations
     fetch("/api/mantra").then((r) => r.json()).then((d) => { setMantras(d.mantras); }).catch(() => {});
+    // Load yogas
+    fetch("/api/yogas").then((r) => r.json()).then((d) => { setYogas(d.yogas); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -234,6 +237,31 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                       </div>
                       <div className="text-[10px] text-ink-muted">{m.meaning}</div>
                       <div className="text-[9px] text-ink-muted/60 mt-0.5">{m.reason}</div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
+            {/* Yoga detection */}
+            {yogas?.detected?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Your Yogas</span>
+                  </div>
+                  <span className="text-[10px] text-gold">{yogas.count} found</span>
+                </div>
+                <div className="space-y-2">
+                  {yogas.detected.slice(0, 5).map((y: any, i: number) => (
+                    <div key={i} className="p-2 rounded-lg bg-white/[0.02]">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-[12px] text-ink font-medium">{y.name}</span>
+                        <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full", y.strength === "strong" ? "bg-leaf/15 text-leaf" : y.strength === "moderate" ? "bg-gold/15 text-gold" : "bg-white/5 text-ink-muted")}>{y.strength}</span>
+                      </div>
+                      <div className="text-[10px] text-ink-muted">{y.effect}</div>
+                      <div className="text-[9px] text-ink-muted/60 mt-0.5">{y.planets}</div>
                     </div>
                   ))}
                 </div>

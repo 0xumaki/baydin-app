@@ -1062,6 +1062,67 @@ export function computeVimsamsa(natal: NatalChart): { planets: { name: string; s
 }
 
 /**
+ * Compute Chaturvimsamsa (D-24) divisional chart — education, learning & knowledge.
+ * Each sign divided into 24 parts of 1°15' each.
+ * Odd signs start from Leo (5); even signs start from Cancer (3).
+ */
+export function computeChaturvimsamsa(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  function d24Sign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const pada = Math.floor(degreeInSign / 1.25); // 0-23
+    const startSign = signIdx % 2 === 0 ? 4 : 3; // Leo for odd, Cancer for even
+    return (startSign + pada) % 12;
+  }
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: d24Sign(p.longitude),
+    sign: ZODIAC_SIGNS[d24Sign(p.longitude)],
+  }));
+  const ascSign = d24Sign(natal.ascendant.longitude);
+  return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
+}
+
+/**
+ * Compute Trimsamsa (D-30) divisional chart — misfortunes, struggles & hidden matters.
+ * Odd signs: Mars(5°), Saturn(5°), Jupiter(8°), Mercury(7°), Venus(5°).
+ * Even signs: Venus(5°), Mercury(7°), Jupiter(8°), Saturn(5°), Mars(5°).
+ */
+export function computeTrimsamsa(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  // Odd sign division: Mars 0-5, Saturn 5-10, Jupiter 10-18, Mercury 18-25, Venus 25-30
+  // Even sign division: Venus 0-5, Mercury 5-12, Jupiter 12-20, Saturn 20-25, Mars 25-30
+  const oddLords = ["Mars", "Saturn", "Jupiter", "Mercury", "Venus"];
+  const evenLords = ["Venus", "Mercury", "Jupiter", "Saturn", "Mars"];
+  const lordSigns: Record<string, number> = { Mars: 0, Saturn: 10, Jupiter: 8, Mercury: 2, Venus: 6 };
+
+  function d30Sign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const isOdd = signIdx % 2 === 0;
+    const lords = isOdd ? oddLords : evenLords;
+    const boundaries = isOdd ? [0, 5, 10, 18, 25, 30] : [0, 5, 12, 20, 25, 30];
+    let lordIdx = 0;
+    for (let i = 0; i < 5; i++) {
+      if (degreeInSign >= boundaries[i] && degreeInSign < boundaries[i + 1]) {
+        lordIdx = i;
+        break;
+      }
+    }
+    const lord = lords[lordIdx];
+    return lordSigns[lord];
+  }
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: d30Sign(p.longitude),
+    sign: ZODIAC_SIGNS[d30Sign(p.longitude)],
+  }));
+  const ascSign = d30Sign(natal.ascendant.longitude);
+  return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
+}
+
+/**
  * Compute Solar Return (Varshaphal) chart — the year ahead.
  * Finds the moment when transit Sun returns to its natal longitude,
  * then casts a chart for that instant.
