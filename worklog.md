@@ -880,3 +880,29 @@ Task: Add D-3 Drekkana, D-4 Chaturthamsa, Solar Return (Varshaphal) charts, git 
 ## Current App State (46 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 **8 divisional charts**: D-1 (natal), D-2 (Hora/wealth), D-3 (Drekkana/siblings), D-4 (Chaturthamsa/property), D-7 (Saptamsa/children), D-9 (Navamsa/marriage), D-10 (Dasamsa/career), D-12 (Dwadasamsa/parents) + Solar Return (Varshaphal/year ahead)
+
+---
+Task ID: 26 (webDevReview cron round 22)
+Agent: Orchestrator (Z.ai Code)
+Task: Add gemstone recommendation engine, today's nakshatra widget, git push
+
+## Completed Modifications
+
+### 1. Gemstone Recommendation Engine
+- `GET /api/gemstones` — analyzes natal chart benefic planets (ascendant lord, 5th lord, 9th lord, Moon, Jupiter)
+- Maps planets to Vedic gemstones with color, benefit, and recommended finger
+- 7 gemstones: Ruby (Sun), Pearl (Moon), Red Coral (Mars), Emerald (Mercury), Yellow Sapphire (Jupiter), Diamond (Venus), Blue Sapphire (Saturn)
+- Widget on Today dashboard showing up to 5 recommendations with gem initial, name, color, benefit, planet, finger
+
+### 2. Today's Nakshatra Widget
+- `GET /api/nakshatra` — computes transit Moon's nakshatra (from current planetary positions)
+- Returns: nakshatra name, pada (quarter), ruling lord, deity
+- Widget on Today dashboard showing nakshatra name + pada + lord + deity
+
+### 3. Git Push
+- Committed and pushed to https://github.com/0xumaki/baydin-app
+- 48 API routes, 17 views
+
+## Current App State (48 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with 8 divisional charts + Solar Return, Muhurta, Panchanga, transits, moon phase, nakshatra, lucky numbers, gemstone recommendations, plus all prior features (streaming astrologer, tarot, frequencies, positivity, manifest, ritual, Luck economy, achievements, reseller, admin).
