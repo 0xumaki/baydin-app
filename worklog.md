@@ -1332,3 +1332,32 @@ Task: Add Tara Bala + Rahu Kaal precise timings, git push
 ## Current App State (66 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with Tara Bala + Rahu Kaal + all prior features.
+
+---
+Task ID: 40 (webDevReview cron round 36)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Choghadiya + Vedic Nadi astrology, git push
+
+## Completed Modifications
+
+### 1. Choghadiya (Auspicious Periods)
+- `GET /api/choghadiya` — day/night Choghadiya (16 periods total)
+  7 types: Amrit, Shubh, Labh, Char (auspicious) + Rog, Udveg, Kaal (inauspicious)
+  Weekday-specific ordering, night periods are reverse of day
+  Active period highlighting, next auspicious period indicator
+  Each type has nature, effect description, color, icon
+
+### 2. Vedic Nadi Astrology
+- `GET /api/nadi` — Nadi (pulse) analysis based on Moon nakshatra
+  3 Nadis: Aadi (Vata/Air), Madhya (Pitta/Fire), Antya (Kapha/Earth)
+  Each with: element, temperament, health tendencies, spiritual path
+  Nadi Dosha detection (same Nadi = incompatible for marriage)
+  Compatible/incompatible Nadis listed
+  Dosha-specific remedies (grounding for Vata, cooling for Pitta, stimulation for Kapha)
+
+### 3. Git Push
+- 68 API routes, 17 views, lint clean
+
+## Current App State (68 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with Choghadiya + Nadi + all prior features.
