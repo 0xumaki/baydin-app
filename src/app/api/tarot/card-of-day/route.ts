@@ -33,6 +33,7 @@ export async function GET() {
         id: existing.id, question: existing.question, spreadType: existing.spreadType,
         interpretation: existing.interpretation,
         cardsJson: existing.cardsJson,
+        reflection: existing.reflection,
       },
     });
   }
@@ -53,5 +54,26 @@ export async function GET() {
       interpretation,
     },
   });
-  return NextResponse.json({ reading: { id: reading.id, interpretation, cardsJson: reading.cardsJson, question: reading.question, spreadType: "card-of-day" } });
+  return NextResponse.json({ reading: { id: reading.id, interpretation, cardsJson: reading.cardsJson, question: reading.question, spreadType: "card-of-day", reflection: null } });
+}
+
+/** PATCH — save/update the user's reflection note on today's card-of-day. Awards +1 Luck. */
+export async function PATCH(req: NextRequest) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { reflection } = await req.json();
+  if (typeof reflection !== "string") return NextResponse.json({ error: "reflection required" }, { status: 400 });
+  const today = new Date().toISOString().slice(0, 10);
+  const existing = await db.tarotReading.findFirst({
+    where: { userId: user.id, spreadType: "card-of-day", createdAt: { gte: new Date(today + "T00:00:00") } },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!existing) return NextResponse.json({ error: "No card-of-day yet" }, { status: 404 });
+  const wasEmpty = !existing.reflection;
+  const updated = await db.tarotReading.update({ where: { id: existing.id }, data: { reflection } });
+  // Award +1 Luck only the first time a reflection is saved
+  if (wasEmpty && reflection.trim()) {
+    await creditLuck({ userId: user.id, amount: 1, type: "daily_reward", description: "Card-of-day reflection saved" });
+  }
+  return NextResponse.json({ reading: updated, bonusLuck: wasEmpty && reflection.trim() ? 1 : 0 });
 }

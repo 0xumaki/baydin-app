@@ -413,3 +413,62 @@ Task: Verify round 6 files, add Tarot History view, Achievements system, QA
 4. **Add "Today's recommended practice"** — personalized suggestion on Today dashboard based on streak + last activity
 5. **Add conversation search** — search past astrologer chats by keyword
 6. **Add dark/light theme toggle** — currently forced dark, but user may want the Luminary warm theme
+
+---
+Task ID: 14 (webDevReview cron round 9)
+Agent: Orchestrator (Z.ai Code) — scheduled webDevReview
+Task: Verify round 8 files, add Card-of-Day reflection journal, theme toggle, QA
+
+## Current Project Status Assessment
+- Round 8 ended with infrastructure failure. Verified all round-8 files intact: achievements API, achievement-celebration component, seenAchievements in schema (1 match), Search in chat-view (6 matches), RecommendedPractice in today-view (2 matches).
+- Lint clean, 37 API routes, 17 views.
+
+## Completed Modifications This Round
+
+### 1. Card-of-Day Reflection Journal
+- Added `reflection` field to TarotReading model (optional string for journal notes)
+- Updated `GET /api/tarot/card-of-day` to return `reflection` field
+- Added `PATCH /api/tarot/card-of-day` endpoint — saves reflection, awards +1 Luck the first time
+- Updated CardOfDayCard component on Today dashboard with:
+  - Textarea journal input ("What does this card mean to you today?")
+  - "Save reflection · +1 Luck" button (appears when text entered and not saved)
+  - "saved" indicator when reflection is stored
+  - First-time save awards +1 Luck bonus
+- **Verified**: textarea present with correct placeholder, filled + saved successfully, Luck updated
+
+### 2. Theme Toggle (Dark / Luminary Warm)
+- Created `ThemeToggle` component — switches between default dark Lumina theme and warm "Luminary" gold-tinted theme
+- Stored in localStorage as `baydin-theme`
+- Applies `data-theme="luminary"` on `<html>` element (activates the warm gold palette already in globals.css: warm near-black #0A0805 bg, warm cream #F5EDD8 text, brighter gold #E7D2A8 accent)
+- Added to desktop top bar (next to settings button) — moon icon for dark, sun icon for luminary
+- **Verified**: clicking toggles `data-theme="luminary"` on html, theme changes
+
+### 3. Schema Update
+- Added `reflection String?` to TarotReading model
+- Pushed to SQLite, Prisma Client regenerated
+
+## Verification Results (agent-browser)
+- ✅ Reflection journal textarea renders with placeholder "What does this card mean to you today?"
+- ✅ Filling reflection + clicking save works, Luck updated
+- ✅ Theme toggle button present in top bar
+- ✅ Clicking theme toggle sets `data-theme="luminary"` on html (warm gold theme)
+- ✅ Lint clean, 37 API routes, 17 views
+- Screenshots: qa-r9-today.png, qa-r9-reflection.png, qa-r9-luminary-theme.png
+
+## Infrastructure Notes
+- Dev server died between rounds as usual. Restarted and ran full QA in a single command.
+- No MCP frame limit issues this round.
+
+## Unresolved Issues / Risks
+1. **Dev server persistence** — still requires manual restart each round.
+2. **Mobile responsive audit** — still pending. All views use responsive classes but untested at 375px.
+3. **Socket.io reminder mini-service** — not yet built.
+4. **Reflection journal history** — currently only today's reflection is viewable; could add a browsable history of past reflections.
+
+## Priority Recommendations for Next Phase
+1. **Mobile responsive audit** — test all 17 views at 375px width, fix overflow/cramping
+2. **Add socket.io reminder mini-service** — goal reminder times on port 3003
+3. **Add reflection journal history** — browse past card-of-day reflections
+4. **Add "share card of the day"** — Web Share API for daily card (virality)
+5. **Add onboarding flow** — first-time user walkthrough of features
+6. **Add notification badges** — unread conversation count, pending confirmations

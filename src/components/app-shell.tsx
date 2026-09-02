@@ -26,6 +26,7 @@ import { ResellerView } from "@/components/views/reseller-view";
 import { AdminView } from "@/components/views/admin-view";
 import { ProfileSheet } from "@/components/profile-sheet";
 import { AchievementCelebration } from "@/components/achievement-celebration";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
   Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
@@ -132,6 +133,7 @@ export function AppShell() {
                   <Pill variant="gold" className="text-[12px]">
                     <Wallet className="w-3 h-3" /> {user.luckBalance} Luck
                   </Pill>
+                  <ThemeToggle />
                   <button onClick={() => setProfileOpen(true)} className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-ink-muted hover:text-ink hover:border-gold/30 transition">
                     <Settings className="w-4 h-4" />
                   </button>

@@ -213,6 +213,8 @@ model TarotReading {
   // JSON array of { id, reversed, position }
   cardsJson     String   @map("cards_json")
   interpretation String
+  // Optional user reflection / journal note (for card-of-day)
+  reflection    String?
   saved         Boolean  @default(false)
   createdAt     DateTime @default(now()) @map("created_at")
 

@@ -244,20 +244,69 @@ function QuickAction({ icon: Icon, label, desc, onClick, badge }: { icon: any; l
 }
 
 function CardOfDayCard({ reading }: { reading: any }) {
+  const qc = useQueryClient();
+  const [reflection, setReflection] = React.useState(reading.reflection || "");
+  const [saved, setSaved] = React.useState(!!reading.reflection);
+  const [saving, setSaving] = React.useState(false);
   let cards: any[] = [];
   try { cards = JSON.parse(reading.cardsJson); } catch {}
   const card = cards[0];
   if (!card) return <div className="text-[13px] text-ink-muted">{reading.interpretation?.slice(0, 200)}…</div>;
+
+  async function saveReflection() {
+    if (!reflection.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/tarot/card-of-day", {
+        method: "PATCH", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ reflection }),
+      });
+      const data = await res.json();
+      if (data.bonusLuck) {
+        toast.success(`Reflection saved · +${data.bonusLuck} Luck ✦`);
+      } else {
+        toast.success("Reflection updated");
+      }
+      setSaved(true);
+      qc.invalidateQueries({ queryKey: ["me"] });
+    } catch { toast.error("Could not save reflection"); }
+    finally { setSaving(false); }
+  }
+
   return (
-    <div className="flex gap-4">
-      <div className={cn("w-20 h-32 rounded-xl border border-gold/30 bg-gradient-to-br from-surface to-surface-2 flex flex-col items-center justify-center shrink-0", card.reversed && "rotate-180")}>
-        <div className="text-2xl mb-1">{card.symbol || "✦"}</div>
-        <div className="text-[9px] text-ink px-1 text-center">{card.nameShort || card.id}</div>
+    <div>
+      <div className="flex gap-4 mb-3">
+        <div className={cn("w-20 h-32 rounded-xl border border-gold/30 bg-gradient-to-br from-surface to-surface-2 flex flex-col items-center justify-center shrink-0", card.reversed && "rotate-180")}>
+          <div className="text-2xl mb-1">{card.symbol || "✦"}</div>
+          <div className="text-[9px] text-ink px-1 text-center">{card.nameShort || card.id}</div>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-[13px] text-ink font-medium mb-0.5">{card.name || "Card of the Day"}</div>
+          <div className="text-[11px] text-gold mb-1.5">{card.reversed ? "Reversed" : "Upright"}</div>
+          <div className="text-[12px] text-ink-muted line-clamp-3 leading-relaxed">{reading.interpretation?.replace(/\*\*/g, "").slice(0, 180)}…</div>
+        </div>
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-[13px] text-ink font-medium mb-0.5">{card.name || "Card of the Day"}</div>
-        <div className="text-[11px] text-gold mb-1.5">{card.reversed ? "Reversed" : "Upright"}</div>
-        <div className="text-[12px] text-ink-muted line-clamp-3 leading-relaxed">{reading.interpretation?.replace(/\*\*/g, "").slice(0, 180)}…</div>
+      {/* Reflection journal */}
+      <div className="mt-3 pt-3 border-t border-white/5">
+        <div className="text-[10px] uppercase tracking-wide text-ink-muted mb-1.5 flex items-center gap-1">
+          <BookOpen className="w-3 h-3 text-gold" /> Your reflection {saved && <span className="text-leaf">· saved</span>}
+        </div>
+        <textarea
+          value={reflection}
+          onChange={(e) => { setReflection(e.target.value); setSaved(false); }}
+          placeholder="What does this card mean to you today?"
+          className="w-full bg-white/[0.03] border border-white/5 rounded-lg px-3 py-2 text-[12px] text-ink placeholder:text-ink-muted/50 outline-none focus:border-gold/20 resize-none min-h-[48px]"
+          rows={2}
+        />
+        {reflection.trim() && !saved && (
+          <button
+            onClick={saveReflection}
+            disabled={saving}
+            className="mt-1.5 px-3 py-1 rounded-full text-[10px] border border-gold/30 bg-gold/10 text-gold hover:bg-gold/20 active:scale-95 transition disabled:opacity-50"
+          >
+            {saving ? "Saving…" : "Save reflection · +1 Luck"}
+          </button>
+        )}
       </div>
     </div>
   );
