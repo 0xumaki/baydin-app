@@ -906,3 +906,32 @@ Task: Add gemstone recommendation engine, today's nakshatra widget, git push
 ## Current App State (48 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with 8 divisional charts + Solar Return, Muhurta, Panchanga, transits, moon phase, nakshatra, lucky numbers, gemstone recommendations, plus all prior features (streaming astrologer, tarot, frequencies, positivity, manifest, ritual, Luck economy, achievements, reseller, admin).
+
+---
+Task ID: 27 (webDevReview cron round 23)
+Agent: Orchestrator (Z.ai Code)
+Task: Add mantra recommendation engine, D-16 Shodasamsa + D-20 Vimsamsa charts, git push
+
+## Completed Modifications
+
+### 1. Mantra Recommendation Engine
+- `GET /api/mantra` — recommends mantras based on today's nakshatra lord, ascendant lord, and Jupiter
+- 9 Vedic planet mantras with Sanskrit text, meaning, japa count (108 or 18), and Myanmar count text
+- Widget on Today dashboard showing up to 3 personalized mantras with reasoning
+
+### 2. D-16 Shodasamsa (Vehicles & Comforts)
+- `computeShodasamsa(D-16)` — 16 parts per sign, movable/fixed/dual start rules
+- Displayed on birth-chart view
+
+### 3. D-20 Vimsamsa (Spiritual Practices)
+- `computeVimsamsa(D-20)` — 20 parts per sign, odd/even start rules
+- Displayed on birth-chart view
+
+### 4. Git Push
+- Committed and pushed to https://github.com/0xumaki/baydin-app
+- 49 API routes, 17 views
+
+## Current App State (49 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+**10 divisional charts**: D-1, D-2, D-3, D-4, D-7, D-9, D-10, D-12, D-16, D-20 + Solar Return
+**Today dashboard widgets**: greeting, recommended practice, quick actions, weekly summary, card-of-day + reflection, transits, gemstones, mantras, manifest, mood, luck + streak, activity heatmap, moon phase, nakshatra, lucky numbers, muhurta, deep readings
