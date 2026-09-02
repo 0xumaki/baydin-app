@@ -1146,3 +1146,33 @@ Task: Add Karana widget + Panchasara (5-fold remedy) system, git push
 ## Current App State (56 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with full Panchanga + Panchasara + Yadaya + all prior features.
+
+---
+Task ID: 34 (webDevReview cron round 30)
+Agent: Orchestrator (Z.ai Code)
+Task: Add 7-day weekly forecast + Shraaddha (ancestral rites), git push
+
+## Completed Modifications
+
+### 1. 7-Day Weekly Forecast
+- `GET /api/weekly-forecast` — computes 7-day forecast based on transit Moon's relationship to natal Moon
+- Each day rated 1-5 stars based on Moon house position from natal Moon
+- Mood descriptions (Energetic, Creative, Reflective, Intense, etc.)
+- Best day and most challenging day identified
+- Highlights per day (favorable activities, cautions)
+- Widget on Today dashboard: 7-column star grid with mood words + best/challenging indicators
+
+### 2. Shraaddha (Ancestral Rites) Recommendations
+- `GET /api/shraaddha` — Vedic ancestral rites based on nakshatra and chart analysis
+- Nakshatra-specific practices (Magha ruled by Pitrs, Bharani by Yama, etc.)
+- Pitra Dosha indicators (Rahu in 9th/1st, Sun in Capricorn)
+- 5 remedies: Tarpana (water oblation), Pinda Daan (rice balls), Sesame Lamp, Charity, Feeding animals
+- Recommended timing: Amavasya, Saturdays, Pitru Paksha
+- Widget on Today dashboard with remedies grid
+
+### 3. Git Push
+- 58 API routes, 17 views, lint clean
+
+## Current App State (58 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with weekly forecast + Shraaddha + all prior features.
