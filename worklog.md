@@ -935,3 +935,35 @@ Task: Add mantra recommendation engine, D-16 Shodasamsa + D-20 Vimsamsa charts, 
 **GitHub**: https://github.com/0xumaki/baydin-app
 **10 divisional charts**: D-1, D-2, D-3, D-4, D-7, D-9, D-10, D-12, D-16, D-20 + Solar Return
 **Today dashboard widgets**: greeting, recommended practice, quick actions, weekly summary, card-of-day + reflection, transits, gemstones, mantras, manifest, mood, luck + streak, activity heatmap, moon phase, nakshatra, lucky numbers, muhurta, deep readings
+
+---
+Task ID: 28 (webDevReview cron round 24)
+Agent: Orchestrator (Z.ai Code)
+Task: Add yoga detection engine, D-24 + D-30 charts, git push
+
+## Completed Modifications
+
+### 1. Yoga Detection Engine
+- `GET /api/yogas` — detects 7 classical Vedic yogas:
+  - Gaja Kesari (Jupiter in kendra from Moon)
+  - Raja Yoga (kendra + trikona lord conjunction)
+  - Dhana Yoga (2nd/5th/9th/11th lord conjunction)
+  - Chandra-Mangala (Moon+Mars conjoined)
+  - Budha-Aditya (Sun+Mercury conjoined)
+  - Neecha Bhanga Raja (debilitation cancellation)
+  - Kemadruma (no planets flanking Moon)
+- Each with name, description, planets involved, effect, strength (strong/moderate/weak)
+- Widget on Today dashboard with strength badges
+
+### 2. D-24 Chaturvimsamsa (Education & Knowledge)
+- `computeChaturvimsamsa(D-24)` — 24 parts of 1°15', Leo/Cancer start rules
+
+### 3. D-30 Trimsamsa (Struggles & Hidden Matters)
+- `computeTrimsamsa(D-30)` — 5-planet division (Mars/Saturn/Jupiter/Mercury/Venus) with odd/even sign rules
+
+### 4. Git Push
+- 50 API routes, 17 views, lint clean
+
+## Current App State (50 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+**12 divisional charts** + Solar Return + Yoga detection + Mantra + Gemstone + Nakshatra + Muhurta + Transits + Moon phase + Lucky numbers
