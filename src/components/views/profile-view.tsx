@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import {
   BarChart3, Sparkles, MessageCircle, Moon, Target, Flame, Wallet,
   Star, Heart, TrendingUp, Calendar, Award, Zap, Gift, Users, BookOpen, Lock,
-  Download, Trash2, X, AlertTriangle,
+  Download, Trash2, X, AlertTriangle, Bookmark,
 } from "lucide-react";
 import { ACHIEVEMENTS, evaluateAchievements, tierColor } from "@/lib/achievements";
 import { Input } from "@/components/ui/input";
@@ -174,6 +174,9 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
           </div>
         </GlassCard>
 
+        {/* Saved insights (bookmarked deep readings) */}
+        <SavedInsights />
+
         {/* Account info */}
         <GlassCard className="p-5">
           <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2"><Award className="w-3.5 h-3.5 text-gold" /> Account</div>
@@ -299,5 +302,79 @@ function DeleteAccountModal({ onClose }: { onClose: () => void }) {
         </div>
       </GlassCard>
     </div>
+  );
+}
+
+function SavedInsights() {
+  const [insights, setInsights] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [expanded, setExpanded] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    fetch("/api/insights/save", { credentials: "include" })
+      .then((r) => r.json())
+      .then((d) => setInsights(d.insights || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function remove(id: string) {
+    try {
+      await fetch(`/api/insights/save?id=${id}`, { method: "DELETE", credentials: "include" });
+      setInsights((is) => is.filter((i) => i.id !== id));
+      toast.success("Removed");
+    } catch {}
+  }
+
+  if (loading) return null;
+  if (insights.length === 0) return null;
+
+  return (
+    <GlassCard className="p-5 mb-5">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Bookmark className="w-3.5 h-3.5 text-gold" />
+          <span className="text-[12px] text-ink-muted">Saved Insights</span>
+        </div>
+        <span className="text-[11px] text-gold">{insights.length} bookmarked</span>
+      </div>
+      <div className="space-y-2">
+        {insights.slice(0, 10).map((ins) => {
+          const isOpen = expanded === ins.id;
+          return (
+            <div key={ins.id} className="rounded-lg border border-white/5 bg-white/[0.02] overflow-hidden">
+              <button
+                onClick={() => setExpanded(isOpen ? null : ins.id)}
+                className="w-full flex items-center gap-2 p-2.5 text-left hover:bg-white/[0.02] transition"
+              >
+                <span className="text-base shrink-0">{ins.skillName?.[0] || "✦"}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[12px] text-ink truncate">{ins.skillName || ins.skill}</div>
+                  <div className="text-[10px] text-ink-muted">{new Date(ins.savedAt).toLocaleDateString()}</div>
+                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); remove(ins.id); }}
+                  className="p-1 rounded text-ink-muted/40 hover:text-destructive transition shrink-0"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </button>
+              {isOpen && (
+                <div className="px-3 pb-3 border-t border-white/5 pt-2 lum-prose text-[12px] text-ink-muted leading-relaxed max-h-48 overflow-y-auto lumina-scroll">
+                  {ins.content}
+                  {ins.highlights?.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {ins.highlights.map((h: string, i: number) => (
+                        <Pill key={i} variant="gold" className="text-[9px]">{h}</Pill>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </GlassCard>
   );
 }
