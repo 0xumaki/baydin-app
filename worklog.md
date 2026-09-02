@@ -472,3 +472,56 @@ Task: Verify round 8 files, add Card-of-Day reflection journal, theme toggle, QA
 4. **Add "share card of the day"** — Web Share API for daily card (virality)
 5. **Add onboarding flow** — first-time user walkthrough of features
 6. **Add notification badges** — unread conversation count, pending confirmations
+
+---
+Task ID: 15 (webDevReview cron round 10 — completed after infrastructure recovery)
+Agent: Orchestrator (Z.ai Code)
+Task: Wire Onboarding into app-shell, verify round 10 features (share card-of-day, notification badges, onboarding), QA
+
+## Current Project Status Assessment
+- Round 10 ended with infrastructure failure mid-task. The Onboarding component was written but NOT yet imported/rendered in app-shell. All other round-10 edits (notifications API, useBadges hook, badges in sidebar, share button on CardOfDayCard) were on disk but unverified.
+- At start of this continuation: verified all files intact, lint clean.
+
+## Completed Modifications
+
+### 1. Onboarding wired into app-shell (CRITICAL — was incomplete from round 10)
+- Added `import { Onboarding } from "@/components/onboarding"` to app-shell
+- Added `{user && <Onboarding />}` render at the bottom of AppShell (next to AchievementCelebration)
+- Onboarding shows for first-time users (checks localStorage `baydin.onboarded`), 4-slide animated walkthrough
+
+### 2. Share Card-of-Day (from round 10 — verified on disk)
+- Share2 icon button on CardOfDayCard in Today dashboard
+- Web Share API with clipboard fallback
+- Shares card name, orientation, and interpretation preview
+
+### 3. Notification Badges (from round 10 — QA verified this round)
+- `GET /api/notifications` API — returns unconfirmedGoals, ritualIncomplete, recentConversations
+- `useBadges()` hook in api-client (30s staleTime)
+- Gold pill badges on sidebar nav items (Manifest shows count of unconfirmed goals, Ritual shows 1 if incomplete)
+- **Verified via agent-browser**: "Manifest 1, Ritual 1" badges visible in sidebar
+
+## Verification Results (agent-browser)
+- ✅ Notification badges render in sidebar (Manifest=1 unconfirmed goal, Ritual=1 incomplete)
+- ✅ Nav structure intact with all 17 views + grouped sections
+- ✅ Login flow works (94 Luck balance)
+- ✅ Lint clean, 38 API routes, 17 views
+- Onboarding component is correctly wired but couldn't be QA-verified (server kept dying; component will show for new users who haven't seen it)
+- Screenshots: qa-r10-onboarding.png, qa-r10-onboarding2.png
+
+## Infrastructure Notes
+- Dev server continues to die between Bash tool calls. Worked around by combining commands.
+- The onboarding QA couldn't complete because the server died during the localStorage-clear + reload cycle. The component logic is sound (checks localStorage, 1.5s delay, shows for logged-in users) and will work for genuinely new users.
+
+## Unresolved Issues / Risks
+1. **Dev server persistence** — still requires manual restart each round.
+2. **Onboarding QA** — not fully verified via browser (server kept dying). Component is correctly coded and wired.
+3. **Mobile responsive audit** — still pending.
+4. **Socket.io reminder mini-service** — not yet built.
+
+## Priority Recommendations for Next Phase
+1. **Mobile responsive audit** — test all 17 views at 375px width
+2. **Add socket.io reminder mini-service** — goal reminder times on port 3003
+3. **Add reflection journal history** — browse past card-of-day reflections
+4. **Add notification badges to mobile top bar** — currently only in sidebar (desktop)
+5. **Add "streak freeze" indicator** — show when a streak freeze is available
+6. **Add conversation pinning** — pin important consultations to top
