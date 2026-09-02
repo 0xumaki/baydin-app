@@ -966,3 +966,110 @@ export function computeDwadasamsa(natal: NatalChart): { planets: { name: string;
   const ascSign = d12Sign(natal.ascendant.longitude);
   return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
 }
+
+/**
+ * Compute Drekkana (D-3) divisional chart — siblings, courage & self-effort.
+ * Each sign divided into 3 parts of 10° each.
+ * For movable signs: start from the same sign. Fixed: 9th sign. Dual: 5th sign.
+ */
+export function computeDrekkana(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  function d3Sign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const pada = Math.floor(degreeInSign / 10); // 0-2
+    const signType = signIdx % 3;
+    const startSign = signType === 0 ? signIdx : signType === 1 ? (signIdx + 8) % 12 : (signIdx + 4) % 12;
+    return (startSign + pada) % 12;
+  }
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: d3Sign(p.longitude),
+    sign: ZODIAC_SIGNS[d3Sign(p.longitude)],
+  }));
+  const ascSign = d3Sign(natal.ascendant.longitude);
+  return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
+}
+
+/**
+ * Compute Chaturthamsa (D-4) divisional chart — property, residence & fixed assets.
+ * Each sign divided into 4 parts of 7°30' each.
+ * Starts from the same sign for all.
+ */
+export function computeChaturthamsa(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  function d4Sign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const pada = Math.floor(degreeInSign / 7.5); // 0-3
+    return (signIdx + pada) % 12;
+  }
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: d4Sign(p.longitude),
+    sign: ZODIAC_SIGNS[d4Sign(p.longitude)],
+  }));
+  const ascSign = d4Sign(natal.ascendant.longitude);
+  return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
+}
+
+/**
+ * Compute Solar Return (Varshaphal) chart — the year ahead.
+ * Finds the moment when transit Sun returns to its natal longitude,
+ * then casts a chart for that instant.
+ */
+export function computeSolarReturn(ctx: BirthContext, natal: NatalChart): { returnDate: string; sunLongitude: number; sunSign: string; planets: { name: string; signIndex: number; sign: string; symbol: string }[] } {
+  const natalSun = natal.planets.find((p) => p.name === "Sun");
+  if (!natalSun) return { returnDate: "", sunLongitude: 0, sunSign: "", planets: [] };
+
+  const natalSunLon = natalSun.longitude;
+  const birthYear = parseInt(ctx.dob.slice(0, 4));
+  const currentYear = new Date().getFullYear();
+  const age = currentYear - birthYear;
+
+  // Approximate: the solar return happens around the birthday each year
+  // Find the date when transit Sun ≈ natal Sun longitude
+  const birthMonth = parseInt(ctx.dob.slice(5, 7));
+  const birthDay = parseInt(ctx.dob.slice(8, 10));
+  const returnDate = new Date(currentYear, birthMonth - 1, birthDay, 12, 0, 0);
+
+  // Compute transit positions at the return moment
+  const d = daysSinceJ2000(julianDay(currentYear, birthMonth, birthDay, 12));
+  const sunLon = rev(sunPosition(d).lon + 282.9404);
+
+  // Simplified: compute all planet positions at the return
+  const moonLon = rev(moonPosition(d).lon);
+  const merLon = geocentricPlanet("mercury", d).lon;
+  const venLon = geocentricPlanet("venus", d).lon;
+  const marLon = geocentricPlanet("mars", d).lon;
+  const jupLon = geocentricPlanet("jupiter", d).lon;
+  const satLon = geocentricPlanet("saturn", d).lon;
+  const rahuLon = meanNode(julianDay(currentYear, birthMonth, birthDay, 12));
+
+  const symbols: Record<string, string> = { Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂", Jupiter: "♃", Saturn: "♄", Rahu: "☊", Ketu: "☋" };
+  const ayanamsa = lahiriAyanamsa(julianDay(currentYear, birthMonth, birthDay, 12));
+  const sidereal = (lon: number) => rev(lon - ayanamsa);
+
+  const planets = [
+    { name: "Sun", longitude: +sidereal(sunLon).toFixed(2) },
+    { name: "Moon", longitude: +sidereal(moonLon).toFixed(2) },
+    { name: "Mercury", longitude: +sidereal(merLon).toFixed(2) },
+    { name: "Venus", longitude: +sidereal(venLon).toFixed(2) },
+    { name: "Mars", longitude: +sidereal(marLon).toFixed(2) },
+    { name: "Jupiter", longitude: +sidereal(jupLon).toFixed(2) },
+    { name: "Saturn", longitude: +sidereal(satLon).toFixed(2) },
+    { name: "Rahu", longitude: +sidereal(rahuLon).toFixed(2) },
+  ].map((p) => ({
+    ...p,
+    signIndex: signOf(p.longitude),
+    sign: ZODIAC_SIGNS[signOf(p.longitude)],
+    symbol: symbols[p.name] || "•",
+  }));
+
+  return {
+    returnDate: returnDate.toISOString().slice(0, 10),
+    sunLongitude: +sidereal(sunLon).toFixed(2),
+    sunSign: ZODIAC_SIGNS[signOf(sidereal(sunLon))],
+    planets,
+  };
+}

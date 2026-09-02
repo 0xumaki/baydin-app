@@ -3,9 +3,9 @@
 import * as React from "react";
 import { GlassCard, GoldButton, Pill, SectionTitle } from "@/components/lumina/primitives";
 import { useMe, api } from "@/lib/api-client";
-import { Star, Wallet, Sparkles, MapPin } from "lucide-react";
+import { Star, Wallet, Sparkles, MapPin, Sun } from "lucide-react";
 import { toast } from "sonner";
-import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa } from "@/lib/astrology";
+import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn } from "@/lib/astrology";
 
 const PLANET_SYMBOLS: Record<string, string> = {
   Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
@@ -289,6 +289,81 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
             })()}
           </div>
           <div className="text-[10px] text-ink-muted/60 mt-1">D-12 shows the influence of parents, family lineage & ancestral karma.</div>
+        </GlassCard>
+      )}
+
+      {/* Drekkana (D-3) — siblings */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Drekkana (D-3) — Siblings & Courage
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(() => {
+              const d3 = computeDrekkana(c);
+              return d3.planets.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="text-[10px] text-ink-muted/60 mt-1">D-3 reveals siblings, courage, self-effort & inner drive.</div>
+        </GlassCard>
+      )}
+
+      {/* Chaturthamsa (D-4) — property */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Chaturthamsa (D-4) — Property & Residence
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(() => {
+              const d4 = computeChaturthamsa(c);
+              return d4.planets.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="text-[10px] text-ink-muted/60 mt-1">D-4 shows property, fixed assets, residence & land fortune.</div>
+        </GlassCard>
+      )}
+
+      {/* Solar Return (Varshaphal) — year ahead */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Sun className="w-3.5 h-3.5 text-gold" />
+            Solar Return (Varshaphal) — Your Year Ahead
+          </div>
+          {(() => {
+            const sr = computeSolarReturn({ dob: c.meta.birth_datetime.slice(0, 10), tob: "12:00", latitude: c.meta.latitude, longitude: c.meta.longitude, timezone: c.meta.timezone }, c);
+            if (!sr.planets.length) return <div className="text-[12px] text-ink-muted">Could not compute solar return.</div>;
+            return (
+              <>
+                <div className="text-[11px] text-ink-muted mb-2">Return date: {sr.returnDate} · Sun in {sr.sunSign}</div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {sr.planets.map((p) => (
+                    <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                      <span className="text-gold">{p.symbol}</span>
+                      <span className="text-ink">{p.name}</span>
+                      <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-[10px] text-ink-muted/60 mt-1">Varshaphal shows the themes and energies for your current solar year.</div>
+              </>
+            );
+          })()}
         </GlassCard>
       )}
     </div>
