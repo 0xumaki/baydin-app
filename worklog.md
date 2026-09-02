@@ -1209,3 +1209,37 @@ Task: Add Vedic marriage matching + Varshaphal year-ahead summary, git push
 ## Current App State (60 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Milestone: 60 API routes! Complete Vedic astrology + tarot + daily practice platform.
+
+---
+Task ID: 36 (webDevReview cron round 32)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Gochar (transit predictions) + Prashna (horary astrology), git push
+
+## Completed Modifications
+
+### 1. Gochar (Transit Predictions)
+- `GET /api/gochar` — predicts effects of current planetary transits through the user's houses
+- Computes transit planet positions and their house from Ascendant + Moon
+- 12 house-specific predictions (e.g., 1st house = transformation, 10th = career, etc.)
+- Key transits highlighted: Saturn (long-term), Jupiter (growth), Rahu (ambition)
+- Widget on Today dashboard showing key transit predictions
+
+### 2. Prashna (Horary Astrology)
+- `POST /api/prashna` — answers Yes/No/Maybe questions by casting a chart at the moment of asking
+- Determines answer based on Moon's house from Lagna (Prashna Lagna)
+  - Kendra (1/4/7/10) = Yes (strong)
+  - Trikona (5/9) = Yes (favorable)
+  - Dusthana (6/8/12) = No (obstacles)
+  - Upachaya (3/11) = Maybe (depends on effort)
+- Confidence score 55-95% with detailed reasoning
+- Moon-Sun relationship (Krupa/Chandra Bala) adjustment
+- Nakshatra lord benefic/malefic influence
+- Timing prediction (days to outcome)
+- Returns full chart details (Lagna, Moon sign, nakshatra, nakshatra lord)
+
+### 3. Git Push
+- 62 API routes, 17 views, lint clean
+
+## Current App State (62 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with Gochar + Prashna + all prior features.
