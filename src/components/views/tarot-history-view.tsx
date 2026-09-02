@@ -1,0 +1,178 @@
+"use client";
+
+import * as React from "react";
+import { GlassCard, GoldButton, Pill, SectionTitle, ShellCard } from "@/components/lumina/primitives";
+import { useMe, api } from "@/lib/api-client";
+import { cn } from "@/lib/utils";
+import { BookOpen, Bookmark, BookmarkCheck, ChevronDown, ChevronRight, Share2, Sparkles, Loader2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
+import { TAROT_DECK } from "@/lib/tarot-data";
+
+export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
+  const { data } = useMe();
+  const user = data?.user;
+  const [readings, setReadings] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [savedOnly, setSavedOnly] = React.useState(false);
+  const [expanded, setExpanded] = React.useState<string | null>(null);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const res = await api<{ readings: any[] }>(`/api/tarot/history${savedOnly ? "?saved=true" : ""}`);
+      setReadings(res.readings);
+    } catch {}
+    finally { setLoading(false); }
+  }
+  React.useEffect(() => { if (user) load(); }, [user, savedOnly]);
+
+  async function toggleSave(id: string) {
+    try {
+      const res = await api<{ saved: boolean }>(`/api/tarot/save?id=${id}`, { method: "PATCH" });
+      setReadings((rs) => rs.map((r) => r.id === id ? { ...r, saved: res.saved } : r));
+      toast.success(res.saved ? "Reading bookmarked" : "Bookmark removed");
+    } catch (e: any) { toast.error(e.message); }
+  }
+
+  async function shareReading(reading: any) {
+    const text = reading.interpretation?.replace(/[#*_`]/g, "").slice(0, 280) || "";
+    if (navigator.share) {
+      try { await navigator.share({ title: "My Baydin Tarot Reading", text, url: window.location.origin }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(text + "\n\n" + window.location.origin);
+      toast.success("Reading copied to clipboard ✦");
+    }
+  }
+
+  if (!user) {
+    return (
+      <div className="h-full flex items-center justify-center px-6 text-center">
+        <div>
+          <BookOpen className="w-10 h-10 text-ink-muted mx-auto mb-3" />
+          <div className="text-[16px] text-ink mb-1">Sign in to view your history</div>
+          <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
+        <div className="flex items-center justify-between mb-6">
+          <SectionTitle eyebrow="Your past readings" title="Tarot History" subtitle="Browse, bookmark & share your past tarot readings." />
+          <button
+            onClick={() => setSavedOnly(!savedOnly)}
+            className={cn("px-3 py-1.5 rounded-full text-[11px] border transition flex items-center gap-1.5 shrink-0", savedOnly ? "border-gold/30 bg-gold/10 text-gold" : "border-white/10 text-ink-muted hover:text-ink")}
+          >
+            {savedOnly ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
+            {savedOnly ? "Saved only" : "All"}
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="text-center py-12">
+            <Loader2 className="w-6 h-6 text-gold animate-spin mx-auto mb-2" />
+            <div className="text-[13px] text-ink-muted">Loading readings…</div>
+          </div>
+        ) : readings.length === 0 ? (
+          <ShellCard className="p-8 text-center">
+            <Sparkles className="w-8 h-8 text-ink-muted mx-auto mb-3" />
+            <div className="text-[14px] text-ink mb-1">{savedOnly ? "No saved readings yet" : "No readings yet"}</div>
+            <div className="text-[12px] text-ink-muted">{savedOnly ? "Bookmark readings you want to keep." : "Draw your first cards from the Tarot tab."}</div>
+          </ShellCard>
+        ) : (
+          <div className="space-y-2.5">
+            {readings.map((r) => {
+              const isExpanded = expanded === r.id;
+              let cards: any[] = [];
+              try { cards = JSON.parse(r.cardsJson); } catch {}
+              return (
+                <GlassCard key={r.id} className="overflow-hidden">
+                  {/* Header row */}
+                  <button
+                    onClick={() => setExpanded(isExpanded ? null : r.id)}
+                    className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition"
+                  >
+                    {/* Card thumbnails */}
+                    <div className="flex -space-x-2 shrink-0">
+                      {cards.slice(0, 3).map((c: any, i: number) => {
+                        const card = TAROT_DECK.find((t) => t.id === c.id);
+                        return (
+                          <div
+                            key={i}
+                            className={cn("w-8 h-12 rounded border border-white/10 bg-gradient-to-br from-surface to-surface-2 flex items-center justify-center text-sm", c.reversed && "rotate-180")}
+                            style={{ zIndex: 3 - i }}
+                          >
+                            {card?.symbol || "✦"}
+                          </div>
+                        );
+                      })}
+                      {cards.length > 3 && (
+                        <div className="w-8 h-12 rounded border border-white/10 bg-surface flex items-center justify-center text-[9px] text-ink-muted">
+                          +{cards.length - 3}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] text-ink truncate">{r.question}</div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <Pill className="text-[9px]">{r.spreadType}</Pill>
+                        <span className="text-[10px] text-ink-muted">{new Date(r.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+
+                    {/* Save + expand */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleSave(r.id); }}
+                        className={cn("p-1.5 rounded-full transition", r.saved ? "text-gold" : "text-ink-muted/40 hover:text-ink-muted")}
+                      >
+                        {r.saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                      </button>
+                      {isExpanded ? <ChevronDown className="w-4 h-4 text-ink-muted" /> : <ChevronRight className="w-4 h-4 text-ink-muted" />}
+                    </div>
+                  </button>
+
+                  {/* Expanded content */}
+                  {isExpanded && (
+                    <div className="px-4 pb-4 border-t border-white/5 pt-3 lum-anim-float-up">
+                      {/* Full cards */}
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {cards.map((c: any, i: number) => {
+                          const card = TAROT_DECK.find((t) => t.id === c.id);
+                          return (
+                            <div key={i} className="flex flex-col items-center">
+                              <div className={cn("w-12 h-18 rounded border border-gold/20 bg-gradient-to-br from-surface to-surface-2 flex items-center justify-center text-lg p-1", c.reversed && "rotate-180")} style={{ height: "72px" }}>
+                                {card?.symbol || "✦"}
+                              </div>
+                              <div className="text-[9px] text-ink mt-1 text-center max-w-[60px] truncate">{card?.nameShort}</div>
+                              {c.reversed && <div className="text-[8px] text-amber-400">℞</div>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {/* Interpretation */}
+                      <div className="lum-prose text-[13px] text-ink/85 leading-relaxed">
+                        <ReactMarkdown>{r.interpretation}</ReactMarkdown>
+                      </div>
+                      {/* Share */}
+                      <button
+                        onClick={() => shareReading(r)}
+                        className="mt-3 px-3 py-1.5 rounded-full text-[11px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1"
+                      >
+                        <Share2 className="w-3 h-3" /> Share this reading
+                      </button>
+                    </div>
+                  )}
+                </GlassCard>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -9,6 +9,7 @@ import { GlassCard, GoldButton, GhostButton, Pill, StarField } from "@/component
 import { AuthModal } from "@/components/auth-modal";
 import { ChatView } from "@/components/views/chat-view";
 import { TarotView } from "@/components/views/tarot-view";
+import { TarotHistoryView } from "@/components/views/tarot-history-view";
 import { BirthChartView } from "@/components/views/birth-chart-view";
 import { HoroscopeView } from "@/components/views/horoscope-view";
 import { TodayView } from "@/components/views/today-view";
@@ -34,6 +35,7 @@ const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean;
   { view: "today", label: "Today", icon: CalendarDays, needsAuth: true, group: "Daily" },
   { view: "chat", label: "Astrologer", icon: MessageCircle, needsAuth: true, group: "Daily" },
   { view: "tarot", label: "Tarot", icon: Sparkles, group: "Daily" },
+  { view: "tarot-history", label: "Tarot History", icon: BookOpen, needsAuth: true, group: "Daily" },
   { view: "horoscope", label: "Horoscope", icon: Moon, needsAuth: true, group: "Daily" },
   { view: "manifest", label: "Manifest", icon: Target, needsAuth: true, group: "Practice" },
   { view: "ritual", label: "Ritual", icon: Flame, needsAuth: true, group: "Practice" },
@@ -156,6 +158,7 @@ export function AppShell() {
                 {view === "today" && <TodayView onAuth={() => setAuthOpen(true)} />}
                 {view === "chat" && <ChatView onAuth={() => setAuthOpen(true)} />}
                 {view === "tarot" && <TarotView onAuth={() => setAuthOpen(true)} />}
+            {view === "tarot-history" && <TarotHistoryView onAuth={() => setAuthOpen(true)} />}
                 {view === "horoscope" && <HoroscopeView onAuth={() => setAuthOpen(true)} />}
                 {view === "manifest" && <ManifestView onAuth={() => setAuthOpen(true)} />}
                 {view === "ritual" && <RitualView onAuth={() => setAuthOpen(true)} />}

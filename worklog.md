@@ -342,3 +342,74 @@ Task: Verify round 4 work, add 7-day streak heatmap, framer-motion page transiti
 4. **Add Tarot history view** — browse past readings with save/bookmark
 5. **Add profile stats page** — lifetime totals, archetype insight, achievement-style badges
 6. **Add "share reading" feature** — Web Share API for tarot/astrologer readings (virality)
+
+---
+Task ID: 12 (webDevReview cron round 7)
+Agent: Orchestrator (Z.ai Code) — scheduled webDevReview
+Task: Verify round 6 files, add Tarot History view, Achievements system, QA
+
+## Current Project Status Assessment
+- Round 6 ended with infrastructure failure. Verified all round-6 files intact: activity API, profile-view, Share2 buttons in chat-view (2 matches) and tarot-view (2 matches).
+- Lint clean, 35 API routes, 16 views at start of round 7.
+
+## Completed Modifications This Round
+
+### 1. Tarot History View (new — `src/components/views/tarot-history-view.tsx`)
+- Browse past tarot readings with card thumbnails (mini cards with symbols)
+- Each reading shows question, spread type, date
+- **Save/bookmark** toggle (PATCH `/api/tarot/save?id=`)
+- "All" / "Saved only" filter toggle
+- Click to expand → shows full card images + interpretation + share button
+- Share via Web Share API with clipboard fallback
+- Empty states for no readings / no saved readings
+
+### 2. Tarot Save API (`src/app/api/tarot/save/route.ts`)
+- PATCH endpoint to toggle `saved` bookmark on a tarot reading
+
+### 3. Tarot History API update (`src/app/api/tarot/history/route.ts`)
+- Added `?saved=true` query param filter
+- Now returns `interpretation` field (was excluded before)
+- Increased take to 50
+
+### 4. Achievements System (`src/lib/achievements.ts`)
+- 20 achievement badges across 4 tiers (bronze/silver/gold/luminary)
+- Categories: Tarot (First Draw, Card Keeper, Cartomancer), Chat (First Question, Seeker, Confidant), Frequency (First Tone, Resonator), Manifest (First Intention, Manifestor), Ritual (First Ritual, Devoted), Mood (First Check-in, Self-Aware), Streak (3-day, Week Warrior, Monthly Devotee), Luck (First Fortune, Centurion, Luminary)
+- `evaluateAchievements(stats)` returns { unlocked, locked, total }
+- `tierColor()` helper for badge tier colors
+
+### 5. Achievements Section on Profile View
+- Added 20-badge grid to Profile view (4 cols mobile, 6 cols desktop)
+- Unlocked badges full color, locked badges grayscale + lock icon
+- "X/20" counter in header
+- Evaluates from lifetime stats fetched via activity API
+
+### Nav + Store Updates
+- Added `tarot-history` to AppView type
+- New nav item "Tarot History" (Daily group, BookOpen icon)
+- Added Lock icon import to profile-view
+
+## Verification Results (agent-browser)
+- ✅ Tarot History view renders: shows 3 past readings with card thumbnails (🜂🜁🜃), "All" filter, dates
+- ✅ Profile achievements section renders: "0/20" counter, badge grid with 🃏🎴🔮 (locked, grayscale)
+- ✅ Login flow works (94 Luck balance)
+- ✅ Lint clean, no TypeScript errors
+- ✅ 36 API routes, 17 views
+- Screenshots: qa-r7-tarot-history.png, qa-r7-profile-achievements.png
+
+## Infrastructure Notes
+- Dev server still dies between Bash tool calls. Worked around by combining server start + login + navigation in single commands (max 75s timeout).
+- No MCP frame limit issues this round (kept commands focused).
+
+## Unresolved Issues / Risks
+1. **Dev server persistence** — still requires manual restart each round. Not a code issue.
+2. **Achievement unlock notifications** — currently badges just appear in the grid; no toast/celebration when a new badge is unlocked.
+3. **Mobile responsive audit** — still pending. All views use responsive classes but untested at 375px.
+4. **Socket.io reminder mini-service** — not yet built.
+
+## Priority Recommendations for Next Phase
+1. **Achievement unlock celebration** — toast + confetti animation when a new badge unlocks
+2. **Mobile responsive audit** — test all 17 views at 375px width, fix overflow
+3. **Add socket.io reminder mini-service** — goal reminder times on port 3003
+4. **Add "Today's recommended practice"** — personalized suggestion on Today dashboard based on streak + last activity
+5. **Add conversation search** — search past astrologer chats by keyword
+6. **Add dark/light theme toggle** — currently forced dark, but user may want the Luminary warm theme

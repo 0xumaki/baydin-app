@@ -12,6 +12,7 @@ export type AppView =
   | "today"        // Daily dashboard (card-of-day, horoscope, mood, ritual, manifest)
   | "chat"          // ChatGPT-style astrologer chat
   | "tarot"         // Tarot reader (free)
+  | "tarot-history" // Past tarot readings with save/bookmark
   | "birth-chart"   // Natal chart tool
   | "horoscope"     // Daily/weekly horoscope
   | "manifest"     // Manifestation goals + confirmations (free, daily-use)

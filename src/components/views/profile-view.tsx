@@ -6,8 +6,9 @@ import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import {
   BarChart3, Sparkles, MessageCircle, Moon, Target, Flame, Wallet,
-  Star, Heart, TrendingUp, Calendar, Award, Zap, Gift, Users, BookOpen,
+  Star, Heart, TrendingUp, Calendar, Award, Zap, Gift, Users, BookOpen, Lock,
 } from "lucide-react";
+import { ACHIEVEMENTS, evaluateAchievements, tierColor } from "@/lib/achievements";
 
 export function ProfileView({ onAuth }: { onAuth: () => void }) {
   const { data } = useMe();
@@ -132,6 +133,36 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
                     {(day?.total ?? 0) === 0 && <span className="text-[10px] text-ink-muted/40">No activity</span>}
                   </div>
                   <span className="text-[10px] text-ink-muted/60 w-8 text-right">{day?.total ?? 0}</span>
+                </div>
+              );
+            })}
+          </div>
+        </GlassCard>
+
+        {/* Achievements */}
+        <GlassCard className="p-5 mb-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Award className="w-3.5 h-3.5 text-gold" />
+              <span className="text-[12px] text-ink-muted">Achievements</span>
+            </div>
+            <span className="text-[11px] text-gold">
+              {totals ? evaluateAchievements({ tarot: totals.tarot, chat: totals.chat, frequency: totals.frequency, manifest: totals.manifest, ritual: totals.ritual, mood: totals.mood, streak: user.streak, luckEarned: totals.luckEarned }).unlocked.length : 0}/{ACHIEVEMENTS.length}
+            </span>
+          </div>
+          <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+            {ACHIEVEMENTS.map((a) => {
+              const unlocked = totals ? a.check({ tarot: totals.tarot, chat: totals.chat, frequency: totals.frequency, manifest: totals.manifest, ritual: totals.ritual, mood: totals.mood, streak: user.streak, luckEarned: totals.luckEarned }) : false;
+              const color = tierColor(a.tier);
+              return (
+                <div
+                  key={a.id}
+                  className={cn("flex flex-col items-center gap-1 p-2 rounded-lg border text-center transition", unlocked ? "border-white/10 bg-white/[0.03]" : "border-white/5 bg-white/[0.01] opacity-40")}
+                  title={`${a.name} — ${a.description}`}
+                >
+                  <div className="text-xl" style={{ filter: unlocked ? "none" : "grayscale(1)" }}>{a.icon}</div>
+                  <div className="text-[8px] text-ink-muted leading-tight">{a.name}</div>
+                  {!unlocked && <Lock className="w-2.5 h-2.5 text-ink-muted/50" />}
                 </div>
               );
             })}
