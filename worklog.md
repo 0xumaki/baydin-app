@@ -1243,3 +1243,35 @@ Task: Add Gochar (transit predictions) + Prashna (horary astrology), git push
 ## Current App State (62 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with Gochar + Prashna + all prior features.
+
+---
+Task ID: 37 (webDevReview cron round 33)
+Agent: Orchestrator (Z.ai Code)
+Task: Add auspicious activities widget + Prashna modal in chat view, git push
+
+## Completed Modifications
+
+### 1. Auspicious Activities Widget
+- `GET /api/auspicious` — 10 activity recommendations based on Panchanga
+  Marriage, New Business, Travel, Property, Spiritual, Education, Medical, Grooming, Legal, Investment
+  Color-coded: green (favorable), red (avoid), white (neutral)
+  Each with note explaining the reasoning
+  Summary counts (favorable/avoid/neutral)
+- Widget on Today dashboard showing all activities in a 2-column grid
+
+### 2. Prashna Modal in Chat View
+- HelpCircle button in chat header opens a Prashna (horary) modal
+- User types a Yes/No question, presses Enter or clicks "Ask the stars"
+- Animated answer display: large colored circle (✓ green=Yes, ✕ red=No, ? gold=Maybe)
+- Confidence score (55-95%)
+- Reasoning text (Moon's house from Lagna, nakshatra lord, Moon-Sun relationship)
+- Timing prediction (days to outcome)
+- Chart details grid (Lagna sign, Moon sign, Nakshatra, Nakshatra Lord)
+- "Ask another question" button to reset
+
+### 3. Git Push
+- 63 API routes, 17 views, lint clean
+
+## Current App State (63 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with Prashna + auspicious activities + all prior features.
