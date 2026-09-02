@@ -6,7 +6,7 @@ import { GlassCard, GoldButton, GhostButton, Pill } from "@/components/lumina/pr
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { useMe, api } from "@/lib/api-client";
-import { MessageSquare, Send, Sparkles, Plus, Clock, ChevronDown, Star, Moon, Sun, Heart, Download } from "lucide-react";
+import { MessageSquare, Send, Sparkles, Plus, Clock, ChevronDown, Star, Moon, Sun, Heart, Download, Share2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
@@ -67,6 +67,23 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
     setActiveConversation(res.conversation.id);
     qc.invalidateQueries({ queryKey: ["conversations"] });
     return res.conversation.id;
+  }
+
+  async function shareLastReading() {
+    const last = messages.filter((m) => m.role === "assistant").pop();
+    if (!last) { toast.error("No reading to share yet"); return; }
+    const text = last.content.slice(0, 500) + (last.content.length > 500 ? "…" : "");
+    const shareData = {
+      title: "My Baydin Astrologer Reading",
+      text: text.replace(/[#*_`]/g, "").slice(0, 280),
+      url: window.location.origin,
+    };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch {}
+    } else {
+      await navigator.clipboard.writeText(shareData.text + "\n\n" + shareData.url);
+      toast.success("Reading copied to clipboard — share it anywhere ✦");
+    }
   }
 
   async function send(text: string) {
@@ -154,13 +171,22 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
             <Pill className="text-[10px] text-amber-400/80 border-amber-400/20 bg-amber-400/5">Add birth data in profile →</Pill>
           )}
           {activeConversationId && messages.length > 0 && (
-            <button
-              onClick={() => window.open(`/api/conversations/${activeConversationId}/export`, "_blank")}
-              className="px-2 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1"
-              title="Download this consultation as markdown"
-            >
-              <Download className="w-3 h-3" /> Export
-            </button>
+            <>
+              <button
+                onClick={() => shareLastReading()}
+                className="px-2 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1"
+                title="Share this consultation"
+              >
+                <Share2 className="w-3 h-3" /> Share
+              </button>
+              <button
+                onClick={() => window.open(`/api/conversations/${activeConversationId}/export`, "_blank")}
+                className="px-2 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1"
+                title="Download this consultation as markdown"
+              >
+                <Download className="w-3 h-3" /> Export
+              </button>
+            </>
           )}
         </div>
       </div>

@@ -19,6 +19,7 @@ import { LifeReportView } from "@/components/views/life-report-view";
 import { FrequencyView } from "@/components/views/frequency-view";
 import { PositivityView } from "@/components/views/positivity-view";
 import { CompatibilityView } from "@/components/views/compatibility-view";
+import { ProfileView } from "@/components/views/profile-view";
 import { LuckStoreView } from "@/components/views/luck-store-view";
 import { ResellerView } from "@/components/views/reseller-view";
 import { AdminView } from "@/components/views/admin-view";
@@ -26,7 +27,7 @@ import { ProfileSheet } from "@/components/profile-sheet";
 import {
   Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
   Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
-  Waves, Heart, Users, Flame,
+  Waves, Heart, Users, Flame, BarChart3,
 } from "lucide-react";
 
 const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group?: string }[] = [
@@ -43,6 +44,7 @@ const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean;
   { view: "compatibility", label: "Compatibility", icon: Users, needsAuth: true, group: "Astrology" },
   { view: "life-report", label: "Life Report", icon: BookOpen, needsAuth: true, group: "Astrology" },
   { view: "luck-store", label: "Buy Luck", icon: Wallet, needsAuth: true, group: "Account" },
+  { view: "profile", label: "Profile & Stats", icon: BarChart3, needsAuth: true, group: "Account" },
   { view: "reseller", label: "Reseller", icon: Store, resellerOnly: true, needsAuth: true, group: "Account" },
   { view: "admin", label: "Admin", icon: Shield, adminOnly: true, needsAuth: true, group: "Account" },
 ];
@@ -164,6 +166,7 @@ export function AppShell() {
                 {view === "compatibility" && <CompatibilityView onAuth={() => setAuthOpen(true)} />}
                 {view === "life-report" && <LifeReportView onAuth={() => setAuthOpen(true)} />}
                 {view === "luck-store" && <LuckStoreView onAuth={() => setAuthOpen(true)} />}
+            {view === "profile" && <ProfileView onAuth={() => setAuthOpen(true)} />}
                 {view === "reseller" && <ResellerView onAuth={() => setAuthOpen(true)} />}
                 {view === "admin" && <AdminView />}
               </motion.div>

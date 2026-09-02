@@ -22,6 +22,7 @@ export type AppView =
   | "compatibility" // Partner matching (Ashtakoota + synastry)
   | "life-report"   // 7-section comprehensive report
   | "luck-store"    // Buy Luck
+  | "profile"       // Stats, achievements, lifetime totals
   | "reseller"      // Reseller portal (whitelist-gated)
   | "admin";        // Admin panel (admin-gated)
 

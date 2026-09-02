@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { GlassCard, GoldButton, Pill, SectionTitle } from "@/components/lumina/primitives";
 import { cn } from "@/lib/utils";
 import { useMe, api } from "@/lib/api-client";
-import { Sparkles, RefreshCw, Shuffle, Eye, Wallet, Star } from "lucide-react";
+import { Sparkles, RefreshCw, Shuffle, Eye, Wallet, Star, Share2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
@@ -101,9 +101,25 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
               ))}
             </div>
             <GlassCard className="p-5 lum-prose">
-              <div className="flex items-center gap-2 mb-3">
-                <Star className="w-4 h-4 text-gold" />
-                <span className="text-[12px] text-gold uppercase tracking-wide">The Reading</span>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-gold" />
+                  <span className="text-[12px] text-gold uppercase tracking-wide">The Reading</span>
+                </div>
+                <button
+                  onClick={async () => {
+                    const text = reading.interpretation.replace(/[#*_`]/g, "").slice(0, 280);
+                    if (navigator.share) {
+                      try { await navigator.share({ title: "My Baydin Tarot Reading", text, url: window.location.origin }); } catch {}
+                    } else {
+                      await navigator.clipboard.writeText(text + "\n\n" + window.location.origin);
+                      toast.success("Reading copied to clipboard ✦");
+                    }
+                  }}
+                  className="px-2.5 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1"
+                >
+                  <Share2 className="w-3 h-3" /> Share
+                </button>
               </div>
               <ReactMarkdown>{reading.interpretation}</ReactMarkdown>
             </GlassCard>
