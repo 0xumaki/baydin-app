@@ -1000,3 +1000,45 @@ D-40 (Khavedamsa), D-45 (Akshavedamsa), D-60 (Shashtiamsa)
 ## Current App State (50 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 **Complete Vedic astrology platform**: 16 Shodasavarga divisional charts + Solar Return + Yoga detection + Mantra recommendations + Gemstone recommendations + Nakshatra + Muhurta + Transits + Moon phase + Lucky numbers + Panchanga + Vimshottari Dasha + Mahabote + Compatibility (Ashtakoota) + all prior features
+
+---
+Task ID: 30 (webDevReview cron round 26)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Ashtakavarga (337 bindus) + Shadbala (6-fold planetary strength), git push
+
+## Completed Modifications
+
+### 1. Ashtakavarga (8-fold bindu system)
+- `computeAshtakavarga()` — BAV (Bhinnashtakavarga) per planet + SAV (Sarvashtakavarga) totals
+- 7 planets each contribute bindus to 12 signs based on classical friendship tables
+- Ascendant (Lagna) contributes as the 8th factor
+- Total 337 bindus across all signs
+- Strong signs (>28 bindus) highlighted in green, weak (<25) in red
+- Displayed on birth-chart view with 12-sign grid + strong/weak lists
+
+### 2. Shadbala (6-fold planetary strength)
+- `computeShadbala()` — computes all 6 strengths for each planet:
+  1. Sthana Bala (positional) — based on degree in sign
+  2. Dig Bala (directional) — based on house placement (best house per planet)
+  3. Kala Bala (temporal) — day/night birth favorability
+  4. Chesta Bala (motional) — retrograde vs direct
+  5. Naisargika Bala (innate) — fixed per planet (Sun/Moon strongest, Saturn weakest)
+  6. Drik Bala (aspectual) — benefic/malefic aspects
+- Total in Shashtiamsas + Rasis with strength rating (excellent/good/average/weak)
+- Displayed on birth-chart view with 6-column grid per planet + strength badge
+
+### 3. Git Push
+- Committed and pushed to https://github.com/0xumaki/baydin-app
+- 50 API routes, 17 views, lint clean
+
+## Current App State (50 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+**Complete Vedic astrology engine**:
+- 16 Shodasavarga divisional charts + Solar Return
+- Ashtakavarga (337 bindus, BAV + SAV)
+- Shadbala (6-fold planetary strength)
+- Yoga detection (7 classical yogas)
+- Vimshottari Dasha (120-year timeline)
+- Mantra + Gemstone + Nakshatra + Muhurta + Transits + Moon phase + Lucky numbers
+- Ashtakoota compatibility + Mahabote + Panchanga
+Plus: streaming astrologer (Gemini), tarot, frequencies, positivity, manifest, ritual, Luck economy, achievements, reseller, admin
