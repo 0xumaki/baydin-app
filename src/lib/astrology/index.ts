@@ -1123,6 +1123,90 @@ export function computeTrimsamsa(natal: NatalChart): { planets: { name: string; 
 }
 
 /**
+ * Compute Khavedamsa (D-40) divisional chart — auspicious & inauspicious effects.
+ * Each sign divided into 40 parts of 0°45' each.
+ * Odd signs start from Aries (0); even signs start from Libra (6).
+ */
+export function computeKhavedamsa(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  function d40Sign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const pada = Math.floor(degreeInSign / 0.75); // 0-39
+    const startSign = signIdx % 2 === 0 ? 0 : 6;
+    return (startSign + pada) % 12;
+  }
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: d40Sign(p.longitude),
+    sign: ZODIAC_SIGNS[d40Sign(p.longitude)],
+  }));
+  const ascSign = d40Sign(natal.ascendant.longitude);
+  return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
+}
+
+/**
+ * Compute Akshavedamsa (D-45) divisional chart — all general matters & overall well-being.
+ * Each sign divided into 45 parts.
+ * Based on the 5 elements (Mars/Saturn/Jupiter/Mercury/Venus) with odd/even sign rules.
+ */
+export function computeAkshavedamsa(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  const lordSigns: Record<string, number> = { Mars: 0, Saturn: 10, Jupiter: 8, Mercury: 2, Venus: 6 };
+  const oddLords = ["Mars", "Saturn", "Jupiter", "Mercury", "Venus"];
+  const evenLords = ["Venus", "Mercury", "Jupiter", "Saturn", "Mars"];
+
+  function d45Sign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const isOdd = signIdx % 2 === 0;
+    // 9 parts per lord (45/5 = 9), each 0°40'
+    const segmentSize = 30 / 45; // 0.666...°
+    const pada = Math.floor(degreeInSign / (segmentSize * 9)); // 0-4 (which lord)
+    const lords = isOdd ? oddLords : evenLords;
+    const lord = lords[pada];
+    return lordSigns[lord];
+  }
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: d45Sign(p.longitude),
+    sign: ZODIAC_SIGNS[d45Sign(p.longitude)],
+  }));
+  const ascSign = d45Sign(natal.ascendant.longitude);
+  return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
+}
+
+/**
+ * Compute Shashtiamsa (D-60) divisional chart — karma from past lives & all hidden matters.
+ * Each sign divided into 60 parts of 0°30' each.
+ * The D-60 sign is determined by the planet's position within its sign, counted from the same sign.
+ */
+export function computeShashtiamsa(natal: NatalChart): { planets: { name: string; signIndex: number; sign: string }[]; ascendant: { signIndex: number; sign: string } } {
+  // D-60 has 60 parts. Each part maps to a specific sign based on classical rules.
+  // Simplified: first 30 parts start from the same sign, next 30 count in reverse.
+  function d60Sign(longitude: number): number {
+    const l = rev(longitude);
+    const signIdx = Math.floor(l / 30);
+    const degreeInSign = l - signIdx * 30;
+    const pada = Math.floor(degreeInSign / 0.5); // 0-59
+    // First 30 parts: count forward from the sign
+    // Next 30 parts: count backward from the sign
+    if (pada < 30) {
+      return (signIdx + pada) % 12;
+    } else {
+      return (signIdx - (pada - 30) + 12 * 5) % 12;
+    }
+  }
+  const planets = natal.planets.map((p) => ({
+    name: p.name,
+    signIndex: d60Sign(p.longitude),
+    sign: ZODIAC_SIGNS[d60Sign(p.longitude)],
+  }));
+  const ascSign = d60Sign(natal.ascendant.longitude);
+  return { planets, ascendant: { signIndex: ascSign, sign: ZODIAC_SIGNS[ascSign] } };
+}
+
+/**
  * Compute Solar Return (Varshaphal) chart — the year ahead.
  * Finds the moment when transit Sun returns to its natal longitude,
  * then casts a chart for that instant.

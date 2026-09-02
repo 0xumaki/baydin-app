@@ -5,7 +5,7 @@ import { GlassCard, GoldButton, Pill, SectionTitle } from "@/components/lumina/p
 import { useMe, api } from "@/lib/api-client";
 import { Star, Wallet, Sparkles, MapPin, Sun } from "lucide-react";
 import { toast } from "sonner";
-import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn, computeShodasamsa, computeVimsamsa, computeChaturvimsamsa, computeTrimsamsa } from "@/lib/astrology";
+import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn, computeShodasamsa, computeVimsamsa, computeChaturvimsamsa, computeTrimsamsa, computeKhavedamsa, computeAkshavedamsa, computeShashtiamsa } from "@/lib/astrology";
 
 const PLANET_SYMBOLS: Record<string, string> = {
   Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
@@ -427,6 +427,75 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
             })()}
           </div>
           <div className="text-[10px] text-ink-muted/60 mt-1">D-30 shows challenges, hidden forces & areas of potential difficulty to transform.</div>
+        </GlassCard>
+      )}
+
+      {/* Khavedamsa (D-40) — auspicious/inauspicious */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Khavedamsa (D-40) — Auspicious & Inauspicious Effects
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(() => {
+              const d40 = computeKhavedamsa(c);
+              return d40.planets.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="text-[10px] text-ink-muted/60 mt-1">D-40 reveals overall auspicious and inauspicious patterns in life.</div>
+        </GlassCard>
+      )}
+
+      {/* Akshavedamsa (D-45) — general well-being */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Akshavedamsa (D-45) — General Well-being
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(() => {
+              const d45 = computeAkshavedamsa(c);
+              return d45.planets.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="text-[10px] text-ink-muted/60 mt-1">D-45 indicates all general matters and overall life well-being.</div>
+        </GlassCard>
+      )}
+
+      {/* Shashtiamsa (D-60) — past karma */}
+      {mode === "vedic" && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-gold" />
+            Shashtiamsa (D-60) — Past Life Karma
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(() => {
+              const d60 = computeShashtiamsa(c);
+              return d60.planets.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
+                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="text-[10px] text-ink-muted/60 mt-1">D-60 reveals karma from past lives & all hidden matters. The most important chart after D-1.</div>
         </GlassCard>
       )}
 
