@@ -1452,3 +1452,33 @@ Task: Add Vedic Argala + today's detailed aspects, git push
 ## Current App State (72 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with Argala + aspects + all prior features.
+
+---
+Task ID: 44 (webDevReview cron round 40)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Ishta Devata + spiritual practice recommendations, git push
+
+## Completed Modifications
+
+### 1. Ishta Devata (Personal Deity)
+- `GET /api/ishta-devata` — determines the user's personal deity for spiritual liberation
+  Based on 12th house from Moon in D-1 (Rasi) and D-9 (Navamsa) charts
+  7 planet-deity mappings with mantra, worship form, description, color
+  Navamsa cross-confirmation (D-9 confirms or differs from D-1)
+  Nakshatra Devata: 27 nakshatras mapped to their ruling deities (Ashwini Kumaras, Yama, Agni, Brahma, etc.)
+
+### 2. Today's Spiritual Practice
+- `GET /api/spiritual-practice` — personalized daily spiritual practice
+  Based on weekday lord + Moon nakshatra + Nadi dosha
+  Morning (Brahma Muhurta 4:24-6:00 AM): weekday-specific practice + mantra
+    Includes Gayatri Mantra for Sunday, Om Namah Shivaya for Monday, Hanuman Chalisa for Tuesday, etc.
+  Afternoon (Sandhya - sunrise/sunset): nakshatra deity meditation
+  Evening (dusk): Nadi-specific practice (Vata grounding / Pitta cooling / Kapha stimulation)
+  Daily activity + charity recommendations per weekday
+
+### 3. Git Push
+- 74 API routes, 17 views, lint clean
+
+## Current App State (74 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with Ishta Devata + spiritual practice + all prior features.
