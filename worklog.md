@@ -1422,3 +1422,33 @@ Task: Add Vedic Drishti (planetary aspects) computation, git push
 ## Current App State (70 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Milestone: 70 API routes! Complete Vedic astrology platform with Drishti + all prior features.
+
+---
+Task ID: 43 (webDevReview cron round 39)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Vedic Argala + today's detailed aspects, git push
+
+## Completed Modifications
+
+### 1. Vedic Argala (Planetary Interventions)
+- `GET /api/argala` — analyzes Argala (support/blockage) for all planets + Lagna
+  Primary Argala (support): planets in 2nd, 4th, 11th from target
+  Vipreet Argala (blockage): planets in 12th, 10th, 3rd from target
+  Net effect: supported / blocked / mixed / clean
+  Benefic/malefic distinction per intervening planet
+  Lagna (Ascendant) Argala analysis included
+
+### 2. Today's Detailed Planetary Aspects
+- `GET /api/aspects-today` — transit-to-natal aspect analysis
+  Aspect types: Conjunction, Trine (120°), Sextile (60°), Opposition (180°), Quincunx (150°)
+  Benefic/malefic/neutral classification per transit planet
+  10 life areas mapped per natal planet (vitality, emotions, career, etc.)
+  Summary: favorable/challenging/balanced period
+  Sorted: conjunctions first, then by orb
+
+### 3. Git Push
+- 72 API routes, 17 views, lint clean
+
+## Current App State (72 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Complete Vedic astrology platform with Argala + aspects + all prior features.
