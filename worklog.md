@@ -1176,3 +1176,36 @@ Task: Add 7-day weekly forecast + Shraaddha (ancestral rites), git push
 ## Current App State (58 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Complete Vedic astrology platform with weekly forecast + Shraaddha + all prior features.
+
+---
+Task ID: 35 (webDevReview cron round 31)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Vedic marriage matching + Varshaphal year-ahead summary, git push
+
+## Completed Modifications
+
+### 1. Vedic Marriage Matching (beyond Ashtakoota)
+- `GET /api/marriage-match` — 4 additional marriage compatibility checks:
+  1. **Mahendra** — favorable nakshatras for progeny and marriage longevity
+  2. **Vedha** — nakshatra pairs that obstruct (should avoid for marriage)
+  3. **Rajju** — same-Rajju type incompatibility (5 Rajju types)
+  4. **Stree-Deergha** — Moon sign distance requirement (7+ signs)
+- Shows favorable and unfavorable nakshatras for each check
+- Widget on Today dashboard
+
+### 2. Varshaphal (Year Ahead) Summary
+- `GET /api/varshaphal` — current solar year analysis
+  Muntha (progressed ascendant that moves 1 sign/year)
+  Muntha Lord (lord of the Muntha sign)
+  Year Lord (simplified: = Muntha Lord)
+  Muntha effects per sign (12 signs with descriptions)
+  Age-based themes (formative/productive/wisdom/reflection years)
+  Solar Return Sun sign + return date
+- Widget on Today dashboard with age circle, Muntha sign, year lord, themes
+
+### 3. Git Push
+- 60 API routes, 17 views, lint clean
+
+## Current App State (60 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+Milestone: 60 API routes! Complete Vedic astrology + tarot + daily practice platform.
