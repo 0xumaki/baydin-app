@@ -32,6 +32,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [nakshatra, setNakshatra] = React.useState<any>(null);
   const [mantras, setMantras] = React.useState<any>(null);
   const [yogas, setYogas] = React.useState<any>(null);
+  const [tithi, setTithi] = React.useState<any>(null);
+  const [namkaran, setNamkaran] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -58,6 +60,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/mantra").then((r) => r.json()).then((d) => { setMantras(d.mantras); }).catch(() => {});
     // Load yogas
     fetch("/api/yogas").then((r) => r.json()).then((d) => { setYogas(d.yogas); }).catch(() => {});
+    // Load today's tithi
+    fetch("/api/tithi").then((r) => r.json()).then((d) => { setTithi(d.tithi); }).catch(() => {});
+    // Load namkaran (naming suggestions)
+    fetch("/api/namkaran").then((r) => r.json()).then((d) => { setNamkaran(d.namkaran); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -268,6 +274,30 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               </GlassCard>
             )}
 
+            {/* Namkaran (naming suggestions) */}
+            {namkaran && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-4 h-4 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Namkaran — Name Suggestions</span>
+                </div>
+                <div className="text-[11px] text-ink-muted mb-2">
+                  Based on {namkaran.nakshatra} pada {namkaran.pada}
+                </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-[10px] text-ink-muted">Starting letters:</span>
+                  {namkaran.startingLetters.map((l: string, i: number) => (
+                    <span key={i} className={cn("px-2 py-0.5 rounded-full text-[10px] border", i === namkaran.pada - 1 ? "border-gold/30 bg-gold/10 text-gold" : "border-white/5 text-ink-muted")}>{l}</span>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {namkaran.sampleNames.map((n: string, i: number) => (
+                    <span key={i} className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/5 text-[11px] text-ink">{n}</span>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
             {/* Manifest confirmations */}
             <GlassCard className="p-5">
               <div className="flex items-center justify-between mb-3">
@@ -380,6 +410,16 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                   <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Today's Nakshatra</div>
                   <div className="text-[13px] text-ink">{nakshatra.name} <span className="text-[10px] text-gold">pada {nakshatra.pada}</span></div>
                   <div className="text-[10px] text-ink-muted">Lord: {nakshatra.lord} · Deity: {nakshatra.deity}</div>
+                </div>
+              </GlassCard>
+            )}
+            {tithi && (
+              <GlassCard className="p-4 flex items-center gap-3">
+                <div className="text-2xl">{tithi.special?.includes("Full") ? "🌕" : tithi.special?.includes("New") ? "🌑" : tithi.special?.includes("Ekadashi") ? "🕉" : "📅"}</div>
+                <div className="flex-1">
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Today's Tithi</div>
+                  <div className="text-[13px] text-ink">{tithi.name}</div>
+                  <div className="text-[10px] text-ink-muted">{tithi.paksha}{tithi.special ? ` · ${tithi.special}` : ""}</div>
                 </div>
               </GlassCard>
             )}
