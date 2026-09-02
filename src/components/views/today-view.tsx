@@ -24,6 +24,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [goals, setGoals] = React.useState<any[]>([]);
   const [loadingCard, setLoadingCard] = React.useState(false);
   const [activity, setActivity] = React.useState<any[]>([]);
+  const [lucky, setLucky] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -34,6 +35,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/manifest/goals").then((r) => r.json()).then((d) => setGoals(d.goals || [])).catch(() => {});
     // Load 7-day activity from multi-source activity API
     fetch("/api/activity").then((r) => r.json()).then((d) => { setActivity(d.days || []); }).catch(() => {});
+    // Load lucky numbers
+    fetch("/api/lucky").then((r) => r.json()).then((d) => { setLucky(d.lucky); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -215,6 +218,33 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 {activity.reduce((sum: number, d: any) => sum + (d?.total ?? 0), 0)} actions this week
               </div>
             </GlassCard>
+
+            {/* Today's lucky numbers */}
+            {lucky && (
+              <GlassCard className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-3.5 h-3.5 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Luck</span>
+                </div>
+                <div className="flex items-center gap-2 mb-3">
+                  {lucky.numbers.map((n: number, i: number) => (
+                    <div key={i} className="w-9 h-9 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-gold/30 flex items-center justify-center text-[15px] font-light text-gold">
+                      {n}
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div>
+                    <div className="text-[9px] uppercase tracking-wide text-ink-muted">Color</div>
+                    <div className="text-gold">{lucky.color}</div>
+                  </div>
+                  <div>
+                    <div className="text-[9px] uppercase tracking-wide text-ink-muted">Time</div>
+                    <div className="text-ink">{lucky.time}</div>
+                  </div>
+                </div>
+              </GlassCard>
+            )}
 
             {/* Deep dive upsell */}
             <ShellCard className="p-4">
