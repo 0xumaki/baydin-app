@@ -34,6 +34,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [yogas, setYogas] = React.useState<any>(null);
   const [tithi, setTithi] = React.useState<any>(null);
   const [namkaran, setNamkaran] = React.useState<any>(null);
+  const [yadaya, setYadaya] = React.useState<any>(null);
+  const [yogaToday, setYogaToday] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -64,6 +66,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/tithi").then((r) => r.json()).then((d) => { setTithi(d.tithi); }).catch(() => {});
     // Load namkaran (naming suggestions)
     fetch("/api/namkaran").then((r) => r.json()).then((d) => { setNamkaran(d.namkaran); }).catch(() => {});
+    // Load yadaya (remedial measures)
+    fetch("/api/yadaya").then((r) => r.json()).then((d) => { setYadaya(d.yadaya); }).catch(() => {});
+    // Load today's yoga
+    fetch("/api/yoga-today").then((r) => r.json()).then((d) => { setYogaToday(d.yoga); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -298,6 +304,34 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               </GlassCard>
             )}
 
+            {/* Yadaya (remedial measures) */}
+            {yadaya?.remedies?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Yadaya — Remedies</span>
+                  </div>
+                  <span className="text-[10px] text-gold">{yadaya.count} needed</span>
+                </div>
+                <div className="space-y-2">
+                  {yadaya.remedies.slice(0, 3).map((r: any, i: number) => (
+                    <div key={i} className="p-2.5 rounded-lg bg-white/[0.02]">
+                      <div className="text-[12px] text-gold font-medium mb-0.5">{r.planet}</div>
+                      <div className="text-[10px] text-ink-muted mb-1.5">{r.problem}</div>
+                      <div className="grid grid-cols-2 gap-1">
+                        {r.remedies.map((rem: any, j: number) => (
+                          <div key={j} className="text-[9px] text-ink-muted">
+                            <span className="text-gold/70">{rem.type}:</span> {rem.detail}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
             {/* Manifest confirmations */}
             <GlassCard className="p-5">
               <div className="flex items-center justify-between mb-3">
@@ -420,6 +454,17 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                   <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Today's Tithi</div>
                   <div className="text-[13px] text-ink">{tithi.name}</div>
                   <div className="text-[10px] text-ink-muted">{tithi.paksha}{tithi.special ? ` · ${tithi.special}` : ""}</div>
+                </div>
+              </GlassCard>
+            )}
+            {yogaToday && (
+              <GlassCard className="p-4 flex items-center gap-3">
+                <div className="text-2xl">{yogaToday.nature?.includes("Auspicious") ? "✦" : yogaToday.nature?.includes("Inauspicious") ? "⚠" : "◇"}</div>
+                <div className="flex-1">
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Today's Yoga</div>
+                  <div className="text-[13px] text-ink">{yogaToday.name} <span className="text-[10px] text-ink-muted">#{yogaToday.number}/27</span></div>
+                  <div className={cn("text-[10px]", yogaToday.nature?.includes("Auspicious") ? "text-leaf" : yogaToday.nature?.includes("Inauspicious") ? "text-destructive/70" : "text-ink-muted")}>{yogaToday.nature}</div>
+                  <div className="text-[9px] text-ink-muted/60 mt-0.5">{yogaToday.effect}</div>
                 </div>
               </GlassCard>
             )}
