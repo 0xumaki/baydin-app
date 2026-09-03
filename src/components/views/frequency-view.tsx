@@ -21,48 +21,55 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
   const synthRef = React.useRef<any>(null);
   const intervalRef = React.useRef<any>(null);
 
-  // Dynamic import Tone.js only on client
+  // Dynamic import Tone.js only on client — with proper error handling
   async function startTone() {
     if (!user) { onAuth(); return; }
     if (playing) return;
-    const Tone = (await import("tone")).default;
-    await Tone.start();
-    // Create synth based on mode
-    if (synthRef.current) { synthRef.current.dispose(); synthRef.current = null; }
-    if (mode === "pure") {
-      synthRef.current = new Tone.Oscillator(selected.hz, "sine").toDestination();
-      synthRef.current.volume.value = muted ? -Infinity : -12;
-      synthRef.current.start();
-    } else if (mode === "binaural") {
-      // Two oscillators, slightly detuned (binaural beat)
-      const left = new Tone.Oscillator(selected.hz, "sine");
-      const right = new Tone.Oscillator(selected.hz + 4, "sine");
-      const merger = new Tone.Merge().toDestination();
-      left.connect(merger, 0, 0);
-      right.connect(merger, 0, 1);
-      left.volume.value = muted ? -Infinity : -14;
-      right.volume.value = muted ? -Infinity : -14;
-      synthRef.current = { dispose: () => { left.dispose(); right.dispose(); merger.dispose(); }, setVolume: (v: number) => { left.volume.value = v; right.volume.value = v; } };
-      left.start(); right.start();
-    } else {
-      // pad — ambient polyphonic
-      synthRef.current = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sine" }, envelope: { attack: 2, decay: 1, sustain: 0.8, release: 4 } }).toDestination();
-      synthRef.current.volume.value = muted ? -Infinity : -16;
-      // Play a chord around the frequency
-      const notes = [`${selected.hz}`, `${selected.hz * 1.5}`, `${selected.hz * 2}`].map((f) => Tone.Frequency(f).toNote());
-      synthRef.current.triggerAttack(notes);
-      synthRef.current._notes = notes;
-    }
-    setPlaying(true);
-    // Timer
-    const start = Date.now();
-    intervalRef.current = setInterval(() => {
-      const e = Math.floor((Date.now() - start) / 1000);
-      setElapsed(e);
-      if (e >= duration) {
-        stopTone(true);
+    try {
+      const Tone = (await import("tone")).default;
+      await Tone.start();
+      // Create synth based on mode
+      if (synthRef.current) { synthRef.current.dispose(); synthRef.current = null; }
+      if (mode === "pure") {
+        synthRef.current = new Tone.Oscillator(selected.hz, "sine").toDestination();
+        synthRef.current.volume.value = muted ? -Infinity : -12;
+        synthRef.current.start();
+      } else if (mode === "binaural") {
+        // Two oscillators, slightly detuned (binaural beat)
+        const left = new Tone.Oscillator(selected.hz, "sine");
+        const right = new Tone.Oscillator(selected.hz + 4, "sine");
+        const merger = new Tone.Merge().toDestination();
+        left.connect(merger, 0, 0);
+        right.connect(merger, 0, 1);
+        left.volume.value = muted ? -Infinity : -14;
+        right.volume.value = muted ? -Infinity : -14;
+        synthRef.current = { dispose: () => { left.dispose(); right.dispose(); merger.dispose(); }, setVolume: (v: number) => { left.volume.value = v; right.volume.value = v; } };
+        left.start(); right.start();
+      } else {
+        // pad — ambient polyphonic
+        synthRef.current = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sine" }, envelope: { attack: 2, decay: 1, sustain: 0.8, release: 4 } }).toDestination();
+        synthRef.current.volume.value = muted ? -Infinity : -16;
+        // Play a chord around the frequency
+        const notes = [`${selected.hz}`, `${selected.hz * 1.5}`, `${selected.hz * 2}`].map((f) => Tone.Frequency(f).toNote());
+        synthRef.current.triggerAttack(notes);
+        synthRef.current._notes = notes;
       }
-    }, 1000);
+      setPlaying(true);
+      toast.success(`Playing ${selected.hz}Hz · ${mode}`);
+      // Timer
+      const start = Date.now();
+      intervalRef.current = setInterval(() => {
+        const e = Math.floor((Date.now() - start) / 1000);
+        setElapsed(e);
+        if (e >= duration) {
+          stopTone(true);
+        }
+      }, 1000);
+    } catch (err: any) {
+      console.error("Tone.js failed:", err);
+      toast.error("Audio couldn't start. Try clicking play again, or use a different browser.");
+      setPlaying(false);
+    }
   }
 
   async function stopTone(completed = false) {
