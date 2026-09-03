@@ -18,8 +18,10 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
   const [duration, setDuration] = React.useState(300); // 5 min default
   const [elapsed, setElapsed] = React.useState(0);
   const [session, setSession] = React.useState<any>(null);
+  const [ambient, setAmbient] = React.useState<"none" | "rain" | "ocean" | "wind" | "stream" | "river">("none");
   const synthRef = React.useRef<any>(null);
   const intervalRef = React.useRef<any>(null);
+  const ambientAudioRef = React.useRef<HTMLAudioElement | null>(null);
 
   // Dynamic import Tone.js only on client — with proper error handling
   async function startTone() {
@@ -56,6 +58,13 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
       }
       setPlaying(true);
       toast.success(`Playing ${selected.hz}Hz · ${mode}`);
+      // Start ambient bed if selected
+      if (ambient !== "none") {
+        ambientAudioRef.current = new Audio(`/audio/${ambient}.wav`);
+        ambientAudioRef.current.loop = true;
+        ambientAudioRef.current.volume = 0.3;
+        ambientAudioRef.current.play().catch(() => {});
+      }
       // Timer
       const start = Date.now();
       intervalRef.current = setInterval(() => {
@@ -73,6 +82,11 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
   }
 
   async function stopTone(completed = false) {
+    // Stop ambient bed
+    if (ambientAudioRef.current) {
+      ambientAudioRef.current.pause();
+      ambientAudioRef.current = null;
+    }
     if (synthRef.current) {
       if (mode === "pad" && synthRef.current.triggerRelease) {
         synthRef.current.triggerRelease(synthRef.current._notes);
@@ -171,6 +185,19 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                   {(["pure", "binaural", "pad"] as const).map((m) => (
                     <button key={m} onClick={() => { if (playing) stopTone(false); setMode(m); }} className={cn("px-2.5 py-1 rounded-full text-[10px] border transition", mode === m ? "border-gold/30 bg-gold/10 text-gold" : "border-white/10 text-ink-muted hover:text-ink")}>
                       {m === "pure" ? "Pure Tone" : m === "binaural" ? "Binaural" : "Ambient Pad"}
+                    </button>
+                  ))}
+                </div>
+                {/* Headphone hint for binaural */}
+                {mode === "binaural" && (
+                  <div className="text-[10px] text-ink-muted mt-1.5">🎧 Use headphones for the binaural effect</div>
+                )}
+                {/* Ambient bed selector */}
+                <div className="flex items-center gap-1 mt-2">
+                  <span className="text-[9px] text-ink-muted mr-1">Ambient:</span>
+                  {(["none", "rain", "ocean", "wind", "stream", "river"] as const).map((a) => (
+                    <button key={a} onClick={() => { if (playing) stopTone(false); setAmbient(a); }} className={cn("px-2 py-0.5 rounded-full text-[9px] transition", ambient === a ? "text-gold" : "text-ink-muted hover:text-ink")}>
+                      {a === "none" ? "Off" : a}
                     </button>
                   ))}
                 </div>
