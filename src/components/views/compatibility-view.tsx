@@ -217,7 +217,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
             </div>
             <div className="flex items-center justify-between mb-4">
               <Pill variant="gold" className="text-[11px]"><Wallet className="w-3 h-3" /> 5 Luck</Pill>
-              <span className="text-[11px] text-ink-muted">~335 MMK · 99% cheaper than a real-life matching</span>
+              <span className="text-[11px] text-ink-muted">Ashtakoota + Mahendra + Vedha + Rajju + Stree-Deergha + Nadi</span>
             </div>
             <GradientButton onClick={run} disabled={!partner.dob} className="w-full">
               <Users className="w-4 h-4" /> Check compatibility

@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GlassCard, GoldButton, GradientButton, Pill, SectionTitle, ShellCard } from "@/components/lumina/primitives";
 import { useMe, api } from "@/lib/api-client";
 import { useStore } from "@/lib/store";
+import { useT } from "@/lib/use-t";
 import { cn } from "@/lib/utils";
 import {
   Sparkles, Moon, Star, Sun, Flame, Gift, ChevronRight, Heart, Calendar,
@@ -19,6 +20,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const user = data?.user;
   const qc = useQueryClient();
   const { setView } = useStore();
+  const t = useT();
   const [cardOfDay, setCardOfDay] = React.useState<any>(null);
   const [mood, setMood] = React.useState<any>(null);
   const [goals, setGoals] = React.useState<any[]>([]);
@@ -157,7 +159,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
             </div>
             <h1 className="serif-display text-[2.75rem] sm:text-[3.5rem] leading-[1.05] text-[#E8E2D5] mb-5 tracking-tight">
-              Read the sky<br />like a page.
+              {t("hero_read_sky")}
             </h1>
             <p className="t-body-lg text-[#9C9489] max-w-md leading-[1.7] mb-10">
               Baydin is a daily astrologer, tarot reader, and ritual companion. Vedic, Western, and Myanmar Mahabote traditions, drawn from your birth chart and the moon overhead.
@@ -179,17 +181,17 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
           <div className="space-y-8">
             <Pillar
               n="i"
-              title="Today's sky"
+              title={t("hero_pillar_today")}
               body="Moon phase, nakshatra, tithi. The panchanga of the moment, computed from the same ephemeris used for natal charts."
             />
             <Pillar
               n="ii"
-              title="Draw a card"
+              title={t("hero_pillar_card")}
               body="Tarot grounded in your question and the chart overhead — not a random pull, but a considered reading."
             />
             <Pillar
               n="iii"
-              title="Keep a practice"
+              title={t("hero_pillar_practice")}
               body="Manifest, ritual, frequencies, dream journal. Small daily gestures that compound into a pattern you can read back."
             />
           </div>

@@ -33,7 +33,7 @@ const SLIDES = [
   {
     icon: Waves,
     title: "Luck Credits",
-    desc: "Pay-as-you-go with Luck — 99% cheaper than real-life fortune telling. Buy in MMK, earn free daily, refer friends for more.",
+    desc: "Each reading costs Luck — earn it through daily rewards, referrals, or by topping up.",
     color: "#5FA9C7",
     feature: "luck-store" as const,
   },

@@ -34,40 +34,42 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Onboarding } from "@/components/onboarding";
 import { ReminderService } from "@/components/reminder-service";
 import { PWARegister } from "@/components/pwa-register";
+import { useT } from "@/lib/use-t";
 import {
   Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
   Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
   Waves, Heart, Users, Flame, BarChart3, Hash, Calendar, CloudMoon, LineChart,
 } from "lucide-react";
 
-const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group?: string }[] = [
-  { view: "today", label: "Today", icon: CalendarDays, needsAuth: true, group: "Daily" },
-  { view: "chat", label: "Astrologer", icon: MessageCircle, needsAuth: true, group: "Daily" },
-  { view: "tarot", label: "Tarot", icon: Sparkles, group: "Daily" },
-  { view: "tarot-history", label: "Tarot History", icon: BookOpen, needsAuth: true, group: "Daily" },
-  { view: "horoscope", label: "Horoscope", icon: Moon, needsAuth: true, group: "Daily" },
-  { view: "lunar-calendar", label: "Lunar Calendar", icon: Calendar, needsAuth: true, group: "Daily" },
-  { view: "dream-journal", label: "Dream Journal", icon: CloudMoon, needsAuth: true, group: "Daily" },
-  { view: "manifest", label: "Manifest", icon: Target, needsAuth: true, group: "Practice" },
-  { view: "ritual", label: "Ritual", icon: Flame, needsAuth: true, group: "Practice" },
-  { view: "frequency", label: "Frequencies", icon: Waves, needsAuth: true, group: "Practice" },
-  { view: "positivity", label: "Positivity", icon: Heart, needsAuth: true, group: "Practice" },
-  { view: "birth-chart", label: "Birth Chart", icon: Star, needsAuth: true, group: "Astrology" },
-  { view: "numerology", label: "Numerology", icon: Hash, needsAuth: true, group: "Astrology" },
-  { view: "insights", label: "Insights", icon: Compass, needsAuth: true, group: "Astrology" },
-  { view: "compatibility", label: "Compatibility", icon: Users, needsAuth: true, group: "Astrology" },
-  { view: "life-report", label: "Life Report", icon: BookOpen, needsAuth: true, group: "Astrology" },
-  { view: "luck-store", label: "Buy Luck", icon: Wallet, needsAuth: true, group: "Account" },
-  { view: "profile", label: "Profile & Stats", icon: BarChart3, needsAuth: true, group: "Account" },
-  { view: "analytics", label: "Insights Dashboard", icon: LineChart, needsAuth: true, group: "Account" },
-  { view: "reseller", label: "Reseller", icon: Store, resellerOnly: true, needsAuth: true, group: "Account" },
-  { view: "admin", label: "Admin", icon: Shield, adminOnly: true, needsAuth: true, group: "Account" },
+const NAV_ITEMS: { view: AppView; labelKey: string; icon: any; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group: string }[] = [
+  { view: "today", labelKey: "nav_today", icon: CalendarDays, needsAuth: true, group: "Daily" },
+  { view: "chat", labelKey: "nav_astrologer", icon: MessageCircle, needsAuth: true, group: "Daily" },
+  { view: "tarot", labelKey: "nav_tarot", icon: Sparkles, group: "Daily" },
+  { view: "tarot-history", labelKey: "nav_tarot_history", icon: BookOpen, needsAuth: true, group: "Daily" },
+  { view: "horoscope", labelKey: "nav_horoscope", icon: Moon, needsAuth: true, group: "Daily" },
+  { view: "lunar-calendar", labelKey: "nav_lunar_calendar", icon: Calendar, needsAuth: true, group: "Daily" },
+  { view: "dream-journal", labelKey: "nav_dream_journal", icon: CloudMoon, needsAuth: true, group: "Daily" },
+  { view: "manifest", labelKey: "nav_manifest", icon: Target, needsAuth: true, group: "Practice" },
+  { view: "ritual", labelKey: "nav_ritual", icon: Flame, needsAuth: true, group: "Practice" },
+  { view: "frequency", labelKey: "nav_frequencies", icon: Waves, needsAuth: true, group: "Practice" },
+  { view: "positivity", labelKey: "nav_positivity", icon: Heart, needsAuth: true, group: "Practice" },
+  { view: "birth-chart", labelKey: "nav_birth_chart", icon: Star, needsAuth: true, group: "Astrology" },
+  { view: "numerology", labelKey: "nav_numerology", icon: Hash, needsAuth: true, group: "Astrology" },
+  { view: "insights", labelKey: "nav_insights", icon: Compass, needsAuth: true, group: "Astrology" },
+  { view: "compatibility", labelKey: "nav_compatibility", icon: Users, needsAuth: true, group: "Astrology" },
+  { view: "life-report", labelKey: "nav_life_report", icon: BookOpen, needsAuth: true, group: "Astrology" },
+  { view: "luck-store", labelKey: "nav_earn_luck", icon: Wallet, needsAuth: true, group: "Account" },
+  { view: "profile", labelKey: "nav_profile", icon: BarChart3, needsAuth: true, group: "Account" },
+  { view: "analytics", labelKey: "nav_analytics", icon: LineChart, needsAuth: true, group: "Account" },
+  { view: "reseller", labelKey: "nav_reseller", icon: Store, resellerOnly: true, needsAuth: true, group: "Account" },
+  { view: "admin", labelKey: "nav_admin", icon: Shield, adminOnly: true, needsAuth: true, group: "Account" },
 ];
 
 export function AppShell() {
   const { view, setView, sidebarOpen, setSidebarOpen } = useStore();
   const { data, isLoading } = useMe();
   const { data: badgeData } = useBadges();
+  const t = useT();
   const user = data?.user ?? null;
   const badges = badgeData?.badges;
   const [authOpen, setAuthOpen] = React.useState(false);
@@ -112,7 +114,7 @@ export function AppShell() {
             <span className="tabular-nums">{user.luckBalance}</span>
           </button>
         ) : (
-          <button onClick={() => setAuthOpen(true)} className="text-[13px] text-[#9C9489] hover:text-[#E8E2D5] transition">Sign in</button>
+          <button onClick={() => setAuthOpen(true)} className="text-[13px] text-[#9C9489] hover:text-[#E8E2D5] transition">{t("sign_in")}</button>
         )}
       </header>
 
@@ -158,12 +160,12 @@ export function AppShell() {
                 </>
               ) : (
                 <>
-                  <GhostButton onClick={() => setAuthOpen(true)} className="py-2 px-4 text-[12px]">Sign in</GhostButton>
+                  <GhostButton onClick={() => setAuthOpen(true)} className="py-2 px-4 text-[12px]">{t("sign_in")}</GhostButton>
                   <button
                     onClick={() => setAuthOpen(true)}
                     className="py-2 px-4 text-[13px] bg-[#E8E2D5] text-[#0A0908] hover:bg-white transition rounded-sm focus-ring"
                   >
-                    Begin
+                    {t("begin")}
                   </button>
                 </>
               )}
@@ -230,6 +232,7 @@ function Sidebar(props: {
   onProfile: () => void;
   badges?: { unconfirmedGoals: number; ritualIncomplete: boolean; recentConversations: number };
 }) {
+  const t = useT();
   // Helper to get badge count for a view
   function badgeFor(view: AppView): number | null {
     if (!props.badges) return null;
@@ -267,11 +270,11 @@ function Sidebar(props: {
             onClick={props.onNewChat}
             className="w-full flex items-center gap-2 py-2.5 text-[13px] text-[#E8E2D5] hover:text-[#C5A572] transition border-b border-[#2A2722] focus-ring rounded-sm"
           >
-            <Plus className="w-3.5 h-3.5" /> New consultation
+            <Plus className="w-3.5 h-3.5" /> {t("new_consultation")}
           </button>
         </div>
 
-        {/* Navigation — sentence-case group labels, no ALL-CAPS */}
+        {/* Navigation — sentence-case group labels, translated via i18n */}
         <nav className="px-3 flex-1 overflow-y-auto lumina-scroll">
           {(() => {
             const groups: Record<string, typeof props.navItems> = {};
@@ -280,9 +283,10 @@ function Sidebar(props: {
               (groups[g] ||= []).push(item);
             }
             const order = ["Daily", "Practice", "Astrology", "Account", "Other"];
+            const groupKey = (g: string) => `nav_${g.toLowerCase()}`;
             return order.filter((g) => groups[g]).map((g) => (
               <div key={g} className="mb-5">
-                <div className="px-3 pt-3 pb-1.5 text-[12px] text-[#6B6358] font-medium">{g}</div>
+                <div className="px-3 pt-3 pb-1.5 text-[12px] text-[#6B6358] font-medium">{t(groupKey(g))}</div>
                 <div className="space-y-px">
                   {groups[g].map((item) => (
                     <button
@@ -296,7 +300,7 @@ function Sidebar(props: {
                       )}
                     >
                       <item.icon className={cn("w-[15px] h-[15px] shrink-0", props.currentView === item.view && "text-[#C5A572]")} />
-                      <span className="flex-1 text-left">{item.label}</span>
+                      <span className="flex-1 text-left">{t(item.labelKey)}</span>
                       {(() => { const b = badgeFor(item.view); return b ? <span className="text-[10px] text-[#C5A572] tabular-nums">{b}</span> : null; })()}
                     </button>
                   ))}
@@ -331,7 +335,7 @@ function Sidebar(props: {
             </button>
           ) : (
             <GhostButton onClick={props.onAuth} className="w-full py-2.5 text-[13px]">
-              Sign in
+              {t("sign_in")}
             </GhostButton>
           )}
         </div>

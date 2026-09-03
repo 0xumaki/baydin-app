@@ -66,8 +66,8 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
         {/* Buy more (wholesale) */}
         <GlassCard className="p-5 mb-4">
           <div className="text-[13px] text-ink mb-2">Need more inventory?</div>
-          <div className="text-[12px] text-ink-muted mb-3">Buy Luck at wholesale rates from the <span className="text-gold">Buy Luck</span> tab — reseller tiers start at 50,000 MMK with up to 100% bonus.</div>
-          <a href="#" onClick={(e) => { e.preventDefault(); setView("luck-store"); }} className="text-[12px] text-gold hover:underline">Go to Buy Luck →</a>
+          <div className="text-[12px] text-ink-muted mb-3">Top up your wholesale inventory from the <span className="text-gold">Earn Luck</span> tab — reseller packs start at 50,000 MMK with up to 100% bonus.</div>
+          <a href="#" onClick={(e) => { e.preventDefault(); setView("luck-store"); }} className="text-[12px] text-gold hover:underline">Go to Earn Luck →</a>
         </GlassCard>
 
         {/* Transfer (resell) */}

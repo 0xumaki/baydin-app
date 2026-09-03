@@ -7,9 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import { useT } from "@/lib/use-t";
 
 export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const qc = useQueryClient();
+  const t = useT();
   const [loading, setLoading] = React.useState(false);
   const [demoLoading, setDemoLoading] = React.useState(false);
   const [referralCode, setReferralCode] = React.useState("");
@@ -89,7 +91,7 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Sign in or create account"
+          aria-label={t("sign_in")}
           className="relative bg-[#0A0908] border border-[#2A2722] p-7 lum-reveal"
         >
           <button
@@ -125,7 +127,7 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
                 value="register"
                 className="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-[#C5A572] data-[state=active]:bg-transparent data-[state=active]:text-[#E8E2D5] text-[#6B6358] text-[13px] py-3 data-[state=active]:shadow-none"
               >
-                Create account
+                {t("auth_create_account")}
               </TabsTrigger>
             </TabsList>
 
@@ -144,7 +146,7 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
               disabled={demoLoading || loading}
               className="w-full text-[13px] text-[#6B6358] hover:text-[#C5A572] transition py-2 disabled:opacity-50 focus-ring rounded-sm"
             >
-              {demoLoading ? "Signing in…" : "Continue as demo admin"}
+              {demoLoading ? t("loading") : t("auth_demo_admin")}
             </button>
             <p className="text-[11px] text-[#4A4540] text-center mt-1 leading-relaxed">
               All features available without charge.
@@ -163,12 +165,13 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
 }
 
 function LoginForm({ onSubmit, loading }: { onSubmit: (email: string, password: string) => void; loading: boolean }) {
+  const t = useT();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   return (
     <form onSubmit={(e) => { e.preventDefault(); onSubmit(email, password); }} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="le" className="text-[12px] text-[#6B6358] font-medium">Email</Label>
+        <Label htmlFor="le" className="text-[12px] text-[#6B6358] font-medium">{t("auth_email")}</Label>
         <Input
           id="le"
           type="email"
@@ -180,7 +183,7 @@ function LoginForm({ onSubmit, loading }: { onSubmit: (email: string, password: 
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="lp" className="text-[12px] text-[#6B6358] font-medium">Password</Label>
+        <Label htmlFor="lp" className="text-[12px] text-[#6B6358] font-medium">{t("auth_password")}</Label>
         <Input
           id="lp"
           type="password"
@@ -196,20 +199,21 @@ function LoginForm({ onSubmit, loading }: { onSubmit: (email: string, password: 
         disabled={loading}
         className="w-full mt-6 py-3 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium tracking-tight hover:bg-white transition disabled:opacity-50 focus-ring rounded-sm"
       >
-        {loading ? "Signing in…" : "Sign in"}
+        {loading ? t("loading") : t("sign_in")}
       </button>
     </form>
   );
 }
 
 function RegisterForm({ onSubmit, loading, referralCode, setReferralCode }: { onSubmit: (email: string, password: string, name?: string) => void; loading: boolean; referralCode: string; setReferralCode: (v: string) => void }) {
+  const t = useT();
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   return (
     <form onSubmit={(e) => { e.preventDefault(); onSubmit(email, password, name || undefined); }} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="rn" className="text-[12px] text-[#6B6358] font-medium">Name (optional)</Label>
+        <Label htmlFor="rn" className="text-[12px] text-[#6B6358] font-medium">{t("auth_name")}</Label>
         <Input
           id="rn"
           value={name}
@@ -219,7 +223,7 @@ function RegisterForm({ onSubmit, loading, referralCode, setReferralCode }: { on
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="re" className="text-[12px] text-[#6B6358] font-medium">Email</Label>
+        <Label htmlFor="re" className="text-[12px] text-[#6B6358] font-medium">{t("auth_email")}</Label>
         <Input
           id="re"
           type="email"
@@ -231,7 +235,7 @@ function RegisterForm({ onSubmit, loading, referralCode, setReferralCode }: { on
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="rp" className="text-[12px] text-[#6B6358] font-medium">Password</Label>
+        <Label htmlFor="rp" className="text-[12px] text-[#6B6358] font-medium">{t("auth_password")}</Label>
         <Input
           id="rp"
           type="password"
@@ -244,7 +248,7 @@ function RegisterForm({ onSubmit, loading, referralCode, setReferralCode }: { on
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="rr" className="text-[12px] text-[#6B6358] font-medium">Referral code (optional)</Label>
+        <Label htmlFor="rr" className="text-[12px] text-[#6B6358] font-medium">{t("auth_referral")}</Label>
         <Input
           id="rr"
           value={referralCode}
@@ -258,7 +262,7 @@ function RegisterForm({ onSubmit, loading, referralCode, setReferralCode }: { on
         disabled={loading}
         className="w-full mt-6 py-3 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium tracking-tight hover:bg-white transition disabled:opacity-50 focus-ring rounded-sm"
       >
-        {loading ? "Creating…" : "Create account"}
+        {loading ? t("loading") : t("auth_create_account")}
       </button>
     </form>
   );

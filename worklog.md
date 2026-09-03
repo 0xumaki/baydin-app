@@ -2245,3 +2245,56 @@ Found 8 issues:
 - Added 4 error/loading boundaries (error.tsx, global-error.tsx, not-found.tsx, loading.tsx)
 - Added accessibility: ARIA labels, Escape-to-close, body scroll lock, focus management
 - Lint clean, all 85 API routes return 200, committed and pushed
+
+---
+Task ID: 60 (Copy cleanup + i18n + Earn Luck rename)
+Agent: Orchestrator (Z.ai Code)
+Task: Remove all cost-comparison marketing copy, rename "Buy Luck" → "Earn Luck", add multi-language UI localization
+
+## Phase 1: Copy cleanup
+
+Removed all marketing/comparison language per user request:
+- `src/lib/luck.ts`: Removed "99% cheaper", "30K–250K MMK", "98% margin", Gemini cost math from docstring. Now just states: "Luck is the in-app credit. Users earn Luck through daily rewards, referrals, and purchases, and spend it per feature."
+- `src/components/views/life-report-view.tsx`: Removed "~1,005 MMK · 98% cheaper than a real-life reading" → "Generates a seven-section report drawn from your natal chart."
+- `src/components/views/insights-view.tsx`: Removed "(~200 MMK)" from "Each insight costs 3 Luck"
+- `src/components/views/chat-view.tsx`: Removed "99% cheaper than real-life fortune telling" → "Each consultation turn costs 2 Luck. The first turn is free."
+- `src/components/views/compatibility-view.tsx`: Removed "~335 MMK · 99% cheaper than a real-life matching" → "Ashtakoota + Mahendra + Vedha + Rajju + Stree-Deergha + Nadi"
+- `src/components/views/luck-store-view.tsx`: Removed entire "Margin explainer" card ("Real-life fortune telling costs 30,000–250,000 MMK... Win-win"). Replaced with neutral "What Luck buys" feature-cost list.
+- `src/components/onboarding.tsx`: Removed "99% cheaper than real-life fortune telling. Buy in MMK" → "Each reading costs Luck — earn it through daily rewards, referrals, or by topping up."
+
+Renamed "Buy Luck" → "Earn Luck":
+- `src/components/app-shell.tsx`: NAV_ITEMS label "Buy Luck" → labelKey "nav_earn_luck"
+- `src/components/views/reseller-view.tsx`: "Buy Luck tab" → "Earn Luck tab"
+- All UI surfaces now say "Earn Luck" instead of "Buy Luck"
+
+## Phase 2: Multi-language UI localization (i18n)
+
+New files:
+- `src/lib/i18n.ts`: Dictionary of 40+ UI string keys across 5 languages (en/my/th/kh/lo). Covers nav groups, nav items, common actions (sign_in, begin, cancel, save, delete, close, back, loading), auth modal labels, today hero, luck store sections. `translate(key, lang)` falls back to English.
+- `src/lib/use-t.ts`: `useT()` hook for client components. Reads user's language from useMe(), returns `t(key)` function. Re-renders when language changes.
+
+Wired i18n into:
+- `src/components/app-shell.tsx`: NAV_ITEMS now use `labelKey` instead of `label`. Sidebar renders `t(item.labelKey)` and `t(groupKey(g))` for group headers. AppShell uses `t("sign_in")`, `t("begin")`, `t("new_consultation")`.
+- `src/components/auth-modal.tsx`: All labels (Email, Password, Name, Referral code), tab triggers (Sign in, Create account), buttons (Sign in, Create account, Continue as demo admin), loading state use `t()`.
+- `src/components/views/today-view.tsx`: Hero headline "Read the sky like a page" → `t("hero_read_sky")`. Three pillars use `t("hero_pillar_today")`, `t("hero_pillar_card")`, `t("hero_pillar_practice")`.
+- `src/components/views/luck-store-view.tsx`: "Earn Luck", "What Luck buys", "Ways to earn", "Luck packs", "Sign in" all use `t()`.
+
+## Verification
+
+### Copy cleanup verified via rg
+- `rg "99% cheaper|cheaper than real|real-life fortune|win-win|98% margin|profit margin|134 MMK|335 MMK|1005 MMK|200 MMK" src/` → 0 results
+- All feature surfaces now state only the Luck cost (e.g. "15 Luck", "3 Luck", "2 Luck") with no MMK/marketing comparison
+
+### i18n verified via agent-browser
+- Set user language to Myanmar (my) via PATCH /api/me
+- Reload → nav labels render in Myanmar: ယနေ့ (Today), ဗေဒင်ဆရာ (Astrologer), တာရော့ (Tarot), ဟောစာတမ်း (Horoscope), လပြက္ခဒိန် (Lunar Calendar), အိပ်မက်မှတ်တမ်း (Dream Journal), ဆုတောင်း (Manifest), etc.
+- Group headers translated: နေ့စဉ် (Daily), ကျင့်စဉ် (Practice), ဗေဒင် (Astrology), အကောင့် (Account)
+- Set back to English → labels revert to English
+- Language selector in profile sheet already existed (5 languages)
+
+## Stage Summary
+- All marketing/comparison copy removed; UI now states only Luck costs per action
+- "Buy Luck" → "Earn Luck" everywhere
+- 5-language UI localization (en/my/th/kh/lo) wired into sidebar, auth modal, today hero, luck store
+- 40+ translation keys, fallback to English for missing translations
+- Lint clean, committed and pushed

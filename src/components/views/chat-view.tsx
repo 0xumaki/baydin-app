@@ -551,7 +551,7 @@ function EmptyState({ onAuth }: { onAuth: () => void }) {
       </h1>
       <p className="text-[14px] text-ink-muted max-w-md mb-6 leading-relaxed">
         Your AI astrologer — Vedic, Western & Myanmar Mahabote readings. Tarot, horoscopes, rituals.
-        Pay-as-you-go with Luck credits. <span className="text-leaf">99% cheaper than real-life fortune telling.</span>
+        Each consultation turn costs 2 Luck. The first turn is free.
       </p>
       <GoldButton onClick={onAuth} className="px-8">Begin your consultation</GoldButton>
       <div className="mt-4 text-[11px] text-ink-muted">5 Luck free on signup · No card required</div>

@@ -129,7 +129,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
 
         <div className="flex items-center gap-2 mb-4">
           <Pill variant="gold" className="text-[10px]"><Wallet className="w-3 h-3" /> {user.luckBalance} Luck</Pill>
-          <span className="text-[11px] text-ink-muted">Each insight costs 3 Luck (~200 MMK)</span>
+          <span className="text-[11px] text-ink-muted">Each insight costs 3 Luck</span>
         </div>
 
         {/* Optional query */}

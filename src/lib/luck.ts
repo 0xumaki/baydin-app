@@ -4,17 +4,13 @@ import { db } from "@/lib/db";
 /**
  * BAYDIN — Luck credit economy configuration.
  *
- * "Luck" is the pay-as-you-go credit. Users buy Luck in MMK, spend it per
- * feature. Lumina freebies (basic tarot, manifest, mood) stay free; all GURU
- * astrology features and premium Lumina features cost Luck.
+ * "Luck" is the in-app credit. Users earn Luck through daily rewards,
+ * referrals, and purchases, and spend it per feature. Lumina freebies
+ * (basic tarot, manifest, mood) stay free; GURU astrology features and
+ * premium Lumina features cost Luck.
  *
- * PRICING DESIGN (win-win: >90% platform margin after Gemini LLM cost,
- * yet 99% cheaper than real-life fortune telling which costs 30K–250K MMK).
- *
- * Gemini 2.0 Flash ≈ $0.10/1M in + $0.40/1M out ≈ 0.21 MMK/K in + 0.84 MMK/K out.
- * A chat turn ≈ 4.3K in + 1.5K out ≈ 2.2 MMK LLM cost. Charging 2 Luck (≥134 MMK)
- * → ~98% margin. Life report (7 sections) ≈ 19 MMK LLM cost, charges 15 Luck
- * (≥1,005 MMK) → ~98% margin.
+ * Per-feature costs are listed in FEATURE_COSTS below. Each cost is
+ * surfaced to the user in the UI before they confirm a purchase.
  */
 
 export type LuckTier = {

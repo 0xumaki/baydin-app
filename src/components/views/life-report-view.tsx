@@ -201,7 +201,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
               </GradientButton>
               <Pill variant="gold" className="text-[11px]"><Wallet className="w-3 h-3" /> 15 Luck</Pill>
             </div>
-            <div className="text-[11px] text-ink-muted mt-2">~1,005 MMK · 98% cheaper than a real-life reading</div>
+            <div className="text-[11px] text-ink-muted mt-2">Generates a seven-section report drawn from your natal chart.</div>
           </div>
         </ShellCard>
 
