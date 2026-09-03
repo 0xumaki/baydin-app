@@ -356,7 +356,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {analytics.tarotBySpread.map((s) => (
-                    <div key={s.spread} className="p-3 rounded-xl bg-black/20 border border-white/5">
+                    <div key={s.spread} className="p-3 rounded-sm bg-black/20 border border-white/5">
                       <div className="text-[11px] text-ink-muted truncate">{SPREAD_LABELS[s.spread] || s.spread}</div>
                       <div className="text-[20px] font-light text-ink mt-0.5">{s.count}</div>
                     </div>

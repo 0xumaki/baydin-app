@@ -83,7 +83,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
 
         {/* Progress + streak hero */}
         <ShellCard className="p-5 mb-5 relative overflow-hidden">
-          <div className="lum-glow-gold absolute inset-0 opacity-30" />
+          <div className="" />
           <div className="relative flex items-center gap-5">
             {/* Progress ring */}
             <div className="relative w-20 h-20 shrink-0">

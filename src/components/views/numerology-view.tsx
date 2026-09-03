@@ -375,7 +375,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
               </div>
               <div className="flex items-center gap-5 mb-4">
                 <div
-                  className="w-24 h-24 rounded-2xl flex items-center justify-center shrink-0"
+                  className="w-24 h-24 rounded-sm flex items-center justify-center shrink-0"
                   style={{ background: `${preview.meaning.color}18`, border: `1px solid ${preview.meaning.color}40` }}
                 >
                   <span
@@ -397,7 +397,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
               </div>
               <p className="text-[13px] leading-relaxed text-ink/85">{preview.meaning.summary}</p>
 
-              <div className="mt-4 p-3 rounded-xl bg-gold-soft/30 border border-gold/15">
+              <div className="mt-4 p-3 rounded-sm bg-gold-soft/30 border border-gold/15">
                 <div className="text-[12px] text-gold font-medium mb-1">Unlock the full picture</div>
                 <div className="text-[11px] text-ink-muted leading-relaxed">
                   Your Life Path is just the beginning. The full report reveals your Destiny, Soul Urge, Personality, Maturity, Birthday and Personal Year numbers — plus a synthesis of how they interact, and your lucky days, colors and gems.
@@ -423,7 +423,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
                   tabIndex={0}
                   onClick={() => loadHistory(h.id)}
                   onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); loadHistory(h.id); } }}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl lum-glass border border-white/5 hover:border-gold/20 transition group cursor-pointer"
+                  className="w-full flex items-center gap-3 p-3 rounded-sm bg-[#0A0908] border border-[#2A2722] hover:border-[#4A4540] transition group cursor-pointer"
                 >
                   <div className="w-9 h-9 rounded-lg bg-gold-soft/40 border border-gold/15 flex items-center justify-center shrink-0">
                     <Hash className="w-4 h-4 text-gold" />
@@ -465,7 +465,7 @@ function NumberDetail({
       <div className="flex items-start gap-5 flex-col sm:flex-row">
         {/* Big Number */}
         <div
-          className="w-28 h-28 rounded-3xl flex flex-col items-center justify-center shrink-0"
+          className="w-28 h-28 rounded-sm flex flex-col items-center justify-center shrink-0"
           style={{ background: `${meaning.color}15`, border: `1px solid ${meaning.color}40` }}
         >
           <span className="text-[56px] font-light leading-none" style={{ color: meaning.color }}>

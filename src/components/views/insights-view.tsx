@@ -65,7 +65,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
           </button>
 
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center text-2xl text-gold">
+            <div className="w-12 h-12 rounded-sm bg-gold/10 border border-gold/20 flex items-center justify-center text-2xl text-gold">
               {skill?.icon || "✦"}
             </div>
             <div className="flex-1">
@@ -83,7 +83,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
             </GlassCard>
           ) : result ? (
             <GlassCard className="p-6">
-              <div className="lum-prose text-[14px] text-ink/90 leading-relaxed">
+              <div className="serif prose-editorial text-[14px] text-ink/90 leading-relaxed">
                 <ReactMarkdown>{result.content}</ReactMarkdown>
               </div>
               {result.highlights?.length > 0 && (
@@ -150,7 +150,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
             <button
               key={s.id}
               onClick={() => run(s.id)}
-              className="group text-left p-4 rounded-2xl border border-white/8 bg-white/[0.02] hover:border-gold/30 hover:bg-gold/[0.04] transition-all hover:shadow-[0_0_30px_-8px_rgba(197,168,124,0.25)]"
+              className="group text-left p-4 rounded-sm border border-white/8 bg-white/[0.02] hover:border-gold/30 hover:bg-gold/[0.04] transition-all hover:shadow-[0_0_30px_-8px_rgba(197,168,124,0.25)]"
             >
               <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{s.icon}</div>
               <div className="text-[13px] text-ink font-medium mb-0.5">{s.name}</div>

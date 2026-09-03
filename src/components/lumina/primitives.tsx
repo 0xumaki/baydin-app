@@ -4,8 +4,8 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * GlassCard — the base Baydin/Lumina surface.
- * rgba(18,24,21,0.5), hairline white border, inset highlight, backdrop blur.
+ * GlassCard — editorial surface (no more glass blur/shadows).
+ * Now uses solid dark background with hairline border — content sits on the page.
  */
 export function GlassCard({
   className,
@@ -15,7 +15,7 @@ export function GlassCard({
 }: React.ComponentProps<"div"> & { float?: boolean }) {
   return (
     <div
-      className={cn(float ? "lum-glass-float" : "lum-glass", "rounded-2xl", className)}
+      className={cn("bg-[#0A0908] border border-[#2A2722] rounded-sm", className)}
       {...props}
     >
       {children}
@@ -29,10 +29,8 @@ export function ShellCard({
   ...props
 }: React.ComponentProps<"div">) {
   return (
-    <div className={cn("lum-border-shell", className)} {...props}>
-      <div className="lum-border-shell__inner lum-glass rounded-[15px]">
-        {children}
-      </div>
+    <div className={cn("bg-[#0A0908] border border-[#2A2722] rounded-sm", className)} {...props}>
+      {children}
     </div>
   );
 }
@@ -48,10 +46,16 @@ export function Pill({
   className?: string;
   style?: React.CSSProperties;
 }) {
+  const variants = {
+    default: "bg-[#1A1714] text-[#9C9489] border-[#2A2722]",
+    gold: "bg-[#1A1714] text-[#C5A572] border-[#C5A572]/20",
+    leaf: "bg-[#1A1714] text-[#7A8B6F] border-[#7A8B6F]/20",
+  };
   return (
     <span
       className={cn(
-        variant === "gold" ? "lum-pill-gold" : variant === "leaf" ? "lum-pill-leaf" : "lum-pill",
+        "inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] border rounded-sm font-medium",
+        variants[variant],
         className
       )}
       style={style}
@@ -77,17 +81,17 @@ export function SectionTitle({
   return (
     <div className={cn("space-y-1", className)}>
       {eyebrow && (
-        <div className="text-[11px] uppercase tracking-[0.22em] text-gold/80 font-medium">
+        <div className="text-[12px] text-[#6B6358] font-medium">
           {eyebrow}
         </div>
       )}
       {title && (
-        <h2 className="text-[22px] leading-[28px] font-light tracking-[-0.02em] text-ink">
+        <h2 className="serif-display text-[1.5rem] text-[#E8E2D5] tracking-tight">
           {title}
         </h2>
       )}
       {subtitle && (
-        <p className="text-[13px] leading-[18px] text-ink-muted">{subtitle}</p>
+        <p className="text-[13px] text-[#9C9489] leading-[1.6]">{subtitle}</p>
       )}
       {children}
     </div>
@@ -101,11 +105,11 @@ export const GoldButton = React.forwardRef<
   <button
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center gap-2 rounded-full px-5 py-3",
-      "bg-[#E8EBE9] text-[#050806] text-[13px] font-medium tracking-[-0.01em]",
+      "inline-flex items-center justify-center gap-2 rounded-sm px-5 py-2.5",
+      "bg-[#E8E2D5] text-[#0A0908] text-[13px] font-medium tracking-tight",
       "transition-all duration-150 hover:bg-white active:scale-[0.98]",
       "disabled:opacity-40 disabled:pointer-events-none",
-      "shadow-[0_1px_0_0_rgba(255,255,255,0.4)_inset,0_8px_24px_-8px_rgba(197,168,124,0.4)]",
+      "focus-ring",
       className
     )}
     {...props}
@@ -122,11 +126,12 @@ export const GhostButton = React.forwardRef<
   <button
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center gap-2 rounded-full px-5 py-3",
-      "text-ink-muted text-[13px] font-medium",
-      "border border-white/10 bg-white/[0.02] backdrop-blur",
-      "transition-all duration-150 hover:text-ink hover:border-white/20 hover:bg-white/[0.04] active:scale-[0.98]",
+      "inline-flex items-center justify-center gap-2 rounded-sm px-5 py-2.5",
+      "text-[#9C9489] text-[13px] font-medium",
+      "border border-[#2A2722] bg-transparent",
+      "transition-all duration-150 hover:text-[#E8E2D5] hover:border-[#4A4540] active:scale-[0.98]",
       "disabled:opacity-40 disabled:pointer-events-none",
+      "focus-ring",
       className
     )}
     {...props}
@@ -136,7 +141,7 @@ export const GhostButton = React.forwardRef<
 ));
 GhostButton.displayName = "GhostButton";
 
-/** Gold-accent gradient button for premium CTAs (e.g. buy Luck). */
+/** Gold-accent gradient button for premium CTAs — now uses solid parchment like GoldButton */
 export const GradientButton = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button">
@@ -144,12 +149,11 @@ export const GradientButton = React.forwardRef<
   <button
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center gap-2 rounded-full px-5 py-3",
-      "text-[#0A0805] text-[13px] font-semibold tracking-[-0.01em]",
-      "bg-[linear-gradient(135deg,#FBEFC8,#D4B27A,#8A6A2F)]",
-      "transition-all duration-150 hover:brightness-110 active:scale-[0.98]",
+      "inline-flex items-center justify-center gap-2 rounded-sm px-5 py-2.5",
+      "bg-[#E8E2D5] text-[#0A0908] text-[13px] font-medium tracking-tight",
+      "transition-all duration-150 hover:bg-white active:scale-[0.98]",
       "disabled:opacity-40 disabled:pointer-events-none",
-      "shadow-[0_1px_0_0_rgba(255,255,255,0.5)_inset,0_10px_30px_-8px_rgba(197,168,124,0.6)]",
+      "focus-ring",
       className
     )}
     {...props}

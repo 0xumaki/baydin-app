@@ -82,7 +82,7 @@ export function ManifestView({ onAuth }: { onAuth: () => void }) {
         </div>
 
         {showForm && (
-          <ShellCard className="p-5 mb-4 lum-anim-float-up">
+          <ShellCard className="p-5 mb-4 lum-reveal">
             <div className="flex items-center justify-between mb-3">
               <div className="text-[13px] text-ink flex items-center gap-2"><Sparkles className="w-4 h-4 text-gold" /> New intention</div>
               <button onClick={() => setShowForm(false)} className="text-ink-muted hover:text-ink"><X className="w-4 h-4" /></button>

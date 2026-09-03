@@ -115,7 +115,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
 
           {/* Interpretation */}
           <GlassCard className="p-6">
-            <div className="lum-prose text-[14px] text-ink/90 leading-relaxed">
+            <div className="serif prose-editorial text-[14px] text-ink/90 leading-relaxed">
               <ReactMarkdown>{result.interpretation}</ReactMarkdown>
             </div>
             {result.highlights?.length > 0 && (

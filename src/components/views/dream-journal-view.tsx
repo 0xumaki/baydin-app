@@ -538,7 +538,7 @@ function EntryDetail({
         {/* Header */}
         <div className="flex items-start gap-4 mb-6">
           <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 text-2xl border"
+            className="w-14 h-14 rounded-sm flex items-center justify-center shrink-0 text-2xl border"
             style={{ background: `${mood.color}15`, borderColor: `${mood.color}40` }}
             title={mood.label}
           >
@@ -612,7 +612,7 @@ function EntryDetail({
                 const Icon = sym ? (CATEGORY_ICON[sym.category] || Star) : Star;
                 const color = sym ? POLARITY_COLOR[sym.polarity] : "#8B7355";
                 return (
-                  <div key={kw} className="p-3 rounded-xl bg-black/20 border border-white/5">
+                  <div key={kw} className="p-3 rounded-sm bg-black/20 border border-white/5">
                     <div className="flex items-center gap-2 mb-1">
                       <Icon className="w-3.5 h-3.5" style={{ color }} />
                       <span className="text-[13px] text-ink font-medium">#{kw}</span>
@@ -657,7 +657,7 @@ function EntryDetail({
         ) : (
           <ShellCard>
             <div className="p-6 text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gold-soft/30 border border-gold/15 mb-3">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-sm bg-gold-soft/30 border border-gold/15 mb-3">
                 <Sparkles className="w-5 h-5 text-gold" />
               </div>
               <div className="text-[14px] text-ink font-medium mb-1">No interpretation yet</div>

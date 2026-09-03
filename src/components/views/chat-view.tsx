@@ -10,6 +10,7 @@ import { Send, Plus, ChevronDown, Star, Moon, Sun, Heart, Download, Share2, Sear
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThinkingAnimation } from "@/components/thinking-animation";
 
 const SUGGESTIONS = [
   { icon: Star, text: "Read my birth chart", mode: "vedic" as const },
@@ -228,7 +229,11 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
                 <MessageBubble key={m.id || i} msg={m} />
               ))}
               {streaming && (
-                <MessageBubble msg={{ role: "assistant", content: streamText || "" }} streaming />
+                streamText ? (
+                  <MessageBubble msg={{ role: "assistant", content: streamText }} streaming />
+                ) : (
+                  <ThinkingAnimation />
+                )
               )}
             </div>
           )}

@@ -258,7 +258,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
 
             {/* Card of the day */}
             <GlassCard className="p-5 relative overflow-hidden">
-              <div className="lum-glow-gold absolute inset-0 opacity-30 pointer-events-none" />
+              <div className="" />
               <div className="relative">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
@@ -720,7 +720,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {/* Pancha Mahapurusha Yoga */}
             {panchaMahapurusha?.formedCount > 0 && (
               <GlassCard className="p-5 relative overflow-hidden">
-                <div className="lum-glow-gold absolute inset-0 opacity-30" />
+                <div className="" />
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-3">
                     <Star className="w-4 h-4 text-gold" />
@@ -898,7 +898,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 </button>
               </div>
               {goals.length === 0 ? (
-                <button onClick={() => setView("manifest")} className="w-full p-3 rounded-xl border border-dashed border-white/10 text-[12px] text-ink-muted hover:border-gold/20 hover:text-gold transition text-left">
+                <button onClick={() => setView("manifest")} className="w-full p-3 rounded-sm border border-dashed border-white/10 text-[12px] text-ink-muted hover:border-gold/20 hover:text-gold transition text-left">
                   + Set your first intention
                 </button>
               ) : (
@@ -1214,7 +1214,7 @@ function greeting(): string {
 
 function QuickAction({ icon: Icon, label, desc, onClick, badge }: { icon: any; label: string; desc: string; onClick: () => void; badge?: number }) {
   return (
-    <button onClick={onClick} className="group relative p-3 rounded-xl lum-glass border border-white/5 hover:border-gold/20 hover:bg-gold/[0.03] transition text-left">
+    <button onClick={onClick} className="group relative p-3 rounded-sm bg-[#0A0908] border border-[#2A2722] hover:border-[#4A4540] hover:bg-[#0F0D0B] transition text-left">
       <div className="flex items-center justify-between mb-1.5">
         <Icon className="w-4 h-4 text-gold group-hover:scale-110 transition-transform" />
         {badge ? <Pill variant="gold" className="text-[9px] py-0">{badge}</Pill> : null}
@@ -1258,7 +1258,7 @@ function CardOfDayCard({ reading }: { reading: any }) {
   return (
     <div>
       <div className="flex gap-4 mb-3">
-        <div className={cn("w-20 h-32 rounded-xl border border-gold/30 bg-gradient-to-br from-surface to-surface-2 flex flex-col items-center justify-center shrink-0", card.reversed && "rotate-180")}>
+        <div className={cn("w-20 h-32 rounded-sm border border-gold/30 bg-gradient-to-br from-surface to-surface-2 flex flex-col items-center justify-center shrink-0", card.reversed && "rotate-180")}>
           <div className="text-2xl mb-1">{card.symbol || "✦"}</div>
           <div className="text-[9px] text-ink px-1 text-center">{card.nameShort || card.id}</div>
         </div>
@@ -1406,7 +1406,7 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
 
   if (!next) {
     return (
-      <ShellCard className="p-4 mb-5 lum-anim-float-up">
+      <ShellCard className="p-4 mb-5 lum-reveal">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-leaf/15 border border-leaf/30 flex items-center justify-center shrink-0">
             <Flame className="w-5 h-5 text-leaf" />
@@ -1421,7 +1421,7 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
   }
 
   return (
-    <button onClick={() => onNavigate(next.view)} className="block w-full text-left mb-5 lum-anim-float-up group">
+    <button onClick={() => onNavigate(next.view)} className="block w-full text-left mb-5 lum-reveal group">
       <ShellCard className="p-4 hover:border-gold/30 transition">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border" style={{ background: `${next.color}15`, borderColor: `${next.color}40` }}>

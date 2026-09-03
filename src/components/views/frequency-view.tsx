@@ -148,7 +148,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
           <div className="space-y-4">
             {/* Now playing card */}
             <ShellCard className="p-6 relative overflow-hidden">
-              <div className="lum-glow-gold absolute inset-0 opacity-30 pointer-events-none" style={{ background: `radial-gradient(120% 80% at 50% -10%, ${selected.color}28 0%, transparent 60%)` }} />
+              <div className="" style={{ background: `radial-gradient(120% 80% at 50% -10%, ${selected.color}28 0%, transparent 60%)` }} />
               <div className="relative flex flex-col items-center text-center">
                 {/* Frequency dial */}
                 <div className="relative w-40 h-40 mb-4">
@@ -224,7 +224,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                 <button
                   key={f.id}
                   onClick={() => { if (playing) stopTone(false); setSelected(f); }}
-                  className={cn("text-left p-3 rounded-xl border transition group", selected.id === f.id ? "border-gold/30 bg-gold/[0.06]" : "border-white/8 bg-white/[0.02] hover:border-white/15")}
+                  className={cn("text-left p-3 rounded-sm border transition group", selected.id === f.id ? "border-gold/30 bg-gold/[0.06]" : "border-white/8 bg-white/[0.02] hover:border-white/15")}
                   style={selected.id === f.id ? { borderColor: `${f.color}50`, background: `${f.color}10` } : {}}
                 >
                   <div className="flex items-center justify-between mb-1">

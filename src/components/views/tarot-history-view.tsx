@@ -138,7 +138,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
 
                   {/* Expanded content */}
                   {isExpanded && (
-                    <div className="px-4 pb-4 border-t border-white/5 pt-3 lum-anim-float-up">
+                    <div className="px-4 pb-4 border-t border-white/5 pt-3 lum-reveal">
                       {/* Full cards */}
                       <div className="flex flex-wrap gap-2 mb-3">
                         {cards.map((c: any, i: number) => {
@@ -155,7 +155,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                         })}
                       </div>
                       {/* Interpretation */}
-                      <div className="lum-prose text-[13px] text-ink/85 leading-relaxed">
+                      <div className="serif prose-editorial text-[13px] text-ink/85 leading-relaxed">
                         <ReactMarkdown>{r.interpretation}</ReactMarkdown>
                       </div>
                       {/* Share */}

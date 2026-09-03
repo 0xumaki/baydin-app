@@ -52,7 +52,7 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
 
         {/* Archetype card */}
         <ShellCard className="p-6 mb-5 relative overflow-hidden">
-          <div className="lum-glow-gold absolute inset-0 opacity-30" />
+          <div className="" />
           <div className="relative flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-gold/20 flex items-center justify-center text-3xl shrink-0">
               {archetype.icon}
@@ -293,7 +293,7 @@ function DeleteAccountModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={onClose}>
-      <GlassCard float className="max-w-sm w-full p-6 rounded-3xl" >
+      <GlassCard float className="max-w-sm w-full p-6 rounded-sm" >
         <div onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2 text-destructive">
@@ -376,7 +376,7 @@ function SavedInsights() {
                 </button>
               </button>
               {isOpen && (
-                <div className="px-3 pb-3 border-t border-white/5 pt-2 lum-prose text-[12px] text-ink-muted leading-relaxed max-h-48 overflow-y-auto lumina-scroll">
+                <div className="px-3 pb-3 border-t border-white/5 pt-2 serif prose-editorial text-[12px] text-ink-muted leading-relaxed max-h-48 overflow-y-auto lumina-scroll">
                   {ins.content}
                   {ins.highlights?.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">

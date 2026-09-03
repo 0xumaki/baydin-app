@@ -231,9 +231,9 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
             <button
               key={c.id}
               onClick={() => generate(c.id)}
-              className="group text-left p-4 rounded-2xl border border-white/8 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04] transition-all"
+              className="group text-left p-4 rounded-sm border border-white/8 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04] transition-all"
             >
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-2 transition-transform group-hover:scale-110" style={{ background: `${c.color}15`, border: `1px solid ${c.color}40` }}>
+              <div className="w-9 h-9 rounded-sm flex items-center justify-center mb-2 transition-transform group-hover:scale-110" style={{ background: `${c.color}15`, border: `1px solid ${c.color}40` }}>
                 <Heart className="w-4 h-4" style={{ color: c.color }} />
               </div>
               <div className="text-[13px] text-ink font-medium leading-tight mb-0.5">{c.name}</div>

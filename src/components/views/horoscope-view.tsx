@@ -69,7 +69,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
         {horoscope && !loading && (
           <GlassCard className="p-5">
             {horoscope.personalized && <Pill variant="gold" className="mb-3">Personalized for your chart</Pill>}
-            <div className="lum-prose text-[14px] text-ink/90">
+            <div className="serif prose-editorial text-[14px] text-ink/90">
               <ReactMarkdown>{horoscope.content}</ReactMarkdown>
             </div>
             {horoscope.guidance && (

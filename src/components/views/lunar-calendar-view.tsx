@@ -354,7 +354,7 @@ export function MoonPhaseSvg({ phaseFrac, size = 24 }: { phaseFrac: number; size
 // ============================================================
 function LegendItem({ emoji, label, desc }: { emoji: string; label: string; desc: string }) {
   return (
-    <div className="p-2.5 rounded-xl lum-glass border border-white/5">
+    <div className="p-2.5 rounded-sm bg-[#0A0908] border border-[#2A2722]">
       <div className="flex items-center gap-2 mb-0.5">
         <span className="text-[14px]">{emoji}</span>
         <span className="text-[11px] text-ink font-medium">{label}</span>
@@ -607,7 +607,7 @@ function SignificanceRow({
   icon: Icon, title, desc, accent,
 }: { icon: any; title: string; desc: string; accent: string }) {
   return (
-    <div className="p-4 rounded-xl border" style={{ background: `${accent}10`, borderColor: `${accent}40` }}>
+    <div className="p-4 rounded-sm border" style={{ background: `${accent}10`, borderColor: `${accent}40` }}>
       <div className="flex items-start gap-3">
         <div
           className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
