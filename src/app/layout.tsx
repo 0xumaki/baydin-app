@@ -18,7 +18,26 @@ export const metadata: Metadata = {
   applicationName: "Baydin",
   authors: [{ name: "Baydin" }],
   keywords: ["astrology", "tarot", "horoscope", "vedic", "mahabote", "fortune", "myanmar"],
-  icons: { icon: "/favicon.svg" },
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: ["/favicon.svg"],
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Baydin",
+    statusBarStyle: "black-translucent",
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+  },
   openGraph: {
     title: "Baydin — Astrologer, Tarot & Fortune",
     description: "AI astrology, tarot and rituals. Pay-as-you-go with Luck credits.",
@@ -31,6 +50,7 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

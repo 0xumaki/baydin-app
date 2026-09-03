@@ -29,6 +29,7 @@ import { AchievementCelebration } from "@/components/achievement-celebration";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Onboarding } from "@/components/onboarding";
 import { ReminderService } from "@/components/reminder-service";
+import { PWARegister } from "@/components/pwa-register";
 import {
   Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
   Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
@@ -191,6 +192,7 @@ export function AppShell() {
       {user && <AchievementCelebration />}
       {user && <ReminderService />}
       {user && <Onboarding />}
+      <PWARegister />
     </div>
   );
 }

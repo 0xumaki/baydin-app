@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#1a1410"/>
+      <stop offset="60%" stop-color="#0a0806"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F0D9A8"/>
+      <stop offset="50%" stop-color="#C5A87C"/>
+      <stop offset="100%" stop-color="#8B6F47"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- maskable safe zone: content within inner 80% (radius 204 from center 256) -->
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- ring -->
+  <circle cx="256" cy="256" r="170" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.4"/>
+  <!-- 8-point star centered -->
+  <g filter="url(#glow)" transform="translate(256, 256)">
+    <path d="M 0,-140 L 32,-32 L 140,0 L 32,32 L 0,140 L -32,32 L -140,0 L -32,-32 Z" fill="url(#gold)"/>
+    <circle r="52" fill="#0a0806"/>
+    <path d="M 0,-36 L 9,-9 L 36,0 L 9,9 L 0,36 L -9,9 L -36,0 L -9,-9 Z" fill="url(#gold)"/>
+  </g>
+</svg>

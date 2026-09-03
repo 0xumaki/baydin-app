@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Offline — Baydin</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background: #0a0806;
+        color: #C5A87C;
+        font-family: Georgia, 'Times New Roman', serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .container { padding: 2rem; max-width: 420px; }
+      .star { font-size: 4rem; margin-bottom: 1rem; display: block; }
+      h1 { font-size: 1.6rem; font-weight: 500; letter-spacing: 0.08em; margin: 0 0 0.5rem; }
+      p { font-size: 0.95rem; line-height: 1.6; opacity: 0.7; margin: 0 0 1.5rem; }
+      button {
+        background: transparent;
+        border: 1px solid #C5A87C;
+        color: #C5A87C;
+        padding: 0.7rem 1.6rem;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background 0.2s;
+      }
+      button:hover { background: rgba(197, 168, 124, 0.12); }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <span class="star">✦</span>
+      <h1>YOU ARE OFFLINE</h1>
+      <p>
+        Baydin cannot reach the stars right now. Your saved charts, tarot history and
+        conversations are still accessible once you reconnect.
+      </p>
+      <button onclick="location.reload()">Try Again</button>
+    </div>
+  </body>
+</html>

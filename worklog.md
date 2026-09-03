@@ -1703,3 +1703,51 @@ Task: Add socket.io reminder mini-service (port 3003), git push
 
 ### 3. Git Push
 - 81 API routes, 17 views, lint clean
+
+---
+Task ID: 53 (PWA support)
+Agent: Orchestrator (Z.ai Code)
+Task: Add PWA manifest + offline service worker + app shortcuts + deep-link routing
+
+Work Log:
+- Verified state: dev server up on :3000, lint clean, last commit `84b6d44` (socket.io reminder service)
+- Created `public/icon-source.svg` (gold star + ring + zodiac ticks on black) and `public/icon-maskable.svg` (maskable safe zone 80%)
+- Used `sharp` to generate PNG icons: `icon-192.png`, `icon-512.png`, `maskable-192.png`, `maskable-512.png`, `apple-touch-icon.png`, `favicon-32.png`, `favicon-16.png`
+- Created `public/manifest.json`:
+  - name/short_name "Baydin", standalone display, portrait orientation
+  - 5 icon entries (any+maskable, 192+512, plus SVG)
+  - 4 app shortcuts: Today / Chat / Tarot / Birth Chart → `?view=...&source=shortcut`
+  - edge_side_panel preferred_width 480
+- Created `public/sw.js` service worker:
+  - VERSION v1.0.0 with 3 caches: shell, runtime, api
+  - Install: precache app shell via Promise.allSettled (tolerant)
+  - Activate: cleanup old versions, clients.claim
+  - Fetch routing:
+    * navigate (HTML) → network-first, fallback to cached "/"
+    * static assets (_next/static, .js/.css/.png/.svg/.woff2) → stale-while-revalidate
+    * API GET → network-first (4s timeout), fallback to cached → 503 JSON
+    * POST/mutations → pass-through (no cache)
+    * Same-origin only, skip HMR
+  - Listens for "SKIP_WAITING" message and "CLEAR_CACHES" message
+- Created `public/offline.html` — gold-on-black branded fallback page with retry button
+- Created `src/components/pwa-register.tsx`:
+  - Registers /sw.js (production only — skipped in dev to avoid HMR conflicts)
+  - Listens for updatefound → postMessage SKIP_WAITING → reload on controllerchange
+  - Deep-link handler: reads ?view= from URL → setView() → strips query params via replaceState
+  - Validates view against AppView union type
+- Wired `<PWARegister />` into app-shell.tsx (always-on, outside auth gate)
+- Updated `src/app/layout.tsx` metadata:
+  - manifest: "/manifest.json"
+  - icons: icon/apple/shortcut arrays
+  - appleWebApp: capable, title "Baydin", black-translucent status bar
+  - formatDetection: disable tel/email/address auto-link
+  - viewport: viewportFit: "cover" (for iOS safe areas)
+
+Stage Summary:
+- PWA installable on Android (Chrome), iOS (Safari), Desktop (Chrome/Edge)
+- 4 app shortcuts on home screen icon long-press
+- Offline support: app shell + static assets cached, API GETs cached as fallback
+- Deep-link routing: `?view=today` (and chat/tarot/birth-chart) opens correct view, then URL is cleaned
+- Files: 7 PNG icons + 2 SVG icons + manifest.json + sw.js + offline.html + pwa-register.tsx
+- Lint clean, dev server 200 OK, all PWA assets serve 200
+- Verified via agent-browser: <link rel="manifest"> present, navigator.serviceWorker present, apple-touch-icon present, theme-color #000000, deep-link `/?view=today` consumed correctly
