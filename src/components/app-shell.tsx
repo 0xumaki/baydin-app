@@ -103,6 +103,11 @@ export function AppShell() {
         </div>
         {user ? (
           <button onClick={() => setProfileOpen(true)} className="flex items-center gap-1.5">
+            {user.role === "admin" && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-medium border bg-gold/15 border-gold/40 text-gold" title="Admin bypass active">
+                <Shield className="w-2.5 h-2.5" /> ADMIN
+              </span>
+            )}
             <Pill variant="gold">{user.luckBalance} Luck</Pill>
           </button>
         ) : (
@@ -137,6 +142,14 @@ export function AppShell() {
             <div className="flex items-center gap-3">
               {user ? (
                 <>
+                  {user.role === "admin" && (
+                    <span
+                      className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide border bg-gold/15 border-gold/40 text-gold"
+                      title="Admin bypass active — all Luck charges waived for QA/preview"
+                    >
+                      <Shield className="w-3 h-3" /> ADMIN BYPASS
+                    </span>
+                  )}
                   <DailyRewardBadge />
                   <Pill variant="gold" className="text-[12px]">
                     <Wallet className="w-3 h-3" /> {user.luckBalance} Luck

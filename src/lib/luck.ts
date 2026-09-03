@@ -272,7 +272,13 @@ export async function debitLuck(params: {
   return { ok: true, balance };
 }
 
-/** Check + debit in one call. Used by feature API routes. */
+/** Check + debit in one call. Used by feature API routes.
+ *
+ * ADMIN BYPASS: users with role "admin" skip Luck charges entirely.
+ * The function returns ok=true with their current balance, debits nothing,
+ * and records no ledger entry. This lets admins/demo accounts exercise every
+ * feature without buying Luck. Set BAYDIN_DISABLE_ADMIN_BYPASS=1 to disable.
+ */
 export async function spendForFeature(params: {
   userId: string;
   feature: FeatureId;
@@ -280,6 +286,18 @@ export async function spendForFeature(params: {
   description?: string;
 }): Promise<{ ok: boolean; balance: number; cost: number; reason?: string }> {
   const cost = FEATURE_COSTS[params.feature];
+
+  // Admin bypass — load user, check role
+  if (process.env.BAYDIN_DISABLE_ADMIN_BYPASS !== "1") {
+    const adminUser = await db.user.findUnique({
+      where: { id: params.userId },
+      select: { role: true, luckBalance: true },
+    });
+    if (adminUser?.role === "admin") {
+      return { ok: true, balance: adminUser.luckBalance, cost: 0, reason: "admin_bypass" };
+    }
+  }
+
   const res = await debitLuck({
     userId: params.userId,
     amount: cost,

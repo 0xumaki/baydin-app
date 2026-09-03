@@ -6,12 +6,13 @@ import { GlassCard, GoldButton, GhostButton, Pill } from "@/components/lumina/pr
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { X, Sparkles, Wallet, Star } from "lucide-react";
+import { X, Sparkles, Wallet, Star, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const qc = useQueryClient();
   const [loading, setLoading] = React.useState(false);
+  const [demoLoading, setDemoLoading] = React.useState(false);
   const [referralCode, setReferralCode] = React.useState("");
 
   React.useEffect(() => {
@@ -44,6 +45,26 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
     }
   }
 
+  /** One-click demo admin login — bypasses Luck charges on all features. */
+  async function demoAdminLogin() {
+    setDemoLoading(true);
+    try {
+      const res = await fetch("/api/auth/demo-admin", {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Demo admin login failed");
+      toast.success("Logged in as Baydin Admin · all features unlocked ✦");
+      qc.invalidateQueries({ queryKey: ["me"] });
+      onOpenChange(false);
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setDemoLoading(false);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
       <GlassCard float className="w-full max-w-md p-6 relative lum-anim-float-up">
@@ -70,6 +91,27 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
             <RegisterForm onSubmit={(e, p, n) => submit("register", e, p, n)} loading={loading} referralCode={referralCode} setReferralCode={setReferralCode} />
           </TabsContent>
         </Tabs>
+
+        {/* Demo Admin one-click login — bypasses Luck charges on all features */}
+        <div className="mt-4 pt-4 border-t border-white/5">
+          <button
+            onClick={demoAdminLogin}
+            disabled={demoLoading || loading}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gold/30 bg-gold-soft/40 hover:bg-gold-soft/60 text-gold text-[12px] font-medium tracking-wide transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {demoLoading ? (
+              <span className="animate-pulse">Signing in…</span>
+            ) : (
+              <>
+                <ShieldCheck className="w-4 h-4" />
+                Demo Admin · unlock everything
+              </>
+            )}
+          </button>
+          <p className="text-[10px] text-ink-muted/70 text-center mt-1.5 leading-relaxed">
+            Bypasses Luck charges for QA / preview. All features free.
+          </p>
+        </div>
 
         {referralCode && (
           <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-leaf">

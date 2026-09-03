@@ -1848,3 +1848,69 @@ Task: Add Numerology view (Pythagorean + Chaldean) + fix broken astrology export
 - Critical regression fixed: 5 missing `export` keywords in `src/lib/astrology/index.ts` had broken ~20 API routes since an earlier refactor
 - Lint clean, dev server up, all 81+ API routes return 200
 - 82 API routes total now (was 81), 18 views (was 17)
+
+---
+Task ID: 55 (Admin bypass — one-click demo login)
+Agent: Orchestrator (Z.ai Code)
+Task: Give the user an admin bypass for using the actual app at its current stage (no Luck charges, no signup friction)
+
+## Completed Modifications
+
+### 1. Luck charge bypass for admin users — `src/lib/luck.ts`
+- Modified `spendForFeature()` to check the caller's role.
+- If user.role === "admin": returns `{ ok: true, balance: <current>, cost: 0, reason: "admin_bypass" }` — no DB write, no ledger entry, no balance change.
+- Applies to every feature that uses `spendForFeature`:
+  - astrologer_chat (2 Luck → 0)
+  - birth_chart (3 Luck → 0)
+  - insight (3 Luck → 0)
+  - life_report (15 Luck → 0)
+  - compatibility (5 Luck → 0)
+  - mahabote (3 Luck → 0)
+  - horoscope_personal (2 Luck → 0)
+  - tarot_premium (1 Luck → 0)
+  - numerology (3 Luck → 0)
+- Kill switch: `BAYDIN_DISABLE_ADMIN_BYPASS=1` env var disables the bypass.
+
+### 2. One-click demo-admin endpoint — `src/app/api/auth/demo-admin/route.ts`
+- POST creates (or refreshes) admin@baydin.app user with:
+  - role: "admin"
+  - luckBalance: 99999
+  - language: "en"
+  - unique referralCode (auto-generated)
+- Sets the session cookie (creates a real authenticated session).
+- Returns user object + credentials for reference.
+- Kill switch: `BAYDIN_DISABLE_DEMO_ADMIN=1` env var returns 403.
+
+### 3. "Demo Admin · unlock everything" button — `src/components/auth-modal.tsx`
+- Added a gold-bordered button below the login/register tabs.
+- Calls /api/auth/demo-admin, shows toast "Logged in as Baydin Admin · all features unlocked ✦"
+- Subtitle: "Bypasses Luck charges for QA / preview. All features free."
+
+### 4. ADMIN BYPASS badge in app shell — `src/components/app-shell.tsx`
+- Desktop top bar: gold "🛡 ADMIN BYPASS" pill (with title="Admin bypass active — all Luck charges waived for QA/preview")
+- Mobile top bar: smaller "🛡 ADMIN" pill
+- Visible only when `user.role === "admin"`.
+
+## Verification Results
+
+### API test (curl with session cookie)
+- POST /api/auth/demo-admin → 200, creates admin@baydin.app, role=admin, luck=99999, adminBypass:true
+- GET /api/me → confirms role=admin, luckBalance=99999
+- POST /api/numerology (full report) → 200, balance unchanged (99999→99999), cost:0, reason:"admin_bypass"
+- POST /api/conversations/[id]/stream (chat) → SSE stream with `luckSpent:0, balance:99999`, full chat response returned
+
+### Browser test (agent-browser)
+- Cleared cookies, opened /, clicked "Sign in" → modal opened
+- "Demo Admin · unlock everything" button visible
+- Clicked → toast success, user logged in as admin@baydin.app
+- Top bar shows "ADMIN BYPASS" badge + "99999 Luck"
+- Navigated to Numerology, filled "Aung San" / 1945-02-13, clicked "Full report · 3 Luck"
+- Full report rendered (8 number cards + synthesis section)
+- Luck still 99999 after — bypass confirmed end-to-end
+
+## Stage Summary
+- User can now click "Demo Admin · unlock everything" on the sign-in modal to instantly log in as admin with 99999 Luck and zero Luck charges on every feature
+- Visible "ADMIN BYPASS" badge in top bar so the user knows they're in bypass mode
+- All features (chat, tarot, numerology, life report, compatibility, mahabote, horoscope, insights) free for admin
+- Production kill switches via env vars (BAYDIN_DISABLE_ADMIN_BYPASS=1 and BAYDIN_DISABLE_DEMO_ADMIN=1)
+- Credentials for reference: email=admin@baydin.app, password=baydin-admin-2026
