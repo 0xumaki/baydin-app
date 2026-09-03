@@ -116,18 +116,28 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const stream = new ReadableStream({
     async start(controller) {
       const send = (event: string, data: any) => {
-        controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+        try {
+          controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+        } catch {
+          // controller already closed (client disconnected)
+        }
       };
 
       send("phase", { phase: "calculating", luckSpent: luckCost, balance: user.luckBalance - luckCost });
 
       let fullText = "";
       let parsed: any = null;
+      let clientDisconnected = false;
       try {
         send("phase", { phase: "writing" });
         // Stream in a single pass; capture the generator return value on done.
         const gen = streamAstrologerLLM(system, userPrompt, { temperature: 0.7, maxTokens: 2048 });
         while (true) {
+          // Check if client has disconnected between chunks
+          if (req.signal.aborted) {
+            clientDisconnected = true;
+            break;
+          }
           const r = await gen.next();
           if (r.done) {
             parsed = r.value?.parsed ?? null;
@@ -149,7 +159,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const highlights = parsed?.highlights ?? [];
       const guidance = parsed?.guidance ?? null;
 
-      // --- Persist the assistant message ---
+      // --- Persist the assistant message (even if client disconnected,
+      //     so the conversation history is complete on next load) ---
       const saved = await db.message.create({
         data: {
           conversationId: id,
@@ -168,13 +179,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         },
       });
 
-      send("done", {
-        content,
-        highlights,
-        guidance,
-        luckSpent: luckCost,
-        messageId: saved.id,
-      });
+      // Only send the "done" event if the client is still connected
+      if (!clientDisconnected && !req.signal.aborted) {
+        send("done", {
+          content,
+          highlights,
+          guidance,
+          luckSpent: luckCost,
+          messageId: saved.id,
+        });
+      }
       controller.close();
     },
   });

@@ -63,15 +63,24 @@ export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { title, content, mood, isRecurring, dreamDate } = await req.json();
-  if (!title || typeof title !== "string" || title.trim().length < 3) {
-    return NextResponse.json({ error: "Please give your dream a title (3+ characters)." }, { status: 400 });
+  const body = await req.json().catch(() => ({}));
+  const { title, content, mood, isRecurring, dreamDate } = body;
+  if (!title || typeof title !== "string" || title.trim().length < 3 || title.length > 200) {
+    return NextResponse.json({ error: "Please give your dream a title (3-200 characters)." }, { status: 400 });
   }
-  if (!content || typeof content !== "string" || content.trim().length < 10) {
-    return NextResponse.json({ error: "Please describe your dream (10+ characters)." }, { status: 400 });
+  if (!content || typeof content !== "string" || content.trim().length < 10 || content.length > 20000) {
+    return NextResponse.json({ error: "Please describe your dream (10-20000 characters)." }, { status: 400 });
   }
-  if (!dreamDate || !/^\d{4}-\d{2}-\d{2}$/.test(dreamDate)) {
+  if (!dreamDate || typeof dreamDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(dreamDate)) {
     return NextResponse.json({ error: "Dream date must be YYYY-MM-DD." }, { status: 400 });
+  }
+  // Validate the date is real
+  const dateCheck = new Date(dreamDate + "T12:00:00Z");
+  if (isNaN(dateCheck.getTime()) || dateCheck.toISOString().slice(0, 10) !== dreamDate) {
+    return NextResponse.json({ error: "Please enter a valid dream date." }, { status: 400 });
+  }
+  if (dateCheck.getTime() > Date.now() + 86400000) {
+    return NextResponse.json({ error: "Dream date cannot be in the future." }, { status: 400 });
   }
   const validMoods = DREAM_MOODS.map((m) => m.id);
   const moodId = validMoods.includes(mood) ? mood : "neutral";

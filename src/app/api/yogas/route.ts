@@ -46,17 +46,17 @@ export async function GET() {
   // Raja Yoga — lords of kendra (1,4,7,10) and trikona (1,5,9) houses conjoined
   const kendraHouses = [1, 4, 7, 10];
   const trikonaHouses = [1, 5, 9];
-  const allHouses = [...kendraHouses, ...trionaHouses(trikonaHouses)];
+  const allHouses = [...kendraHouses, ...trikonaHouses];
   const ascSign = asc.signIndex;
   const houseSigns = allHouses.map((h) => (ascSign + h - 1) % 12);
   const houseLords = houseSigns.map((s) => signLords[s]);
 
   // Check for conjunctions between kendra and trikona lords
   const kendraLords = [1, 4, 7, 10].map((h) => signLords[(ascSign + h - 1) % 12]);
-  const trikonaLords = [1, 5, 9].map((h) => signLords[(ascSign + h - 1) % 12]);
+  const trikonaLordsArr = [1, 5, 9].map((h) => signLords[(ascSign + h - 1) % 12]);
 
   for (const kl of [...new Set(kendraLords)]) {
-    for (const tl of [...new Set(trikonalLords(trikonaLords))]) {
+    for (const tl of [...new Set(trikonaLordsArr)]) {
       if (kl === tl) continue; // same planet
       const kp = get(kl);
       const tp = get(tl);

@@ -13,6 +13,11 @@ const SESSION_COOKIE = "baydin_session";
 const SESSION_SECRET = process.env.SESSION_SECRET || "baydin-dev-secret-change-me";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
+// Warn at startup if using the default dev secret in production
+if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {
+  console.warn("⚠️ WARNING: SESSION_SECRET not set in production. Using insecure default.");
+}
+
 /** HMAC-sign a payload so the cookie can't be tampered with. */
 function sign(payload: string): string {
   const mac = createHmac("sha256", SESSION_SECRET).update(payload).digest("hex");
@@ -35,8 +40,13 @@ function verify(token: string): string | null {
   }
 }
 
+// bcrypt cost factor: 12 in production, 10 in dev (faster for testing)
+const BCRYPT_ROUNDS = process.env.NODE_ENV === "production" ? 12 : 10;
+
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 10);
+  // Truncate at 72 bytes (bcrypt limit) to prevent DoS via very long passwords
+  const safe = Buffer.from(password, "utf8").subarray(0, 72).toString("utf8");
+  return bcrypt.hash(safe, BCRYPT_ROUNDS);
 }
 
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {

@@ -56,6 +56,9 @@ export async function GET(req: NextRequest) {
   const now = new Date();
   const year = yearParam ? parseInt(yearParam, 10) : now.getFullYear();
   const month = monthParam ? parseInt(monthParam, 10) : now.getMonth() + 1;
+  if (!Number.isFinite(year) || !Number.isFinite(month)) {
+    return NextResponse.json({ error: "Year and month must be numbers." }, { status: 400 });
+  }
   if (month < 1 || month > 12) {
     return NextResponse.json({ error: "Month must be 1-12." }, { status: 400 });
   }

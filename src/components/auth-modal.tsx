@@ -14,6 +14,7 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
   const [loading, setLoading] = React.useState(false);
   const [demoLoading, setDemoLoading] = React.useState(false);
   const [referralCode, setReferralCode] = React.useState("");
+  const dialogRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     // Read ?ref= from URL
@@ -21,6 +22,24 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
     const ref = params.get("ref");
     if (ref) setReferralCode(ref);
   }, []);
+
+  // Close on Escape, lock body scroll while open
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onOpenChange(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    // Focus the first input on open
+    setTimeout(() => {
+      dialogRef.current?.querySelector("input")?.focus();
+    }, 50);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open, onOpenChange]);
 
   if (!open) return null;
 
@@ -67,8 +86,9 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
-      <GlassCard float className="w-full max-w-md p-6 relative lum-anim-float-up">
-        <button onClick={() => onOpenChange(false)} className="absolute top-4 right-4 text-ink-muted hover:text-ink">
+      <div ref={dialogRef} className="w-full max-w-md">
+      <GlassCard float className="p-6 relative lum-anim-float-up" role="dialog" aria-modal="true" aria-label="Sign in or create account">
+        <button onClick={() => onOpenChange(false)} aria-label="Close dialog" className="absolute top-4 right-4 text-ink-muted hover:text-ink transition">
           <X className="w-5 h-5" />
         </button>
 
@@ -124,6 +144,7 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
           <span className="flex items-center gap-1"><Wallet className="w-3 h-3 text-leaf" /> Pay-as-you-go</span>
         </div>
       </GlassCard>
+      </div>
     </div>
   );
 }

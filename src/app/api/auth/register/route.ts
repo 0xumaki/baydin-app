@@ -2,20 +2,45 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { hashPassword, createSession, generateReferralCode } from "@/lib/auth";
 import { creditLuck, SIGNUP_BONUS, REFERRAL_BONUS } from "@/lib/luck";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// Simple but robust email validation (RFC 5322 simplified)
+const EMAIL_RE = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+const NAME_RE = /^[\p{L}\p{M}\s.'-]{0,80}$/u;
+
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, name, referralCode, language } = await req.json();
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
+    // Rate limit: 5 registrations per IP per 15 min
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (!checkRateLimit(`register:${ip}`, 5, 15 * 60 * 1000)) {
+      return NextResponse.json(
+        { error: "Too many signup attempts. Please try again later." },
+        { status: 429, headers: { "Retry-After": "900" } }
+      );
     }
-    if (password.length < 6) {
-      return NextResponse.json({ error: "Password must be at least 6 characters." }, { status: 400 });
+
+    const body = await req.json().catch(() => ({}));
+    const { email, password, name, referralCode, language } = body;
+    if (!email || typeof email !== "string" || !EMAIL_RE.test(email)) {
+      return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
     }
-    const existing = await db.user.findUnique({ where: { email: email.toLowerCase() } });
+    if (!password || typeof password !== "string") {
+      return NextResponse.json({ error: "Password is required." }, { status: 400 });
+    }
+    if (password.length < 6 || password.length > 200) {
+      return NextResponse.json({ error: "Password must be 6-200 characters." }, { status: 400 });
+    }
+    if (name !== undefined && name !== null && (typeof name !== "string" || !NAME_RE.test(name))) {
+      return NextResponse.json({ error: "Name contains invalid characters." }, { status: 400 });
+    }
+    const normalizedEmail = email.toLowerCase().trim();
+    if (normalizedEmail.length > 320) {
+      return NextResponse.json({ error: "Email address is too long." }, { status: 400 });
+    }
+    const existing = await db.user.findUnique({ where: { email: normalizedEmail } });
     if (existing) {
       return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
     }
@@ -35,9 +60,9 @@ export async function POST(req: NextRequest) {
 
     const user = await db.user.create({
       data: {
-        email: email.toLowerCase(),
+        email: normalizedEmail,
         hashedPassword,
-        name: name || null,
+        name: name?.trim() || null,
         language: language || "my",
         referralCode: code,
         referredById: referrerId,

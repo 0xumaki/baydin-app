@@ -71,7 +71,7 @@ export function ProfileSheet({ open, onOpenChange }: { open: boolean; onOpenChan
       <GlassCard float className="w-full max-w-lg max-h-[92dvh] overflow-y-auto lumina-scroll p-6 rounded-t-3xl sm:rounded-2xl lum-anim-float-up">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[18px] font-light text-ink">Profile & Birth Details</h2>
-          <button onClick={() => onOpenChange(false)} className="text-ink-muted hover:text-ink">
+          <button onClick={() => onOpenChange(false)} aria-label="Close profile sheet" className="text-ink-muted hover:text-ink transition">
             <X className="w-5 h-5" />
           </button>
         </div>

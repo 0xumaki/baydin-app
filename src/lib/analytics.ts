@@ -126,18 +126,24 @@ export async function buildAnalytics(userId: string): Promise<AnalyticsPayload> 
   });
   const ritualStreak = computeStreak(ritualLogs.map((r) => ({ date: r.date, completed: r.completed })));
 
-  // Practice activity (last 14 days)
+  // Practice activity (last 14 days) — use Set lookups for O(1) per check
+  const moodDates = new Set(moodEntries.map((m) => m.date));
+  const ritualDates = new Set(ritualLogs.filter((r) => r.completed).map((r) => r.date));
+  const freqDates = new Set(frequencySessions.map((f) => f.createdAt.toISOString().slice(0, 10)));
+  const posDates = new Set(positivitySessions.map((p) => p.date));
+  const tarotDates = new Set(tarotReadings.map((t) => t.createdAt.toISOString().slice(0, 10)));
+  const dreamDates = new Set(dreams.map((d) => d.dreamDate));
   const practiceActivity: { date: string; count: number }[] = [];
   for (let i = 13; i >= 0; i--) {
     const d = new Date(now.getTime() - i * 86400000);
     const dateStr = d.toISOString().slice(0, 10);
     let count = 0;
-    if (moodEntries.some((m) => m.date === dateStr)) count++;
-    if (ritualLogs.some((r) => r.date === dateStr && r.completed)) count++;
-    if (frequencySessions.some((f) => f.createdAt.toISOString().slice(0, 10) === dateStr)) count++;
-    if (positivitySessions.some((p) => p.date === dateStr)) count++;
-    if (tarotReadings.some((t) => t.createdAt.toISOString().slice(0, 10) === dateStr)) count++;
-    if (dreams.some((dream) => dream.dreamDate === dateStr)) count++;
+    if (moodDates.has(dateStr)) count++;
+    if (ritualDates.has(dateStr)) count++;
+    if (freqDates.has(dateStr)) count++;
+    if (posDates.has(dateStr)) count++;
+    if (tarotDates.has(dateStr)) count++;
+    if (dreamDates.has(dateStr)) count++;
     practiceActivity.push({ date: dateStr, count });
   }
 

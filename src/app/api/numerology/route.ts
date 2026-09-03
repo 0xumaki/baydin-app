@@ -13,28 +13,37 @@ export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const readings = await db.numerologyReading.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
-    take: 20,
-    select: {
-      id: true,
-      input: true,
-      system: true,
-      createdAt: true,
-    },
-  });
+  try {
+    const readings = await db.numerologyReading.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: {
+        id: true,
+        input: true,
+        system: true,
+        createdAt: true,
+      },
+    });
 
-  return NextResponse.json({
-    readings: readings.map((r) => ({
-      id: r.id,
-      input: JSON.parse(r.input),
-      system: r.system,
-      createdAt: r.createdAt,
-    })),
-    costLuck: 3,
-    freePreview: true, // life path is free to preview
-  });
+    return NextResponse.json({
+      readings: readings.map((r) => {
+        let input: any = {};
+        try { input = JSON.parse(r.input); } catch { /* ignore corrupt */ }
+        return {
+          id: r.id,
+          input,
+          system: r.system,
+          createdAt: r.createdAt,
+        };
+      }),
+      costLuck: 3,
+      freePreview: true,
+    });
+  } catch (e: any) {
+    console.error("Numerology GET error:", e);
+    return NextResponse.json({ error: "Failed to load readings." }, { status: 500 });
+  }
 }
 
 /** POST — compute numerology report. 3 Luck per full report.
@@ -46,12 +55,21 @@ export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { name, birthDate, system, preview } = await req.json();
-  if (!name || typeof name !== "string" || name.trim().length < 2) {
-    return NextResponse.json({ error: "Please enter your full name." }, { status: 400 });
+  const body = await req.json().catch(() => ({}));
+  const { name, birthDate, system, preview } = body;
+  if (!name || typeof name !== "string" || name.trim().length < 2 || name.length > 200) {
+    return NextResponse.json({ error: "Please enter your full name (2-200 characters)." }, { status: 400 });
   }
-  if (!birthDate || !/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) {
+  if (!birthDate || typeof birthDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) {
     return NextResponse.json({ error: "Please enter your birth date (YYYY-MM-DD)." }, { status: 400 });
+  }
+  // Validate the date is real (not 2026-02-30)
+  const parsed = new Date(birthDate + "T12:00:00Z");
+  if (isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== birthDate) {
+    return NextResponse.json({ error: "Please enter a valid birth date." }, { status: 400 });
+  }
+  if (parsed.getFullYear() < 1800 || parsed.getTime() > Date.now()) {
+    return NextResponse.json({ error: "Birth date must be between 1800 and today." }, { status: 400 });
   }
   const sys: NumerologySystem = system === "chaldean" ? "chaldean" : "pythagorean";
 

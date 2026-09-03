@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { hashPassword, createSession, generateReferralCode } from "@/lib/auth";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -8,14 +9,14 @@ export const dynamic = "force-dynamic";
 /**
  * DEMO ADMIN BYPASS — one-click login as an admin user.
  *
+ * SECURITY: This endpoint is GATED to non-production environments only.
+ * In production, set BAYDIN_DISABLE_DEMO_ADMIN=1 (or rely on NODE_ENV=production
+ * which auto-disables it).
+ *
  * Creates (or refreshes) an admin@baydin.app user with role=admin and a
  * generous Luck balance. Admins bypass all Luck charges (see spendForFeature).
  *
- * This endpoint is intended for local/demo/QA use to let reviewers exercise
- * every feature of the app without buying Luck. It is gated by the
- * BAYDIN_DEMO_ADMIN env var (defaults to enabled in non-production).
- *
- * Set BAYDIN_DISABLE_DEMO_ADMIN=1 in production to disable.
+ * Rate-limited to 10 calls per IP per hour to prevent abuse.
  */
 
 const DEMO_EMAIL = "admin@baydin.app";
@@ -23,11 +24,27 @@ const DEMO_PASSWORD = "baydin-admin-2026";
 const DEMO_NAME = "Baydin Admin";
 const DEMO_LUCK = 99999;
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  // Auto-disable in production unless explicitly enabled
+  if (process.env.NODE_ENV === "production" && process.env.BAYDIN_ENABLE_DEMO_ADMIN !== "1") {
+    return NextResponse.json(
+      { error: "Demo admin login is disabled in production." },
+      { status: 403 }
+    );
+  }
   if (process.env.BAYDIN_DISABLE_DEMO_ADMIN === "1") {
     return NextResponse.json(
       { error: "Demo admin login is disabled in this environment." },
       { status: 403 }
+    );
+  }
+
+  // Rate limit: 10 calls per IP per hour
+  const ip = getClientIp(req);
+  if (!checkRateLimit(`demo-admin:${ip}`, 10, 60 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Too many demo admin attempts. Please try again later." },
+      { status: 429, headers: { "Retry-After": "3600" } }
     );
   }
 
