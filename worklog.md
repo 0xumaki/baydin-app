@@ -1673,3 +1673,33 @@ Task: Add SVG MiniWheel for divisional charts + mobile responsive fixes, git pus
 
 ### 4. Git Push
 - 81 API routes, 17 views, lint clean
+
+---
+Task ID: 52 (webDevReview cron round 49)
+Agent: Orchestrator (Z.ai Code)
+Task: Add socket.io reminder mini-service (port 3003), git push
+
+## Completed Modifications
+
+### 1. Socket.io Reminder Service (mini-services/reminder-service/)
+- New independent bun project on port 3003
+- Socket.io server with path "/" (for Caddy XTransformPort gateway)
+- Polls database every 30 seconds for:
+  1. Goal reminders: active goals whose reminderTime matches current HH:mm
+  2. Daily reward: users who haven't claimed today's Luck (checked at :01)
+  3. Ritual reminders: users with incomplete daily rituals (checked at :30)
+- Emits 'reminder' events with type, message, timestamp
+- socketId → userId mapping for targeted delivery
+- Auto-restart with `bun --hot index.ts`
+
+### 2. Frontend ReminderService Component
+- src/components/reminder-service.tsx — React component (renders nothing)
+- Connects via io("/?XTransformPort=3003", { transports: ["websocket"] })
+- Registers user ID on connect
+- Listens for 'reminder' events → shows toast (10s) + browser notification
+- Requests Notification.permission on mount
+- Graceful reconnection (5s delay, 10 attempts)
+- Wired into app-shell: {user && <ReminderService />}
+
+### 3. Git Push
+- 81 API routes, 17 views, lint clean
