@@ -149,21 +149,51 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
 
   if (!user) {
     return (
-      <div className="h-full flex items-center justify-center px-6 text-center">
-        <ShellCard className="max-w-md w-full p-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-gold/20 mb-4">
-            <Sparkles className="w-7 h-7 text-gold" />
+      <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+        <div className="max-w-2xl mx-auto px-6 py-12 lg:py-20">
+          {/* The one distinctive moment — serif headline, no card chrome */}
+          <div className="lum-reveal">
+            <div className="text-[13px] text-[#6B6358] mb-3">
+              {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+            </div>
+            <h1 className="serif-display text-[2.75rem] sm:text-[3.5rem] leading-[1.05] text-[#E8E2D5] mb-5 tracking-tight">
+              Read the sky<br />like a page.
+            </h1>
+            <p className="t-body-lg text-[#9C9489] max-w-md leading-[1.7] mb-10">
+              Baydin is a daily astrologer, tarot reader, and ritual companion. Vedic, Western, and Myanmar Mahabote traditions, drawn from your birth chart and the moon overhead.
+            </p>
+            <button
+              onClick={onAuth}
+              className="inline-flex items-center gap-2 py-3 px-6 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition focus-ring rounded-sm"
+            >
+              Begin
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            <div className="mt-3 text-[12px] text-[#6B6358]">5 Luck to start. No card required.</div>
           </div>
-          <h1 className="text-[24px] font-light tracking-tight text-ink mb-2">
-            Welcome to <span className="lum-text-gold">Baydin</span>
-          </h1>
-          <p className="text-[13px] text-ink-muted mb-6 leading-relaxed">
-            Your daily astrologer, tarot reader & ritual companion.
-            Vedic, Western & Myanmar Mahabote traditions — 99% cheaper than real-life fortune telling.
-          </p>
-          <GoldButton onClick={onAuth} className="w-full">Begin your journey · 5 Luck free</GoldButton>
-          <div className="mt-3 text-[11px] text-ink-muted">No card required</div>
-        </ShellCard>
+
+          {/* Hairline divider */}
+          <hr className="rule-h my-12" />
+
+          {/* Three pillars — editorial, not card grid */}
+          <div className="space-y-8">
+            <Pillar
+              n="i"
+              title="Today's sky"
+              body="Moon phase, nakshatra, tithi. The panchanga of the moment, computed from the same ephemeris used for natal charts."
+            />
+            <Pillar
+              n="ii"
+              title="Draw a card"
+              body="Tarot grounded in your question and the chart overhead — not a random pull, but a considered reading."
+            />
+            <Pillar
+              n="iii"
+              title="Keep a practice"
+              body="Manifest, ritual, frequencies, dream journal. Small daily gestures that compound into a pattern you can read back."
+            />
+          </div>
+        </div>
       </div>
     );
   }
@@ -174,16 +204,16 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   return (
     <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
       <div className="max-w-4xl mx-auto px-4 py-6 lg:py-8">
-        {/* Hero greeting */}
-        <div className="mb-6 lum-anim-float-up">
-          <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-gold uppercase tracking-[0.2em] mb-1">
-            <Calendar className="w-3 h-3" /> {dateStr}
+        {/* Hero — serif greeting, sentence-case date, no ALL-CAPS eyebrow */}
+        <div className="mb-8 lum-reveal">
+          <div className="text-[13px] text-[#6B6358] mb-2">
+            {dateStr}
           </div>
-          <h1 className="text-[22px] sm:text-[28px] font-light tracking-tight text-ink mb-1">
-            {greeting()}, {user.name?.split(" ")[0] || user.email.split("@")[0]} <span className="lum-text-gold">✦</span>
+          <h1 className="serif-display text-[1.75rem] sm:text-[2.25rem] leading-[1.15] text-[#E8E2D5] mb-1.5 tracking-tight">
+            {greeting()}, {user.name?.split(" ")[0] || user.email.split("@")[0]}.
           </h1>
-          <p className="text-[12px] sm:text-[13px] text-ink-muted">
-            {user.streak > 0 ? `${user.streak}-day streak — keep it alive ✦` : "Begin your daily practice — claim your free Luck below."}
+          <p className="t-body text-[#9C9489]">
+            {user.streak > 0 ? `${user.streak}-day streak. Keep it alive.` : "Begin your daily practice — claim your free Luck below."}
           </p>
         </div>
 
@@ -1420,4 +1450,18 @@ function ordinalSuffix(n: number): string {
   const s = ["th", "st", "nd", "rd"];
   const v = n % 100;
   return s[(v - 20) % 10] || s[v] || s[0];
+}
+
+function Pillar({ n, title, body }: { n: string; title: string; body: string }) {
+  return (
+    <div className="grid grid-cols-[auto_1fr] gap-5">
+      <div className="serif-italic text-[#C5A572] text-[1.5rem] leading-none mt-1 select-none">
+        {n}
+      </div>
+      <div>
+        <div className="t-title text-[#E8E2D5] mb-1.5">{title}</div>
+        <div className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch]">{body}</div>
+      </div>
+    </div>
+  );
 }

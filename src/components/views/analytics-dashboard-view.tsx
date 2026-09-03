@@ -93,36 +93,29 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
 
   return (
     <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
-      <div className="max-w-5xl mx-auto px-4 py-6 lg:py-8">
-        {/* Header */}
-        <div className="flex items-center gap-2 mb-6">
-          <BarChart3 className="w-5 h-5 text-gold" />
-          <div>
-            <h1 className="text-[22px] lg:text-[26px] font-light text-ink tracking-tight">Insights Dashboard</h1>
-            <div className="text-[12px] text-ink-muted">Your spiritual practice · at a glance</div>
-          </div>
+      <div className="max-w-5xl mx-auto px-6 py-10 lg:py-14">
+        {/* Header — serif, no icon-in-row */}
+        <div className="mb-10 lum-reveal">
+          <div className="text-[13px] text-[#6B6358] mb-2">Your practice</div>
+          <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.1] tracking-tight">
+            Insights
+          </h1>
         </div>
 
         {!hasAnyActivity ? (
-          <ShellCard>
-            <div className="p-8 lg:p-12 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gold-soft/30 border border-gold/15 mb-4">
-                <TrendingUp className="w-7 h-7 text-gold" />
-              </div>
-              <h3 className="text-[18px] font-light text-ink mb-2">No activity yet</h3>
-              <p className="text-[12px] text-ink-muted leading-relaxed max-w-md mx-auto">
-                Start using Baydin's features — record dreams, draw tarot, chat with the astrologer, log moods, complete rituals — and your personal analytics will appear here.
-              </p>
+          <div className="pt-8 border-t border-[#2A2722]">
+            <div className="text-[14px] text-[#9C9489] leading-[1.7] max-w-[55ch]">
+              Start using Baydin — record dreams, draw tarot, chat with the astrologer, complete rituals — and your patterns will appear here.
             </div>
-          </ShellCard>
+          </div>
         ) : (
           <>
-            {/* Top stats grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            {/* Top stats — hairline grid, no cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#2A2722] border border-[#2A2722] mb-10">
               <StatCard icon={Moon} label="Dreams" value={analytics.totals.dreams} accent="#C5A87C" />
-              <StatCard icon={Sparkles} label="Tarot Readings" value={analytics.totals.tarotReadings} accent="#D4A0B8" />
-              <StatCard icon={MessageCircle} label="Chat Turns" value={analytics.totals.chatMessages} accent="#9CB4D1" />
-              <StatCard icon={Calendar} label="Days Active" value={analytics.totals.daysActive} accent="#7A8B6F" />
+              <StatCard icon={Sparkles} label="Tarot" value={analytics.totals.tarotReadings} accent="#D4A0B8" />
+              <StatCard icon={MessageCircle} label="Chat turns" value={analytics.totals.chatMessages} accent="#9CB4D1" />
+              <StatCard icon={Calendar} label="Days active" value={analytics.totals.daysActive} accent="#7A8B6F" />
               <StatCard icon={Flame} label="Rituals" value={analytics.totals.ritualsCompleted} accent="#B8553F" />
               <StatCard icon={Waves} label="Frequencies" value={analytics.totals.frequencySessions} accent="#6F8BA0" />
               <StatCard icon={Heart} label="Affirmations" value={analytics.totals.positivitySessions} accent="#D58FA3" />
@@ -397,27 +390,22 @@ function StatCard({
   icon: Icon, label, value, accent,
 }: { icon: any; label: string; value: number; accent: string }) {
   return (
-    <GlassCard className="p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <div
-          className="w-7 h-7 rounded-lg flex items-center justify-center"
-          style={{ background: `${accent}15`, color: accent }}
-        >
-          <Icon className="w-3.5 h-3.5" />
-        </div>
-        <div className="text-[10px] uppercase tracking-[0.15em] text-ink-muted">{label}</div>
+    <div className="p-5 bg-[#0A0908]">
+      <div className="flex items-center gap-2 mb-3">
+        <Icon className="w-3.5 h-3.5" style={{ color: accent }} />
+        <div className="text-[11px] text-[#6B6358] font-medium">{label}</div>
       </div>
-      <div className="text-[28px] font-light text-ink leading-none">{value}</div>
-    </GlassCard>
+      <div className="serif-display text-[2rem] text-[#E8E2D5] leading-none tabular-nums">{value}</div>
+    </div>
   );
 }
 
 function LuckStat({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="p-3 rounded-xl bg-black/20 border border-white/5 text-center">
-      <div className="text-[10px] uppercase tracking-[0.15em] text-ink-muted mb-1">{label}</div>
-      <div className="text-[22px] font-light" style={{ color }}>{value}</div>
-      <div className="text-[9px] text-ink-muted">Luck</div>
+    <div className="p-4 bg-[#0A0908] border border-[#2A2722] text-center">
+      <div className="text-[11px] text-[#6B6358] mb-1.5 font-medium">{label}</div>
+      <div className="serif-display text-[1.75rem] leading-none tabular-nums" style={{ color }}>{value}</div>
+      <div className="text-[10px] text-[#6B6358] mt-1">Luck</div>
     </div>
   );
 }

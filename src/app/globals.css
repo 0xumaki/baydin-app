@@ -314,3 +314,116 @@ button, a, [role="button"] { touch-action: manipulation; }
   --ink: #F5EDD8;
   --ink-muted: #C5A87C;
 }
+
+/* ============================================================
+   EDITORIAL LAYER — refined type scale + manuscript utilities
+   Added per frontend-design skill: deliberate, not templated.
+   - Cormorant Garamond for serif moments (illuminated manuscript feel)
+   - Sentence-case labels (not ALL-CAPS eyebrows — that's a default tell)
+   - Hairline rules instead of card shadows where possible
+   - One gold accent per view, never as a wash
+   ============================================================ */
+@layer components {
+  /* Type scale — 1.333 ratio, anchored at 13px body */
+  .t-caption { font-size: 0.75rem; line-height: 1.5; letter-spacing: 0; }
+  .t-body    { font-size: 0.8125rem; line-height: 1.6; letter-spacing: -0.005em; }
+  .t-body-lg { font-size: 0.9375rem; line-height: 1.65; letter-spacing: -0.005em; }
+  .t-title   { font-size: 1.125rem; line-height: 1.4; letter-spacing: -0.015em; font-weight: 500; }
+  .t-headline { font-size: 1.5rem; line-height: 1.25; letter-spacing: -0.02em; font-weight: 400; }
+  .t-display  { font-size: 2rem; line-height: 1.15; letter-spacing: -0.025em; font-weight: 400; }
+  .t-monument { font-size: 3rem; line-height: 1.05; letter-spacing: -0.03em; font-weight: 300; }
+
+  /* Serif moments — use sparingly, one per view for the most characteristic element */
+  .serif {
+    font-family: var(--font-serif), "Cormorant Garamond", Georgia, serif;
+    font-feature-settings: "liga" 1, "dlig" 1;
+  }
+  .serif-display {
+    font-family: var(--font-serif), "Cormorant Garamond", Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    font-feature-settings: "liga" 1, "dlig" 1, "lnum" 1;
+  }
+  .serif-italic {
+    font-family: var(--font-serif), "Cormorant Garamond", Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  /* Hairline rule — replaces shadow/border on cards for editorial feel */
+  .rule-h {
+    height: 1px;
+    background: var(--rule, rgba(255, 255, 255, 0.08));
+    border: 0;
+  }
+  .rule-v {
+    width: 1px;
+    background: var(--rule, rgba(255, 255, 255, 0.08));
+    align-self: stretch;
+  }
+
+  /* Section label — sentence case, not all-caps.
+     Replaces the tracked-out uppercase eyebrow tell. */
+  .label-section {
+    font-size: 0.75rem;
+    line-height: 1;
+    color: var(--ink-muted);
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  /* Editorial surface — content sits on the page, not in floating glass.
+     Used instead of lum-glass for static content blocks. */
+  .surface-editorial {
+    border-top: 1px solid var(--rule, rgba(255, 255, 255, 0.08));
+    padding-top: 1.5rem;
+  }
+
+  /* The single gold moment — one accent per view */
+  .accent-gold {
+    color: var(--gold);
+  }
+  .accent-gold-hairline {
+    border-color: rgba(197, 168, 124, 0.35);
+  }
+
+  /* Vermilion — for significance/warnings only, never decorative */
+  .accent-vermilion {
+    color: #C26B5C;
+  }
+
+  /* Focus ring — visible, keyboard-accessible */
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================================
+   PRINT-LIKE READING OPTIMIZATIONS
+   ============================================================ */
+.prose-editorial {
+  max-width: 70ch;
+}
+.prose-editorial p {
+  margin-bottom: 1em;
+  line-height: 1.7;
+}
+.prose-editorial p:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================================
+   MOTION — sparing, deliberate. One moment per view max.
+   ============================================================ */
+@keyframes lum-reveal-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.lum-reveal {
+  animation: lum-reveal-up 0.4s cubic-bezier(0.2, 0, 0, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lum-reveal { animation: none; }
+}

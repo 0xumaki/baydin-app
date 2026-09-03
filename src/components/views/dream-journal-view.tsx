@@ -169,49 +169,49 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
 
   return (
     <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
-      <div className="max-w-5xl mx-auto px-4 py-6 lg:py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div className="max-w-5xl mx-auto px-6 py-10 lg:py-14">
+        {/* Header — serif headline */}
+        <div className="flex items-end justify-between mb-8 flex-wrap gap-4 lum-reveal">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Moon className="w-5 h-5 text-gold" />
-              <h1 className="text-[22px] lg:text-[26px] font-light text-ink tracking-tight">Dream Journal</h1>
-            </div>
-            <div className="text-[12px] text-ink-muted">
-              Record your dreams · auto-detect symbols · AI interpretation by lunar context
-            </div>
+            <div className="text-[13px] text-[#6B6358] mb-2">Dreams and their patterns</div>
+            <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.1] tracking-tight">
+              Dream journal
+            </h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setFilterFav((v) => !v)}
               className={cn(
-                "p-2 rounded-lg border transition",
+                "p-2 border transition focus-ring rounded-sm",
                 filterFav
-                  ? "border-gold/40 bg-gold-soft/40 text-gold"
-                  : "lum-glass border-white/5 text-ink-muted hover:text-gold hover:border-gold/20"
+                  ? "border-[#C5A572] text-[#C5A572]"
+                  : "border-[#2A2722] text-[#6B6358] hover:text-[#E8E2D5] hover:border-[#4A4540]"
               )}
-              title="Filter favorites"
+              aria-label="Filter favorites"
             >
               <Heart className={cn("w-4 h-4", filterFav && "fill-current")} />
             </button>
-            <GoldButton onClick={() => setShowForm(true)} className="py-2 px-4 text-[13px]">
+            <button
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center gap-2 py-2 px-4 bg-[#E8E2D5] text-[#0A0908] text-[13px] font-medium hover:bg-white transition rounded-sm focus-ring"
+            >
               <Plus className="w-3.5 h-3.5" /> Record dream
-            </GoldButton>
+            </button>
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats — text, not pills */}
         {entries.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-5">
-            <Pill variant="gold" className="text-[11px]"><BookOpen className="w-3 h-3" /> {entries.length} dreams</Pill>
+          <div className="flex flex-wrap gap-x-6 gap-y-2 mb-8 text-[12px] text-[#6B6358]">
+            <span>{entries.length} dream{entries.length > 1 ? "s" : ""}</span>
             {entries.filter((e) => e.isFavorite).length > 0 && (
-              <Pill variant="gold" className="text-[11px]"><Heart className="w-3 h-3" /> {entries.filter((e) => e.isFavorite).length} favorites</Pill>
+              <span>{entries.filter((e) => e.isFavorite).length} favorite{entries.filter((e) => e.isFavorite).length > 1 ? "s" : ""}</span>
             )}
             {entries.filter((e) => e.isRecurring).length > 0 && (
-              <Pill className="text-[11px] bg-white/5 text-ink-muted border border-white/10"><RefreshCw className="w-3 h-3" /> {entries.filter((e) => e.isRecurring).length} recurring</Pill>
+              <span>{entries.filter((e) => e.isRecurring).length} recurring</span>
             )}
             {entries.filter((e) => e.interpretation).length > 0 && (
-              <Pill variant="leaf" className="text-[11px]"><Sparkles className="w-3 h-3" /> {entries.filter((e) => e.interpretation).length} interpreted</Pill>
+              <span>{entries.filter((e) => e.interpretation).length} interpreted</span>
             )}
           </div>
         )}
@@ -259,45 +259,41 @@ function EntryCard({
       tabIndex={0}
       onClick={onClick}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }}
-      className="w-full p-4 rounded-2xl lum-glass border border-white/5 hover:border-gold/20 transition group cursor-pointer text-left"
+      className="w-full p-5 border-b border-[#2A2722] hover:bg-[#0F0D0B] transition group cursor-pointer text-left focus-ring"
     >
-      <div className="flex items-start gap-3">
-        {/* Mood badge */}
-        <div
-          className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-xl border"
-          style={{ background: `${mood.color}15`, borderColor: `${mood.color}40` }}
-          title={mood.label}
-        >
+      <div className="flex items-start gap-4">
+        {/* Mood — just the emoji, no badge chrome */}
+        <div className="text-[1.5rem] leading-none mt-1 shrink-0" title={mood.label}>
           {mood.emoji}
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <div className="text-[14px] text-ink font-medium truncate">{entry.title}</div>
+          <div className="flex items-baseline gap-2 mb-1">
+            <div className="serif text-[1.125rem] text-[#E8E2D5] truncate">{entry.title}</div>
             {entry.isRecurring && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-white/5 text-ink-muted border border-white/10">RECURRING</span>
+              <span className="text-[10px] text-[#6B6358] serif-italic">recurring</span>
             )}
             {entry.interpretation && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-leaf/10 text-leaf border border-leaf/20">INTERPRETED</span>
+              <span className="text-[10px] text-[#C5A572] serif-italic">interpreted</span>
             )}
           </div>
-          <div className="text-[12px] text-ink-muted line-clamp-2 mb-1.5">{entry.content}</div>
+          <div className="text-[13px] text-[#9C9489] line-clamp-2 mb-2 leading-[1.6]">{entry.content}</div>
 
-          {/* Symbols + lunar */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] text-ink-muted/70">
+          {/* Symbols + lunar — text, not pills */}
+          <div className="flex items-center gap-3 flex-wrap text-[11px] text-[#6B6358]">
+            <span>
               {new Date(entry.dreamDate + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </span>
             {entry.lunarContext && (
-              <span className="text-[10px] text-gold/80 flex items-center gap-0.5" title={`${entry.lunarContext.moonPhase} · ${entry.lunarContext.nakshatra}`}>
+              <span title={`${entry.lunarContext.moonPhase} · ${entry.lunarContext.nakshatra}`}>
                 {entry.lunarContext.emoji} {entry.lunarContext.nakshatra}
               </span>
             )}
-            {entry.symbols.slice(0, 3).map((s) => (
-              <span key={s} className="text-[9px] px-1.5 py-0.5 rounded-full bg-white/5 text-ink-muted border border-white/10">#{s}</span>
+            {entry.symbols.slice(0, 4).map((s) => (
+              <span key={s} className="text-[#9C9489]">#{s}</span>
             ))}
-            {entry.symbols.length > 3 && (
-              <span className="text-[9px] text-ink-muted/60">+{entry.symbols.length - 3}</span>
+            {entry.symbols.length > 4 && (
+              <span className="text-[#6B6358]">+{entry.symbols.length - 4}</span>
             )}
           </div>
         </div>
@@ -305,15 +301,15 @@ function EntryCard({
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
-            className="p-1.5 rounded-md text-ink-muted hover:text-gold transition opacity-60 group-hover:opacity-100"
-            title={entry.isFavorite ? "Remove favorite" : "Add to favorites"}
+            className="p-1.5 text-[#6B6358] hover:text-[#C5A572] transition focus-ring rounded-sm"
+            aria-label={entry.isFavorite ? "Remove favorite" : "Add to favorites"}
           >
-            <Heart className={cn("w-3.5 h-3.5", entry.isFavorite && "fill-gold text-gold")} />
+            <Heart className={cn("w-3.5 h-3.5", entry.isFavorite && "fill-[#C5A572] text-[#C5A572]")} />
           </button>
           <button
             onClick={onDelete}
-            className="p-1.5 rounded-md text-ink-muted hover:text-red-400 transition opacity-60 group-hover:opacity-100"
-            title="Delete dream"
+            className="p-1.5 text-[#6B6358] hover:text-[#C26B5C] transition focus-ring rounded-sm"
+            aria-label="Delete dream"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -328,20 +324,18 @@ function EntryCard({
 // ============================================================
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
-    <ShellCard>
-      <div className="p-8 lg:p-12 text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gold-soft/30 border border-gold/15 mb-4">
-          <Moon className="w-7 h-7 text-gold" />
-        </div>
-        <h3 className="text-[18px] font-light text-ink mb-2">Your dream journal is empty</h3>
-        <p className="text-[12px] text-ink-muted leading-relaxed max-w-md mx-auto mb-5">
-          Record your dreams upon waking. Baydin will auto-detect archetypal symbols, compute the lunar context, and offer an AI interpretation grounded in Vedic and Jungian wisdom.
-        </p>
-        <GoldButton onClick={onCreate} className="py-2.5 px-5 text-[13px]">
-          <Plus className="w-4 h-4" /> Record your first dream
-        </GoldButton>
-      </div>
-    </ShellCard>
+    <div className="pt-12 border-t border-[#2A2722]">
+      <div className="serif text-[1.5rem] text-[#E8E2D5] mb-3">Your dream journal is empty.</div>
+      <p className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch] mb-6">
+        Record your dreams upon waking. Baydin detects archetypal symbols, computes the lunar context, and offers an interpretation grounded in Vedic and Jungian tradition.
+      </p>
+      <button
+        onClick={onCreate}
+        className="inline-flex items-center gap-2 py-3 px-6 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition rounded-sm focus-ring"
+      >
+        <Plus className="w-4 h-4" /> Record your first dream
+      </button>
+    </div>
   );
 }
 
@@ -384,47 +378,49 @@ function EntryForm({
 
   return (
     <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
-      <form onSubmit={submit} className="max-w-2xl mx-auto px-4 py-6 lg:py-8">
-        <button type="button" onClick={onCancel} className="text-[12px] text-ink-muted hover:text-gold transition mb-4">
+      <form onSubmit={submit} className="max-w-2xl mx-auto px-6 py-12 lg:py-16">
+        <button type="button" onClick={onCancel} className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition mb-4 focus-ring rounded-sm">
           ← Cancel
         </button>
 
-        <div className="flex items-center gap-2 mb-6">
-          <Moon className="w-5 h-5 text-gold" />
-          <h1 className="text-[22px] lg:text-[26px] font-light text-ink tracking-tight">Record a Dream</h1>
+        <div className="mb-10 lum-reveal">
+          <div className="text-[13px] text-[#6B6358] mb-2">A new entry</div>
+          <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.1] tracking-tight">
+            Record a dream
+          </h1>
         </div>
 
-        <GlassCard className="p-5 lg:p-6 space-y-4">
+        <div className="space-y-6 pb-8 border-b border-[#2A2722] mb-8">
           {/* Dream date */}
           <div>
-            <label className="text-[12px] text-ink-muted mb-1.5 block">Dream date</label>
+            <label className="block text-[12px] text-[#6B6358] font-medium mb-2">Dream date</label>
             <input
               type="date"
               value={dreamDate}
               onChange={(e) => setDreamDate(e.target.value)}
               max={new Date().toISOString().slice(0, 10)}
               min="1900-01-01"
-              className="w-full bg-black/30 border border-white/10 rounded-xl px-3.5 py-2.5 text-[14px] text-ink focus:outline-none focus:border-gold/40 transition [color-scheme:dark]"
+              className="w-full bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] focus:outline-none focus:border-[#C5A572] transition [color-scheme:dark]"
             />
-            <div className="text-[10px] text-ink-muted mt-1">The lunar context will be computed for this date.</div>
+            <div className="text-[11px] text-[#6B6358] mt-1.5">The lunar context will be computed for this date.</div>
           </div>
 
           {/* Title */}
           <div>
-            <label className="text-[12px] text-ink-muted mb-1.5 block">Title</label>
+            <label className="block text-[12px] text-[#6B6358] font-medium mb-2">Title</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. The serpent at the river"
               maxLength={100}
-              className="w-full bg-black/30 border border-white/10 rounded-xl px-3.5 py-2.5 text-[14px] text-ink placeholder:text-ink-muted/50 focus:outline-none focus:border-gold/40 transition"
+              className="w-full bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] placeholder:text-[#4A4540] focus:outline-none focus:border-[#C5A572] transition"
             />
           </div>
 
           {/* Mood */}
           <div>
-            <label className="text-[12px] text-ink-muted mb-2 block">Mood</label>
+            <label className="block text-[12px] text-[#6B6358] font-medium mb-2.5">Mood</label>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
               {MOODS.map((m) => (
                 <button
@@ -432,15 +428,14 @@ function EntryForm({
                   type="button"
                   onClick={() => setMood(m.id)}
                   className={cn(
-                    "p-2 rounded-xl border text-center transition",
+                    "p-3 border text-center transition focus-ring rounded-sm",
                     mood === m.id
-                      ? "border-gold/40 bg-gold-soft/30"
-                      : "border-white/10 bg-black/20 hover:border-gold/20"
+                      ? "border-[#C5A572] bg-[#1A1714]"
+                      : "border-[#2A2722] bg-transparent hover:border-[#4A4540]"
                   )}
-                  style={mood === m.id ? { borderColor: `${m.color}60`, background: `${m.color}15` } : {}}
                 >
-                  <div className="text-lg">{m.emoji}</div>
-                  <div className="text-[9px] text-ink-muted mt-0.5">{m.label}</div>
+                  <div className="text-lg leading-none">{m.emoji}</div>
+                  <div className="text-[10px] text-[#6B6358] mt-1">{m.label}</div>
                 </button>
               ))}
             </div>
@@ -448,35 +443,44 @@ function EntryForm({
 
           {/* Content */}
           <div>
-            <label className="text-[12px] text-ink-muted mb-1.5 block">Dream narrative</label>
+            <label className="block text-[12px] text-[#6B6358] font-medium mb-2">Dream narrative</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Describe your dream in as much detail as you remember — places, characters, emotions, colors, actions..."
+              placeholder="Describe your dream in as much detail as you remember — places, characters, emotions, colors, actions…"
               rows={8}
-              className="w-full bg-black/30 border border-white/10 rounded-xl px-3.5 py-2.5 text-[14px] text-ink placeholder:text-ink-muted/50 focus:outline-none focus:border-gold/40 transition resize-y min-h-[160px]"
+              className="w-full bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] placeholder:text-[#4A4540] focus:outline-none focus:border-[#C5A572] transition resize-y min-h-[160px] leading-[1.7]"
             />
-            <div className="text-[10px] text-ink-muted mt-1">{content.length} characters · symbols will be auto-detected</div>
+            <div className="text-[11px] text-[#6B6358] mt-1.5">{content.length} characters · symbols auto-detected</div>
           </div>
 
           {/* Recurring */}
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-2.5 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={isRecurring}
               onChange={(e) => setIsRecurring(e.target.checked)}
-              className="w-4 h-4 rounded border-white/20 bg-black/30 text-gold focus:ring-gold/40"
+              className="w-4 h-4 accent-[#C5A572]"
             />
-            <span className="text-[12px] text-ink-muted">This is a recurring dream theme</span>
+            <span className="text-[13px] text-[#9C9489]">This is a recurring dream theme</span>
           </label>
-        </GlassCard>
+        </div>
 
-        <div className="flex gap-2 mt-5">
-          <GhostButton type="button" onClick={onCancel} className="flex-1 py-2.5 text-[13px]">Cancel</GhostButton>
-          <GoldButton type="submit" disabled={saving} className="flex-1 py-2.5 text-[13px]">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-            Save dream
-          </GoldButton>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 py-3 text-[14px] text-[#9C9489] hover:text-[#E8E2D5] border border-[#2A2722] hover:border-[#4A4540] transition rounded-sm focus-ring"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex-1 py-3 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition rounded-sm disabled:opacity-50 focus-ring"
+          >
+            {saving ? "Saving…" : "Save dream"}
+          </button>
         </div>
       </form>
     </div>
@@ -541,7 +545,7 @@ function EntryDetail({
             {mood.emoji}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.2em] text-gold">
+            <div className="text-[12px] text-[#6B6358] font-medium">
               {dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
             </div>
             <h1 className="text-[22px] lg:text-[26px] font-light text-ink mt-1 leading-tight">{entry.title}</h1>
@@ -568,7 +572,7 @@ function EntryDetail({
 
         {/* Dream narrative */}
         <GlassCard className="p-5 lg:p-6 mb-4">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-2">The Dream</div>
+          <div className="text-[12px] text-[#6B6358] font-medium mb-3">The Dream</div>
           <div className="text-[14px] text-ink/90 leading-relaxed whitespace-pre-wrap">{entry.content}</div>
         </GlassCard>
 
@@ -577,7 +581,7 @@ function EntryDetail({
           <GlassCard className="p-5 lg:p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
               <Moon className="w-4 h-4 text-gold" />
-              <div className="text-[10px] uppercase tracking-[0.2em] text-gold">Lunar Context</div>
+              <div className="text-[12px] text-[#6B6358] font-medium">Lunar Context</div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <LunarMini label="Moon phase" value={`${entry.lunarContext.emoji} ${entry.lunarContext.moonPhase}`} sub={`${(entry.lunarContext.illumination * 100).toFixed(0)}% lit`} />
@@ -600,7 +604,7 @@ function EntryDetail({
           <GlassCard className="p-5 lg:p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
               <Star className="w-4 h-4 text-gold" />
-              <div className="text-[10px] uppercase tracking-[0.2em] text-gold">Symbols Detected</div>
+              <div className="text-[12px] text-[#6B6358] font-medium">Symbols Detected</div>
             </div>
             <div className="space-y-2.5">
               {entry.symbols.map((kw) => {
@@ -639,7 +643,7 @@ function EntryDetail({
             <div className="p-5 lg:p-6">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="w-4 h-4 text-gold" />
-                <div className="text-[10px] uppercase tracking-[0.2em] text-gold">AI Interpretation</div>
+                <div className="text-[12px] text-[#6B6358] font-medium">AI Interpretation</div>
               </div>
               <div className="text-[13px] text-ink/90 leading-relaxed whitespace-pre-wrap">{interpretation}</div>
               <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
@@ -675,7 +679,7 @@ function EntryDetail({
 function LunarMini({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="p-2.5 rounded-lg bg-black/20 border border-white/5">
-      <div className="text-[9px] uppercase tracking-[0.18em] text-ink-muted/70">{label}</div>
+      <div className="text-[11px] text-[#6B6358]">{label}</div>
       <div className="text-[12px] text-ink mt-0.5 font-medium truncate" title={value}>{value}</div>
       {sub && <div className="text-[10px] text-ink-muted">{sub}</div>}
     </div>

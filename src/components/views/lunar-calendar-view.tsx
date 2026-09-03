@@ -125,70 +125,59 @@ export function LunarCalendarView({ onAuth }: { onAuth: () => void }) {
 
   return (
     <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
-      <div className="max-w-6xl mx-auto px-4 py-6 lg:py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div className="max-w-6xl mx-auto px-6 py-10 lg:py-14">
+        {/* Header — serif headline + month nav */}
+        <div className="flex items-end justify-between mb-8 flex-wrap gap-4 lum-reveal">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Moon className="w-5 h-5 text-gold" />
-              <h1 className="text-[22px] lg:text-[26px] font-light text-ink tracking-tight">Lunar Calendar</h1>
-            </div>
-            <div className="text-[12px] text-ink-muted">
-              Vedic panchanga · moon phases · nakshatra · tithi · festivals
-            </div>
+            <div className="text-[13px] text-[#6B6358] mb-2">Vedic panchanga</div>
+            <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.1] tracking-tight">
+              Lunar calendar
+            </h1>
           </div>
-          <div className="flex items-center gap-2">
-            <GhostButton onClick={goToday} className="py-2 px-3 text-[12px]">
-              <Calendar className="w-3.5 h-3.5" /> Today
-            </GhostButton>
-            <button onClick={prevMonth} className="p-2 rounded-lg lum-glass border border-white/5 hover:border-gold/30 text-ink-muted hover:text-gold transition">
+          <div className="flex items-center gap-3">
+            <button onClick={goToday} className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition focus-ring rounded-sm">
+              Today
+            </button>
+            <button onClick={prevMonth} aria-label="Previous month" className="p-1.5 text-[#6B6358] hover:text-[#E8E2D5] transition focus-ring rounded-sm">
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <div className="text-[14px] text-ink font-medium min-w-[140px] text-center">
-              {lunarMonth?.monthName ?? "..."} {year}
+            <div className="serif-display text-[1.25rem] text-[#E8E2D5] min-w-[160px] text-center tabular-nums">
+              {lunarMonth?.monthName ?? "…"} {year}
             </div>
-            <button onClick={nextMonth} className="p-2 rounded-lg lum-glass border border-white/5 hover:border-gold/30 text-ink-muted hover:text-gold transition">
+            <button onClick={nextMonth} aria-label="Next month" className="p-1.5 text-[#6B6358] hover:text-[#E8E2D5] transition focus-ring rounded-sm">
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Month summary pills */}
+        {/* Month summary — text, not pills */}
         {summary && (
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap gap-x-6 gap-y-2 mb-8 text-[12px] text-[#6B6358]">
             {summary.purnima.length > 0 && (
-              <Pill variant="gold" className="text-[11px]">
-                <Moon className="w-3 h-3" /> Purnima: {summary.purnima.map(d => d.date.slice(8)).join(", ")}
-              </Pill>
+              <span>Purnima: <span className="text-[#C5A572]">{summary.purnima.map(d => d.date.slice(8)).join(", ")}</span></span>
             )}
             {summary.amavasya.length > 0 && (
-              <Pill className="text-[11px] bg-white/5 text-ink-muted border border-white/10">
-                <Sun className="w-3 h-3" /> Amavasya: {summary.amavasya.map(d => d.date.slice(8)).join(", ")}
-              </Pill>
+              <span>Amavasya: <span className="text-[#9C9489]">{summary.amavasya.map(d => d.date.slice(8)).join(", ")}</span></span>
             )}
             {summary.ekadashi.length > 0 && (
-              <Pill variant="leaf" className="text-[11px]">
-                <Sparkles className="w-3 h-3" /> Ekadashi: {summary.ekadashi.map(d => d.date.slice(8)).join(", ")}
-              </Pill>
+              <span>Ekadashi: <span className="text-[#9C9489]">{summary.ekadashi.map(d => d.date.slice(8)).join(", ")}</span></span>
             )}
             {summary.festivals.length > 0 && (
-              <Pill variant="gold" className="text-[11px]">
-                <Star className="w-3 h-3" /> {summary.festivals.length} festival{summary.festivals.length > 1 ? "s" : ""}
-              </Pill>
+              <span>{summary.festivals.length} festival{summary.festivals.length > 1 ? "s" : ""}</span>
             )}
           </div>
         )}
 
-        {/* Calendar grid */}
-        <GlassCard className="p-3 lg:p-4 mb-6 overflow-hidden">
+        {/* Calendar grid — hairline border, no glass */}
+        <div className="border border-[#2A2722] mb-10">
           {/* DOW header */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
+          <div className="grid grid-cols-7 border-b border-[#2A2722]">
             {DOW_LABELS.map((d, i) => (
               <div
                 key={d}
                 className={cn(
-                  "text-center text-[10px] uppercase tracking-[0.18em] py-1 font-medium",
-                  i === 0 ? "text-gold/80" : i === 6 ? "text-leaf/80" : "text-ink-muted/60"
+                  "text-center text-[11px] py-2.5 font-medium",
+                  i === 0 ? "text-[#C5A572]" : i === 6 ? "text-[#9C9489]" : "text-[#6B6358]"
                 )}
               >
                 {d}
@@ -196,19 +185,19 @@ export function LunarCalendarView({ onAuth }: { onAuth: () => void }) {
             ))}
           </div>
           {/* Day cells */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7">
             {cells.map((day, idx) => (
               <DayCell key={idx} day={day} onClick={() => day && openDay(day)} />
             ))}
           </div>
-        </GlassCard>
+        </div>
 
-        {/* Legend */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
-          <LegendItem emoji="🌑" label="Amavasya" desc="New Moon · ancestor rituals" />
-          <LegendItem emoji="🌕" label="Purnima" desc="Full Moon · auspicious" />
-          <LegendItem emoji="✦" label="Ekadashi" desc="11th lunar day · fasting" />
-          <LegendItem emoji="⭐" label="Festival" desc="Vedic holy day" />
+        {/* Legend — text, not cards */}
+        <div className="flex flex-wrap gap-x-6 gap-y-2 mb-10 text-[12px] text-[#6B6358]">
+          <span>🌑 Amavasya — new moon</span>
+          <span>🌕 Purnima — full moon</span>
+          <span>Ekadashi — 11th tithi</span>
+          <span>★ Festival</span>
         </div>
 
         {/* Today's moon spotlight */}
@@ -224,53 +213,45 @@ export function LunarCalendarView({ onAuth }: { onAuth: () => void }) {
 // DAY CELL — one cell in the calendar grid
 // ============================================================
 function DayCell({ day, onClick }: { day: LunarDay | null; onClick: () => void }) {
-  if (!day) return <div className="aspect-square min-h-[56px] rounded-lg bg-white/[0.01]" />;
+  if (!day) return <div className="aspect-square min-h-[60px] border-r border-b border-[#1A1714]" />;
 
   return (
     <button
       onClick={onClick}
       className={cn(
-        "aspect-square min-h-[56px] rounded-lg p-1.5 lg:p-2 flex flex-col items-center justify-start border transition relative group",
+        "aspect-square min-h-[60px] p-2 flex flex-col items-center justify-start transition-colors relative border-r border-b border-[#1A1714] focus-ring",
         day.isToday
-          ? "border-gold/50 bg-gold-soft/30 shadow-[0_0_0_1px_rgba(197,168,124,0.2)]"
+          ? "bg-[#1A1714]"
           : day.isFestival
-          ? "border-gold/20 bg-gold-soft/10 hover:border-gold/40"
-          : day.isAmavasya
-          ? "border-white/5 bg-black/30 hover:border-white/20"
+          ? "bg-[#15110D] hover:bg-[#1A1714]"
           : day.isPurnima
-          ? "border-gold/15 bg-gold/[0.06] hover:border-gold/30"
-          : "border-white/5 bg-white/[0.02] hover:border-gold/20 hover:bg-white/[0.04]"
+          ? "bg-[#13110C] hover:bg-[#1A1714]"
+          : "hover:bg-[#0F0D0B]"
       )}
     >
-      {/* Day number */}
-      <div className="flex items-center justify-between w-full">
+      {/* Day number — serif, tabular */}
+      <div className="flex items-center justify-between w-full mb-1">
         <span className={cn(
-          "text-[11px] lg:text-[12px] font-medium leading-none",
-          day.isToday ? "text-gold" : "text-ink"
+          "text-[12px] leading-none tabular-nums",
+          day.isToday ? "text-[#C5A572] font-medium" : "text-[#E8E2D5]"
         )}>
           {parseInt(day.date.slice(8), 10)}
         </span>
-        {day.isToday && <span className="w-1 h-1 rounded-full bg-gold" />}
+        {day.isToday && <span className="w-1 h-1 rounded-full bg-[#C5A572]" />}
       </div>
       {/* Moon phase SVG */}
-      <div className="flex-1 flex items-center justify-center py-1">
-        <MoonPhaseSvg phaseFrac={day.moonPhase.phaseFrac} size={day.isToday ? 26 : 22} />
+      <div className="flex-1 flex items-center justify-center py-0.5">
+        <MoonPhaseSvg phaseFrac={day.moonPhase.phaseFrac} size={day.isToday ? 24 : 20} />
       </div>
-      {/* Tithi number / festival indicator */}
-      <div className="flex items-center justify-center gap-0.5 w-full">
-        {day.isFestival ? (
-          <span className="text-[8px] text-gold leading-none truncate max-w-full" title={day.festivalName}>
-            <Star className="w-2 h-2 inline" />
-          </span>
-        ) : (
-          <span className="text-[8px] text-ink-muted leading-none truncate max-w-full" title={day.panchanga.nakshatra}>
-            {day.panchanga.nakshatra.substring(0, 4)}
-          </span>
-        )}
+      {/* Nakshatra abbreviation — sentence case */}
+      <div className="w-full text-center">
+        <span className="text-[9px] text-[#6B6358] leading-none truncate block max-w-full" title={day.panchanga.nakshatra}>
+          {day.panchanga.nakshatra.substring(0, 4)}
+        </span>
       </div>
-      {/* Festival dot */}
+      {/* Festival marker — small gold dot in corner */}
       {day.isFestival && (
-        <span className="absolute top-1 right-1 w-1 h-1 rounded-full bg-gold animate-pulse" />
+        <span className="absolute top-1.5 right-1.5 w-1 h-1 rounded-full bg-[#C5A572]" />
       )}
     </button>
   );

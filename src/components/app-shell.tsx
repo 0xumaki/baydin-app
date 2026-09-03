@@ -97,27 +97,22 @@ export function AppShell() {
   }
 
   return (
-    <div className="relative min-h-[100dvh] flex flex-col bg-background lum-aurora overflow-hidden">
+    <div className="relative min-h-[100dvh] flex flex-col bg-background overflow-hidden">
       {/* Mobile top bar */}
-      <header className="lg:hidden sticky top-0 z-30 lum-glass border-b border-white/5 px-4 py-3 flex items-center justify-between lum-pt-safe">
-        <button onClick={() => setSidebarOpen(true)} aria-label="Open navigation menu" className="p-2 -ml-2 text-ink-muted hover:text-ink transition">
+      <header className="lg:hidden sticky top-0 z-30 bg-[#0A0908] border-b border-[#2A2722] px-4 py-3 flex items-center justify-between lum-pt-safe">
+        <button onClick={() => setSidebarOpen(true)} aria-label="Open navigation menu" className="p-2 -ml-2 text-[#6B6358] hover:text-[#E8E2D5] transition">
           <Menu className="w-5 h-5" />
         </button>
-        <div className="flex items-center gap-2">
-          <span className="text-gold text-lg">✦</span>
-          <span className="font-light tracking-tight text-ink text-[15px]">Baydin</span>
-        </div>
+        <div className="serif-display text-[1.125rem] text-[#E8E2D5] leading-none">Baydin</div>
         {user ? (
-          <button onClick={() => setProfileOpen(true)} className="flex items-center gap-1.5">
+          <button onClick={() => setProfileOpen(true)} className="flex items-center gap-1.5 text-[12px] text-[#9C9489]">
             {user.role === "admin" && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-medium border bg-gold/15 border-gold/40 text-gold" title="Admin bypass active">
-                <Shield className="w-2.5 h-2.5" /> ADMIN
-              </span>
+              <span className="text-[10px] text-[#C5A572]">admin</span>
             )}
-            <Pill variant="gold">{user.luckBalance} Luck</Pill>
+            <span className="tabular-nums">{user.luckBalance}</span>
           </button>
         ) : (
-          <button onClick={() => setAuthOpen(true)} className="text-[13px] text-gold">Sign in</button>
+          <button onClick={() => setAuthOpen(true)} className="text-[13px] text-[#9C9489] hover:text-[#E8E2D5] transition">Sign in</button>
         )}
       </header>
 
@@ -138,37 +133,38 @@ export function AppShell() {
 
         {/* Main area */}
         <main className="flex-1 min-w-0 flex flex-col">
-          {/* Desktop top bar */}
-          <div className="hidden lg:flex items-center justify-between px-6 py-3 border-b border-white/5 lum-glass">
-            <div className="flex items-center gap-2">
-              <span className="text-gold text-xl">✦</span>
-              <span className="font-light tracking-tight text-ink text-lg">Baydin</span>
-              <span className="text-ink-muted text-xs ml-2 hidden xl:inline">Astrologer · Tarot · Horoscope · Rituals</span>
+          {/* Desktop top bar — quiet, no glass, no sparkle */}
+          <div className="hidden lg:flex items-center justify-between px-8 py-4 border-b border-[#2A2722] bg-[#0A0908]">
+            <div className="flex items-baseline gap-3">
+              <span className="serif-display text-[1.125rem] text-[#E8E2D5]">Baydin</span>
+              <span className="text-[11px] text-[#6B6358] hidden xl:inline">Astrology, tarot, ritual</span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {user ? (
                 <>
                   {user.role === "admin" && (
-                    <span
-                      className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide border bg-gold/15 border-gold/40 text-gold"
-                      title="Admin bypass active — all Luck charges waived for QA/preview"
-                    >
-                      <Shield className="w-3 h-3" /> ADMIN BYPASS
+                    <span className="text-[11px] text-[#C5A572]" title="Admin bypass active">
+                      admin
                     </span>
                   )}
                   <DailyRewardBadge />
-                  <Pill variant="gold" className="text-[12px]">
-                    <Wallet className="w-3 h-3" /> {user.luckBalance} Luck
-                  </Pill>
+                  <button onClick={() => setProfileOpen(true)} className="text-[12px] text-[#9C9489] hover:text-[#E8E2D5] transition tabular-nums">
+                    {user.luckBalance} Luck
+                  </button>
                   <ThemeToggle />
-                  <button onClick={() => setProfileOpen(true)} aria-label="Open profile and settings" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-ink-muted hover:text-ink hover:border-gold/30 transition">
+                  <button onClick={() => setProfileOpen(true)} aria-label="Open profile and settings" className="w-8 h-8 rounded-sm flex items-center justify-center text-[#6B6358] hover:text-[#E8E2D5] transition focus-ring">
                     <Settings className="w-4 h-4" />
                   </button>
                 </>
               ) : (
                 <>
                   <GhostButton onClick={() => setAuthOpen(true)} className="py-2 px-4 text-[12px]">Sign in</GhostButton>
-                  <GoldButton onClick={() => setAuthOpen(true)} className="py-2 px-4 text-[12px]">Get started</GoldButton>
+                  <button
+                    onClick={() => setAuthOpen(true)}
+                    className="py-2 px-4 text-[13px] bg-[#E8E2D5] text-[#0A0908] hover:bg-white transition rounded-sm focus-ring"
+                  >
+                    Begin
+                  </button>
                 </>
               )}
             </div>
@@ -250,33 +246,33 @@ function Sidebar(props: {
       <aside
         className={cn(
           "fixed lg:sticky top-0 left-0 z-40 lg:z-10 h-[100dvh] lg:h-auto lg:self-stretch w-[280px] shrink-0",
-          "lum-glass border-r border-white/5 flex flex-col transition-transform duration-300",
+          "bg-[#0A0908] border-r border-[#2A2722] flex flex-col transition-transform duration-300",
           props.open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        {/* Logo / brand */}
-        <div className="flex items-center justify-between px-5 pt-5 pb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-gold text-2xl">✦</span>
-            <div className="leading-tight">
-              <div className="font-light tracking-tight text-ink text-[17px]">Baydin</div>
-              <div className="text-[10px] text-ink-muted tracking-[0.2em] uppercase">Fortune · Stars · Ritual</div>
-            </div>
+        {/* Brand — serif wordmark, no sparkle emoji */}
+        <div className="flex items-center justify-between px-5 pt-6 pb-4">
+          <div className="leading-tight">
+            <div className="serif-display text-[1.5rem] text-[#E8E2D5] leading-none">Baydin</div>
+            <div className="text-[11px] text-[#6B6358] mt-1">Fortune, stars, ritual</div>
           </div>
-          <button onClick={props.onClose} aria-label="Close navigation menu" className="lg:hidden p-1 text-ink-muted">
+          <button onClick={props.onClose} aria-label="Close navigation menu" className="lg:hidden p-1 text-[#6B6358] hover:text-[#E8E2D5] transition">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* New consultation button */}
-        <div className="px-3 pb-3">
-          <GoldButton onClick={props.onNewChat} className="w-full py-2.5 text-[13px]">
-            <Plus className="w-4 h-4" /> New consultation
-          </GoldButton>
+        {/* New consultation — understated text link, not a gold button */}
+        <div className="px-5 pb-4">
+          <button
+            onClick={props.onNewChat}
+            className="w-full flex items-center gap-2 py-2.5 text-[13px] text-[#E8E2D5] hover:text-[#C5A572] transition border-b border-[#2A2722] focus-ring rounded-sm"
+          >
+            <Plus className="w-3.5 h-3.5" /> New consultation
+          </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="px-2 flex-1 overflow-y-auto lumina-scroll">
+        {/* Navigation — sentence-case group labels, no ALL-CAPS */}
+        <nav className="px-3 flex-1 overflow-y-auto lumina-scroll">
           {(() => {
             const groups: Record<string, typeof props.navItems> = {};
             for (const item of props.navItems) {
@@ -285,24 +281,23 @@ function Sidebar(props: {
             }
             const order = ["Daily", "Practice", "Astrology", "Account", "Other"];
             return order.filter((g) => groups[g]).map((g) => (
-              <div key={g} className="mb-3">
-                <div className="px-3 pt-2 pb-1 text-[9px] uppercase tracking-[0.18em] text-ink-muted/60 font-medium">{g}</div>
-                <div className="space-y-0.5">
+              <div key={g} className="mb-5">
+                <div className="px-3 pt-3 pb-1.5 text-[12px] text-[#6B6358] font-medium">{g}</div>
+                <div className="space-y-px">
                   {groups[g].map((item) => (
                     <button
                       key={item.view}
                       onClick={() => props.onNav(item)}
                       className={cn(
-                        "group w-full flex items-center gap-3 px-3 py-2.5 min-h-[40px] rounded-xl text-[13px] transition-all border",
+                        "group w-full flex items-center gap-3 px-3 py-2 min-h-[36px] rounded-none text-[13px] transition-colors",
                         props.currentView === item.view
-                          ? "bg-gold-soft text-gold border-gold/20 shadow-[inset_0_0_0_1px_rgba(197,168,124,0.08)]"
-                          : "text-ink-muted hover:text-ink hover:bg-white/[0.03] border-transparent"
+                          ? "text-[#E8E2D5] bg-[#1A1714]"
+                          : "text-[#9C9489] hover:text-[#E8E2D5] hover:bg-[#0F0D0B]"
                       )}
                     >
-                      <item.icon className={cn("w-[17px] h-[17px] shrink-0 transition-transform group-hover:scale-110", props.currentView === item.view && "text-gold")} />
+                      <item.icon className={cn("w-[15px] h-[15px] shrink-0", props.currentView === item.view && "text-[#C5A572]")} />
                       <span className="flex-1 text-left">{item.label}</span>
-                      {(() => { const b = badgeFor(item.view); return b ? <span className="px-1.5 py-0.5 rounded-full bg-gold/20 text-gold text-[9px] font-medium leading-none min-w-[16px] text-center">{b}</span> : null; })()}
-                      {props.currentView === item.view && <ChevronRight className="w-3.5 h-3.5" />}
+                      {(() => { const b = badgeFor(item.view); return b ? <span className="text-[10px] text-[#C5A572] tabular-nums">{b}</span> : null; })()}
                     </button>
                   ))}
                 </div>
@@ -311,28 +306,28 @@ function Sidebar(props: {
           })()}
         </nav>
 
-        {/* Daily reward CTA (always visible, addictive) */}
+        {/* Daily reward CTA */}
         {props.user && (
-          <div className="px-3 py-2">
+          <div className="px-5 py-2">
             <DailyRewardCard />
           </div>
         )}
 
         {/* Footer: user profile / sign in */}
-        <div className="border-t border-white/5 p-3">
+        <div className="border-t border-[#2A2722] p-3">
           {props.user ? (
             <button
               onClick={props.onProfile}
-              className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/[0.03] transition"
+              className="w-full flex items-center gap-3 p-2 rounded-sm hover:bg-[#0F0D0B] transition"
             >
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gold/30 to-leaf/20 border border-gold/20 flex items-center justify-center text-gold text-[13px] font-medium">
+              <div className="w-8 h-8 rounded-full bg-[#1A1714] border border-[#2A2722] flex items-center justify-center text-[#C5A572] text-[12px] font-medium">
                 {(props.user.email[0] || "B").toUpperCase()}
               </div>
               <div className="flex-1 min-w-0 text-left">
-                <div className="text-[13px] text-ink truncate">{props.user.name || props.user.email}</div>
-                <div className="text-[11px] text-gold/80">{props.user.luckBalance} Luck</div>
+                <div className="text-[13px] text-[#E8E2D5] truncate">{props.user.name || props.user.email}</div>
+                <div className="text-[11px] text-[#6B6358]">{props.user.luckBalance} Luck</div>
               </div>
-              <Settings className="w-4 h-4 text-ink-muted" />
+              <Settings className="w-3.5 h-3.5 text-[#6B6358]" />
             </button>
           ) : (
             <GhostButton onClick={props.onAuth} className="w-full py-2.5 text-[13px]">

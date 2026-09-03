@@ -65,4 +65,4 @@ server.log
 /repo-scan/
 
 # Agent context
-/agent-ctx/
+/agent-ctx/.skills/
