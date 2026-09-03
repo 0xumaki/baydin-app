@@ -1,6 +1,6 @@
 import "server-only";
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { db } from "@/lib/db";
 import { createHmac, timingSafeEqual, randomBytes } from "crypto";
 
@@ -46,10 +46,17 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 export async function createSession(userId: string): Promise<void> {
   const token = sign(userId);
   const store = await cookies();
+  // Detect if we're being accessed via the preview gateway (HTTPS) or direct
+  // dev (HTTP). The preview gateway forwards X-Forwarded-Proto=https.
+  // For cross-origin preview access, we need SameSite=None + Secure so the
+  // session cookie is sent on fetch() requests from the preview domain.
+  const h = await headers();
+  const forwardedProto = h.get("x-forwarded-proto") || "";
+  const isHttpsProxy = forwardedProto.includes("https") || process.env.NODE_ENV === "production";
   store.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isHttpsProxy,
+    sameSite: isHttpsProxy ? "none" : "lax",
     path: "/",
     maxAge: SESSION_MAX_AGE,
   });

@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
+  // Allow the preview gateway origin to access dev assets
+  allowedDevOrigins: [
+    "*.space-z.ai",
+    "preview-chat-*.space-z.ai",
+  ],
 };
 
 export default nextConfig;
