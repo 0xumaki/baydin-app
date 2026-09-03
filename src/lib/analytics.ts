@@ -257,7 +257,7 @@ function computeStreak(logs: { date: string; completed: boolean }[]): {
     }
   }
 
-  const last7 = [];
+  const last7: { date: string; completed: boolean }[] = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date(Date.now() - i * 86400000);
     const dateStr = d.toISOString().slice(0, 10);

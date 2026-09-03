@@ -10,10 +10,10 @@ import { Flame, Waves, Target, Sparkles, Check, Loader2, ChevronRight, Calendar 
 import { toast } from "sonner";
 
 const STEPS = [
-  { id: "step1Cleanse", num: 1, name: "Cleanse", desc: "Tune to a Solfeggio frequency to clear your field", icon: Waves, color: "#9CA8A3", action: "frequency", cta: "Open Frequencies" },
-  { id: "step2Manifest", num: 2, name: "Manifest", desc: "Confirm your daily intention to anchor it", icon: Target, color: "#B5CD7E", action: "manifest", cta: "Open Manifest" },
+  { id: "step1Cleanse", num: 1, name: "Cleanse", desc: "Tune to a Solfeggio frequency to clear your field", icon: Waves, color: "#9CA8A3", action: "frequency", cta: "Open Frequencies", optional: false },
+  { id: "step2Manifest", num: 2, name: "Manifest", desc: "Confirm your daily intention to anchor it", icon: Target, color: "#B5CD7E", action: "manifest", cta: "Open Manifest", optional: false },
   { id: "step3Tarot", num: 3, name: "Ask the Cards", desc: "Draw a card for guidance (optional)", icon: Sparkles, color: "#C5A87C", action: "tarot", cta: "Draw Tarot", optional: true },
-  { id: "step4Balance", num: 4, name: "Balance", desc: "A frequency session to close your ritual", icon: Waves, color: "#5FA9C7", action: "frequency", cta: "Open Frequencies" },
+  { id: "step4Balance", num: 4, name: "Balance", desc: "A frequency session to close your ritual", icon: Waves, color: "#5FA9C7", action: "frequency", cta: "Open Frequencies", optional: false },
 ] as const;
 
 export function RitualView({ onAuth }: { onAuth: () => void }) {

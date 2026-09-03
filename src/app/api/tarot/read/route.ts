@@ -15,9 +15,10 @@ const SPREAD_COUNTS: Record<string, number> = {
 };
 
 export async function POST(req: NextRequest) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  let luckResult: { ok: boolean; balance: number; cost: number; reason?: string } | null = null;
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const body = await req.json().catch(() => ({}));
     const { question, spreadType } = body;
 
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
     });
     const freeRemaining = Math.max(0, FREE_LIMITS.tarot_per_day - todayCount);
 
-    let luckResult: { ok: boolean; balance: number; cost: number; reason?: string } | null = null;
+    luckResult = null;
     if (freeRemaining <= 0) {
       luckResult = await spendForFeature({
         userId: user.id,

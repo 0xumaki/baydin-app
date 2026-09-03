@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest) {
     const data: any = {};
 
     if (typeof body.name === "string") {
-      data.name = sanitizeString(body.name, 80, null);
+      data.name = sanitizeString(body.name, 80, "");
     }
     if (typeof body.language === "string") {
       const validLangs = ["en", "my", "th", "kh", "lo"];

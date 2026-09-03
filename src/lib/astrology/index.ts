@@ -489,8 +489,9 @@ export function computeAspects(planets: PlanetPosition[]): Aspect[] {
       for (const def of ASPECT_DEFS) {
         const orb = Math.abs(closer - def.angle);
         if (orb <= def.orb) {
-          const applying = (diff < def.angle && p1.speed > p2.speed) ||
-                           (diff > def.angle && p1.speed < p2.speed);
+          const s1 = p1.speed ?? 0;
+          const s2 = p2.speed ?? 0;
+          const applying = (diff < def.angle && s1 > s2) || (diff > def.angle && s1 < s2);
           results.push({
             planet1: p1.name,
             planet2: p2.name,
@@ -1431,7 +1432,7 @@ export function computeShadbala(natal: NatalChart): {
 
     const total = sthana + dig + kala + chesta + naisargika + drik;
     const totalRasis = +(total / 60).toFixed(2);
-    const strength = total > 250 ? "excellent" : total > 200 ? "good" : total > 150 ? "average" : "weak";
+    const strength: "excellent" | "good" | "average" | "weak" = total > 250 ? "excellent" : total > 200 ? "good" : total > 150 ? "average" : "weak";
 
     return {
       name: p.name,

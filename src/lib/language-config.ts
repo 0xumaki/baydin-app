@@ -31,7 +31,7 @@ export type LanguageConfig = {
   /** Script purity rules — what characters are forbidden */
   scriptRules: string;
   /** Native astrological terminology (zodiac signs, planets, key terms) */
-  terminology: Record<string, string>;
+  terminology: Record<string, string | string[] | Record<string, string>>;
   /** Cultural voice instructions — tone, formality, dialect notes */
   voiceInstructions: string;
   /** Polite particles or sentence-final markers */
@@ -208,11 +208,12 @@ export function buildLanguageInstructions(lang: Language, gender?: "male" | "fem
 
   // Add terminology guide
   const terms = config.terminology;
-  if (terms.signs) {
-    instructions += `\nZodiac signs (use these native terms): ${terms.signs.join(", ")}.\n`;
+  const signs = terms.signs;
+  if (Array.isArray(signs)) {
+    instructions += `\nZodiac signs (use these native terms): ${signs.join(", ")}.\n`;
   }
-  if (terms.planets) {
-    const planets = terms.planets as Record<string, string>;
+  const planets = terms.planets;
+  if (planets && typeof planets === "object") {
     instructions += `Planets: ${Object.entries(planets).map(([k, v]) => `${v} (${k})`).join(", ")}.\n`;
   }
   instructions += `Key terms: ${terms.zodiac} (zodiac), ${terms.dasha} (dasha), ${terms.nakshatra} (nakshatra), ${terms.yoga} (yoga), ${terms.ascendant} (ascendant), ${terms.exalted} (exalted), ${terms.debilitated} (debilitated), ${terms.remedy} (remedy), ${terms.house} (house).\n`;

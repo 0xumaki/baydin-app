@@ -28,7 +28,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
     if (!user) { onAuth(); return; }
     if (playing) return;
     try {
-      const Tone = (await import("tone")).default;
+      const Tone = await import("tone");
       await Tone.start();
       // Create synth based on mode
       if (synthRef.current) { synthRef.current.dispose(); synthRef.current = null; }

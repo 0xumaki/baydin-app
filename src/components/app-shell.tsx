@@ -368,6 +368,7 @@ function DailyRewardBadge() {
 
 function DailyRewardCard({ compact }: { compact?: boolean }) {
   const [claimed, setClaimed] = React.useState<boolean | null>(null);
+  const claimedBool = claimed ?? false;
   const [amount, setAmount] = React.useState(0);
   const [streak, setStreak] = React.useState(0);
   const { refetch } = useMe();
@@ -395,16 +396,16 @@ function DailyRewardCard({ compact }: { compact?: boolean }) {
     return (
       <button
         onClick={claim}
-        disabled={claimed}
+        disabled={claimedBool}
         className={cn(
           "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] transition border",
-          claimed
+          claimedBool
             ? "border-white/5 text-ink-muted/50"
             : "border-leaf/30 bg-leaf/10 text-leaf hover:bg-leaf/20"
         )}
       >
         <Gift className="w-3 h-3" />
-        {claimed ? "Claimed" : `+${Math.max(1, amount)} Luck`}
+        {claimedBool ? "Claimed" : `+${Math.max(1, amount)} Luck`}
       </button>
     );
   }
@@ -412,22 +413,22 @@ function DailyRewardCard({ compact }: { compact?: boolean }) {
   return (
     <button
       onClick={claim}
-      disabled={claimed}
+      disabled={claimedBool}
       className={cn(
         "w-full text-left p-3 rounded-xl border transition-all",
-        claimed
+        claimedBool
           ? "border-white/5 bg-white/[0.02] opacity-60"
           : "border-leaf/20 bg-leaf/[0.06] hover:bg-leaf/[0.1] hover:border-leaf/30"
       )}
     >
       <div className="flex items-center gap-2 mb-1">
-        <Gift className={cn("w-4 h-4", claimed ? "text-ink-muted" : "text-leaf")} />
-        <span className={cn("text-[12px] font-medium", claimed ? "text-ink-muted" : "text-leaf")}>
-          {claimed ? "Today's Luck claimed" : "Claim daily Luck"}
+        <Gift className={cn("w-4 h-4", claimedBool ? "text-ink-muted" : "text-leaf")} />
+        <span className={cn("text-[12px] font-medium", claimedBool ? "text-ink-muted" : "text-leaf")}>
+          {claimedBool ? "Today's Luck claimed" : "Claim daily Luck"}
         </span>
       </div>
       <div className="text-[11px] text-ink-muted">
-        {claimed ? `Come back tomorrow (streak ${streak} days)` : `Streak ${streak} days · next reward +${Math.max(1, amount)} Luck`}
+        {claimedBool ? `Come back tomorrow (streak ${streak} days)` : `Streak ${streak} days · next reward +${Math.max(1, amount)} Luck`}
       </div>
     </button>
   );

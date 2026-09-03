@@ -41,10 +41,12 @@ export function Pill({
   children,
   variant = "default",
   className,
+  style,
 }: {
   children: React.ReactNode;
   variant?: "default" | "gold" | "leaf";
   className?: string;
+  style?: React.CSSProperties;
 }) {
   return (
     <span
@@ -52,6 +54,7 @@ export function Pill({
         variant === "gold" ? "lum-pill-gold" : variant === "leaf" ? "lum-pill-leaf" : "lum-pill",
         className
       )}
+      style={style}
     >
       {children}
     </span>
@@ -63,11 +66,13 @@ export function SectionTitle({
   title,
   subtitle,
   className,
+  children,
 }: {
   eyebrow?: string;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   subtitle?: React.ReactNode;
   className?: string;
+  children?: React.ReactNode;
 }) {
   return (
     <div className={cn("space-y-1", className)}>
@@ -76,12 +81,15 @@ export function SectionTitle({
           {eyebrow}
         </div>
       )}
-      <h2 className="text-[22px] leading-[28px] font-light tracking-[-0.02em] text-ink">
-        {title}
-      </h2>
+      {title && (
+        <h2 className="text-[22px] leading-[28px] font-light tracking-[-0.02em] text-ink">
+          {title}
+        </h2>
+      )}
       {subtitle && (
         <p className="text-[13px] leading-[18px] text-ink-muted">{subtitle}</p>
       )}
+      {children}
     </div>
   );
 }

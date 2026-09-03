@@ -43,7 +43,7 @@ export async function GET() {
   const cardIdx = hash % TAROT_DECK.length;
   const reversed = (hash >> 8) % 100 < 38;
   const card = TAROT_DECK[cardIdx];
-  const drawn: DrawnCardWithMeta[] = [{ card, reversed, position: "Card of the Day" }];
+  const drawn: DrawnCardWithMeta[] = [{ card, reversed, position: "Card of the Day", id: card.id }];
   const interpretation = await interpretReading("What does today hold for me?", "card-of-day", drawn, false);
   const reading = await db.tarotReading.create({
     data: {

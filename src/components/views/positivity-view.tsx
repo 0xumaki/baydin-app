@@ -32,14 +32,14 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
     setScript("");
     setPlaying(false);
     try {
-      const res = await api<{ session: any; error?: string; balance?: number }>("/api/positivity/generate", {
+      const res = await api<{ session: any; error?: string; balance?: number; isFree?: boolean }>("/api/positivity/generate", {
         method: "POST", json: { category: catId, intention: intention || undefined, durationSec: 120 },
       });
       if (res.error) { toast.error(res.error); return; }
       setScript(res.session.script);
       setSession(res.session);
       setTodayCount((c) => c + 1);
-      toast.success(res.isFree ? "Script generated · 1 free today" : `Script generated · 1 Luck spent`);
+      toast.success(res.isFree ? "Script generated · 1 free today" : "Script generated");
     } catch (e: any) { toast.error(e.message); }
     finally { setLoading(false); }
   }
