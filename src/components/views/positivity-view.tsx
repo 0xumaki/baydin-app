@@ -47,22 +47,33 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
   function play() {
     if (!script) return;
     const words = script.split(/\s+/);
-    setWordIndex(0);
+    // Resume from current position (don't reset to 0 if already started)
+    if (wordIndex >= words.length) setWordIndex(0);
     setPlaying(true);
-    let i = 0;
+    // Use a ref to track position without stale closure
     intervalRef.current = setInterval(() => {
-      i++;
-      setWordIndex(i);
-      if (i >= words.length) {
-        clearInterval(intervalRef.current);
-        setPlaying(false);
-        setTimeout(() => setWordIndex(0), 2000);
-      }
-    }, 450); // ~450ms per word
+      setWordIndex((prev) => {
+        const next = prev + 1;
+        if (next >= words.length) {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          setPlaying(false);
+          // Keep the last word visible — don't reset to 0
+          return words.length;
+        }
+        return next;
+      });
+    }, 450);
   }
 
   function pause() {
     if (intervalRef.current) clearInterval(intervalRef.current);
+    setPlaying(false);
+    // wordIndex is preserved in state — resume will continue from here
+  }
+
+  function restart() {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setWordIndex(0);
     setPlaying(false);
   }
 
@@ -86,68 +97,94 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
   // Showing script player
   if (script && cat) {
     const visibleWords = words.slice(Math.max(0, wordIndex - 8), wordIndex + 12);
+    const startIdx = Math.max(0, wordIndex - 8);
+    const isFinished = wordIndex >= words.length;
     return (
       <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
-        <div className="max-w-2xl mx-auto px-4 py-6 lg:py-8">
-          <button onClick={() => { pause(); setScript(""); setSelectedCat(null); }} className="text-[12px] text-ink-muted hover:text-gold mb-4 transition">← All categories</button>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl border" style={{ background: `${cat.color}15`, borderColor: `${cat.color}40`, color: cat.color }}>
-              <Heart className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-[11px] uppercase tracking-[0.2em]" style={{ color: cat.color }}>{cat.name}</div>
-              <div className="text-[18px] font-light text-ink">Affirmation Script</div>
-            </div>
+        <div className="max-w-2xl mx-auto px-6 py-10 lg:py-14">
+          <button onClick={() => { pause(); setScript(""); setSelectedCat(null); }} className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition mb-6 focus-ring rounded-sm">← All categories</button>
+
+          {/* Category header */}
+          <div className="mb-8">
+            <div className="text-[13px] mb-2" style={{ color: cat.color }}>{cat.name}</div>
+            <h1 className="serif-display text-[1.75rem] text-[#E8E2D5] leading-[1.2] tracking-tight">Affirmation</h1>
           </div>
 
-          {/* Word-by-word player */}
-          <ShellCard className="p-8 mb-4 min-h-[200px] flex items-center justify-center text-center relative overflow-hidden">
-            <div className="lum-glow-gold absolute inset-0 opacity-20" style={{ background: `radial-gradient(80% 60% at 50% 50%, ${cat.color}20 0%, transparent 70%)` }} />
-            <div className="relative">
-              {playing || wordIndex > 0 ? (
-                <div className="flex flex-wrap gap-x-2 gap-y-1 justify-center max-w-md">
+          {/* Word-by-word player — editorial, minimal */}
+          <div className="min-h-[200px] flex items-center justify-center text-center relative mb-8 py-12 border-y border-[#2A2722]">
+            <div>
+              {wordIndex > 0 || playing ? (
+                <div className="flex flex-wrap gap-x-2 gap-y-1 justify-center max-w-lg">
                   {visibleWords.map((w, i) => {
-                    const absIdx = Math.max(0, wordIndex - 8) + i;
+                    const absIdx = startIdx + i;
                     const isCurrent = absIdx === wordIndex;
                     const dist = Math.abs(absIdx - wordIndex);
                     return (
-                      <span key={i} className="transition-all duration-300" style={{
-                        opacity: isCurrent ? 1 : Math.max(0.15, 1 - dist * 0.18),
-                        transform: isCurrent ? "scale(1.15)" : "scale(1)",
-                        color: isCurrent ? cat.color : "var(--ink)",
-                        fontWeight: isCurrent ? 500 : 300,
-                        fontSize: isCurrent ? "22px" : "16px",
-                      }}>
+                      <span
+                        key={absIdx}
+                        className="serif transition-all duration-500"
+                        style={{
+                          opacity: isCurrent ? 1 : Math.max(0.15, 1 - dist * 0.15),
+                          transform: isCurrent ? "scale(1.2)" : "scale(1)",
+                          color: isCurrent ? cat.color : "#9C9489",
+                          fontWeight: isCurrent ? 500 : 300,
+                          fontSize: isCurrent ? "1.625rem" : "1.125rem",
+                          textShadow: isCurrent ? `0 0 20px ${cat.color}40` : "none",
+                        }}
+                      >
                         {w}
                       </span>
                     );
                   })}
                 </div>
               ) : (
-                <div className="text-[14px] text-ink-muted">Press play to begin. Read each word as it lights up. Let it sink in.</div>
+                <div className="text-[14px] text-[#6B6358] leading-relaxed max-w-sm">
+                  Press play to begin. Read each word as it appears. Let it sink in.
+                </div>
+              )}
+              {isFinished && !playing && (
+                <div className="mt-6 text-[13px] text-[#6B6358] serif-italic">Complete</div>
               )}
             </div>
-          </ShellCard>
+          </div>
+
+          {/* Progress bar */}
+          {words.length > 0 && (
+            <div className="w-full h-px bg-[#2A2722] mb-8 relative overflow-hidden">
+              <div
+                className="absolute top-0 left-0 h-full transition-all duration-300"
+                style={{
+                  width: `${(wordIndex / words.length) * 100}%`,
+                  background: cat.color,
+                }}
+              />
+            </div>
+          )}
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-4 mb-8">
             <button
               onClick={playing ? pause : play}
-              className="w-14 h-14 rounded-full flex items-center justify-center transition active:scale-95"
-              style={{ background: `linear-gradient(135deg, ${cat.color}, ${cat.color}80)`, boxShadow: `0 8px 30px -8px ${cat.color}80` }}
+              className="w-14 h-14 rounded-full flex items-center justify-center transition active:scale-95 focus-ring"
+              style={{ background: cat.color, boxShadow: `0 8px 30px -8px ${cat.color}80` }}
+              aria-label={playing ? "Pause" : "Play"}
             >
-              {playing ? <Pause className="w-6 h-6 text-black" /> : <Play className="w-6 h-6 text-black ml-0.5" />}
+              {playing ? <Pause className="w-6 h-6 text-[#0A0908]" /> : <Play className="w-6 h-6 text-[#0A0908] ml-0.5" />}
             </button>
-            <button onClick={() => generate(cat.id)} disabled={loading} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-ink-muted hover:text-gold transition">
-              <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
+            <button
+              onClick={restart}
+              className="w-10 h-10 rounded-full border border-[#2A2722] flex items-center justify-center text-[#6B6358] hover:text-[#E8E2D5] transition focus-ring"
+              aria-label="Restart"
+            >
+              <RefreshCw className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Full script (readable) */}
-          <GlassCard className="p-5 mt-5 lum-prose text-[13px] text-ink-muted leading-relaxed">
-            <div className="text-[10px] uppercase tracking-wide text-ink-muted mb-2">{session?.source === "llm" ? "AI-generated" : "Template"} · full script</div>
-            {script}
-          </GlassCard>
+          {/* Full script */}
+          <div className="pt-6 border-t border-[#2A2722]">
+            <div className="text-[12px] text-[#6B6358] font-medium mb-3">Full script</div>
+            <div className="serif text-[14px] text-[#9C9489] leading-[1.8] prose-editorial">{script}</div>
+          </div>
         </div>
       </div>
     );

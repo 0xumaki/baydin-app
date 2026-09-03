@@ -58,29 +58,63 @@ export async function POST(req: NextRequest) {
     ayanamsa: chart.ayanamsa,
   };
 
-  // Generate all 7 sections concurrently (was sequential ~7min → now ~1min)
-  const sectionResults = await Promise.all(
-    SECTIONS.map(async (section) => {
-      const { system, user: prompt } = renderLifeReportSectionPrompt({
-        language: user.language || "my",
-        gender: birthData.gender ?? null,
-        sectionName: section.id,
-        chart,
-        enhancedData,
+  // Generate all 7 sections concurrently using allSettled so partial failures don't
+  // lose the entire report. This prevents the "15 Luck lost, no report" scenario.
+  const sectionPromises = SECTIONS.map(async (section) => {
+    const { system, user: prompt } = renderLifeReportSectionPrompt({
+      language: user.language || "my",
+      gender: birthData.gender ?? null,
+      sectionName: section.id,
+      chart,
+      enhancedData,
+    });
+    const result = await callAstrologerLLM(system, prompt, {
+      temperature: 0.7,
+      maxTokens: 1200,
+    });
+    return {
+      id: section.id,
+      name: section.name,
+      content: result.parsed?.content ?? result.content,
+      highlights: result.parsed?.highlights ?? [],
+      guidance: result.parsed?.guidance ?? null,
+    };
+  });
+
+  const settled = await Promise.allSettled(sectionPromises);
+
+  // Collect successful sections
+  const sectionResults = settled
+    .map((r, i) => r.status === "fulfilled" ? r.value : null)
+    .filter((r): r is NonNullable<typeof r> => r !== null);
+
+  // If ALL sections failed, refund fully
+  if (sectionResults.length === 0) {
+    await creditLuck({
+      userId: user.id,
+      amount: res.cost,
+      type: "admin_grant",
+      description: "Refund: life report — all sections failed",
+    });
+    return NextResponse.json(
+      { error: "The report couldn't be generated. Your Luck has been refunded." },
+      { status: 500 }
+    );
+  }
+
+  // If some sections failed, partial refund (proportional)
+  const failedCount = SECTIONS.length - sectionResults.length;
+  if (failedCount > 0) {
+    const refundAmount = Math.round((res.cost * failedCount) / SECTIONS.length);
+    if (refundAmount > 0) {
+      await creditLuck({
+        userId: user.id,
+        amount: refundAmount,
+        type: "admin_grant",
+        description: `Partial refund: ${failedCount}/${SECTIONS.length} sections failed`,
       });
-      const result = await callAstrologerLLM(system, prompt, {
-        temperature: 0.7,
-        maxTokens: 1200,
-      });
-      return {
-        id: section.id,
-        name: section.name,
-        content: result.parsed?.content ?? result.content,
-        highlights: result.parsed?.highlights ?? [],
-        guidance: result.parsed?.guidance ?? null,
-      };
-    })
-  );
+    }
+  }
 
   // Persist as a conversation so it shows in history
   const conv = await db.conversation.create({
@@ -110,4 +144,25 @@ export async function POST(req: NextRequest) {
       meta: { ai_generated: true, generated_at: new Date().toISOString(), interpretation_type: "life_report" },
     },
   });
+}
+
+/** GET /api/life-report — list past life reports for the user. */
+export async function GET() {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const reports = await db.conversation.findMany({
+    where: { userId: user.id, mode: "life-report" },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+    select: {
+      id: true,
+      title: true,
+      createdAt: true,
+      messageCount: true,
+      _count: { select: { messages: true } },
+    },
+  });
+
+  return NextResponse.json({ reports });
 }

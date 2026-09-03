@@ -52,8 +52,31 @@ export async function POST(req: NextRequest) {
   const count = SPREAD_COUNTS[validSpread] ?? 3;
   const drawnRaw = drawCards(count);
   const drawn: DrawnCardWithMeta[] = attachMeta(drawnRaw);
-  const interpretation = await interpretReading(safeQuestion, validSpread, drawn, false);
 
+  // Interpret — if this fails, refund Luck and return error.
+  // Never charge the user for a failed LLM call.
+  let interpretation: string;
+  try {
+    interpretation = await interpretReading(safeQuestion, validSpread, drawn, false);
+  } catch (interpErr) {
+    console.error("Tarot interpretation failed:", interpErr);
+    // Refund Luck if it was charged
+    if (luckResult && luckResult.ok && luckResult.cost > 0) {
+      await creditLuck({
+        userId: user.id,
+        amount: luckResult.cost,
+        type: "admin_grant",
+        description: `Refund: tarot interpretation failed`,
+      });
+    }
+    return NextResponse.json(
+      { error: "The cards were drawn, but the interpretation couldn't be completed. Your Luck has been refunded." },
+      { status: 500 }
+    );
+  }
+
+  // Persist the reading to the database — this happens BEFORE returning,
+  // so even if the user navigates away, the reading is saved.
   const reading = await db.tarotReading.create({
     data: {
       userId: user.id,
@@ -75,6 +98,15 @@ export async function POST(req: NextRequest) {
   });
   } catch (err) {
     console.error("Tarot read failed:", err);
+    // Refund Luck on any unexpected error
+    if (luckResult?.ok && luckResult.cost > 0) {
+      await creditLuck({
+        userId: user.id,
+        amount: luckResult.cost,
+        type: "admin_grant",
+        description: `Refund: tarot read failed`,
+      }).catch(() => {});
+    }
     return NextResponse.json({ error: "Failed to read tarot." }, { status: 500 });
   }
 }

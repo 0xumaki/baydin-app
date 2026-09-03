@@ -2,12 +2,15 @@
 
 import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { GlassCard, GoldButton, Pill, SectionTitle } from "@/components/lumina/primitives";
 import { cn } from "@/lib/utils";
 import { useMe, api } from "@/lib/api-client";
-import { Sparkles, RefreshCw, Shuffle, Eye, Wallet, Star, Share2 } from "lucide-react";
+import { TarotCardFace, TarotCardBack } from "@/components/tarot-card-face";
+import { Sparkles, Shuffle, Star, Share2, Save, BookOpen, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
+import { useStore } from "@/lib/store";
+import { useT } from "@/lib/use-t";
 
 const SPREADS = [
   { id: "yes-no", name: "Yes / No", count: 1, desc: "A single card for a clear answer" },
@@ -22,17 +25,21 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
   const { data } = useMe();
   const user = data?.user;
   const qc = useQueryClient();
+  const t = useT();
+  const { setView } = useStore();
   const [spread, setSpread] = React.useState("three-card");
   const [question, setQuestion] = React.useState("");
   const [reading, setReading] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(false);
   const [revealed, setRevealed] = React.useState(false);
+  const [saved, setSaved] = React.useState(false);
 
   async function draw() {
     if (!user) { onAuth(); return; }
     if (!question.trim()) { toast.error("Enter a question first"); return; }
     setLoading(true);
     setRevealed(false);
+    setSaved(false);
     try {
       const res = await api<{ reading: any; error?: string }>("/api/tarot/read", {
         method: "POST", json: { question, spreadType: spread },
@@ -40,125 +47,212 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
       if (res.error) { toast.error(res.error); return; }
       setReading(res.reading);
       qc.invalidateQueries({ queryKey: ["me"] });
-      setTimeout(() => setRevealed(true), 400);
+      // Reveal cards one by one with stagger
+      setTimeout(() => setRevealed(true), 600);
     } catch (e: any) {
       toast.error(e.message);
     } finally { setLoading(false); }
   }
 
+  async function saveReading() {
+    if (!reading) return;
+    try {
+      await api(`/api/tarot/save?id=${reading.id}`, { method: "PATCH" });
+      setSaved(true);
+      toast.success("Reading saved to your journal");
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  }
+
+  async function shareReading() {
+    if (!reading) return;
+    const text = reading.interpretation.replace(/[#*_`]/g, "").slice(0, 280);
+    if (navigator.share) {
+      try { await navigator.share({ title: "My Baydin Tarot Reading", text, url: window.location.origin }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(text + "\n\n" + window.location.origin);
+      toast.success("Reading copied to clipboard");
+    }
+  }
+
   return (
     <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
-      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
-        <SectionTitle eyebrow="Free daily ritual" title="Ask the Tarot" subtitle="The Rider-Waite-Smith deck speaks in symbols. Ask, and the cards answer." className="mb-6" />
-
-        {/* Free tier indicator */}
-        {user && (
-          <div className="mb-4 flex items-center gap-2 text-[11px] text-ink-muted">
-            <Pill variant="leaf">2 free readings/day</Pill>
-            {reading?.freeRemaining !== undefined && <span>· {reading.freeRemaining} free left today</span>}
-            {reading?.luckSpent > 0 && <Pill variant="gold">{reading.luckSpent} Luck spent</Pill>}
-          </div>
-        )}
+      <div className="max-w-3xl mx-auto px-6 py-10 lg:py-14">
+        {/* Hero */}
+        <div className="mb-8 lum-reveal">
+          <div className="text-[13px] text-[#6B6358] mb-2">Rider-Waite-Smith deck</div>
+          <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.1] tracking-tight mb-3">
+            Tarot
+          </h1>
+          <p className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch]">
+            The deck speaks in symbols. Ask, and the cards answer. 2 free readings daily, then 1 Luck each.
+          </p>
+        </div>
 
         {/* Question */}
-        <GlassCard className="p-4 mb-4">
+        <div className="mb-6 pb-6 border-b border-[#2A2722]">
+          <label className="block text-[12px] text-[#6B6358] font-medium mb-2">Your question</label>
           <input
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && draw()}
             placeholder="What weighs on your heart?"
-            className="w-full bg-transparent outline-none text-[15px] text-ink placeholder:text-ink-muted/60 py-2"
+            maxLength={300}
+            className="w-full bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] placeholder:text-[#4A4540] focus:outline-none focus:border-[#C5A572] transition"
           />
-        </GlassCard>
+        </div>
 
         {/* Spread selector */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
           {SPREADS.map((s) => (
             <button
               key={s.id}
               onClick={() => setSpread(s.id)}
               className={cn(
-                "text-left p-3 rounded-xl border transition",
-                spread === s.id ? "border-gold/30 bg-gold/[0.06]" : "border-white/5 bg-white/[0.02] hover:border-white/10"
+                "p-3 border text-left transition focus-ring rounded-sm",
+                spread === s.id
+                  ? "border-[#C5A572] bg-[#1A1714]"
+                  : "border-[#2A2722] bg-transparent hover:border-[#4A4540]"
               )}
             >
-              <div className={cn("text-[13px] font-medium mb-0.5", spread === s.id ? "text-gold" : "text-ink")}>{s.name}</div>
-              <div className="text-[10px] text-ink-muted">{s.desc}</div>
+              <div className={cn("text-[13px] font-medium mb-0.5", spread === s.id ? "text-[#E8E2D5]" : "text-[#9C9489]")}>{s.name}</div>
+              <div className="text-[11px] text-[#6B6358]">{s.desc}</div>
             </button>
           ))}
         </div>
 
-        <GoldButton onClick={draw} disabled={loading || !question.trim()} className="w-full mb-6">
-          {loading ? <><Shuffle className="w-4 h-4 animate-spin" /> Drawing cards…</> : <><Sparkles className="w-4 h-4" /> Draw {SPREADS.find(s => s.id === spread)?.count} card{SPREADS.find(s => s.id === spread)!.count > 1 ? "s" : ""}</>}
-        </GoldButton>
+        {/* Draw button */}
+        <button
+          onClick={draw}
+          disabled={loading || !question.trim()}
+          className="w-full py-3.5 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition rounded-sm disabled:opacity-50 focus-ring mb-8 flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <><Loader2 className="w-4 h-4 animate-spin" /> Drawing cards…</>
+          ) : (
+            <><Sparkles className="w-4 h-4" /> Draw {SPREADS.find(s => s.id === spread)?.count} card{SPREADS.find(s => s.id === spread)!.count > 1 ? "s" : ""}</>
+          )}
+        </button>
 
-        {/* Reading */}
-        {reading && (
-          <div className="space-y-4">
-            <div className="flex flex-wrap justify-center gap-3 mb-2">
-              {reading.cards.map((c: any, i: number) => (
-                <CardFace key={i} card={c.card} reversed={c.reversed} position={c.position} revealed={revealed} index={i} />
-              ))}
-            </div>
-            <GlassCard className="p-5 lum-prose">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-gold" />
-                  <span className="text-[12px] text-gold uppercase tracking-wide">The Reading</span>
-                </div>
-                <button
-                  onClick={async () => {
-                    const text = reading.interpretation.replace(/[#*_`]/g, "").slice(0, 280);
-                    if (navigator.share) {
-                      try { await navigator.share({ title: "My Baydin Tarot Reading", text, url: window.location.origin }); } catch {}
-                    } else {
-                      await navigator.clipboard.writeText(text + "\n\n" + window.location.origin);
-                      toast.success("Reading copied to clipboard ✦");
-                    }
-                  }}
-                  className="px-2.5 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1"
-                >
-                  <Share2 className="w-3 h-3" /> Share
-                </button>
+        {/* Loading state — show card backs shuffling */}
+        {loading && (
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            {Array.from({ length: SPREADS.find(s => s.id === spread)?.count || 3 }).map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <TarotCardBack size="md" className="animate-pulse" />
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        {/* Reading result */}
+        {reading && !loading && (
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="space-y-6"
+            >
+              {/* Cards */}
+              <div className="flex flex-wrap justify-center gap-4 lg:gap-6">
+                {reading.cards.map((c: any, i: number) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 30, rotateY: 180 }}
+                    animate={revealed ? { opacity: 1, y: 0, rotateY: 0 } : {}}
+                    transition={{ delay: i * 0.15, duration: 0.6, ease: [0.2, 0, 0, 1] }}
+                    className="flex flex-col items-center"
+                  >
+                    {c.position && (
+                      <div className="text-[11px] text-[#6B6358] mb-2 font-medium">{c.position}</div>
+                    )}
+                    {revealed ? (
+                      <TarotCardFace
+                        card={c.card}
+                        reversed={c.reversed}
+                        size="md"
+                      />
+                    ) : (
+                      <TarotCardBack size="md" />
+                    )}
+                    {revealed && (
+                      <div className="text-[11px] text-[#9C9489] mt-2 serif-italic">
+                        {c.reversed ? "Reversed" : "Upright"}
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
               </div>
-              <ReactMarkdown>{reading.interpretation}</ReactMarkdown>
-            </GlassCard>
-          </div>
+
+              {/* Interpretation */}
+              {revealed && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="pt-8 border-t border-[#2A2722]"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="text-[12px] text-[#6B6358] font-medium">The reading</div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={shareReading}
+                        className="text-[12px] text-[#9C9489] hover:text-[#E8E2D5] transition focus-ring rounded-sm px-3 py-1.5 border border-[#2A2722] hover:border-[#4A4540]"
+                      >
+                        <Share2 className="w-3 h-3 inline mr-1" /> Share
+                      </button>
+                      <button
+                        onClick={saveReading}
+                        disabled={saved}
+                        className={cn(
+                          "text-[12px] transition focus-ring rounded-sm px-3 py-1.5 border",
+                          saved
+                            ? "text-[#C5A572] border-[#C5A572]/30 bg-[#C5A572]/5 cursor-default"
+                            : "text-[#9C9489] hover:text-[#E8E2D5] border-[#2A2722] hover:border-[#4A4540]"
+                        )}
+                      >
+                        {saved ? <><Save className="w-3 h-3 inline mr-1" /> Saved</> : <><Save className="w-3 h-3 inline mr-1" /> Save</>}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="serif text-[15px] leading-[1.8] text-[#E8E2D5] prose-editorial">
+                    <ReactMarkdown>{reading.interpretation}</ReactMarkdown>
+                  </div>
+
+                  {/* Luck info */}
+                  {reading.luckSpent > 0 && (
+                    <div className="mt-6 text-[11px] text-[#6B6358]">
+                      {reading.luckSpent} Luck spent · {reading.freeRemaining} free readings remaining today
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </motion.div>
+          </AnimatePresence>
         )}
 
+        {/* Empty state */}
         {!reading && !loading && (
-          <div className="text-center py-12 text-ink-muted text-[13px]">
-            The deck waits. Ask, and the cards will speak.
+          <div className="pt-12 border-t border-[#2A2722]">
+            <div className="serif text-[1.25rem] text-[#E8E2D5] mb-3">The deck waits.</div>
+            <p className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch] mb-6">
+              Ask a question, choose a spread, and draw. Each card carries symbols drawn from centuries of esoteric tradition — the images will speak to whatever you bring to them.
+            </p>
+            <button
+              onClick={() => setView("tarot-history")}
+              className="inline-flex items-center gap-2 text-[13px] text-[#9C9489] hover:text-[#C5A572] transition focus-ring rounded-sm"
+            >
+              <BookOpen className="w-3.5 h-3.5" /> View past readings
+            </button>
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-function CardFace({ card, reversed, position, revealed, index }: { card: any; reversed: boolean; position?: string; revealed: boolean; index: number }) {
-  return (
-    <div className="flex flex-col items-center" style={{ animationDelay: `${index * 100}ms` }}>
-      {position && <div className="text-[10px] text-ink-muted mb-1.5 uppercase tracking-wide">{position}</div>}
-      <div
-        className={cn(
-          "w-20 h-32 sm:w-24 sm:h-36 rounded-xl border flex items-center justify-center transition-all duration-700 lum-anim-float-up",
-          revealed ? "border-gold/30 bg-gradient-to-br from-surface to-surface-2" : "border-white/10 bg-white/[0.03]",
-          reversed && revealed && "rotate-180"
-        )}
-        style={{ transform: revealed ? (reversed ? "rotate(180deg)" : "none") : "scale(0.95)" }}
-      >
-        {revealed ? (
-          <div className="rotate-0 text-center px-1">
-            <div className="text-2xl mb-1">{card.symbol}</div>
-            <div className="text-[9px] text-ink leading-tight">{card.nameShort}</div>
-            <div className="text-[8px] text-gold/70 mt-0.5">{card.element}</div>
-          </div>
-        ) : (
-          <div className="text-gold/40 text-2xl">✦</div>
-        )}
-      </div>
-      {revealed && <div className="text-[9px] text-ink-muted mt-1 max-w-[90px] text-center leading-tight">{reversed ? "Reversed" : "Upright"}</div>}
     </div>
   );
 }
