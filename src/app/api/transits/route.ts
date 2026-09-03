@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { parseBirthData } from "@/lib/validate";
 import { getCurrentUser } from "@/lib/auth";
 import { computeNatalChart, computeTransits, type BirthContext, ZODIAC_SIGNS, ZODIAC_MY, PLANET_MY } from "@/lib/astrology";
 
@@ -14,7 +15,7 @@ export async function GET() {
   if (!user) return NextResponse.json({ transits: null });
   if (!user.birthData) return NextResponse.json({ transits: null });
 
-  const birthData: BirthContext = JSON.parse(user.birthData);
+  const birthData = parseBirthData(user.birthData); if (!birthData) return NextResponse.json({ error: "Birth data required" }, { status: 400 });
   let natal: any;
   try {
     natal = computeNatalChart(birthData, "vedic");

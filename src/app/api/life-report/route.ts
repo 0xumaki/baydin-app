@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseBirthData } from "@/lib/validate";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { spendForFeature, creditLuck } from "@/lib/luck";
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Insufficient Luck.", balance: res.balance }, { status: 402 });
   }
 
-  const birthData: BirthContext = JSON.parse(user.birthData);
+  const birthData = parseBirthData(user.birthData); if (!birthData) return NextResponse.json({ error: "Birth data required" }, { status: 400 });
   if (!birthData.dob) {
     return NextResponse.json({ error: "Birth date missing. Update your profile." }, { status: 400 });
   }

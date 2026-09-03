@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseBirthData } from "@/lib/validate";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { spendForFeature, creditLuck, todayKey } from "@/lib/luck";
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
   if (!isFree) {
     const res = await spendForFeature({
       userId: user.id,
-      feature: "tarot_premium" as any,
+      feature: "positivity",
       description: `Positivity script: ${cat.name}`,
     });
     if (!res.ok) {
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
   try {
     const { system, user: prompt } = renderPositivityPrompt({
       language: user.language || "my",
-      gender: user.birthData ? JSON.parse(user.birthData).gender : null,
+      gender: parseBirthData(user.birthData)?.gender ?? null,
       category: cat.id,
       intention,
     });

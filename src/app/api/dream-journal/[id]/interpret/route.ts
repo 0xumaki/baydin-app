@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseBirthData } from "@/lib/validate";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { spendForFeature } from "@/lib/luck";
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   // Charge Luck
   const spent = await spendForFeature({
     userId: user.id,
-    feature: "astrologer_chat", // 2 Luck — same as a chat turn
+    feature: "dream_interpretation",
     description: `Dream interpretation: "${entry.title}"`,
   });
   if (!spent.ok) {

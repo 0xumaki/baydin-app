@@ -11,43 +11,25 @@ export async function GET(req: NextRequest) {
   const search = req.nextUrl.searchParams.get("q")?.trim();
 
   if (search) {
-    // Search both conversation titles AND message content
-    const [titleMatches, messageMatches] = await Promise.all([
-      db.conversation.findMany({
-        where: { userId: user.id, title: { contains: search } },
-        orderBy: [{ pinned: "desc" }, { updatedAt: "desc" }],
-        take: 50,
-        select: {
-          id: true, title: true, mode: true, astrologyMode: true,
-          messageCount: true, totalLuckCost: true, pinned: true,
-          createdAt: true, updatedAt: true,
-        },
-      }),
-      db.message.findMany({
-        where: { conversation: { userId: user.id }, content: { contains: search } },
-        distinct: ["conversationId"],
-        select: { conversationId: true },
-        take: 50,
-      }),
-    ]);
+    // Single query: conversations whose title matches OR whose messages contain the search.
+    // Uses a subquery on Message via Prisma's relation filter (translated to EXISTS).
+    const conversations = await db.conversation.findMany({
+      where: {
+        userId: user.id,
+        OR: [
+          { title: { contains: search } },
+          { messages: { some: { content: { contains: search } } } },
+        ],
+      },
+      orderBy: [{ pinned: "desc" }, { updatedAt: "desc" }],
+      take: 50,
+      select: {
+        id: true, title: true, mode: true, astrologyMode: true,
+        messageCount: true, totalLuckCost: true, pinned: true,
+        createdAt: true, updatedAt: true,
+      },
+    });
 
-    // Fetch full conversation data for message matches not already in title matches
-    const titleIds = new Set(titleMatches.map((c) => c.id));
-    const messageConvIds = messageMatches.map((m) => m.conversationId).filter((id) => !titleIds.has(id));
-
-    const messageConvMatches = messageConvIds.length > 0
-      ? await db.conversation.findMany({
-          where: { userId: user.id, id: { in: messageConvIds } },
-          orderBy: [{ pinned: "desc" }, { updatedAt: "desc" }],
-          select: {
-            id: true, title: true, mode: true, astrologyMode: true,
-            messageCount: true, totalLuckCost: true, pinned: true,
-            createdAt: true, updatedAt: true,
-          },
-        })
-      : [];
-
-    const conversations = [...titleMatches, ...messageConvMatches];
     return NextResponse.json({ conversations });
   }
 
@@ -64,34 +46,68 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ conversations });
 }
 
+const VALID_MODES = ["astrologer", "tarot", "horoscope", "birth-chart", "insight"] as const;
+const VALID_ASTRO_MODES = ["vedic", "western", "mahabote"] as const;
+
 export async function POST(req: NextRequest) {
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { mode, astrologyMode, title } = await req.json();
-  const conv = await db.conversation.create({
-    data: {
-      userId: user.id,
-      mode: mode || "astrologer",
-      astrologyMode: astrologyMode || "vedic",
-      title: title || "New consultation",
-      birthContext: user.birthData,
-    },
-  });
-  return NextResponse.json({ conversation: conv });
+  try {
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const body = await req.json().catch(() => ({}));
+    const { mode, astrologyMode, title } = body;
+
+    // Validate inputs — only allow known enum values
+    const safeMode = VALID_MODES.includes(mode) ? mode : "astrologer";
+    const safeAstro = VALID_ASTRO_MODES.includes(astrologyMode) ? astrologyMode : "vedic";
+    const safeTitle = typeof title === "string" && title.trim().length > 0 && title.trim().length <= 100
+      ? title.trim()
+      : "New consultation";
+
+    const conv = await db.conversation.create({
+      data: {
+        userId: user.id,
+        mode: safeMode,
+        astrologyMode: safeAstro,
+        title: safeTitle,
+        birthContext: user.birthData,
+      },
+    });
+    return NextResponse.json({ conversation: conv });
+  } catch (err) {
+    console.error("Create conversation failed:", err);
+    return NextResponse.json({ error: "Failed to create conversation." }, { status: 500 });
+  }
 }
 
 export async function PATCH(req: NextRequest) {
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { id, title, pinned } = await req.json();
-  const conv = await db.conversation.update({
-    where: { id, userId: user.id },
-    data: {
-      ...(title !== undefined ? { title } : {}),
-      ...(pinned !== undefined ? { pinned } : {}),
-    },
-  });
-  return NextResponse.json({ conversation: conv });
+  try {
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const body = await req.json().catch(() => ({}));
+    const { id, title, pinned } = body;
+    if (typeof id !== "string" || id.length < 10) {
+      return NextResponse.json({ error: "Invalid conversation id." }, { status: 400 });
+    }
+    const update: any = {};
+    if (typeof title === "string" && title.trim().length > 0 && title.trim().length <= 100) {
+      update.title = title.trim();
+    }
+    if (typeof pinned === "boolean") {
+      update.pinned = pinned;
+    }
+    if (Object.keys(update).length === 0) {
+      return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
+    }
+    const conv = await db.conversation.update({
+      where: { id, userId: user.id },
+      data: update,
+    });
+    return NextResponse.json({ conversation: conv });
+  } catch (err) {
+    console.error("Update conversation failed:", err);
+    return NextResponse.json({ error: "Failed to update conversation." }, { status: 500 });
+  }
 }
 
 export async function DELETE(req: NextRequest) {

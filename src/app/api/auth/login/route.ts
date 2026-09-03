@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseBirthData } from "@/lib/validate";
 import { db } from "@/lib/db";
 import { verifyPassword, createSession } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
         id: user.id, email: user.email, name: user.name,
         luckBalance: user.luckBalance, referralCode: user.referralCode,
         role: user.role, language: user.language,
-        birthData: user.birthData ? JSON.parse(user.birthData) : null,
+        birthData: parseBirthData(user.birthData),
         resellerTier: user.resellerTier,
       },
     });

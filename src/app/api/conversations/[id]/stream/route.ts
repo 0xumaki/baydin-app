@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { parseBirthData } from "@/lib/validate";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { spendForFeature } from "@/lib/luck";
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   // --- Compute / fetch cached natal chart ---
   let chart: NatalChart | null = null;
   let transits: any = null;
-  const birthData: BirthContext | null = user.birthData ? JSON.parse(user.birthData) : null;
+  const birthData: BirthContext | null = parseBirthData(user.birthData);
   const mode = (conversation.astrologyMode as AstrologyMode) || "vedic";
 
   if (birthData && (conversation.mode === "astrologer" || conversation.mode === "birth-chart")) {

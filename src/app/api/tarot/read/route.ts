@@ -15,42 +15,50 @@ const SPREAD_COUNTS: Record<string, number> = {
 };
 
 export async function POST(req: NextRequest) {
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { question, spreadType } = await req.json();
+  try {
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const body = await req.json().catch(() => ({}));
+    const { question, spreadType } = body;
 
-  // Free-tier: 2 free readings/day, then 1 Luck each
-  const today = new Date().toISOString().slice(0, 10);
-  const todayCount = await db.tarotReading.count({
-    where: { userId: user.id, createdAt: { gte: new Date(today + "T00:00:00") } },
-  });
-  const freeRemaining = Math.max(0, FREE_LIMITS.tarot_per_day - todayCount);
+    // Validate spreadType — only allow known spreads
+    const validSpread = Object.keys(SPREAD_COUNTS).includes(spreadType) ? spreadType : "three-card";
+    const safeQuestion = typeof question === "string" && question.trim().length > 0 && question.trim().length <= 500
+      ? question.trim()
+      : "What do I need to know right now?";
 
-  let luckResult: { ok: boolean; balance: number; cost: number; reason?: string } | null = null;
-  if (freeRemaining <= 0) {
-    luckResult = await spendForFeature({
-      userId: user.id,
-      feature: "tarot_premium",
-      description: `Tarot reading: ${spreadType}`,
+    // Free-tier: 2 free readings/day, then 1 Luck each
+    const today = new Date().toISOString().slice(0, 10);
+    const todayCount = await db.tarotReading.count({
+      where: { userId: user.id, createdAt: { gte: new Date(today + "T00:00:00") } },
     });
-    if (!luckResult.ok) {
-      return NextResponse.json({
-        error: "You've used your free daily readings. Top up Luck to draw again.",
-        balance: luckResult.balance,
+    const freeRemaining = Math.max(0, FREE_LIMITS.tarot_per_day - todayCount);
+
+    let luckResult: { ok: boolean; balance: number; cost: number; reason?: string } | null = null;
+    if (freeRemaining <= 0) {
+      luckResult = await spendForFeature({
+        userId: user.id,
+        feature: "tarot_premium",
+        description: `Tarot reading: ${validSpread}`,
+      });
+      if (!luckResult.ok) {
+        return NextResponse.json({
+          error: "You've used your free daily readings. Top up Luck to draw again.",
+          balance: luckResult.balance,
       }, { status: 402 });
     }
   }
 
-  const count = SPREAD_COUNTS[spreadType] ?? 3;
+  const count = SPREAD_COUNTS[validSpread] ?? 3;
   const drawnRaw = drawCards(count);
   const drawn: DrawnCardWithMeta[] = attachMeta(drawnRaw);
-  const interpretation = await interpretReading(question, spreadType, drawn, false);
+  const interpretation = await interpretReading(safeQuestion, validSpread, drawn, false);
 
   const reading = await db.tarotReading.create({
     data: {
       userId: user.id,
-      question,
-      spreadType,
+      question: safeQuestion,
+      spreadType: validSpread,
       cardsJson: JSON.stringify(drawn.map((d) => ({ id: d.card.id, reversed: d.reversed, position: d.position }))),
       interpretation,
     },
@@ -59,12 +67,16 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     reading: {
       id: reading.id,
-      question, spreadType, interpretation,
+      question: safeQuestion, spreadType: validSpread, interpretation,
       cards: drawn.map((d) => ({ card: d.card, reversed: d.reversed, position: d.position })),
       freeRemaining: Math.max(0, freeRemaining - 1),
       luckSpent: luckResult?.cost ?? 0,
     },
   });
+  } catch (err) {
+    console.error("Tarot read failed:", err);
+    return NextResponse.json({ error: "Failed to read tarot." }, { status: 500 });
+  }
 }
 
 export async function GET() {

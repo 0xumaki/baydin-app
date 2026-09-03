@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { parseBirthData } from "@/lib/validate";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 
@@ -48,7 +49,7 @@ export async function GET() {
       totalLuckEarned: user.totalLuckEarned,
       totalLuckSpent: user.totalLuckSpent,
       referralCode: user.referralCode,
-      birthData: user.birthData ? JSON.parse(user.birthData) : null,
+      birthData: parseBirthData(user.birthData),
       createdAt: user.createdAt,
     },
     conversations,

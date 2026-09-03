@@ -188,18 +188,22 @@ export type FeatureId =
   | "mahabote"
   | "horoscope_personal"
   | "tarot_premium"
-  | "numerology";
+  | "numerology"
+  | "positivity"
+  | "dream_interpretation";
 
 export const FEATURE_COSTS: Record<FeatureId, number> = {
-  astrologer_chat: 2, // per message — ~134-200 MMK (vs 30K-250K real life)
-  birth_chart: 3, // natal chart generation + interpretation
-  insight: 3, // specific skill reading (yogas, transits, etc.)
-  life_report: 15, // 7-section comprehensive report
-  compatibility: 5, // partner compatibility
-  mahabote: 3, // Myanmar traditional reading
-  horoscope_personal: 2, // personalized daily/weekly horoscope
-  tarot_premium: 1, // premium tarot spreads (beyond 2 free/day)
-  numerology: 3, // full numerology report (life path + destiny + soul urge + ...)
+  astrologer_chat: 2, // per message
+  birth_chart: 3,
+  insight: 3,
+  life_report: 15,
+  compatibility: 5,
+  mahabote: 3,
+  horoscope_personal: 2,
+  tarot_premium: 1,
+  numerology: 3,
+  positivity: 1, // positivity script after free daily
+  dream_interpretation: 2,
 };
 
 /** Free daily limits for freebie features. */
@@ -246,7 +250,13 @@ export async function creditLuck(params: {
   return updated.luckBalance;
 }
 
-/** Debit Luck. Returns false if insufficient balance. */
+/** Debit Luck atomically. Returns false if insufficient balance.
+ *
+ * Uses a conditional update (WHERE balance >= amount) so two concurrent
+ * requests cannot both pass the check and double-spend. This is the
+ * standard pattern for preventing overdrafts in a single-SQL-statement
+ * transaction.
+ */
 export async function debitLuck(params: {
   userId: string;
   amount: number;
@@ -255,21 +265,58 @@ export async function debitLuck(params: {
   referenceId?: string;
 }): Promise<{ ok: boolean; balance: number; reason?: string }> {
   const { userId, amount, feature, description, referenceId } = params;
-  // Re-check balance atomically
-  const user = await db.user.findUnique({ where: { id: userId }, select: { luckBalance: true } });
-  if (!user) return { ok: false, balance: 0, reason: "user_not_found" };
-  if (user.luckBalance < amount) {
-    return { ok: false, balance: user.luckBalance, reason: "insufficient_luck" };
+  if (amount <= 0) return { ok: false, balance: 0, reason: "invalid_amount" };
+
+  try {
+    // Atomic conditional update — only decrements if balance is sufficient.
+    // Prisma translates this to: UPDATE users SET balance = balance - :amount
+    //   WHERE id = :userId AND balance >= :amount
+    const updated = await db.user.updateMany({
+      where: { id: userId, luckBalance: { gte: amount } },
+      data: { luckBalance: { decrement: amount } },
+    });
+
+    if (updated.count === 0) {
+      // Either user doesn't exist, or balance was insufficient.
+      // Fetch the actual balance to disambiguate.
+      const user = await db.user.findUnique({
+        where: { id: userId },
+        select: { luckBalance: true },
+      });
+      if (!user) return { ok: false, balance: 0, reason: "user_not_found" };
+      return { ok: false, balance: user.luckBalance, reason: "insufficient_luck" };
+    }
+
+    // Fetch the new balance to return it to the caller
+    const after = await db.user.findUnique({
+      where: { id: userId },
+      select: { luckBalance: true },
+    });
+    const newBalance = after?.luckBalance ?? 0;
+
+    // Record the ledger entry
+    await db.luckTransaction.create({
+      data: {
+        userId,
+        amount: -amount,
+        balanceAfter: newBalance,
+        type: "spend",
+        feature,
+        description: description ?? `Spent ${amount} Luck on ${feature}`,
+        referenceId: referenceId ?? null,
+      },
+    });
+
+    return { ok: true, balance: newBalance };
+  } catch (err) {
+    console.error("debitLuck failed:", err);
+    // Fetch current balance for the error response
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { luckBalance: true },
+    });
+    return { ok: false, balance: user?.luckBalance ?? 0, reason: "db_error" };
   }
-  const balance = await creditLuck({
-    userId,
-    amount: -amount,
-    type: "spend",
-    feature,
-    description: description ?? `Spent ${amount} Luck on ${feature}`,
-    referenceId,
-  });
-  return { ok: true, balance };
 }
 
 /** Check + debit in one call. Used by feature API routes.
@@ -308,7 +355,13 @@ export async function spendForFeature(params: {
   return { ...res, cost };
 }
 
-/** Reseller: transfer Luck from pool to a recipient's balance (the resell action). */
+/** Reseller: transfer Luck from pool to a recipient's balance (the resell action).
+ *
+ * Uses a conditional updateMany inside a transaction so the pool debit
+ * only succeeds if the reseller has sufficient pool — preventing the
+ * race condition where two concurrent transfers could both pass the
+ * pre-check and overdraft the pool.
+ */
 export async function resellerTransfer(params: {
   fromUserId: string;
   toUserId: string;
@@ -317,55 +370,64 @@ export async function resellerTransfer(params: {
   note?: string;
 }): Promise<{ ok: boolean; reason?: string }> {
   const { fromUserId, toUserId, amount, saleMmk, note } = params;
-  if (amount <= 0) return { ok: false, reason: "invalid_amount" };
-  const reseller = await db.user.findUnique({
-    where: { id: fromUserId },
-    select: { resellerPool: true, role: true },
-  });
-  if (!reseller || (reseller.role !== "reseller" && reseller.role !== "admin")) {
-    return { ok: false, reason: "not_reseller" };
-  }
-  if (reseller.resellerPool < amount) {
-    return { ok: false, reason: "insufficient_pool" };
-  }
-  // Debit pool + credit recipient in a transaction
-  await db.$transaction([
-    db.user.update({
-      where: { id: fromUserId },
-      data: { resellerPool: { decrement: amount } },
-    }),
-    db.user.update({
-      where: { id: toUserId },
-      data: {
-        luckBalance: { increment: amount },
-        totalLuckEarned: { increment: amount },
-      },
-    }),
-    db.luckTransfer.create({
-      data: { fromUserId, toUserId, amount, saleMmk: saleMmk ?? null, note: note ?? null },
-    }),
-    db.luckTransaction.create({
-      data: {
-        userId: toUserId,
-        amount,
-        balanceAfter: 0, // updated below
-        type: "reseller_transfer_in",
-        description: `Luck received from reseller`,
-      },
-    }),
-  ]);
-  // Correct balanceAfter (post-transaction read)
-  const recipient = await db.user.findUnique({
-    where: { id: toUserId },
-    select: { luckBalance: true },
-  });
-  if (recipient) {
-    await db.luckTransaction.updateMany({
-      where: { userId: toUserId, type: "reseller_transfer_in", balanceAfter: 0 },
-      data: { balanceAfter: recipient.luckBalance },
+  if (amount <= 0 || !Number.isFinite(amount)) return { ok: false, reason: "invalid_amount" };
+  if (amount > 1_000_000) return { ok: false, reason: "invalid_amount" }; // sanity cap
+  if (fromUserId === toUserId) return { ok: false, reason: "self_transfer" };
+
+  try {
+    const result = await db.$transaction(async (tx) => {
+      // Verify reseller status
+      const reseller = await tx.user.findUnique({
+        where: { id: fromUserId },
+        select: { resellerPool: true, role: true },
+      });
+      if (!reseller || (reseller.role !== "reseller" && reseller.role !== "admin")) {
+        return { ok: false, reason: "not_reseller" as const };
+      }
+
+      // Atomic conditional debit — only succeeds if pool >= amount.
+      // This prevents the race where two concurrent transfers both
+      // pass the pre-check and overdraft the pool.
+      const debit = await tx.user.updateMany({
+        where: { id: fromUserId, resellerPool: { gte: amount } },
+        data: { resellerPool: { decrement: amount } },
+      });
+      if (debit.count === 0) {
+        return { ok: false, reason: "insufficient_pool" as const };
+      }
+
+      // Credit recipient
+      const recipient = await tx.user.update({
+        where: { id: toUserId },
+        data: {
+          luckBalance: { increment: amount },
+          totalLuckEarned: { increment: amount },
+        },
+        select: { luckBalance: true },
+      });
+
+      // Record transfer + ledger entries
+      await tx.luckTransfer.create({
+        data: { fromUserId, toUserId, amount, saleMmk: saleMmk ?? null, note: note ?? null },
+      });
+      await tx.luckTransaction.create({
+        data: {
+          userId: toUserId,
+          amount,
+          balanceAfter: recipient.luckBalance,
+          type: "reseller_transfer_in",
+          description: `Luck received from reseller`,
+        },
+      });
+
+      return { ok: true, recipientBalance: recipient.luckBalance };
     });
+
+    return { ok: result.ok, reason: "reason" in result ? result.reason : undefined };
+  } catch (err) {
+    console.error("resellerTransfer failed:", err);
+    return { ok: false, reason: "db_error" };
   }
-  return { ok: true };
 }
 
 // ============================================================

@@ -217,6 +217,22 @@ type LLMResult = {
   parsed?: { content: string; highlights: string[]; guidance: any | null };
 };
 
+/** Wrap a promise with a timeout — rejects with a TimeoutError after ms. */
+function withTimeout<T>(promise: Promise<T>, ms: number, label = "operation"): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`${label} timed out after ${ms}ms`));
+    }, ms);
+    promise.then(
+      (val) => { clearTimeout(timer); resolve(val); },
+      (err) => { clearTimeout(timer); reject(err); },
+    );
+  });
+}
+
+const LLM_TIMEOUT_MS = 30_000; // 30s — covers most completions
+const LLM_TIMEOUT_MS_STREAM = 90_000; // 90s for streaming (larger outputs)
+
 /** Call Gemini for a chat interpretation. Returns parsed JSON or fallback text. */
 export async function callAstrologerLLM(system: string, user: string, opts?: {
   temperature?: number;
@@ -224,14 +240,18 @@ export async function callAstrologerLLM(system: string, user: string, opts?: {
 }): Promise<LLMResult> {
   const zai = await zaiPromise;
   try {
-    const completion = await zai.chat.completions.create({
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      temperature: opts?.temperature ?? 0.7,
-      maxTokens: opts?.maxTokens ?? 2048,
-    } as any);
+    const completion = await withTimeout(
+      zai.chat.completions.create({
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        temperature: opts?.temperature ?? 0.7,
+        maxTokens: opts?.maxTokens ?? 2048,
+      } as any),
+      LLM_TIMEOUT_MS,
+      "LLM completion"
+    );
     const raw = completion.choices?.[0]?.message?.content?.trim() ?? "";
     return parseLLMResult(raw);
   } catch (err) {
@@ -253,14 +273,18 @@ export async function* streamAstrologerLLM(system: string, user: string, opts?: 
   const zai = await zaiPromise;
   let full = "";
   try {
-    const completion = await zai.chat.completions.create({
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      temperature: opts?.temperature ?? 0.7,
-      maxTokens: opts?.maxTokens ?? 2048,
-    } as any);
+    const completion = await withTimeout(
+      zai.chat.completions.create({
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        temperature: opts?.temperature ?? 0.7,
+        maxTokens: opts?.maxTokens ?? 2048,
+      } as any),
+      LLM_TIMEOUT_MS_STREAM,
+      "LLM stream"
+    );
     full = completion.choices?.[0]?.message?.content?.trim() ?? "";
     // Simulate streaming: yield the text in ~12-char word-boundary chunks
     const tokens = full.match(/\S+\s*/g) ?? [full];
@@ -283,14 +307,18 @@ export async function callTarotLLM(system: string, user: string, opts?: {
 }): Promise<string> {
   const zai = await zaiPromise;
   try {
-    const completion = await zai.chat.completions.create({
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      temperature: opts?.temperature ?? 0.9,
-      maxTokens: opts?.maxTokens ?? 1400,
-    } as any);
+    const completion = await withTimeout(
+      zai.chat.completions.create({
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        temperature: opts?.temperature ?? 0.9,
+        maxTokens: opts?.maxTokens ?? 1400,
+      } as any),
+      LLM_TIMEOUT_MS,
+      "Tarot LLM"
+    );
     return completion.choices?.[0]?.message?.content?.trim() ?? "";
   } catch (err) {
     console.error("Tarot LLM failed:", err);

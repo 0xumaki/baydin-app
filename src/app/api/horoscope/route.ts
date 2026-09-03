@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseBirthData } from "@/lib/validate";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { spendForFeature } from "@/lib/luck";
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
   let personalized = false;
   let luckCost = 0;
   if (user?.birthData) {
-    const birthData: BirthContext = JSON.parse(user.birthData);
+    const birthData = parseBirthData(user.birthData); if (!birthData) return NextResponse.json({ error: "Birth data required" }, { status: 400 });
     // Spend Luck for personalized horoscope
     const res = await spendForFeature({
       userId: user.id,

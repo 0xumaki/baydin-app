@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseBirthData } from "@/lib/validate";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { spendForFeature, creditLuck } from "@/lib/luck";
@@ -31,7 +32,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Insufficient Luck.", balance: res.balance }, { status: 402 });
   }
 
-  const personA: BirthContext = JSON.parse(user.birthData);
+  const personA = parseBirthData(user.birthData);
+  if (!personA) {
+    await creditLuck({ userId: user.id, amount: res.cost, type: "admin_grant", description: "Refund: missing birth data" });
+    return NextResponse.json({ error: "Your birth data is required. Set it in your profile." }, { status: 400 });
+  }
   const personB: BirthContext = partner;
 
   let compat: any;
