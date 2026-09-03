@@ -207,9 +207,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Dasamsa (D-10) — career */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Dasamsa (D-10) — Career & Profession
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Dasamsa (D-10) — Career & Profession
+            </div>
+            {(() => { const d = computeDasamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-10" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -230,9 +233,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Saptamsa (D-7) — children */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Saptamsa (D-7) — Children & Progeny
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Saptamsa (D-7) — Children & Progeny
+            </div>
+            {(() => { const d = computeSaptamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-7" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -253,9 +259,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Hora (D-2) — wealth */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Hora (D-2) — Wealth & Resources
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Hora (D-2) — Wealth & Resources
+            </div>
+            {(() => { const d = computeHora(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-2" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -276,9 +285,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Dwadasamsa (D-12) — parents */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Dwadasamsa (D-12) — Parents & Ancestry
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Dwadasamsa (D-12) — Parents & Ancestry
+            </div>
+            {(() => { const d = computeDwadasamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-12" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -299,9 +311,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Drekkana (D-3) — siblings */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Drekkana (D-3) — Siblings & Courage
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Drekkana (D-3) — Siblings & Courage
+            </div>
+            {(() => { const d = computeDrekkana(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-3" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -322,9 +337,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Chaturthamsa (D-4) — property */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Chaturthamsa (D-4) — Property & Residence
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Chaturthamsa (D-4) — Property & Residence
+            </div>
+            {(() => { const d = computeChaturthamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-4" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -345,9 +363,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Shodasamsa (D-16) — vehicles */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Shodasamsa (D-16) — Vehicles & Comforts
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Shodasamsa (D-16) — Vehicles & Comforts
+            </div>
+            {(() => { const d = computeShodasamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-16" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -368,9 +389,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Vimsamsa (D-20) — spiritual */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Vimsamsa (D-20) — Spiritual Practices
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Vimsamsa (D-20) — Spiritual Practices
+            </div>
+            {(() => { const d = computeVimsamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-20" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -391,9 +415,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Chaturvimsamsa (D-24) — education */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Chaturvimsamsa (D-24) — Education & Knowledge
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Chaturvimsamsa (D-24) — Education & Knowledge
+            </div>
+            {(() => { const d = computeChaturvimsamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-24" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -414,9 +441,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Trimsamsa (D-30) — misfortunes */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Trimsamsa (D-30) — Struggles & Hidden Matters
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Trimsamsa (D-30) — Struggles & Hidden Matters
+            </div>
+            {(() => { const d = computeTrimsamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-30" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -437,9 +467,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Khavedamsa (D-40) — auspicious/inauspicious */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Khavedamsa (D-40) — Auspicious & Inauspicious Effects
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Khavedamsa (D-40) — Auspicious & Inauspicious Effects
+            </div>
+            {(() => { const d = computeKhavedamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-40" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -460,9 +493,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Akshavedamsa (D-45) — general well-being */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Akshavedamsa (D-45) — General Well-being
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Akshavedamsa (D-45) — General Well-being
+            </div>
+            {(() => { const d = computeAkshavedamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-45" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -483,9 +519,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Shashtiamsa (D-60) — past karma */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Shashtiamsa (D-60) — Past Life Karma
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Shashtiamsa (D-60) — Past Life Karma
+            </div>
+            {(() => { const d = computeShashtiamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-60" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
