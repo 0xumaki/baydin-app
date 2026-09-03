@@ -28,6 +28,7 @@ import { ProfileSheet } from "@/components/profile-sheet";
 import { AchievementCelebration } from "@/components/achievement-celebration";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Onboarding } from "@/components/onboarding";
+import { ReminderService } from "@/components/reminder-service";
 import {
   Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
   Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
@@ -188,6 +189,7 @@ export function AppShell() {
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
       <ProfileSheet open={profileOpen} onOpenChange={setProfileOpen} />
       {user && <AchievementCelebration />}
+      {user && <ReminderService />}
       {user && <Onboarding />}
     </div>
   );
