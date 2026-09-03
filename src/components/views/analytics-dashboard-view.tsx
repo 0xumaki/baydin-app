@@ -73,8 +73,8 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-full flex items-center justify-center px-6 text-center">
         <div>
-          <BarChart3 className="w-10 h-10 text-ink-muted mx-auto mb-3" />
-          <div className="text-[16px] text-ink mb-1">Sign in to view insights</div>
+          <BarChart3 className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to view insights</div>
           <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
         </div>
       </div>
@@ -84,7 +84,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
   if (loading || !analytics) {
     return (
       <div className="h-full flex items-center justify-center">
-        <Loader2 className="w-5 h-5 animate-spin text-gold" />
+        <Loader2 className="w-5 h-5 animate-spin text-[#C5A572]" />
       </div>
     );
   }
@@ -134,20 +134,20 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
               {/* Spent by feature bar chart */}
               {analytics.luck.spentByFeature.length > 0 && (
                 <div className="mb-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted mb-2">Spent by Feature</div>
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-[#9C9489] mb-2">Spent by Feature</div>
                   <div className="space-y-2">
                     {analytics.luck.spentByFeature.map((item) => {
                       const maxAmount = Math.max(...analytics.luck.spentByFeature.map((x) => x.amount), 1);
                       const pct = (item.amount / maxAmount) * 100;
                       return (
                         <div key={item.feature} className="flex items-center gap-3">
-                          <div className="text-[11px] text-ink w-32 truncate">{FEATURE_LABELS[item.feature] || item.feature}</div>
+                          <div className="text-[11px] text-[#E8E2D5] w-32 truncate">{FEATURE_LABELS[item.feature] || item.feature}</div>
                           <div className="flex-1 h-5 bg-black/30 rounded-md overflow-hidden relative">
                             <div
                               className="h-full bg-gradient-to-r from-gold/40 to-gold rounded-md transition-all"
                               style={{ width: `${pct}%` }}
                             />
-                            <div className="absolute inset-0 flex items-center justify-between px-2 text-[10px] text-ink">
+                            <div className="absolute inset-0 flex items-center justify-between px-2 text-[10px] text-[#E8E2D5]">
                               <span></span>
                               <span>{item.amount} Luck · {item.count}×</span>
                             </div>
@@ -162,10 +162,10 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
               {/* Earned by type */}
               {analytics.luck.earnedByType.length > 0 && (
                 <div>
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-ink-muted mb-2">Earned by Source</div>
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-[#9C9489] mb-2">Earned by Source</div>
                   <div className="flex flex-wrap gap-2">
                     {analytics.luck.earnedByType.map((item) => (
-                      <span key={item.type} className="text-[11px] px-2.5 py-1 rounded-full bg-leaf/10 border border-leaf/20 text-leaf">
+                      <span key={item.type} className="text-[11px] px-2.5 py-1 rounded-full bg-leaf/10 border border-leaf/20 text-[#7A8B6F]">
                         {EARNED_LABELS[item.type] || item.type}: +{item.amount} ({item.count}×)
                       </span>
                     ))}
@@ -179,18 +179,18 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
               {/* Ritual streak */}
               <GlassCard className="p-5 lg:p-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <Flame className="w-4 h-4 text-gold" />
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-gold">Ritual Streak</div>
+                  <Flame className="w-4 h-4 text-[#C5A572]" />
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Ritual Streak</div>
                 </div>
                 <div className="flex items-baseline gap-4 mb-4">
                   <div>
-                    <div className="text-[36px] font-light text-gold leading-none">{analytics.ritualStreak.current}</div>
-                    <div className="text-[10px] text-ink-muted mt-0.5">current</div>
+                    <div className="text-[36px] font-light text-[#C5A572] leading-none">{analytics.ritualStreak.current}</div>
+                    <div className="text-[10px] text-[#9C9489] mt-0.5">current</div>
                   </div>
-                  <div className="text-ink-muted/40">/</div>
+                  <div className="text-[#9C9489]/40">/</div>
                   <div>
-                    <div className="text-[24px] font-light text-ink-muted leading-none">{analytics.ritualStreak.longest}</div>
-                    <div className="text-[10px] text-ink-muted mt-0.5">longest</div>
+                    <div className="text-[24px] font-light text-[#9C9489] leading-none">{analytics.ritualStreak.longest}</div>
+                    <div className="text-[10px] text-[#9C9489] mt-0.5">longest</div>
                   </div>
                 </div>
                 {/* Last 7 days dots */}
@@ -203,14 +203,14 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                           className={cn(
                             "w-7 h-7 rounded-md flex items-center justify-center text-[10px] border",
                             d.completed
-                              ? "bg-gold/20 border-gold/40 text-gold"
-                              : "bg-black/20 border-white/5 text-ink-muted/40"
+                              ? "bg-[#C5A572]/20 border-[#C5A572]/40 text-[#C5A572]"
+                              : "bg-black/20 border-[#2A2722] text-[#9C9489]/40"
                           )}
                           title={`${d.date} · ${d.completed ? "completed" : "—"}`}
                         >
                           {d.completed ? "✦" : "·"}
                         </div>
-                        <span className="text-[9px] text-ink-muted">{dayLabel}</span>
+                        <span className="text-[9px] text-[#9C9489]">{dayLabel}</span>
                       </div>
                     );
                   })}
@@ -220,8 +220,8 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
               {/* Practice activity heatmap (last 14 days) */}
               <GlassCard className="p-5 lg:p-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <Zap className="w-4 h-4 text-gold" />
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-gold">Practice Activity · 14 days</div>
+                  <Zap className="w-4 h-4 text-[#C5A572]" />
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Practice Activity · 14 days</div>
                 </div>
                 <div className="grid grid-cols-7 gap-1.5">
                   {analytics.practiceActivity.map((d) => {
@@ -233,7 +233,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                     return (
                       <div
                         key={d.date}
-                        className="aspect-square rounded-md flex items-center justify-center text-[10px] border border-white/5"
+                        className="aspect-square rounded-md flex items-center justify-center text-[10px] border border-[#2A2722]"
                         style={{ background: bg, color: d.count > 0 ? "#F0D9A8" : "rgba(255,255,255,0.2)" }}
                         title={`${d.date} · ${d.count} activit${d.count === 1 ? "y" : "ies"}`}
                       >
@@ -242,7 +242,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                     );
                   })}
                 </div>
-                <div className="flex items-center justify-between mt-3 text-[9px] text-ink-muted">
+                <div className="flex items-center justify-between mt-3 text-[9px] text-[#9C9489]">
                   <span>Less</span>
                   <div className="flex items-center gap-0.5">
                     {[0.03, 0.3, 0.55, 0.8, 1].map((i) => (
@@ -267,8 +267,8 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                   {analytics.dreamsByMood.length > 0 && (
                     <GlassCard className="p-5 lg:p-6">
                       <div className="flex items-center gap-2 mb-3">
-                        <Moon className="w-4 h-4 text-gold" />
-                        <div className="text-[10px] uppercase tracking-[0.2em] text-gold">Dreams by Mood</div>
+                        <Moon className="w-4 h-4 text-[#C5A572]" />
+                        <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Dreams by Mood</div>
                       </div>
                       <div className="space-y-2">
                         {analytics.dreamsByMood.map((item) => {
@@ -278,14 +278,14 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                           return (
                             <div key={item.mood} className="flex items-center gap-3">
                               <span className="text-[14px] w-6 text-center">{meta.emoji}</span>
-                              <div className="text-[11px] text-ink w-16">{meta.label}</div>
+                              <div className="text-[11px] text-[#E8E2D5] w-16">{meta.label}</div>
                               <div className="flex-1 h-4 bg-black/30 rounded-md overflow-hidden">
                                 <div
                                   className="h-full rounded-md"
                                   style={{ width: `${pct}%`, background: meta.color }}
                                 />
                               </div>
-                              <div className="text-[11px] text-ink-muted w-6 text-right">{item.count}</div>
+                              <div className="text-[11px] text-[#9C9489] w-6 text-right">{item.count}</div>
                             </div>
                           );
                         })}
@@ -297,8 +297,8 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                   {analytics.dreamsByMoonPhase.length > 0 && (
                     <GlassCard className="p-5 lg:p-6">
                       <div className="flex items-center gap-2 mb-3">
-                        <Moon className="w-4 h-4 text-gold" />
-                        <div className="text-[10px] uppercase tracking-[0.2em] text-gold">Dreams by Moon Phase</div>
+                        <Moon className="w-4 h-4 text-[#C5A572]" />
+                        <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Dreams by Moon Phase</div>
                       </div>
                       <div className="space-y-2">
                         {analytics.dreamsByMoonPhase.map((item) => {
@@ -307,11 +307,11 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                           return (
                             <div key={item.phase} className="flex items-center gap-3">
                               <span className="text-[14px] w-6 text-center">{item.emoji}</span>
-                              <div className="text-[11px] text-ink flex-1 truncate">{item.phase}</div>
+                              <div className="text-[11px] text-[#E8E2D5] flex-1 truncate">{item.phase}</div>
                               <div className="flex-1 h-4 bg-black/30 rounded-md overflow-hidden">
                                 <div className="h-full bg-gradient-to-r from-ink-muted/30 to-gold rounded-md" style={{ width: `${pct}%` }} />
                               </div>
-                              <div className="text-[11px] text-ink-muted w-6 text-right">{item.count}</div>
+                              <div className="text-[11px] text-[#9C9489] w-6 text-right">{item.count}</div>
                             </div>
                           );
                         })}
@@ -324,8 +324,8 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                 {analytics.topDreamSymbols.length > 0 && (
                   <GlassCard className="p-5 lg:p-6 mb-6">
                     <div className="flex items-center gap-2 mb-3">
-                      <Hash className="w-4 h-4 text-gold" />
-                      <div className="text-[10px] uppercase tracking-[0.2em] text-gold">Top Dream Symbols</div>
+                      <Hash className="w-4 h-4 text-[#C5A572]" />
+                      <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Top Dream Symbols</div>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {analytics.topDreamSymbols.map((s, i) => (
@@ -351,14 +351,14 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
             {analytics.tarotBySpread.length > 0 && (
               <GlassCard className="p-5 lg:p-6 mb-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-4 h-4 text-gold" />
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-gold">Tarot Spreads Used</div>
+                  <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Tarot Spreads Used</div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {analytics.tarotBySpread.map((s) => (
-                    <div key={s.spread} className="p-3 rounded-sm bg-black/20 border border-white/5">
-                      <div className="text-[11px] text-ink-muted truncate">{SPREAD_LABELS[s.spread] || s.spread}</div>
-                      <div className="text-[20px] font-light text-ink mt-0.5">{s.count}</div>
+                    <div key={s.spread} className="p-3 rounded-sm bg-black/20 border border-[#2A2722]">
+                      <div className="text-[11px] text-[#9C9489] truncate">{SPREAD_LABELS[s.spread] || s.spread}</div>
+                      <div className="text-[20px] font-light text-[#E8E2D5] mt-0.5">{s.count}</div>
                     </div>
                   ))}
                 </div>
@@ -369,8 +369,8 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
             {analytics.moodTrend.length > 0 && (
               <GlassCard className="p-5 lg:p-6 mb-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp className="w-4 h-4 text-gold" />
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-gold">Mood Trend · last 30 days</div>
+                  <TrendingUp className="w-4 h-4 text-[#C5A572]" />
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Mood Trend · last 30 days</div>
                 </div>
                 <MoodTrendChart data={analytics.moodTrend} />
               </GlassCard>
@@ -412,7 +412,7 @@ function LuckStat({ label, value, color }: { label: string; value: number; color
 
 function MoodTrendChart({ data }: { data: { date: string; mood: number }[] }) {
   if (data.length === 0) {
-    return <div className="text-[12px] text-ink-muted py-4 text-center">No mood entries yet.</div>;
+    return <div className="text-[12px] text-[#9C9489] py-4 text-center">No mood entries yet.</div>;
   }
   const width = 600;
   const height = 120;

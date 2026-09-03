@@ -40,8 +40,8 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-full flex items-center justify-center px-6 text-center">
         <div>
-          <Users className="w-10 h-10 text-ink-muted mx-auto mb-3" />
-          <div className="text-[16px] text-ink mb-1">Sign in to check compatibility</div>
+          <Users className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to check compatibility</div>
           <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
         </div>
       </div>
@@ -57,7 +57,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
-          <button onClick={() => setResult(null)} className="flex items-center gap-1.5 text-[12px] text-ink-muted hover:text-gold mb-4 transition">
+          <button onClick={() => setResult(null)} className="flex items-center gap-1.5 text-[12px] text-[#9C9489] hover:text-[#C5A572] mb-4 transition">
             <ArrowLeft className="w-3.5 h-3.5" /> New reading
           </button>
 
@@ -73,28 +73,28 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
                     strokeDasharray={`${(pct / 100) * 264} 264`} style={{ transition: "stroke-dasharray 1s ease" }} />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <div className="text-[24px] font-light" style={{ color: verdict.color }}>{score}<span className="text-[12px] text-ink-muted">/{max}</span></div>
+                  <div className="text-[24px] font-light" style={{ color: verdict.color }}>{score}<span className="text-[12px] text-[#9C9489]">/{max}</span></div>
                 </div>
               </div>
               <div className="flex-1">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-1">Ashtakoota Score</div>
+                <div className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-1">Ashtakoota Score</div>
                 <div className="text-[20px] font-light mb-1" style={{ color: verdict.color }}>{verdict.label}</div>
-                <div className="text-[12px] text-ink-muted">{result.person_a.moon_sign} ♡ {result.person_b.moon_sign}</div>
+                <div className="text-[12px] text-[#9C9489]">{result.person_a.moon_sign} ♡ {result.person_b.moon_sign}</div>
               </div>
             </div>
           </ShellCard>
 
           {/* Breakdown */}
           <GlassCard className="p-5 mb-4">
-            <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2"><Star className="w-3.5 h-3.5 text-gold" /> 8-Fold Compatibility Breakdown</div>
+            <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2"><Star className="w-3.5 h-3.5 text-[#C5A572]" /> 8-Fold Compatibility Breakdown</div>
             <div className="space-y-2">
               {result.ashtakoota.breakdown.map((b: any, i: number) => (
                 <div key={i} className="flex items-center gap-3">
-                  <span className="w-24 text-[12px] text-ink-muted shrink-0">{b.name}</span>
+                  <span className="w-24 text-[12px] text-[#9C9489] shrink-0">{b.name}</span>
                   <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
                     <div className="h-full rounded-full transition-all duration-700" style={{ width: `${(b.score / b.max) * 100}%`, background: b.score / b.max >= 0.7 ? "#B5CD7E" : b.score / b.max >= 0.4 ? "#C5A87C" : "#b5463a" }} />
                   </div>
-                  <span className="w-12 text-[11px] text-ink text-right shrink-0">{b.score}/{b.max}</span>
+                  <span className="w-12 text-[11px] text-[#E8E2D5] text-right shrink-0">{b.score}/{b.max}</span>
                 </div>
               ))}
             </div>
@@ -103,31 +103,31 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
           {/* Synastry + Mahabote */}
           <div className="grid grid-cols-2 gap-3 mb-4">
             <GlassCard className="p-4">
-              <div className="text-[10px] uppercase tracking-wide text-ink-muted mb-1">Venus Synastry</div>
-              <div className="text-[14px] text-gold capitalize">{result.synastry.venus_aspect}</div>
-              <div className="text-[11px] text-ink-muted">orb {result.synastry.venus_orb}°</div>
+              <div className="text-[10px] uppercase tracking-wide text-[#9C9489] mb-1">Venus Synastry</div>
+              <div className="text-[14px] text-[#C5A572] capitalize">{result.synastry.venus_aspect}</div>
+              <div className="text-[11px] text-[#9C9489]">orb {result.synastry.venus_orb}°</div>
             </GlassCard>
             <GlassCard className="p-4">
-              <div className="text-[10px] uppercase tracking-wide text-ink-muted mb-1">Mahabote Weekday</div>
-              <div className="text-[14px] text-gold capitalize">{result.mahabote.replace("-", " ")}</div>
+              <div className="text-[10px] uppercase tracking-wide text-[#9C9489] mb-1">Mahabote Weekday</div>
+              <div className="text-[14px] text-[#C5A572] capitalize">{result.mahabote.replace("-", " ")}</div>
             </GlassCard>
           </div>
 
           {/* Interpretation */}
           <GlassCard className="p-6">
-            <div className="serif prose-editorial text-[14px] text-ink/90 leading-relaxed">
+            <div className="serif prose-editorial text-[14px] text-[#E8E2D5]/90 leading-relaxed">
               <ReactMarkdown>{result.interpretation}</ReactMarkdown>
             </div>
             {result.highlights?.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-white/5 flex flex-wrap gap-1.5">
+              <div className="mt-4 pt-4 border-t border-[#2A2722] flex flex-wrap gap-1.5">
                 {result.highlights.map((h: string, i: number) => <Pill key={i} variant="gold" className="text-[10px]">{h}</Pill>)}
               </div>
             )}
             {result.guidance?.recommendations?.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-white/5">
-                <div className="text-[11px] uppercase tracking-wide text-ink-muted mb-2">Recommendations</div>
-                <ul className="space-y-1 text-[12px] text-ink/90">
-                  {result.guidance.recommendations.map((r: string, i: number) => <li key={i} className="flex gap-1.5"><span className="text-gold">•</span> {r}</li>)}
+              <div className="mt-4 pt-4 border-t border-[#2A2722]">
+                <div className="text-[11px] uppercase tracking-wide text-[#9C9489] mb-2">Recommendations</div>
+                <ul className="space-y-1 text-[12px] text-[#E8E2D5]/90">
+                  {result.guidance.recommendations.map((r: string, i: number) => <li key={i} className="flex gap-1.5"><span className="text-[#C5A572]">•</span> {r}</li>)}
                 </ul>
               </div>
             )}
@@ -143,11 +143,11 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
       <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] flex items-center justify-center px-6 text-center">
         <div>
           <div className="relative w-20 h-20 mx-auto mb-4">
-            <Heart className="w-20 h-20 text-gold/20 absolute" />
-            <Heart className="w-20 h-20 text-gold absolute animate-pulse" style={{ clipPath: "polygon(0 0, 50% 0, 50% 100%, 0 100%)" }} />
+            <Heart className="w-20 h-20 text-[#C5A572]/20 absolute" />
+            <Heart className="w-20 h-20 text-[#C5A572] absolute animate-pulse" style={{ clipPath: "polygon(0 0, 50% 0, 50% 100%, 0 100%)" }} />
           </div>
-          <div className="text-[14px] text-ink">Reading your compatibility…</div>
-          <div className="text-[11px] text-ink-muted mt-1">Computing Ashtakoota + Venus synastry</div>
+          <div className="text-[14px] text-[#E8E2D5]">Reading your compatibility…</div>
+          <div className="text-[11px] text-[#9C9489] mt-1">Computing Ashtakoota + Venus synastry</div>
         </div>
       </div>
     );
@@ -161,32 +161,32 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
 
         {!user.birthData ? (
           <ShellCard className="p-6 text-center">
-            <Star className="w-8 h-8 text-gold mx-auto mb-3" />
-            <div className="text-[14px] text-ink mb-1">Your birth details needed</div>
-            <div className="text-[12px] text-ink-muted">Open your profile (top-right settings icon) and add your birth date, time, and place first.</div>
+            <Star className="w-8 h-8 text-[#C5A572] mx-auto mb-3" />
+            <div className="text-[14px] text-[#E8E2D5] mb-1">Your birth details needed</div>
+            <div className="text-[12px] text-[#9C9489]">Open your profile (top-right settings icon) and add your birth date, time, and place first.</div>
           </ShellCard>
         ) : (
           <ShellCard className="p-5">
-            <div className="text-[13px] text-ink mb-4 flex items-center gap-2"><Heart className="w-4 h-4 text-gold" /> Partner's birth details</div>
+            <div className="text-[13px] text-[#E8E2D5] mb-4 flex items-center gap-2"><Heart className="w-4 h-4 text-[#C5A572]" /> Partner's birth details</div>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <Label className="text-[12px] text-ink-muted">Birth date</Label>
-                <Input type="date" value={partner.dob} onChange={(e) => setPartner({ ...partner, dob: e.target.value })} className="bg-white/[0.03] border-white/10 text-ink mt-1.5" />
+                <Label className="text-[12px] text-[#9C9489]">Birth date</Label>
+                <Input type="date" value={partner.dob} onChange={(e) => setPartner({ ...partner, dob: e.target.value })} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" />
               </div>
               <div>
-                <Label className="text-[12px] text-ink-muted">Birth time</Label>
-                <Input type="time" value={partner.tob} onChange={(e) => setPartner({ ...partner, tob: e.target.value })} className="bg-white/[0.03] border-white/10 text-ink mt-1.5" />
+                <Label className="text-[12px] text-[#9C9489]">Birth time</Label>
+                <Input type="time" value={partner.tob} onChange={(e) => setPartner({ ...partner, tob: e.target.value })} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <Label className="text-[12px] text-ink-muted">Birth place</Label>
-                <Input value={partner.place} onChange={(e) => setPartner({ ...partner, place: e.target.value })} className="bg-white/[0.03] border-white/10 text-ink mt-1.5" placeholder="Yangon" />
+                <Label className="text-[12px] text-[#9C9489]">Birth place</Label>
+                <Input value={partner.place} onChange={(e) => setPartner({ ...partner, place: e.target.value })} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" placeholder="Yangon" />
               </div>
               <div>
-                <Label className="text-[12px] text-ink-muted">Gender</Label>
+                <Label className="text-[12px] text-[#9C9489]">Gender</Label>
                 <Select value={partner.gender || ""} onValueChange={(v) => setPartner({ ...partner, gender: v as any })}>
-                  <SelectTrigger className="bg-white/[0.03] border-white/10 text-ink mt-1.5"><SelectValue placeholder="—" /></SelectTrigger>
+                  <SelectTrigger className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5"><SelectValue placeholder="—" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="male">Male</SelectItem>
                     <SelectItem value="female">Female</SelectItem>
@@ -196,18 +196,18 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
             </div>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <Label className="text-[12px] text-ink-muted">Latitude</Label>
-                <Input type="number" step="0.0001" value={partner.latitude} onChange={(e) => setPartner({ ...partner, latitude: parseFloat(e.target.value) || 0 })} className="bg-white/[0.03] border-white/10 text-ink mt-1.5" />
+                <Label className="text-[12px] text-[#9C9489]">Latitude</Label>
+                <Input type="number" step="0.0001" value={partner.latitude} onChange={(e) => setPartner({ ...partner, latitude: parseFloat(e.target.value) || 0 })} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" />
               </div>
               <div>
-                <Label className="text-[12px] text-ink-muted">Longitude</Label>
-                <Input type="number" step="0.0001" value={partner.longitude} onChange={(e) => setPartner({ ...partner, longitude: parseFloat(e.target.value) || 0 })} className="bg-white/[0.03] border-white/10 text-ink mt-1.5" />
+                <Label className="text-[12px] text-[#9C9489]">Longitude</Label>
+                <Input type="number" step="0.0001" value={partner.longitude} onChange={(e) => setPartner({ ...partner, longitude: parseFloat(e.target.value) || 0 })} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" />
               </div>
             </div>
             <div className="mb-4">
-              <Label className="text-[12px] text-ink-muted">Relationship type</Label>
+              <Label className="text-[12px] text-[#9C9489]">Relationship type</Label>
               <Select value={relationshipType} onValueChange={setRelationshipType}>
-                <SelectTrigger className="bg-white/[0.03] border-white/10 text-ink mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="MARRIAGE">Marriage</SelectItem>
                   <SelectItem value="PARTNERSHIP">Partnership</SelectItem>
@@ -217,7 +217,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
             </div>
             <div className="flex items-center justify-between mb-4">
               <Pill variant="gold" className="text-[11px]"><Wallet className="w-3 h-3" /> 5 Luck</Pill>
-              <span className="text-[11px] text-ink-muted">Ashtakoota + Mahendra + Vedha + Rajju + Stree-Deergha + Nadi</span>
+              <span className="text-[11px] text-[#9C9489]">Ashtakoota + Mahendra + Vedha + Rajju + Stree-Deergha + Nadi</span>
             </div>
             <GradientButton onClick={run} disabled={!partner.dob} className="w-full">
               <Users className="w-4 h-4" /> Check compatibility

@@ -83,8 +83,8 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-full flex items-center justify-center px-6 text-center">
         <div>
-          <Heart className="w-10 h-10 text-ink-muted mx-auto mb-3" />
-          <div className="text-[16px] text-ink mb-1">Sign in to begin</div>
+          <Heart className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to begin</div>
           <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
         </div>
       </div>
@@ -195,9 +195,9 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] flex items-center justify-center px-6 text-center">
         <div>
-          <Loader2 className="w-8 h-8 text-gold animate-spin mx-auto mb-3" style={{ color: cat.color }} />
-          <div className="text-[14px] text-ink">Writing your {cat.name} affirmation…</div>
-          <div className="text-[11px] text-ink-muted mt-1">Gemini is crafting something just for you</div>
+          <Loader2 className="w-8 h-8 text-[#C5A572] animate-spin mx-auto mb-3" style={{ color: cat.color }} />
+          <div className="text-[14px] text-[#E8E2D5]">Writing your {cat.name} affirmation…</div>
+          <div className="text-[11px] text-[#9C9489] mt-1">Gemini is crafting something just for you</div>
         </div>
       </div>
     );
@@ -211,17 +211,17 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
 
         <div className="flex items-center gap-2 mb-4">
           <Pill variant="leaf" className="text-[10px]">{todayCount === 0 ? "1 free today" : `${todayCount} used today`}</Pill>
-          {todayCount > 0 && <span className="text-[11px] text-ink-muted">Additional scripts: 1 Luck each</span>}
+          {todayCount > 0 && <span className="text-[11px] text-[#9C9489]">Additional scripts: 1 Luck each</span>}
         </div>
 
         {/* Optional intention */}
         <GlassCard className="p-3 mb-4 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-gold shrink-0" />
+          <Sparkles className="w-4 h-4 text-[#C5A572] shrink-0" />
           <input
             value={intention}
             onChange={(e) => setIntention(e.target.value)}
             placeholder="Optional: a specific intention (e.g. 'I release fear about my interview')"
-            className="flex-1 bg-transparent outline-none text-[13px] text-ink placeholder:text-ink-muted/60"
+            className="flex-1 bg-transparent outline-none text-[13px] text-[#E8E2D5] placeholder:text-[#9C9489]/60"
           />
         </GlassCard>
 
@@ -231,13 +231,13 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
             <button
               key={c.id}
               onClick={() => generate(c.id)}
-              className="group text-left p-4 rounded-sm border border-white/8 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04] transition-all"
+              className="group text-left p-4 rounded-sm border border-[#2A2722] bg-white/[0.02] hover:border-[#4A4540] hover:bg-white/[0.04] transition-all"
             >
               <div className="w-9 h-9 rounded-sm flex items-center justify-center mb-2 transition-transform group-hover:scale-110" style={{ background: `${c.color}15`, border: `1px solid ${c.color}40` }}>
                 <Heart className="w-4 h-4" style={{ color: c.color }} />
               </div>
-              <div className="text-[13px] text-ink font-medium leading-tight mb-0.5">{c.name}</div>
-              <div className="text-[10px] text-ink-muted leading-tight">{c.description}</div>
+              <div className="text-[13px] text-[#E8E2D5] font-medium leading-tight mb-0.5">{c.name}</div>
+              <div className="text-[10px] text-[#9C9489] leading-tight">{c.description}</div>
             </button>
           ))}
         </div>

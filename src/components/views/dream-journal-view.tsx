@@ -133,8 +133,8 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-full flex items-center justify-center px-6 text-center">
         <div>
-          <Moon className="w-10 h-10 text-ink-muted mx-auto mb-3" />
-          <div className="text-[16px] text-ink mb-1">Sign in to begin</div>
+          <Moon className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to begin</div>
           <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
         </div>
       </div>
@@ -218,7 +218,7 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
 
         {/* Entries */}
         {loading ? (
-          <div className="flex items-center justify-center py-16 text-ink-muted">
+          <div className="flex items-center justify-center py-16 text-[#9C9489]">
             <Loader2 className="w-5 h-5 animate-spin" />
           </div>
         ) : entries.length === 0 ? (
@@ -531,7 +531,7 @@ function EntryDetail({
   return (
     <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
-        <button onClick={onClose} className="text-[12px] text-ink-muted hover:text-gold transition mb-4">
+        <button onClick={onClose} className="text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4">
           ← Back to journal
         </button>
 
@@ -548,23 +548,23 @@ function EntryDetail({
             <div className="text-[12px] text-[#6B6358] font-medium">
               {dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
             </div>
-            <h1 className="text-[22px] lg:text-[26px] font-light text-ink mt-1 leading-tight">{entry.title}</h1>
+            <h1 className="text-[22px] lg:text-[26px] font-light text-[#E8E2D5] mt-1 leading-tight">{entry.title}</h1>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ background: `${mood.color}15`, borderColor: `${mood.color}40`, color: mood.color }}>
                 {mood.label}
               </span>
               {entry.isRecurring && (
-                <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/5 text-ink-muted border border-white/10">
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/5 text-[#9C9489] border border-[#2A2722]">
                   <RefreshCw className="w-3 h-3 inline mr-1" /> Recurring
                 </span>
               )}
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={onToggleFavorite} className="p-2 rounded-lg text-ink-muted hover:text-gold transition" title={entry.isFavorite ? "Remove favorite" : "Add to favorites"}>
-              <Heart className={cn("w-4 h-4", entry.isFavorite && "fill-gold text-gold")} />
+            <button onClick={onToggleFavorite} className="p-2 rounded-lg text-[#9C9489] hover:text-[#C5A572] transition" title={entry.isFavorite ? "Remove favorite" : "Add to favorites"}>
+              <Heart className={cn("w-4 h-4", entry.isFavorite && "fill-gold text-[#C5A572]")} />
             </button>
-            <button onClick={onDelete} className="p-2 rounded-lg text-ink-muted hover:text-red-400 transition" title="Delete">
+            <button onClick={onDelete} className="p-2 rounded-lg text-[#9C9489] hover:text-red-400 transition" title="Delete">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
@@ -573,14 +573,14 @@ function EntryDetail({
         {/* Dream narrative */}
         <GlassCard className="p-5 lg:p-6 mb-4">
           <div className="text-[12px] text-[#6B6358] font-medium mb-3">The Dream</div>
-          <div className="text-[14px] text-ink/90 leading-relaxed whitespace-pre-wrap">{entry.content}</div>
+          <div className="text-[14px] text-[#E8E2D5]/90 leading-relaxed whitespace-pre-wrap">{entry.content}</div>
         </GlassCard>
 
         {/* Lunar context */}
         {entry.lunarContext && (
           <GlassCard className="p-5 lg:p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <Moon className="w-4 h-4 text-gold" />
+              <Moon className="w-4 h-4 text-[#C5A572]" />
               <div className="text-[12px] text-[#6B6358] font-medium">Lunar Context</div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -592,7 +592,7 @@ function EntryDetail({
             {(entry.lunarContext.isPurnima || entry.lunarContext.isAmavasya || entry.lunarContext.isEkadashi) && (
               <div className="mt-3 flex items-center gap-2 flex-wrap">
                 {entry.lunarContext.isPurnima && <Pill variant="gold" className="text-[10px]">Purnima — vivid dreams</Pill>}
-                {entry.lunarContext.isAmavasya && <Pill className="text-[10px] bg-white/5 text-ink-muted border border-white/10">Amavasya — ancestral messages</Pill>}
+                {entry.lunarContext.isAmavasya && <Pill className="text-[10px] bg-white/5 text-[#9C9489] border border-[#2A2722]">Amavasya — ancestral messages</Pill>}
                 {entry.lunarContext.isEkadashi && <Pill variant="leaf" className="text-[10px]">Ekadashi — spiritual charge</Pill>}
               </div>
             )}
@@ -603,7 +603,7 @@ function EntryDetail({
         {entry.symbols.length > 0 && (
           <GlassCard className="p-5 lg:p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <Star className="w-4 h-4 text-gold" />
+              <Star className="w-4 h-4 text-[#C5A572]" />
               <div className="text-[12px] text-[#6B6358] font-medium">Symbols Detected</div>
             </div>
             <div className="space-y-2.5">
@@ -612,10 +612,10 @@ function EntryDetail({
                 const Icon = sym ? (CATEGORY_ICON[sym.category] || Star) : Star;
                 const color = sym ? POLARITY_COLOR[sym.polarity] : "#8B7355";
                 return (
-                  <div key={kw} className="p-3 rounded-sm bg-black/20 border border-white/5">
+                  <div key={kw} className="p-3 rounded-sm bg-black/20 border border-[#2A2722]">
                     <div className="flex items-center gap-2 mb-1">
                       <Icon className="w-3.5 h-3.5" style={{ color }} />
-                      <span className="text-[13px] text-ink font-medium">#{kw}</span>
+                      <span className="text-[13px] text-[#E8E2D5] font-medium">#{kw}</span>
                       {sym && (
                         <span className="text-[9px] px-1.5 py-0.5 rounded-full border" style={{ background: `${color}15`, borderColor: `${color}40`, color }}>
                           {sym.polarity}
@@ -623,12 +623,12 @@ function EntryDetail({
                       )}
                     </div>
                     {sym ? (
-                      <div className="text-[11px] text-ink-muted leading-relaxed">
-                        <span className="text-gold">Vedic:</span> {sym.vedic}<br />
-                        <span className="text-gold">Jungian:</span> {sym.jungian}
+                      <div className="text-[11px] text-[#9C9489] leading-relaxed">
+                        <span className="text-[#C5A572]">Vedic:</span> {sym.vedic}<br />
+                        <span className="text-[#C5A572]">Jungian:</span> {sym.jungian}
                       </div>
                     ) : (
-                      <div className="text-[11px] text-ink-muted">Tap "Interpret with AI" for the meaning.</div>
+                      <div className="text-[11px] text-[#9C9489]">Tap "Interpret with AI" for the meaning.</div>
                     )}
                   </div>
                 );
@@ -642,12 +642,12 @@ function EntryDetail({
           <ShellCard>
             <div className="p-5 lg:p-6">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-4 h-4 text-gold" />
+                <Sparkles className="w-4 h-4 text-[#C5A572]" />
                 <div className="text-[12px] text-[#6B6358] font-medium">AI Interpretation</div>
               </div>
-              <div className="text-[13px] text-ink/90 leading-relaxed whitespace-pre-wrap">{interpretation}</div>
-              <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-                <div className="text-[10px] text-ink-muted">Drawn from Vedic symbolism, Jungian psychology, and the lunar context above.</div>
+              <div className="text-[13px] text-[#E8E2D5]/90 leading-relaxed whitespace-pre-wrap">{interpretation}</div>
+              <div className="mt-4 pt-3 border-t border-[#2A2722] flex items-center justify-between">
+                <div className="text-[10px] text-[#9C9489]">Drawn from Vedic symbolism, Jungian psychology, and the lunar context above.</div>
                 <GhostButton onClick={interpret} disabled={loadingInterp} className="text-[11px] py-1.5 px-3">
                   <RefreshCw className="w-3 h-3" /> Re-interpret
                 </GhostButton>
@@ -657,11 +657,11 @@ function EntryDetail({
         ) : (
           <ShellCard>
             <div className="p-6 text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-sm bg-gold-soft/30 border border-gold/15 mb-3">
-                <Sparkles className="w-5 h-5 text-gold" />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-sm bg-[#C5A572]-soft/30 border border-[#C5A572]/15 mb-3">
+                <Sparkles className="w-5 h-5 text-[#C5A572]" />
               </div>
-              <div className="text-[14px] text-ink font-medium mb-1">No interpretation yet</div>
-              <div className="text-[12px] text-ink-muted mb-4 max-w-md mx-auto">
+              <div className="text-[14px] text-[#E8E2D5] font-medium mb-1">No interpretation yet</div>
+              <div className="text-[12px] text-[#9C9489] mb-4 max-w-md mx-auto">
                 Get an AI interpretation that draws on the symbols, the lunar context, and your natal chart. Costs 2 Luck.
               </div>
               <GoldButton onClick={interpret} disabled={loadingInterp} className="py-2.5 px-5 text-[13px]">
@@ -678,10 +678,10 @@ function EntryDetail({
 
 function LunarMini({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="p-2.5 rounded-lg bg-black/20 border border-white/5">
+    <div className="p-2.5 rounded-lg bg-black/20 border border-[#2A2722]">
       <div className="text-[11px] text-[#6B6358]">{label}</div>
-      <div className="text-[12px] text-ink mt-0.5 font-medium truncate" title={value}>{value}</div>
-      {sub && <div className="text-[10px] text-ink-muted">{sub}</div>}
+      <div className="text-[12px] text-[#E8E2D5] mt-0.5 font-medium truncate" title={value}>{value}</div>
+      {sub && <div className="text-[10px] text-[#9C9489]">{sub}</div>}
     </div>
   );
 }

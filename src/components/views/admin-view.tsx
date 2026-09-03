@@ -55,7 +55,7 @@ export function AdminView() {
     <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
       <div className="max-w-4xl mx-auto px-4 py-6 lg:py-8">
         <div className="flex items-center gap-2 mb-1">
-          <Shield className="w-5 h-5 text-gold" />
+          <Shield className="w-5 h-5 text-[#C5A572]" />
           <Pill variant="gold">Admin</Pill>
         </div>
         <SectionTitle eyebrow="Internal" title="Admin Panel" subtitle="Manage users, Luck grants, and reseller whitelisting." className="mb-6" />
@@ -71,15 +71,15 @@ export function AdminView() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           {/* Grant Luck */}
           <GlassCard className="p-5">
-            <div className="text-[13px] text-ink mb-3 flex items-center gap-2"><Gift className="w-4 h-4 text-gold" /> Grant Luck</div>
+            <div className="text-[13px] text-[#E8E2D5] mb-3 flex items-center gap-2"><Gift className="w-4 h-4 text-[#C5A572]" /> Grant Luck</div>
             <div className="space-y-3">
               <div>
-                <Label className="text-[12px] text-ink-muted">User email</Label>
-                <Input value={grantEmail} onChange={(e) => setGrantEmail(e.target.value)} className="bg-white/[0.03] border-white/10 text-ink mt-1.5" placeholder="user@example.com" />
+                <Label className="text-[12px] text-[#9C9489]">User email</Label>
+                <Input value={grantEmail} onChange={(e) => setGrantEmail(e.target.value)} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" placeholder="user@example.com" />
               </div>
               <div>
-                <Label className="text-[12px] text-ink-muted">Luck amount</Label>
-                <Input type="number" value={grantAmount} onChange={(e) => setGrantAmount(e.target.value)} className="bg-white/[0.03] border-white/10 text-ink mt-1.5" placeholder="100" />
+                <Label className="text-[12px] text-[#9C9489]">Luck amount</Label>
+                <Input type="number" value={grantAmount} onChange={(e) => setGrantAmount(e.target.value)} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" placeholder="100" />
               </div>
               <GoldButton onClick={grant} disabled={!grantEmail || !grantAmount} className="w-full">Grant Luck</GoldButton>
             </div>
@@ -87,16 +87,16 @@ export function AdminView() {
 
           {/* Whitelist reseller */}
           <GlassCard className="p-5">
-            <div className="text-[13px] text-ink mb-3 flex items-center gap-2"><Store className="w-4 h-4 text-leaf" /> Whitelist reseller</div>
+            <div className="text-[13px] text-[#E8E2D5] mb-3 flex items-center gap-2"><Store className="w-4 h-4 text-[#7A8B6F]" /> Whitelist reseller</div>
             <div className="space-y-3">
               <div>
-                <Label className="text-[12px] text-ink-muted">User email</Label>
-                <Input value={whitelistEmail} onChange={(e) => setWhitelistEmail(e.target.value)} className="bg-white/[0.03] border-white/10 text-ink mt-1.5" placeholder="reseller@example.com" />
+                <Label className="text-[12px] text-[#9C9489]">User email</Label>
+                <Input value={whitelistEmail} onChange={(e) => setWhitelistEmail(e.target.value)} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" placeholder="reseller@example.com" />
               </div>
               <div>
-                <Label className="text-[12px] text-ink-muted">Tier</Label>
+                <Label className="text-[12px] text-[#9C9489]">Tier</Label>
                 <Select value={whitelistTier} onValueChange={setWhitelistTier}>
-                  <SelectTrigger className="bg-white/[0.03] border-white/10 text-ink mt-1.5"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="bronze">Bronze</SelectItem>
                     <SelectItem value="silver">Silver</SelectItem>
@@ -112,10 +112,10 @@ export function AdminView() {
 
         {/* Users table */}
         <GlassCard className="p-5">
-          <div className="text-[13px] text-ink mb-3 flex items-center gap-2"><Users className="w-4 h-4 text-gold" /> Users ({users.length})</div>
+          <div className="text-[13px] text-[#E8E2D5] mb-3 flex items-center gap-2"><Users className="w-4 h-4 text-[#C5A572]" /> Users ({users.length})</div>
           <div className="max-h-96 overflow-y-auto lumina-scroll">
             <table className="w-full text-[12px]">
-              <thead className="text-[10px] text-ink-muted uppercase tracking-wide sticky top-0 bg-surface">
+              <thead className="text-[10px] text-[#9C9489] uppercase tracking-wide sticky top-0 bg-[#121815]">
                 <tr>
                   <th className="text-left py-2 px-1">Email</th>
                   <th className="text-right py-2 px-1">Luck</th>
@@ -125,13 +125,13 @@ export function AdminView() {
               </thead>
               <tbody>
                 {users.map((u) => (
-                  <tr key={u.id} className="border-t border-white/5">
-                    <td className="py-2 px-1 text-ink">{u.email}</td>
-                    <td className="py-2 px-1 text-right text-gold">{u.luckBalance}</td>
+                  <tr key={u.id} className="border-t border-[#2A2722]">
+                    <td className="py-2 px-1 text-[#E8E2D5]">{u.email}</td>
+                    <td className="py-2 px-1 text-right text-[#C5A572]">{u.luckBalance}</td>
                     <td className="py-2 px-1 text-center">
                       <Pill variant={u.role === "admin" ? "gold" : u.role === "reseller" ? "leaf" : "default"} className="text-[9px]">{u.role}</Pill>
                     </td>
-                    <td className="py-2 px-1 text-center text-ink-muted">{u.streak}</td>
+                    <td className="py-2 px-1 text-center text-[#9C9489]">{u.streak}</td>
                   </tr>
                 ))}
               </tbody>
@@ -146,11 +146,11 @@ export function AdminView() {
 function StatCard({ icon: Icon, label, value, sub }: { icon: any; label: string; value: string; sub: string }) {
   return (
     <GlassCard className="p-3">
-      <div className="flex items-center gap-1.5 mb-1 text-[10px] text-ink-muted uppercase tracking-wide">
-        <Icon className="w-3 h-3 text-gold" /> {label}
+      <div className="flex items-center gap-1.5 mb-1 text-[10px] text-[#9C9489] uppercase tracking-wide">
+        <Icon className="w-3 h-3 text-[#C5A572]" /> {label}
       </div>
-      <div className="text-[18px] font-light text-ink">{value}</div>
-      <div className="text-[10px] text-ink-muted">{sub}</div>
+      <div className="text-[18px] font-light text-[#E8E2D5]">{value}</div>
+      <div className="text-[10px] text-[#9C9489]">{sub}</div>
     </GlassCard>
   );
 }
@@ -159,9 +159,9 @@ function Gate({ title, desc }: { title: string; desc?: string }) {
   return (
     <div className="h-full flex items-center justify-center px-6 text-center">
       <div>
-        <Shield className="w-10 h-10 text-ink-muted mx-auto mb-3" />
-        <div className="text-[16px] text-ink mb-1">{title}</div>
-        {desc && <div className="text-[12px] text-ink-muted max-w-sm">{desc}</div>}
+        <Shield className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+        <div className="text-[16px] text-[#E8E2D5] mb-1">{title}</div>
+        {desc && <div className="text-[12px] text-[#9C9489] max-w-sm">{desc}</div>}
       </div>
     </div>
   );

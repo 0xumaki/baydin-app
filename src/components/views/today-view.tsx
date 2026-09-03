@@ -3,6 +3,8 @@
 import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GlassCard, GoldButton, GradientButton, Pill, SectionTitle, ShellCard } from "@/components/lumina/primitives";
+import { TarotCardFace } from "@/components/tarot-card-face";
+import { CardDetailModal } from "@/components/card-detail-modal";
 import { useMe, api } from "@/lib/api-client";
 import { useStore } from "@/lib/store";
 import { useT } from "@/lib/use-t";
@@ -13,6 +15,7 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 import { ZODIAC_SYMBOLS, ZODIAC_MY } from "@/lib/astrology";
 
 export function TodayView({ onAuth }: { onAuth: () => void }) {
@@ -244,8 +247,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {activity.length > 0 && (
               <GlassCard className="p-4 flex items-center gap-4">
                 <div className="flex items-center gap-2 shrink-0">
-                  <TrendingUp className="w-4 h-4 text-leaf" />
-                  <span className="text-[11px] uppercase tracking-[0.15em] text-ink-muted hidden sm:inline">This Week</span>
+                  <TrendingUp className="w-4 h-4 text-[#7A8B6F]" />
+                  <span className="text-[11px] uppercase tracking-[0.15em] text-[#9C9489] hidden sm:inline">This Week</span>
                 </div>
                 <div className="flex items-center gap-4 flex-1 overflow-x-auto lum-no-scrollbar">
                   <WeeklyStat label="Actions" value={activity.reduce((s: number, d: any) => s + (d?.total ?? 0), 0)} color="#C5A87C" />
@@ -257,26 +260,24 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             )}
 
             {/* Card of the day */}
-            <GlassCard className="p-5 relative overflow-hidden">
-              <div className="" />
+            <GlassCard className="p-6 relative overflow-hidden">
               <div className="relative">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-gold">Card of the Day</span>
-                  </div>
-                  <Pill variant="leaf" className="text-[10px]">Free</Pill>
-                </div>
                 {loadingCard ? (
-                  <div className="animate-pulse space-y-2">
-                    <div className="h-4 w-24 bg-white/5 rounded" />
-                    <div className="h-3 w-full bg-white/5 rounded" />
-                    <div className="h-3 w-3/4 bg-white/5 rounded" />
+                  <div className="animate-pulse space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="h-4 w-24 bg-white/5 rounded-sm" />
+                      <div className="h-4 w-12 bg-white/5 rounded-sm" />
+                    </div>
+                    <div className="flex justify-center py-4">
+                      <div className="w-[160px] h-[240px] bg-white/5 rounded-sm" />
+                    </div>
+                    <div className="h-3 w-full bg-white/5 rounded-sm" />
+                    <div className="h-3 w-3/4 bg-white/5 rounded-sm mx-auto" />
                   </div>
                 ) : cardOfDay ? (
                   <CardOfDayCard reading={cardOfDay} />
                 ) : (
-                  <div className="text-[13px] text-ink-muted">Could not load card of the day.</div>
+                  <div className="text-[13px] text-[#9C9489] py-4 text-center">Could not load card of the day.</div>
                 )}
               </div>
             </GlassCard>
@@ -286,26 +287,26 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sun className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Transits</span>
+                    <Sun className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Transits</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-3">
                   {transits.positions.slice(0, 7).map((p: any, i: number) => (
                     <div key={i} className="text-center p-1.5 rounded-lg bg-white/[0.02]">
                       <div className="text-base">{p.symbol}</div>
-                      <div className="text-[8px] text-ink-muted uppercase">{p.name}</div>
-                      <div className="text-[10px] text-gold">{p.signMy || p.sign}</div>
-                      {p.retrograde && <span className="text-[8px] text-amber-400">℞</span>}
+                      <div className="text-[8px] text-[#9C9489] uppercase">{p.name}</div>
+                      <div className="text-[10px] text-[#C5A572]">{p.signMy || p.sign}</div>
+                      {p.retrograde && <span className="text-[8px] text-[#D4A0B8]">℞</span>}
                     </div>
                   ))}
                 </div>
                 {transits.aspects?.length > 0 && (
-                  <div className="pt-2 border-t border-white/5">
-                    <div className="text-[9px] uppercase tracking-wide text-ink-muted mb-1">Aspects to your chart</div>
+                  <div className="pt-2 border-t border-[#2A2722]">
+                    <div className="text-[9px] uppercase tracking-wide text-[#9C9489] mb-1">Aspects to your chart</div>
                     <div className="space-y-0.5">
                       {transits.aspects.slice(0, 3).map((a: string, i: number) => (
-                        <div key={i} className="text-[10px] text-ink-muted">• {a}</div>
+                        <div key={i} className="text-[10px] text-[#9C9489]">• {a}</div>
                       ))}
                     </div>
                   </div>
@@ -317,22 +318,22 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {gemstones?.recommendations?.length > 0 && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-4 h-4 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Your Gemstones</span>
+                  <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Your Gemstones</span>
                 </div>
                 <div className="space-y-2">
                   {gemstones.recommendations.map((g: any, i: number) => (
                     <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02]">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-gold/20 flex items-center justify-center text-[10px] text-gold shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-[#C5A572]/20 flex items-center justify-center text-[10px] text-[#C5A572] shrink-0">
                         {g.gem[0]}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-[12px] text-ink">{g.gem} <span className="text-[9px] text-ink-muted">({g.color})</span></div>
-                        <div className="text-[10px] text-ink-muted">{g.benefit}</div>
+                        <div className="text-[12px] text-[#E8E2D5]">{g.gem} <span className="text-[9px] text-[#9C9489]">({g.color})</span></div>
+                        <div className="text-[10px] text-[#9C9489]">{g.benefit}</div>
                       </div>
                       <div className="text-right shrink-0">
-                        <div className="text-[9px] text-gold">{g.planet}</div>
-                        <div className="text-[8px] text-ink-muted">{g.finger}</div>
+                        <div className="text-[9px] text-[#C5A572]">{g.planet}</div>
+                        <div className="text-[8px] text-[#9C9489]">{g.finger}</div>
                       </div>
                     </div>
                   ))}
@@ -344,18 +345,18 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {mantras?.recommendations?.length > 0 && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Star className="w-4 h-4 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Mantras</span>
+                  <Star className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Mantras</span>
                 </div>
                 <div className="space-y-2">
                   {mantras.recommendations.slice(0, 3).map((m: any, i: number) => (
                     <div key={i} className="p-2.5 rounded-lg bg-white/[0.02]">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-[12px] text-gold font-medium">{m.sanskrit}</span>
-                        <span className="text-[9px] text-ink-muted">{m.countMy}</span>
+                        <span className="text-[12px] text-[#C5A572] font-medium">{m.sanskrit}</span>
+                        <span className="text-[9px] text-[#9C9489]">{m.countMy}</span>
                       </div>
-                      <div className="text-[10px] text-ink-muted">{m.meaning}</div>
-                      <div className="text-[9px] text-ink-muted/60 mt-0.5">{m.reason}</div>
+                      <div className="text-[10px] text-[#9C9489]">{m.meaning}</div>
+                      <div className="text-[9px] text-[#9C9489]/60 mt-0.5">{m.reason}</div>
                     </div>
                   ))}
                 </div>
@@ -367,20 +368,20 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Your Yogas</span>
+                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Your Yogas</span>
                   </div>
-                  <span className="text-[10px] text-gold">{yogas.count} found</span>
+                  <span className="text-[10px] text-[#C5A572]">{yogas.count} found</span>
                 </div>
                 <div className="space-y-2">
                   {yogas.detected.slice(0, 5).map((y: any, i: number) => (
                     <div key={i} className="p-2 rounded-lg bg-white/[0.02]">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-[12px] text-ink font-medium">{y.name}</span>
-                        <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full", y.strength === "strong" ? "bg-leaf/15 text-leaf" : y.strength === "moderate" ? "bg-gold/15 text-gold" : "bg-white/5 text-ink-muted")}>{y.strength}</span>
+                        <span className="text-[12px] text-[#E8E2D5] font-medium">{y.name}</span>
+                        <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full", y.strength === "strong" ? "bg-leaf/15 text-[#7A8B6F]" : y.strength === "moderate" ? "bg-[#C5A572]/15 text-[#C5A572]" : "bg-white/5 text-[#9C9489]")}>{y.strength}</span>
                       </div>
-                      <div className="text-[10px] text-ink-muted">{y.effect}</div>
-                      <div className="text-[9px] text-ink-muted/60 mt-0.5">{y.planets}</div>
+                      <div className="text-[10px] text-[#9C9489]">{y.effect}</div>
+                      <div className="text-[9px] text-[#9C9489]/60 mt-0.5">{y.planets}</div>
                     </div>
                   ))}
                 </div>
@@ -391,21 +392,21 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {namkaran && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Star className="w-4 h-4 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Namkaran — Name Suggestions</span>
+                  <Star className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Namkaran — Name Suggestions</span>
                 </div>
-                <div className="text-[11px] text-ink-muted mb-2">
+                <div className="text-[11px] text-[#9C9489] mb-2">
                   Based on {namkaran.nakshatra} pada {namkaran.pada}
                 </div>
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-[10px] text-ink-muted">Starting letters:</span>
+                  <span className="text-[10px] text-[#9C9489]">Starting letters:</span>
                   {namkaran.startingLetters.map((l: string, i: number) => (
-                    <span key={i} className={cn("px-2 py-0.5 rounded-full text-[10px] border", i === namkaran.pada - 1 ? "border-gold/30 bg-gold/10 text-gold" : "border-white/5 text-ink-muted")}>{l}</span>
+                    <span key={i} className={cn("px-2 py-0.5 rounded-full text-[10px] border", i === namkaran.pada - 1 ? "border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572]" : "border-[#2A2722] text-[#9C9489]")}>{l}</span>
                   ))}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {namkaran.sampleNames.map((n: string, i: number) => (
-                    <span key={i} className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/5 text-[11px] text-ink">{n}</span>
+                    <span key={i} className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-[#2A2722] text-[11px] text-[#E8E2D5]">{n}</span>
                   ))}
                 </div>
               </GlassCard>
@@ -416,20 +417,20 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Yadaya — Remedies</span>
+                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Yadaya — Remedies</span>
                   </div>
-                  <span className="text-[10px] text-gold">{yadaya.count} needed</span>
+                  <span className="text-[10px] text-[#C5A572]">{yadaya.count} needed</span>
                 </div>
                 <div className="space-y-2">
                   {yadaya.remedies.slice(0, 3).map((r: any, i: number) => (
                     <div key={i} className="p-2.5 rounded-lg bg-white/[0.02]">
-                      <div className="text-[12px] text-gold font-medium mb-0.5">{r.planet}</div>
-                      <div className="text-[10px] text-ink-muted mb-1.5">{r.problem}</div>
+                      <div className="text-[12px] text-[#C5A572] font-medium mb-0.5">{r.planet}</div>
+                      <div className="text-[10px] text-[#9C9489] mb-1.5">{r.problem}</div>
                       <div className="grid grid-cols-2 gap-1">
                         {r.remedies.map((rem: any, j: number) => (
-                          <div key={j} className="text-[9px] text-ink-muted">
-                            <span className="text-gold/70">{rem.type}:</span> {rem.detail}
+                          <div key={j} className="text-[9px] text-[#9C9489]">
+                            <span className="text-[#C5A572]/70">{rem.type}:</span> {rem.detail}
                           </div>
                         ))}
                       </div>
@@ -444,21 +445,21 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Panchasara — 5-Fold Remedy</span>
+                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Panchasara — 5-Fold Remedy</span>
                   </div>
-                  <span className="text-[10px] text-gold">for {panchasara.planet}</span>
+                  <span className="text-[10px] text-[#C5A572]">for {panchasara.planet}</span>
                 </div>
-                <div className="text-[10px] text-ink-muted mb-3">{panchasara.problem}</div>
+                <div className="text-[10px] text-[#9C9489] mb-3">{panchasara.problem}</div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {panchasara.remedies.map((r: any, i: number) => (
                     <div key={i} className="p-2.5 rounded-lg bg-white/[0.02]">
                       <div className="flex items-center gap-1.5 mb-0.5">
                         <span className="text-base">{r.icon}</span>
-                        <span className="text-[11px] text-gold font-medium">{r.name}</span>
-                        <span className="text-[9px] text-ink-muted/60">{r.sanskrit}</span>
+                        <span className="text-[11px] text-[#C5A572] font-medium">{r.name}</span>
+                        <span className="text-[9px] text-[#9C9489]/60">{r.sanskrit}</span>
                       </div>
-                      <div className="text-[10px] text-ink-muted leading-relaxed">{r.desc}</div>
+                      <div className="text-[10px] text-[#9C9489] leading-relaxed">{r.desc}</div>
                     </div>
                   ))}
                 </div>
@@ -467,10 +468,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {panchasara && panchasara.status === "balanced" && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <Star className="w-4 h-4 text-leaf" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Panchasara — Chart Balanced</span>
+                  <Star className="w-4 h-4 text-[#7A8B6F]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Panchasara — Chart Balanced</span>
                 </div>
-                <div className="text-[12px] text-leaf leading-relaxed">{panchasara.message}</div>
+                <div className="text-[12px] text-[#7A8B6F] leading-relaxed">{panchasara.message}</div>
               </GlassCard>
             )}
 
@@ -479,26 +480,26 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">7-Day Forecast</span>
+                    <Calendar className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">7-Day Forecast</span>
                   </div>
                   <div className="flex items-center gap-2 text-[10px]">
-                    {forecast.bestDay && <span className="text-leaf">Best: {forecast.bestDay.dayName}</span>}
+                    {forecast.bestDay && <span className="text-[#7A8B6F]">Best: {forecast.bestDay.dayName}</span>}
                   </div>
                 </div>
                 <div className="grid grid-cols-7 gap-1">
                   {forecast.days.map((day: any, i: number) => (
                     <div key={i} className="text-center p-1.5 rounded-lg bg-white/[0.02]">
-                      <div className="text-[9px] text-ink-muted">{day.dayName.slice(0, 3)}</div>
-                      <div className={cn("text-[11px] font-medium my-0.5", day.rating >= 5 ? "text-leaf" : day.rating >= 4 ? "text-gold" : day.rating >= 3 ? "text-ink" : "text-destructive/70")}>
+                      <div className="text-[9px] text-[#9C9489]">{day.dayName.slice(0, 3)}</div>
+                      <div className={cn("text-[11px] font-medium my-0.5", day.rating >= 5 ? "text-[#7A8B6F]" : day.rating >= 4 ? "text-[#C5A572]" : day.rating >= 3 ? "text-[#E8E2D5]" : "text-[#C26B5C]/70")}>
                         {"★".repeat(Math.min(day.rating, 5))}
                       </div>
-                      <div className="text-[8px] text-ink-muted leading-tight">{day.mood.split(" ")[0]}</div>
+                      <div className="text-[8px] text-[#9C9489] leading-tight">{day.mood.split(" ")[0]}</div>
                     </div>
                   ))}
                 </div>
                 {forecast.challengingDay && (
-                  <div className="text-[10px] text-destructive/60 mt-2">Challenging: {forecast.challengingDay.dayName} — {forecast.challengingDay.mood}</div>
+                  <div className="text-[10px] text-[#C26B5C]/60 mt-2">Challenging: {forecast.challengingDay.dayName} — {forecast.challengingDay.mood}</div>
                 )}
               </GlassCard>
             )}
@@ -507,23 +508,23 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {shraaddha && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Star className="w-4 h-4 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Shraaddha — Ancestral Rites</span>
+                  <Star className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Shraaddha — Ancestral Rites</span>
                 </div>
-                <div className="text-[12px] text-ink mb-2 leading-relaxed">{shraaddha.practice}</div>
+                <div className="text-[12px] text-[#E8E2D5] mb-2 leading-relaxed">{shraaddha.practice}</div>
                 {shraaddha.indicators?.length > 0 && (
                   <div className="space-y-0.5 mb-3">
                     {shraaddha.indicators.slice(0, 2).map((ind: string, i: number) => (
-                      <div key={i} className="text-[10px] text-ink-muted">• {ind}</div>
+                      <div key={i} className="text-[10px] text-[#9C9489]">• {ind}</div>
                     ))}
                   </div>
                 )}
-                <div className="text-[10px] uppercase tracking-wide text-ink-muted mb-1.5">Simple remedies</div>
+                <div className="text-[10px] uppercase tracking-wide text-[#9C9489] mb-1.5">Simple remedies</div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                   {shraaddha.remedies?.slice(0, 4).map((r: any, i: number) => (
                     <div key={i} className="p-2 rounded-lg bg-white/[0.02]">
-                      <div className="text-[10px] text-gold font-medium">{r.name} <span className="text-[8px] text-ink-muted">({r.timing})</span></div>
-                      <div className="text-[9px] text-ink-muted leading-relaxed">{r.desc}</div>
+                      <div className="text-[10px] text-[#C5A572] font-medium">{r.name} <span className="text-[8px] text-[#9C9489]">({r.timing})</span></div>
+                      <div className="text-[9px] text-[#9C9489] leading-relaxed">{r.desc}</div>
                     </div>
                   ))}
                 </div>
@@ -534,22 +535,22 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {varshaphal && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sun className="w-4 h-4 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Varshaphal — Year Ahead</span>
+                  <Sun className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Varshaphal — Year Ahead</span>
                 </div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-gold/20 flex items-center justify-center text-[16px] font-light text-gold shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-[#C5A572]/20 flex items-center justify-center text-[16px] font-light text-[#C5A572] shrink-0">
                     {varshaphal.age}
                   </div>
                   <div className="flex-1">
-                    <div className="text-[13px] text-ink">Age {varshaphal.age} · Muntha in {varshaphal.munthaSign}</div>
-                    <div className="text-[10px] text-gold">Year Lord: {varshaphal.yearLord}</div>
-                    <div className="text-[10px] text-ink-muted">{varshaphal.effect}</div>
+                    <div className="text-[13px] text-[#E8E2D5]">Age {varshaphal.age} · Muntha in {varshaphal.munthaSign}</div>
+                    <div className="text-[10px] text-[#C5A572]">Year Lord: {varshaphal.yearLord}</div>
+                    <div className="text-[10px] text-[#9C9489]">{varshaphal.effect}</div>
                   </div>
                 </div>
                 <div className="space-y-0.5">
                   {varshaphal.themes?.map((t: string, i: number) => (
-                    <div key={i} className="text-[10px] text-ink-muted">• {t}</div>
+                    <div key={i} className="text-[10px] text-[#9C9489]">• {t}</div>
                   ))}
                 </div>
               </GlassCard>
@@ -559,18 +560,18 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {marriageMatch && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Heart className="w-4 h-4 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Marriage Matching</span>
+                  <Heart className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Marriage Matching</span>
                 </div>
-                <div className="text-[11px] text-ink-muted mb-2">Based on {marriageMatch.yourNakshatra} nakshatra</div>
+                <div className="text-[11px] text-[#9C9489] mb-2">Based on {marriageMatch.yourNakshatra} nakshatra</div>
                 <div className="space-y-2">
                   {Object.values(marriageMatch.checks || {}).map((check: any, i: number) => (
                     <div key={i} className="p-2 rounded-lg bg-white/[0.02]">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-[11px] text-gold font-medium">{check.name}</span>
+                        <span className="text-[11px] text-[#C5A572] font-medium">{check.name}</span>
                       </div>
-                      <div className="text-[9px] text-ink-muted mb-1">{check.desc}</div>
-                      <div className="text-[9px] text-ink-muted/70">{check.status}</div>
+                      <div className="text-[9px] text-[#9C9489] mb-1">{check.desc}</div>
+                      <div className="text-[9px] text-[#9C9489]/70">{check.status}</div>
                     </div>
                   ))}
                 </div>
@@ -581,16 +582,16 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {gochar?.predictions?.length > 0 && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sun className="w-4 h-4 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Gochar — Transit Predictions</span>
+                  <Sun className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Gochar — Transit Predictions</span>
                 </div>
                 <div className="space-y-1.5">
                   {gochar.keyTransits?.map((p: any, i: number) => (
                     <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-white/[0.02]">
-                      <span className="text-gold text-[11px] font-medium shrink-0 w-16">{p.planet}</span>
+                      <span className="text-[#C5A572] text-[11px] font-medium shrink-0 w-16">{p.planet}</span>
                       <div className="flex-1 min-w-0">
-                        <div className="text-[10px] text-ink">House {p.houseFromAsc} · {p.sign}</div>
-                        <div className="text-[9px] text-ink-muted leading-relaxed">{p.prediction}</div>
+                        <div className="text-[10px] text-[#E8E2D5]">House {p.houseFromAsc} · {p.sign}</div>
+                        <div className="text-[9px] text-[#9C9489] leading-relaxed">{p.prediction}</div>
                       </div>
                     </div>
                   ))}
@@ -603,21 +604,21 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Activities</span>
+                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Activities</span>
                   </div>
                   <div className="flex items-center gap-2 text-[9px]">
-                    <span className="text-leaf">{auspicious.summary.favorable} favorable</span>
-                    <span className="text-destructive/70">{auspicious.summary.avoid} avoid</span>
+                    <span className="text-[#7A8B6F]">{auspicious.summary.favorable} favorable</span>
+                    <span className="text-[#C26B5C]/70">{auspicious.summary.avoid} avoid</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                   {auspicious.activities.map((a: any, i: number) => (
-                    <div key={i} className={cn("flex items-center gap-2 p-2 rounded-lg", a.status === "favorable" ? "bg-leaf/[0.04]" : a.status === "avoid" ? "bg-destructive/[0.04]" : "bg-white/[0.02]")}>
-                      <span className={cn("w-2 h-2 rounded-full shrink-0", a.status === "favorable" ? "bg-leaf" : a.status === "avoid" ? "bg-destructive" : "bg-white/20")} />
+                    <div key={i} className={cn("flex items-center gap-2 p-2 rounded-lg", a.status === "favorable" ? "bg-leaf/[0.04]" : a.status === "avoid" ? "bg-[#C26B5C]/[0.04]" : "bg-white/[0.02]")}>
+                      <span className={cn("w-2 h-2 rounded-full shrink-0", a.status === "favorable" ? "bg-leaf" : a.status === "avoid" ? "bg-[#C26B5C]" : "bg-white/20")} />
                       <div className="flex-1 min-w-0">
-                        <div className="text-[11px] text-ink truncate">{a.name}</div>
-                        <div className="text-[9px] text-ink-muted truncate">{a.note}</div>
+                        <div className="text-[11px] text-[#E8E2D5] truncate">{a.name}</div>
+                        <div className="text-[9px] text-[#9C9489] truncate">{a.note}</div>
                       </div>
                     </div>
                   ))}
@@ -630,23 +631,23 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Tara Bala</span>
+                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Tara Bala</span>
                   </div>
-                  <span className={cn("text-[10px] px-2 py-0.5 rounded-full", taraBala.currentTara.nature === "auspicious" ? "bg-leaf/15 text-leaf" : "bg-destructive/15 text-destructive")}>
+                  <span className={cn("text-[10px] px-2 py-0.5 rounded-full", taraBala.currentTara.nature === "auspicious" ? "bg-leaf/15 text-[#7A8B6F]" : "bg-[#C26B5C]/15 text-[#C26B5C]")}>
                     {taraBala.currentTara.name} (#{taraBala.currentTara.number}/9)
                   </span>
                 </div>
-                <div className="text-[11px] text-ink mb-1">Birth: {taraBala.birthNakshatra} · Today: {taraBala.todayNakshatra}</div>
-                <div className="text-[10px] text-ink-muted mb-3">{taraBala.currentTara.effect}</div>
+                <div className="text-[11px] text-[#E8E2D5] mb-1">Birth: {taraBala.birthNakshatra} · Today: {taraBala.todayNakshatra}</div>
+                <div className="text-[10px] text-[#9C9489] mb-3">{taraBala.currentTara.effect}</div>
                 <div className="flex items-center gap-1 mb-2">
                   {taraBala.dailyForecast?.slice(0, 9).map((d: any, i: number) => (
-                    <div key={i} className={cn("shrink-0 px-1.5 py-1 rounded text-[8px] text-center", i === 0 ? "ring-1 ring-gold/30" : "", d.nature === "auspicious" ? "bg-leaf/[0.06] text-leaf" : "bg-destructive/[0.06] text-destructive/70")} title={d.taraName}>
+                    <div key={i} className={cn("shrink-0 px-1.5 py-1 rounded text-[8px] text-center", i === 0 ? "ring-1 ring-gold/30" : "", d.nature === "auspicious" ? "bg-leaf/[0.06] text-[#7A8B6F]" : "bg-[#C26B5C]/[0.06] text-[#C26B5C]/70")} title={d.taraName}>
                       {d.day.slice(0, 1)}
                     </div>
                   ))}
                 </div>
-                <div className="text-[10px] text-ink-muted">{taraBala.recommendation}</div>
+                <div className="text-[10px] text-[#9C9489]">{taraBala.recommendation}</div>
               </GlassCard>
             )}
 
@@ -655,19 +656,19 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Heart className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Nadi — {nadi.nadiName}</span>
+                    <Heart className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Nadi — {nadi.nadiName}</span>
                   </div>
-                  <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full", nadi.dosha === "Vata" ? "bg-purple-500/15 text-purple-300" : nadi.dosha === "Pitta" ? "bg-destructive/15 text-destructive" : "bg-leaf/15 text-leaf")}>
+                  <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full", nadi.dosha === "Vata" ? "bg-purple-500/15 text-purple-300" : nadi.dosha === "Pitta" ? "bg-[#C26B5C]/15 text-[#C26B5C]" : "bg-leaf/15 text-[#7A8B6F]")}>
                     {nadi.dosha} · {nadi.element}
                   </span>
                 </div>
-                <div className="text-[11px] text-ink mb-1">Nakshatra: {nadi.nakshatra} · Moon: {nadi.moonSign}</div>
-                <div className="text-[10px] text-ink-muted mb-2">{nadi.temperament}</div>
-                <div className="text-[10px] text-ink-muted mb-2"><span className="text-gold">Health:</span> {nadi.health}</div>
-                <div className="text-[10px] text-ink-muted mb-2"><span className="text-gold">Spiritual:</span> {nadi.spiritual}</div>
-                <div className="text-[10px] text-ink-muted mb-1"><span className="text-gold">Marriage:</span> {nadi.incompatible}</div>
-                <div className="text-[10px] text-ink-muted"><span className="text-gold">Remedies:</span> {nadi.remedies[0]}</div>
+                <div className="text-[11px] text-[#E8E2D5] mb-1">Nakshatra: {nadi.nakshatra} · Moon: {nadi.moonSign}</div>
+                <div className="text-[10px] text-[#9C9489] mb-2">{nadi.temperament}</div>
+                <div className="text-[10px] text-[#9C9489] mb-2"><span className="text-[#C5A572]">Health:</span> {nadi.health}</div>
+                <div className="text-[10px] text-[#9C9489] mb-2"><span className="text-[#C5A572]">Spiritual:</span> {nadi.spiritual}</div>
+                <div className="text-[10px] text-[#9C9489] mb-1"><span className="text-[#C5A572]">Marriage:</span> {nadi.incompatible}</div>
+                <div className="text-[10px] text-[#9C9489]"><span className="text-[#C5A572]">Remedies:</span> {nadi.remedies[0]}</div>
               </GlassCard>
             )}
 
@@ -676,18 +677,18 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Dasha Effects</span>
+                    <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Dasha Effects</span>
                   </div>
-                  <span className={cn("text-[10px] px-2 py-0.5 rounded-full", dashaEffects.current.placementEffect === "beneficial" ? "bg-leaf/15 text-leaf" : dashaEffects.current.placementEffect === "challenging" ? "bg-destructive/15 text-destructive" : "bg-gold/15 text-gold")}>
+                  <span className={cn("text-[10px] px-2 py-0.5 rounded-full", dashaEffects.current.placementEffect === "beneficial" ? "bg-leaf/15 text-[#7A8B6F]" : dashaEffects.current.placementEffect === "challenging" ? "bg-[#C26B5C]/15 text-[#C26B5C]" : "bg-[#C5A572]/15 text-[#C5A572]")}>
                     {dashaEffects.current.mahadasha}
                   </span>
                 </div>
-                <div className="text-[12px] text-ink mb-1">{dashaEffects.current.general}</div>
-                <div className="text-[10px] text-ink-muted mb-2">{dashaEffects.current.natalPlacement}</div>
-                <div className="text-[10px] text-leaf mb-1">✓ {dashaEffects.current.beneficial}</div>
-                <div className="text-[10px] text-destructive/70 mb-2">⚠ {dashaEffects.current.challenging}</div>
-                <div className="text-[10px] text-gold">Remedy: {dashaEffects.current.remedies[0]}</div>
+                <div className="text-[12px] text-[#E8E2D5] mb-1">{dashaEffects.current.general}</div>
+                <div className="text-[10px] text-[#9C9489] mb-2">{dashaEffects.current.natalPlacement}</div>
+                <div className="text-[10px] text-[#7A8B6F] mb-1">✓ {dashaEffects.current.beneficial}</div>
+                <div className="text-[10px] text-[#C26B5C]/70 mb-2">⚠ {dashaEffects.current.challenging}</div>
+                <div className="text-[10px] text-[#C5A572]">Remedy: {dashaEffects.current.remedies[0]}</div>
               </GlassCard>
             )}
 
@@ -695,24 +696,24 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {grahaBala?.planets?.length > 0 && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Star className="w-4 h-4 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Graha Bala — Power Ranking</span>
+                  <Star className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Graha Bala — Power Ranking</span>
                 </div>
                 <div className="space-y-1">
                   {grahaBala.planets.slice(0, 5).map((p: any, i: number) => (
                     <div key={i} className="flex items-center gap-2 text-[11px]">
-                      <span className="text-gold w-4">{i + 1}.</span>
+                      <span className="text-[#C5A572] w-4">{i + 1}.</span>
                       <span className="text-base w-5 text-center">{p.symbol}</span>
-                      <span className="text-ink w-16">{p.planet}</span>
+                      <span className="text-[#E8E2D5] w-16">{p.planet}</span>
                       <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
                         <div className="h-full rounded-full" style={{ width: `${p.power}%`, background: p.color }} />
                       </div>
-                      <span className={cn("text-[9px] w-12 text-right", p.rating === "dominant" ? "text-leaf" : p.rating === "strong" ? "text-gold" : p.rating === "weak" ? "text-destructive/70" : "text-ink-muted")}>{p.power}</span>
+                      <span className={cn("text-[9px] w-12 text-right", p.rating === "dominant" ? "text-[#7A8B6F]" : p.rating === "strong" ? "text-[#C5A572]" : p.rating === "weak" ? "text-[#C26B5C]/70" : "text-[#9C9489]")}>{p.power}</span>
                     </div>
                   ))}
                 </div>
                 {grahaBala.dominant && (
-                  <div className="text-[10px] text-ink-muted mt-2">{grahaBala.dominant.summary}</div>
+                  <div className="text-[10px] text-[#9C9489] mt-2">{grahaBala.dominant.summary}</div>
                 )}
               </GlassCard>
             )}
@@ -723,17 +724,17 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 <div className="" />
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-3">
-                    <Star className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-gold">Pancha Mahapurusha Yoga</span>
+                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#C5A572]">Pancha Mahapurusha Yoga</span>
                   </div>
                   {panchaMahapurusha.formed.map((y: any, i: number) => (
-                    <div key={i} className="mb-2 p-2 rounded-lg bg-gold/[0.04] border border-gold/10">
-                      <div className="text-[12px] text-gold font-medium">{y.yoga} ({y.sanskrit})</div>
-                      <div className="text-[10px] text-ink-muted">{y.qualities}</div>
-                      <div className="text-[9px] text-ink-muted/60">{y.effects}</div>
+                    <div key={i} className="mb-2 p-2 rounded-lg bg-[#C5A572]/[0.04] border border-[#C5A572]/10">
+                      <div className="text-[12px] text-[#C5A572] font-medium">{y.yoga} ({y.sanskrit})</div>
+                      <div className="text-[10px] text-[#9C9489]">{y.qualities}</div>
+                      <div className="text-[9px] text-[#9C9489]/60">{y.effects}</div>
                     </div>
                   ))}
-                  <div className="text-[10px] text-gold/70">Exceptionally rare and auspicious!</div>
+                  <div className="text-[10px] text-[#C5A572]/70">Exceptionally rare and auspicious!</div>
                 </div>
               </GlassCard>
             )}
@@ -743,20 +744,20 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sun className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Gochar Phala — Transit Effects</span>
+                    <Sun className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Gochar Phala — Transit Effects</span>
                   </div>
-                  <span className="text-[10px] text-ink-muted">{gocharPhala.beneficialCount} beneficial · {gocharPhala.challengingCount} challenging</span>
+                  <span className="text-[10px] text-[#9C9489]">{gocharPhala.beneficialCount} beneficial · {gocharPhala.challengingCount} challenging</span>
                 </div>
                 <div className="space-y-1.5">
                   {gocharPhala.majorTransits.map((t: any, i: number) => (
                     <div key={i} className="p-2 rounded-lg bg-white/[0.02]">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-[11px] text-gold font-medium">{t.planet}</span>
-                        <span className="text-[9px] text-ink-muted">{t.duration}</span>
+                        <span className="text-[11px] text-[#C5A572] font-medium">{t.planet}</span>
+                        <span className="text-[9px] text-[#9C9489]">{t.duration}</span>
                       </div>
-                      <div className="text-[10px] text-ink-muted">{t.sign} · {t.houseFromMoon}{ordinalSuffix(t.houseFromMoon)} from Moon</div>
-                      <div className="text-[9px] text-ink-muted/70 mt-0.5">{t.houseEffect}</div>
+                      <div className="text-[10px] text-[#9C9489]">{t.sign} · {t.houseFromMoon}{ordinalSuffix(t.houseFromMoon)} from Moon</div>
+                      <div className="text-[9px] text-[#9C9489]/70 mt-0.5">{t.houseEffect}</div>
                     </div>
                   ))}
                 </div>
@@ -767,16 +768,16 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {remedyTiming?.recommendations?.length > 0 && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-4 h-4 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Remedy Timing</span>
+                  <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Remedy Timing</span>
                 </div>
                 <div className="space-y-1">
                   {remedyTiming.recommendations.slice(0, 5).map((r: any, i: number) => (
-                    <div key={i} className={cn("flex items-start gap-2 p-1.5 rounded-lg", r.priority === "high" ? "bg-gold/[0.04]" : "bg-white/[0.02]")}>
-                      <span className={cn("text-[8px] px-1 py-0.5 rounded-full shrink-0", r.priority === "high" ? "bg-gold/15 text-gold" : "bg-white/5 text-ink-muted")}>{r.priority}</span>
+                    <div key={i} className={cn("flex items-start gap-2 p-1.5 rounded-lg", r.priority === "high" ? "bg-[#C5A572]/[0.04]" : "bg-white/[0.02]")}>
+                      <span className={cn("text-[8px] px-1 py-0.5 rounded-full shrink-0", r.priority === "high" ? "bg-[#C5A572]/15 text-[#C5A572]" : "bg-white/5 text-[#9C9489]")}>{r.priority}</span>
                       <div className="flex-1 min-w-0">
-                        <div className="text-[10px] text-ink">{r.remedy}</div>
-                        <div className="text-[9px] text-ink-muted">⏰ {r.bestHour}</div>
+                        <div className="text-[10px] text-[#E8E2D5]">{r.remedy}</div>
+                        <div className="text-[9px] text-[#9C9489]">⏰ {r.bestHour}</div>
                       </div>
                     </div>
                   ))}
@@ -789,23 +790,23 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Arishta — Afflictions</span>
+                    <Flame className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Arishta — Afflictions</span>
                   </div>
-                  <span className={cn("text-[10px] px-2 py-0.5 rounded-full", arishta.overall === "minimal" ? "bg-leaf/15 text-leaf" : arishta.overall === "mild" ? "bg-gold/15 text-gold" : "bg-destructive/15 text-destructive")}>
+                  <span className={cn("text-[10px] px-2 py-0.5 rounded-full", arishta.overall === "minimal" ? "bg-leaf/15 text-[#7A8B6F]" : arishta.overall === "mild" ? "bg-[#C5A572]/15 text-[#C5A572]" : "bg-[#C26B5C]/15 text-[#C26B5C]")}>
                     {arishta.overall}
                   </span>
                 </div>
-                <div className="text-[10px] text-ink-muted mb-3">{arishta.summary}</div>
+                <div className="text-[10px] text-[#9C9489] mb-3">{arishta.summary}</div>
                 <div className="space-y-1.5">
                   {arishta.afflictions.slice(0, 5).map((a: any, i: number) => (
                     <div key={i} className="p-2 rounded-lg bg-white/[0.02]">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-[11px] text-ink font-medium">{a.name}</span>
-                        <span className={cn("text-[8px] px-1.5 py-0.5 rounded-full", a.severity === "high" ? "bg-destructive/15 text-destructive" : a.severity === "medium" ? "bg-gold/15 text-gold" : "bg-white/5 text-ink-muted")}>{a.severity}</span>
+                        <span className="text-[11px] text-[#E8E2D5] font-medium">{a.name}</span>
+                        <span className={cn("text-[8px] px-1.5 py-0.5 rounded-full", a.severity === "high" ? "bg-[#C26B5C]/15 text-[#C26B5C]" : a.severity === "medium" ? "bg-[#C5A572]/15 text-[#C5A572]" : "bg-white/5 text-[#9C9489]")}>{a.severity}</span>
                       </div>
-                      <div className="text-[9px] text-ink-muted">{a.description}</div>
-                      <div className="text-[9px] text-gold/70 mt-0.5">Remedy: {a.remedy}</div>
+                      <div className="text-[9px] text-[#9C9489]">{a.description}</div>
+                      <div className="text-[9px] text-[#C5A572]/70 mt-0.5">Remedy: {a.remedy}</div>
                     </div>
                   ))}
                 </div>
@@ -816,18 +817,18 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {ishtaDevata?.primary && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-4 h-4 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Ishta Devata</span>
+                  <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Ishta Devata</span>
                 </div>
-                <div className="text-[13px] text-gold font-medium mb-1">{ishtaDevata.primary.deity}</div>
-                <div className="text-[10px] text-ink-muted mb-2">{ishtaDevata.primary.description}</div>
+                <div className="text-[13px] text-[#C5A572] font-medium mb-1">{ishtaDevata.primary.deity}</div>
+                <div className="text-[10px] text-[#9C9489] mb-2">{ishtaDevata.primary.description}</div>
                 <div className="p-2 rounded-lg bg-white/[0.02] mb-2">
-                  <div className="text-[10px] text-gold">Mantra</div>
-                  <div className="text-[11px] text-ink">{ishtaDevata.primary.mantra}</div>
+                  <div className="text-[10px] text-[#C5A572]">Mantra</div>
+                  <div className="text-[11px] text-[#E8E2D5]">{ishtaDevata.primary.mantra}</div>
                 </div>
-                <div className="text-[10px] text-ink-muted">{ishtaDevata.primary.form}</div>
+                <div className="text-[10px] text-[#9C9489]">{ishtaDevata.primary.form}</div>
                 {ishtaDevata.nakshatraDevata && (
-                  <div className="text-[9px] text-ink-muted/60 mt-1">Nakshatra Devata: {ishtaDevata.nakshatraDevata.deity}</div>
+                  <div className="text-[9px] text-[#9C9489]/60 mt-1">Nakshatra Devata: {ishtaDevata.nakshatraDevata.deity}</div>
                 )}
               </GlassCard>
             )}
@@ -836,25 +837,25 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {spiritualPractice?.morning && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Star className="w-4 h-4 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Spiritual Practice</span>
+                  <Star className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Spiritual Practice</span>
                 </div>
-                <div className="text-[10px] text-ink-muted mb-1">{spiritualPractice.day} · {spiritualPractice.dayLord} day · {spiritualPractice.nadi}</div>
-                <div className="p-2 rounded-lg bg-gold/[0.04] mb-2">
-                  <div className="text-[10px] text-gold mb-0.5">🌅 Morning ({spiritualPractice.morning.time.split("—")[0].trim()})</div>
-                  <div className="text-[10px] text-ink">{spiritualPractice.morning.primary}</div>
-                  <div className="text-[9px] text-ink-muted mt-0.5">{spiritualPractice.morning.mantra}</div>
-                </div>
-                <div className="p-2 rounded-lg bg-white/[0.02] mb-2">
-                  <div className="text-[10px] text-gold mb-0.5">☀️ Afternoon</div>
-                  <div className="text-[10px] text-ink-muted">{spiritualPractice.afternoon.practice}</div>
+                <div className="text-[10px] text-[#9C9489] mb-1">{spiritualPractice.day} · {spiritualPractice.dayLord} day · {spiritualPractice.nadi}</div>
+                <div className="p-2 rounded-lg bg-[#C5A572]/[0.04] mb-2">
+                  <div className="text-[10px] text-[#C5A572] mb-0.5">🌅 Morning ({spiritualPractice.morning.time.split("—")[0].trim()})</div>
+                  <div className="text-[10px] text-[#E8E2D5]">{spiritualPractice.morning.primary}</div>
+                  <div className="text-[9px] text-[#9C9489] mt-0.5">{spiritualPractice.morning.mantra}</div>
                 </div>
                 <div className="p-2 rounded-lg bg-white/[0.02] mb-2">
-                  <div className="text-[10px] text-gold mb-0.5">🌙 Evening</div>
-                  <div className="text-[10px] text-ink-muted">{spiritualPractice.evening.practice}</div>
+                  <div className="text-[10px] text-[#C5A572] mb-0.5">☀️ Afternoon</div>
+                  <div className="text-[10px] text-[#9C9489]">{spiritualPractice.afternoon.practice}</div>
                 </div>
-                <div className="text-[9px] text-ink-muted">📿 {spiritualPractice.dailyActivity}</div>
-                <div className="text-[9px] text-leaf">🤲 {spiritualPractice.charity}</div>
+                <div className="p-2 rounded-lg bg-white/[0.02] mb-2">
+                  <div className="text-[10px] text-[#C5A572] mb-0.5">🌙 Evening</div>
+                  <div className="text-[10px] text-[#9C9489]">{spiritualPractice.evening.practice}</div>
+                </div>
+                <div className="text-[9px] text-[#9C9489]">📿 {spiritualPractice.dailyActivity}</div>
+                <div className="text-[9px] text-[#7A8B6F]">🤲 {spiritualPractice.charity}</div>
               </GlassCard>
             )}
 
@@ -863,22 +864,22 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sun className="w-4 h-4 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Aspects</span>
+                    <Sun className="w-4 h-4 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Aspects</span>
                   </div>
                   <div className="flex items-center gap-2 text-[9px]">
-                    <span className="text-leaf">{aspectsToday.beneficial} beneficial</span>
-                    <span className="text-destructive/70">{aspectsToday.malefic} challenging</span>
+                    <span className="text-[#7A8B6F]">{aspectsToday.beneficial} beneficial</span>
+                    <span className="text-[#C26B5C]/70">{aspectsToday.malefic} challenging</span>
                   </div>
                 </div>
-                <div className="text-[10px] text-ink-muted mb-2">{aspectsToday.summary}</div>
+                <div className="text-[10px] text-[#9C9489] mb-2">{aspectsToday.summary}</div>
                 <div className="space-y-1">
                   {aspectsToday.aspects.slice(0, 5).map((a: any, i: number) => (
                     <div key={i} className="flex items-start gap-2 p-1.5 rounded-lg bg-white/[0.02]">
-                      <span className={cn("text-[8px] px-1 py-0.5 rounded-full shrink-0", a.nature === "benefic" ? "bg-leaf/15 text-leaf" : "bg-destructive/15 text-destructive")}>{a.aspectType.split(" ")[0]}</span>
+                      <span className={cn("text-[8px] px-1 py-0.5 rounded-full shrink-0", a.nature === "benefic" ? "bg-leaf/15 text-[#7A8B6F]" : "bg-[#C26B5C]/15 text-[#C26B5C]")}>{a.aspectType.split(" ")[0]}</span>
                       <div className="flex-1 min-w-0">
-                        <div className="text-[10px] text-ink">{a.transitPlanet} → {a.natalPlanet}</div>
-                        <div className="text-[9px] text-ink-muted">{a.effect}</div>
+                        <div className="text-[10px] text-[#E8E2D5]">{a.transitPlanet} → {a.natalPlanet}</div>
+                        <div className="text-[9px] text-[#9C9489]">{a.effect}</div>
                       </div>
                     </div>
                   ))}
@@ -890,15 +891,15 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             <GlassCard className="p-5">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4 text-leaf" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's intentions</span>
+                  <Target className="w-4 h-4 text-[#7A8B6F]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's intentions</span>
                 </div>
-                <button onClick={() => setView("manifest")} className="text-[11px] text-gold hover:underline flex items-center gap-0.5">
+                <button onClick={() => setView("manifest")} className="text-[11px] text-[#C5A572] hover:underline flex items-center gap-0.5">
                   All <ChevronRight className="w-3 h-3" />
                 </button>
               </div>
               {goals.length === 0 ? (
-                <button onClick={() => setView("manifest")} className="w-full p-3 rounded-sm border border-dashed border-white/10 text-[12px] text-ink-muted hover:border-gold/20 hover:text-gold transition text-left">
+                <button onClick={() => setView("manifest")} className="w-full p-3 rounded-sm border border-dashed border-[#2A2722] text-[12px] text-[#9C9489] hover:border-[#C5A572]/20 hover:text-[#C5A572] transition text-left">
                   + Set your first intention
                 </button>
               ) : (
@@ -914,8 +915,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {/* Mood check-in */}
             <GlassCard className="p-5">
               <div className="flex items-center gap-2 mb-3">
-                <Heart className="w-4 h-4 text-gold" />
-                <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Mood</span>
+                <Heart className="w-4 h-4 text-[#C5A572]" />
+                <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Mood</span>
               </div>
               <MoodPicker current={mood?.mood} onPick={async (m) => {
                 try {
@@ -930,16 +931,16 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {/* Luck balance + streak */}
             <GlassCard className="p-5">
               <div className="flex items-center gap-2 mb-3">
-                <Wallet className="w-4 h-4 text-gold" />
-                <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Your Luck</span>
+                <Wallet className="w-4 h-4 text-[#C5A572]" />
+                <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Your Luck</span>
               </div>
-              <div className="text-[32px] font-light text-gold leading-none mb-1">{user.luckBalance}</div>
-              <div className="text-[11px] text-ink-muted mb-2">
+              <div className="text-[32px] font-light text-[#C5A572] leading-none mb-1">{user.luckBalance}</div>
+              <div className="text-[11px] text-[#9C9489] mb-2">
                 {user.streak}-day streak · {user.totalLuckEarned} earned lifetime
               </div>
               {/* Streak freeze indicator */}
               {user.streak > 0 && (
-                <div className="flex items-center gap-1.5 mb-3 text-[10px] text-leaf/80">
+                <div className="flex items-center gap-1.5 mb-3 text-[10px] text-[#7A8B6F]/80">
                   <Snowflake className="w-3 h-3" />
                   Streak freeze active — miss 1 day without losing your streak
                 </div>
@@ -955,8 +956,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {/* 7-day activity heatmap */}
             <GlassCard className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">7-day practice</span>
-                <Flame className="w-3.5 h-3.5 text-leaf" />
+                <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">7-day practice</span>
+                <Flame className="w-3.5 h-3.5 text-[#7A8B6F]" />
               </div>
               <div className="flex items-end justify-between gap-1.5 h-16">
                 {(activity.length > 0 ? activity : Array(7).fill(null)).map((day: any, i: number) => {
@@ -970,12 +971,12 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                         className={`w-full rounded-md transition-all duration-500 ${total > 0 ? "bg-gradient-to-t from-leaf/40 to-leaf/80" : "bg-white/[0.04]"}`}
                         style={{ height }}
                       />
-                      <span className={`text-[9px] ${isToday ? "text-gold font-medium" : "text-ink-muted/60"}`}>{dayLabel[0]}</span>
+                      <span className={`text-[9px] ${isToday ? "text-[#C5A572] font-medium" : "text-[#9C9489]/60"}`}>{dayLabel[0]}</span>
                     </div>
                   );
                 })}
               </div>
-              <div className="text-[10px] text-ink-muted mt-2 text-center">
+              <div className="text-[10px] text-[#9C9489] mt-2 text-center">
                 {activity.reduce((sum: number, d: any) => sum + (d?.total ?? 0), 0)} actions this week
               </div>
             </GlassCard>
@@ -985,9 +986,9 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-4 flex items-center gap-3">
                 <div className="text-3xl">{moon.icon}</div>
                 <div className="flex-1">
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Moon Phase</div>
-                  <div className="text-[13px] text-ink">{moon.phase}</div>
-                  <div className="text-[10px] text-ink-muted">{moon.illumination}% illuminated · {moon.age}d old · in {moon.sign}</div>
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-0.5">Moon Phase</div>
+                  <div className="text-[13px] text-[#E8E2D5]">{moon.phase}</div>
+                  <div className="text-[10px] text-[#9C9489]">{moon.illumination}% illuminated · {moon.age}d old · in {moon.sign}</div>
                 </div>
               </GlassCard>
             )}
@@ -995,9 +996,9 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-4 flex items-center gap-3">
                 <div className="text-2xl">✦</div>
                 <div className="flex-1">
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Today's Nakshatra</div>
-                  <div className="text-[13px] text-ink">{nakshatra.name} <span className="text-[10px] text-gold">pada {nakshatra.pada}</span></div>
-                  <div className="text-[10px] text-ink-muted">Lord: {nakshatra.lord} · Deity: {nakshatra.deity}</div>
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-0.5">Today's Nakshatra</div>
+                  <div className="text-[13px] text-[#E8E2D5]">{nakshatra.name} <span className="text-[10px] text-[#C5A572]">pada {nakshatra.pada}</span></div>
+                  <div className="text-[10px] text-[#9C9489]">Lord: {nakshatra.lord} · Deity: {nakshatra.deity}</div>
                 </div>
               </GlassCard>
             )}
@@ -1005,9 +1006,9 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-4 flex items-center gap-3">
                 <div className="text-2xl">{tithi.special?.includes("Full") ? "🌕" : tithi.special?.includes("New") ? "🌑" : tithi.special?.includes("Ekadashi") ? "🕉" : "📅"}</div>
                 <div className="flex-1">
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Today's Tithi</div>
-                  <div className="text-[13px] text-ink">{tithi.name}</div>
-                  <div className="text-[10px] text-ink-muted">{tithi.paksha}{tithi.special ? ` · ${tithi.special}` : ""}</div>
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-0.5">Today's Tithi</div>
+                  <div className="text-[13px] text-[#E8E2D5]">{tithi.name}</div>
+                  <div className="text-[10px] text-[#9C9489]">{tithi.paksha}{tithi.special ? ` · ${tithi.special}` : ""}</div>
                 </div>
               </GlassCard>
             )}
@@ -1015,10 +1016,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-4 flex items-center gap-3">
                 <div className="text-2xl">{yogaToday.nature?.includes("Auspicious") ? "✦" : yogaToday.nature?.includes("Inauspicious") ? "⚠" : "◇"}</div>
                 <div className="flex-1">
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Today's Yoga</div>
-                  <div className="text-[13px] text-ink">{yogaToday.name} <span className="text-[10px] text-ink-muted">#{yogaToday.number}/27</span></div>
-                  <div className={cn("text-[10px]", yogaToday.nature?.includes("Auspicious") ? "text-leaf" : yogaToday.nature?.includes("Inauspicious") ? "text-destructive/70" : "text-ink-muted")}>{yogaToday.nature}</div>
-                  <div className="text-[9px] text-ink-muted/60 mt-0.5">{yogaToday.effect}</div>
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-0.5">Today's Yoga</div>
+                  <div className="text-[13px] text-[#E8E2D5]">{yogaToday.name} <span className="text-[10px] text-[#9C9489]">#{yogaToday.number}/27</span></div>
+                  <div className={cn("text-[10px]", yogaToday.nature?.includes("Auspicious") ? "text-[#7A8B6F]" : yogaToday.nature?.includes("Inauspicious") ? "text-[#C26B5C]/70" : "text-[#9C9489]")}>{yogaToday.nature}</div>
+                  <div className="text-[9px] text-[#9C9489]/60 mt-0.5">{yogaToday.effect}</div>
                 </div>
               </GlassCard>
             )}
@@ -1026,32 +1027,32 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-4 flex items-center gap-3">
                 <div className="text-2xl">{karana.nature?.includes("Auspicious") ? "✦" : karana.nature?.includes("Inauspicious") ? "⚠" : "◇"}</div>
                 <div className="flex-1">
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Today's Karana</div>
-                  <div className="text-[13px] text-ink">{karana.name} <span className="text-[10px] text-ink-muted">#{karana.index}/60</span></div>
-                  <div className={cn("text-[10px]", karana.nature?.includes("Auspicious") ? "text-leaf" : karana.nature?.includes("Inauspicious") ? "text-destructive/70" : "text-ink-muted")}>{karana.nature}</div>
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-0.5">Today's Karana</div>
+                  <div className="text-[13px] text-[#E8E2D5]">{karana.name} <span className="text-[10px] text-[#9C9489]">#{karana.index}/60</span></div>
+                  <div className={cn("text-[10px]", karana.nature?.includes("Auspicious") ? "text-[#7A8B6F]" : karana.nature?.includes("Inauspicious") ? "text-[#C26B5C]/70" : "text-[#9C9489]")}>{karana.nature}</div>
                 </div>
               </GlassCard>
             )}
             {planetaryHours?.current && (
               <GlassCard className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Clock className="w-3.5 h-3.5 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Planetary Hours</span>
+                  <Clock className="w-3.5 h-3.5 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Planetary Hours</span>
                 </div>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0 border" style={{ borderColor: planetaryHours.current.color + "40", background: planetaryHours.current.color + "15", color: planetaryHours.current.color }}>
                     {planetaryHours.current.symbol}
                   </div>
                   <div className="flex-1">
-                    <div className="text-[13px] text-ink">{planetaryHours.current.planet} hour <span className="text-[10px] text-ink-muted">({planetaryHours.current.hour}:00)</span></div>
-                    <div className="text-[10px] text-ink-muted">{planetaryHours.current.effect}</div>
+                    <div className="text-[13px] text-[#E8E2D5]">{planetaryHours.current.planet} hour <span className="text-[10px] text-[#9C9489]">({planetaryHours.current.hour}:00)</span></div>
+                    <div className="text-[10px] text-[#9C9489]">{planetaryHours.current.effect}</div>
                   </div>
                 </div>
-                <div className="text-[9px] text-ink-muted mb-1">Day ruler: {planetaryHours.dayRuler} {planetaryHours.dayRulerSymbol}</div>
+                <div className="text-[9px] text-[#9C9489] mb-1">Day ruler: {planetaryHours.dayRuler} {planetaryHours.dayRulerSymbol}</div>
                 {/* Mini hour strip */}
                 <div className="flex gap-0.5 overflow-x-auto lum-no-scrollbar">
                   {planetaryHours.all?.slice(0, 12).map((h: any, i: number) => (
-                    <div key={i} className={cn("shrink-0 px-1 py-0.5 rounded text-[8px] text-center transition", h.isCurrent ? "bg-gold/15 text-gold" : "bg-white/[0.02] text-ink-muted")} title={`${h.planet} hour`}>
+                    <div key={i} className={cn("shrink-0 px-1 py-0.5 rounded text-[8px] text-center transition", h.isCurrent ? "bg-[#C5A572]/15 text-[#C5A572]" : "bg-white/[0.02] text-[#9C9489]")} title={`${h.planet} hour`}>
                       {h.symbol}
                     </div>
                   ))}
@@ -1061,26 +1062,26 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {rahuKaal?.periods?.length > 0 && (
               <GlassCard className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Clock className="w-3.5 h-3.5 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Rahu Kaal Timings</span>
+                  <Clock className="w-3.5 h-3.5 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Rahu Kaal Timings</span>
                 </div>
                 {rahuKaal.currentlyInauspicious && (
-                  <div className="px-2 py-1 rounded-full bg-destructive/15 text-destructive text-[10px] inline-block mb-2">
+                  <div className="px-2 py-1 rounded-full bg-[#C26B5C]/15 text-[#C26B5C] text-[10px] inline-block mb-2">
                     ⚠ Currently in {rahuKaal.currentPeriod}
                   </div>
                 )}
                 <div className="space-y-1">
                   {rahuKaal.periods.map((p: any, i: number) => (
-                    <div key={i} className={cn("flex items-center gap-2 text-[10px]", p.active ? "text-destructive" : "text-ink-muted")}>
+                    <div key={i} className={cn("flex items-center gap-2 text-[10px]", p.active ? "text-[#C26B5C]" : "text-[#9C9489]")}>
                       <span className="text-sm">{p.icon}</span>
                       <span className="flex-1">{p.name}</span>
                       <span className={cn("font-mono", p.active && "font-medium")}>{p.start} – {p.end}</span>
                     </div>
                   ))}
                 </div>
-                <div className="text-[9px] text-ink-muted/60 mt-2">Sunrise: {rahuKaal.sunrise} · Sunset: {rahuKaal.sunset}</div>
+                <div className="text-[9px] text-[#9C9489]/60 mt-2">Sunrise: {rahuKaal.sunrise} · Sunset: {rahuKaal.sunset}</div>
                 {!rahuKaal.currentlyInauspicious && rahuKaal.nextStarting && (
-                  <div className="text-[10px] text-gold mt-1">Next: {rahuKaal.nextStarting}</div>
+                  <div className="text-[10px] text-[#C5A572] mt-1">Next: {rahuKaal.nextStarting}</div>
                 )}
               </GlassCard>
             )}
@@ -1088,24 +1089,24 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Clock className="w-3.5 h-3.5 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Choghadiya</span>
+                    <Clock className="w-3.5 h-3.5 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Choghadiya</span>
                   </div>
-                  <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full", choghadiya.current.nature === "auspicious" ? "bg-leaf/15 text-leaf" : "bg-destructive/15 text-destructive")}>
+                  <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full", choghadiya.current.nature === "auspicious" ? "bg-leaf/15 text-[#7A8B6F]" : "bg-[#C26B5C]/15 text-[#C26B5C]")}>
                     {choghadiya.current.icon} {choghadiya.current.name}
                   </span>
                 </div>
-                <div className="text-[10px] text-ink-muted mb-2">{choghadiya.current.start} – {choghadiya.current.end}</div>
-                <div className="text-[10px] text-ink-muted mb-3">{choghadiya.current.effect}</div>
-                <div className="text-[9px] text-ink-muted mb-1">Day periods</div>
+                <div className="text-[10px] text-[#9C9489] mb-2">{choghadiya.current.start} – {choghadiya.current.end}</div>
+                <div className="text-[10px] text-[#9C9489] mb-3">{choghadiya.current.effect}</div>
+                <div className="text-[9px] text-[#9C9489] mb-1">Day periods</div>
                 <div className="flex flex-wrap gap-0.5 mb-2">
                   {choghadiya.dayPeriods?.map((p: any, i: number) => (
-                    <div key={i} className={cn("shrink-0 px-1 py-0.5 rounded text-[8px] text-center", p.active ? "ring-1 ring-gold/40" : "", p.nature === "auspicious" ? "bg-leaf/[0.06] text-leaf" : "bg-destructive/[0.06] text-destructive/70")} title={`${p.name} ${p.start}-${p.end}`}>
+                    <div key={i} className={cn("shrink-0 px-1 py-0.5 rounded text-[8px] text-center", p.active ? "ring-1 ring-gold/40" : "", p.nature === "auspicious" ? "bg-leaf/[0.06] text-[#7A8B6F]" : "bg-[#C26B5C]/[0.06] text-[#C26B5C]/70")} title={`${p.name} ${p.start}-${p.end}`}>
                       {p.icon}
                     </div>
                   ))}
                 </div>
-                <div className="text-[10px] text-gold">{choghadiya.nextAuspicious}</div>
+                <div className="text-[10px] text-[#C5A572]">{choghadiya.nextAuspicious}</div>
               </GlassCard>
             )}
 
@@ -1114,8 +1115,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-gold" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Luck</span>
+                    <Sparkles className="w-3.5 h-3.5 text-[#C5A572]" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Luck</span>
                   </div>
                   <button
                     onClick={async () => {
@@ -1127,7 +1128,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                         toast.success("Lucky numbers copied ✦");
                       }
                     }}
-                    className="p-1 rounded-full text-ink-muted/50 hover:text-gold transition"
+                    className="p-1 rounded-full text-[#9C9489]/50 hover:text-[#C5A572] transition"
                     title="Share lucky numbers"
                   >
                     <Share2 className="w-3 h-3" />
@@ -1135,19 +1136,19 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 </div>
                 <div className="flex items-center gap-2 mb-3">
                   {lucky.numbers.map((n: number, i: number) => (
-                    <div key={i} className="w-9 h-9 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-gold/30 flex items-center justify-center text-[15px] font-light text-gold">
+                    <div key={i} className="w-9 h-9 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-[#C5A572]/30 flex items-center justify-center text-[15px] font-light text-[#C5A572]">
                       {n}
                     </div>
                   ))}
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-[11px]">
                   <div>
-                    <div className="text-[9px] uppercase tracking-wide text-ink-muted">Color</div>
-                    <div className="text-gold">{lucky.color}</div>
+                    <div className="text-[9px] uppercase tracking-wide text-[#9C9489]">Color</div>
+                    <div className="text-[#C5A572]">{lucky.color}</div>
                   </div>
                   <div>
-                    <div className="text-[9px] uppercase tracking-wide text-ink-muted">Time</div>
-                    <div className="text-ink">{lucky.time}</div>
+                    <div className="text-[9px] uppercase tracking-wide text-[#9C9489]">Time</div>
+                    <div className="text-[#E8E2D5]">{lucky.time}</div>
                   </div>
                 </div>
               </GlassCard>
@@ -1157,26 +1158,26 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {muhurta && (
               <GlassCard className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Clock className="w-3.5 h-3.5 text-gold" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Auspicious Time</span>
+                  <Clock className="w-3.5 h-3.5 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Auspicious Time</span>
                 </div>
                 {/* Inauspicious (active highlighted) */}
                 <div className="space-y-1.5 mb-3">
                   {muhurta.inauspicious.map((per: any, i: number) => (
-                    <div key={i} className={cn("flex items-center gap-2 text-[11px]", per.active ? "text-destructive" : "text-ink-muted")}>
+                    <div key={i} className={cn("flex items-center gap-2 text-[11px]", per.active ? "text-[#C26B5C]" : "text-[#9C9489]")}>
                       <span className="text-sm">{per.icon}</span>
                       <span className="flex-1">{per.name}</span>
                       <span className={cn("font-mono", per.active && "font-medium")}>{per.time}</span>
-                      {per.active && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-destructive/15 text-destructive">NOW</span>}
+                      {per.active && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#C26B5C]/15 text-[#C26B5C]">NOW</span>}
                     </div>
                   ))}
                 </div>
                 {/* Upcoming auspicious */}
                 {muhurta.upcoming?.length > 0 && (
-                  <div className="pt-2 border-t border-white/5">
-                    <div className="text-[9px] uppercase tracking-wide text-ink-muted mb-1">Next favorable</div>
+                  <div className="pt-2 border-t border-[#2A2722]">
+                    <div className="text-[9px] uppercase tracking-wide text-[#9C9489] mb-1">Next favorable</div>
                     {muhurta.upcoming.map((u: any, i: number) => (
-                      <div key={i} className={cn("flex items-center justify-between text-[11px]", u.note.includes("Current") ? "text-leaf" : "text-ink-muted")}>
+                      <div key={i} className={cn("flex items-center justify-between text-[11px]", u.note.includes("Current") ? "text-[#7A8B6F]" : "text-[#9C9489]")}>
                         <span>{u.time}</span>
                         <span className="text-[10px]">{u.note}</span>
                       </div>
@@ -1189,10 +1190,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {/* Deep dive upsell */}
             <ShellCard className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Compass className="w-4 h-4 text-gold" />
-                <span className="text-[11px] uppercase tracking-[0.2em] text-gold">Deep readings</span>
+                <Compass className="w-4 h-4 text-[#C5A572]" />
+                <span className="text-[11px] uppercase tracking-[0.2em] text-[#C5A572]">Deep readings</span>
               </div>
-              <div className="text-[13px] text-ink mb-3">Unlock your full chart with deep astrological insights.</div>
+              <div className="text-[13px] text-[#E8E2D5] mb-3">Unlock your full chart with deep astrological insights.</div>
               <div className="space-y-1.5">
                 <UpsellRow icon={BookOpen} label="Life Report" cost={15} desc="7-section comprehensive" onClick={() => setView("life-report")} />
                 <UpsellRow icon={Compass} label="Insights" cost={3} desc="Yogas, transits, dasha…" onClick={() => setView("insights")} />
@@ -1216,11 +1217,11 @@ function QuickAction({ icon: Icon, label, desc, onClick, badge }: { icon: any; l
   return (
     <button onClick={onClick} className="group relative p-3 rounded-sm bg-[#0A0908] border border-[#2A2722] hover:border-[#4A4540] hover:bg-[#0F0D0B] transition text-left">
       <div className="flex items-center justify-between mb-1.5">
-        <Icon className="w-4 h-4 text-gold group-hover:scale-110 transition-transform" />
+        <Icon className="w-4 h-4 text-[#C5A572] group-hover:scale-110 transition-transform" />
         {badge ? <Pill variant="gold" className="text-[9px] py-0">{badge}</Pill> : null}
       </div>
-      <div className="text-[12px] text-ink leading-tight">{label}</div>
-      <div className="text-[10px] text-ink-muted">{desc}</div>
+      <div className="text-[12px] text-[#E8E2D5] leading-tight">{label}</div>
+      <div className="text-[10px] text-[#9C9489]">{desc}</div>
     </button>
   );
 }
@@ -1230,10 +1231,23 @@ function CardOfDayCard({ reading }: { reading: any }) {
   const [reflection, setReflection] = React.useState(reading.reflection || "");
   const [saved, setSaved] = React.useState(!!reading.reflection);
   const [saving, setSaving] = React.useState(false);
+  const [cardRevealed, setCardRevealed] = React.useState(false);
+  const [detailOpen, setDetailOpen] = React.useState(false);
+
   let cards: any[] = [];
   try { cards = JSON.parse(reading.cardsJson); } catch {}
   const card = cards[0];
-  if (!card) return <div className="text-[13px] text-ink-muted">{reading.interpretation?.slice(0, 200)}…</div>;
+
+  const fullCard = React.useMemo(() => {
+    if (reading.cards && Array.isArray(reading.cards) && reading.cards[0]?.card) {
+      return reading.cards[0].card;
+    }
+    return { id: card?.id || "the-fool", name: card?.name || card?.id || "Card", nameShort: card?.nameShort || card?.id || "Card", symbol: card?.symbol || "✦", suit: "major", arcana: "major", number: 0, meaningUpright: reading.interpretation?.slice(0, 200) || "", meaningReversed: "", keywordsUpright: [], keywordsReversed: [], element: "", astrology: "", yesNoUpright: "maybe", yesNoReversed: "maybe", affirmation: "", numerology: "" };
+  }, [card, reading]);
+
+  if (!card) return <div className="text-[13px] text-[#9C9489]">{reading.interpretation?.slice(0, 200)}…</div>;
+
+  const reversed = card.reversed;
 
   async function saveReflection() {
     if (!reflection.trim()) return;
@@ -1245,7 +1259,7 @@ function CardOfDayCard({ reading }: { reading: any }) {
       });
       const data = await res.json();
       if (data.bonusLuck) {
-        toast.success(`Reflection saved · +${data.bonusLuck} Luck ✦`);
+        toast.success(`Reflection saved · +${data.bonusLuck} Luck`);
       } else {
         toast.success("Reflection updated");
       }
@@ -1257,56 +1271,165 @@ function CardOfDayCard({ reading }: { reading: any }) {
 
   return (
     <div>
-      <div className="flex gap-4 mb-3">
-        <div className={cn("w-20 h-32 rounded-sm border border-gold/30 bg-gradient-to-br from-surface to-surface-2 flex flex-col items-center justify-center shrink-0", card.reversed && "rotate-180")}>
-          <div className="text-2xl mb-1">{card.symbol || "✦"}</div>
-          <div className="text-[9px] text-ink px-1 text-center">{card.nameShort || card.id}</div>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <div className="text-[12px] text-[#6B6358] font-medium">Card of the Day</div>
+          <div className="text-[11px] text-[#9C9489] mt-0.5">
+            {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+          </div>
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-0.5">
-            <div className="text-[13px] text-ink font-medium">{card.name || "Card of the Day"}</div>
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] border border-[#C5A572]/20 text-[#C5A572] rounded-sm">
+          {reversed ? "Reversed" : "Upright"}
+        </span>
+      </div>
+
+      {/* Card with reveal animation */}
+      <div className="flex flex-col items-center">
+        <button
+          onClick={() => {
+            if (!cardRevealed) {
+              setCardRevealed(true);
+            } else {
+              setDetailOpen(true);
+            }
+          }}
+          className="relative group focus-ring rounded-sm"
+          aria-label={`View details for ${fullCard.name}`}
+          style={{ filter: cardRevealed ? "drop-shadow(0 0 20px rgba(197,168,124,0.25))" : "none" }}
+        >
+          <motion.div
+            animate={{
+              filter: cardRevealed ? "blur(0px)" : "blur(14px)",
+              opacity: cardRevealed ? 1 : 0.5,
+            }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+          >
+            <TarotCardFace card={fullCard} reversed={reversed} size="md" />
+          </motion.div>
+          {!cardRevealed && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <motion.div
+                animate={{ scale: [1, 1.15, 1], opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                className="text-[32px] text-[#C5A572]"
+                style={{ filter: "drop-shadow(0 0 12px rgba(197,168,124,0.5))" }}
+              >
+                ✦
+              </motion.div>
+              <div className="text-[11px] text-[#C5A572] font-medium mt-2">Tap to reveal</div>
+            </div>
+          )}
+          {cardRevealed && (
+            <div className="absolute inset-0 rounded-sm bg-[#C5A572]/0 group-hover:bg-[#C5A572]/10 transition-colors" />
+          )}
+        </button>
+      </div>
+
+      {/* Card name + meaning — hidden until revealed */}
+      <AnimatePresence>
+        {cardRevealed ? (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-5 text-center"
+          >
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="text-xl leading-none">{fullCard.symbol}</span>
+              <h3 className="serif text-[18px] text-[#E8E2D5]">{fullCard.name}</h3>
+              {reversed && <span className="text-[11px] text-[#C5A572] serif-italic">· Rev</span>}
+            </div>
+            <p className="text-[13px] leading-[20px] text-[#9C9489] max-w-[300px] mx-auto">
+              {reversed ? (fullCard.meaningReversed || reading.interpretation?.slice(0, 180)) : (fullCard.meaningUpright || reading.interpretation?.slice(0, 180))}
+            </p>
+            {fullCard.keywordsUpright?.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 justify-center mt-3">
+                {(reversed ? fullCard.keywordsReversed : fullCard.keywordsUpright).slice(0, 3).map((k: string) => (
+                  <span key={k} className="text-[11px] px-2.5 py-0.5 border border-[#C5A572]/20 text-[#C5A572] rounded-sm">{k}</span>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="mt-5 text-center"
+          >
+            <div className="h-5 w-40 bg-white/[0.06] rounded-full mx-auto mb-3" style={{ filter: "blur(8px)" }} />
+            <div className="space-y-2 max-w-[260px] mx-auto">
+              <div className="h-3 bg-white/[0.04] rounded-full" style={{ filter: "blur(6px)" }} />
+              <div className="h-3 w-3/4 bg-white/[0.04] rounded-full mx-auto" style={{ filter: "blur(6px)" }} />
+            </div>
+            <p className="text-[12px] text-[#6B6358] serif-italic mt-4">Reveal to discover today's message</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Affirmation + Reflection — hidden until revealed */}
+      <AnimatePresence>
+        {cardRevealed && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <hr className="rule-h my-4" />
+
+            {/* Affirmation */}
+            {fullCard.affirmation && (
+              <div className="p-3 border border-[#C5A572]/15 mb-3" style={{ background: "rgba(197,168,124,0.04)" }}>
+                <div className="text-[12px] text-[#C5A572] font-medium mb-1">Today's affirmation</div>
+                <p className="serif-italic text-[14px] leading-[20px] text-[#E8E2D5]">"{fullCard.affirmation}"</p>
+              </div>
+            )}
+
+            {/* Reflection */}
+            <div className="mt-3">
+              <div className="text-[12px] text-[#6B6358] font-medium mb-1.5 flex items-center gap-1.5">
+                <BookOpen className="w-3 h-3 text-[#C5A572]" /> Your reflection {saved && <span className="text-[#7A8B6F] serif-italic">· saved</span>}
+              </div>
+              <textarea
+                value={reflection}
+                onChange={(e) => { setReflection(e.target.value); setSaved(false); }}
+                placeholder="How does this card speak to your day?"
+                className="w-full bg-transparent border border-[#2A2722] rounded-sm px-3 py-2 text-[12px] text-[#E8E2D5] placeholder:text-[#4A4540] outline-none focus:border-[#C5A572] resize-none min-h-[48px] transition"
+                rows={2}
+              />
+              {reflection.trim() && !saved && (
+                <button
+                  onClick={saveReflection}
+                  disabled={saving}
+                  className="mt-2 px-4 py-1.5 text-[11px] border border-[#C5A572]/30 text-[#C5A572] hover:bg-[#C5A572]/10 active:scale-95 transition rounded-sm disabled:opacity-50 focus-ring"
+                >
+                  {saving ? "Saving…" : "Save reflection · +1 Luck"}
+                </button>
+              )}
+            </div>
+
+            {/* Share */}
             <button
               onClick={async () => {
-                const text = `${card.name || "Card of the Day"} (${card.reversed ? "Reversed" : "Upright"})\n\n${reading.interpretation?.replace(/[#*_`]/g, "").slice(0, 200)}`;
+                const text = `${fullCard.name || "Card of the Day"} (${reversed ? "Reversed" : "Upright"})\n\n${reading.interpretation?.replace(/[#*_`]/g, "").slice(0, 200)}`;
                 if (navigator.share) {
                   try { await navigator.share({ title: "My Baydin Card of the Day", text, url: window.location.origin }); } catch {}
                 } else {
                   await navigator.clipboard.writeText(text + "\n\n" + window.location.origin);
-                  toast.success("Card shared ✦");
+                  toast.success("Card shared");
                 }
               }}
-              className="p-1 rounded-full text-ink-muted/60 hover:text-gold transition shrink-0"
-              title="Share this card"
+              className="mt-3 inline-flex items-center gap-1.5 text-[12px] text-[#6B6358] hover:text-[#C5A572] transition focus-ring rounded-sm"
             >
-              <Share2 className="w-3.5 h-3.5" />
+              <Share2 className="w-3.5 h-3.5" /> Share this card
             </button>
-          </div>
-          <div className="text-[11px] text-gold mb-1.5">{card.reversed ? "Reversed" : "Upright"}</div>
-          <div className="text-[12px] text-ink-muted line-clamp-3 leading-relaxed">{reading.interpretation?.replace(/\*\*/g, "").slice(0, 180)}…</div>
-        </div>
-      </div>
-      {/* Reflection journal */}
-      <div className="mt-3 pt-3 border-t border-white/5">
-        <div className="text-[10px] uppercase tracking-wide text-ink-muted mb-1.5 flex items-center gap-1">
-          <BookOpen className="w-3 h-3 text-gold" /> Your reflection {saved && <span className="text-leaf">· saved</span>}
-        </div>
-        <textarea
-          value={reflection}
-          onChange={(e) => { setReflection(e.target.value); setSaved(false); }}
-          placeholder="What does this card mean to you today?"
-          className="w-full bg-white/[0.03] border border-white/5 rounded-lg px-3 py-2 text-[12px] text-ink placeholder:text-ink-muted/50 outline-none focus:border-gold/20 resize-none min-h-[48px]"
-          rows={2}
-        />
-        {reflection.trim() && !saved && (
-          <button
-            onClick={saveReflection}
-            disabled={saving}
-            className="mt-1.5 px-3 py-1 rounded-full text-[10px] border border-gold/30 bg-gold/10 text-gold hover:bg-gold/20 active:scale-95 transition disabled:opacity-50"
-          >
-            {saving ? "Saving…" : "Save reflection · +1 Luck"}
-          </button>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
+
+      <CardDetailModal card={fullCard} reversed={reversed} open={detailOpen} onOpenChange={setDetailOpen} />
     </div>
   );
 }
@@ -1329,10 +1452,10 @@ function GoalRow({ goal }: { goal: any }) {
   }
   return (
     <div className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02]">
-      <Flame className={cn("w-3.5 h-3.5 shrink-0", goal.streak > 0 ? "text-leaf" : "text-ink-muted/40")} />
+      <Flame className={cn("w-3.5 h-3.5 shrink-0", goal.streak > 0 ? "text-[#7A8B6F]" : "text-[#9C9489]/40")} />
       <div className="flex-1 min-w-0">
-        <div className="text-[12px] text-ink truncate">{goal.title}</div>
-        {goal.streak > 0 && <div className="text-[10px] text-leaf">{goal.streak}-day streak</div>}
+        <div className="text-[12px] text-[#E8E2D5] truncate">{goal.title}</div>
+        {goal.streak > 0 && <div className="text-[10px] text-[#7A8B6F]">{goal.streak}-day streak</div>}
       </div>
       <button
         onClick={confirm}
@@ -1340,8 +1463,8 @@ function GoalRow({ goal }: { goal: any }) {
         className={cn(
           "px-2.5 py-1 rounded-full text-[10px] transition border",
           goal.confirmedToday
-            ? "border-leaf/20 bg-leaf/10 text-leaf"
-            : "border-gold/20 bg-gold/10 text-gold hover:bg-gold/20"
+            ? "border-leaf/20 bg-leaf/10 text-[#7A8B6F]"
+            : "border-[#C5A572]/20 bg-[#C5A572]/10 text-[#C5A572] hover:bg-[#C5A572]/20"
         )}
       >
         {goal.confirmedToday ? "✓ Done" : confirming ? "…" : "Confirm"}
@@ -1368,11 +1491,11 @@ function MoodPicker({ current, onPick }: { current?: number; onPick: (m: number)
           onClick={() => { setVal(m.v); onPick(m.v); }}
           className={cn(
             "flex flex-col items-center gap-1 py-2 rounded-lg border transition",
-            val === m.v ? "border-gold/30 bg-gold/10" : "border-transparent hover:bg-white/[0.03]"
+            val === m.v ? "border-[#C5A572]/30 bg-[#C5A572]/10" : "border-transparent hover:bg-white/[0.03]"
           )}
         >
           <span className="text-lg">{m.e}</span>
-          <span className={cn("text-[9px]", val === m.v ? "text-gold" : "text-ink-muted")}>{m.l}</span>
+          <span className={cn("text-[9px]", val === m.v ? "text-[#C5A572]" : "text-[#9C9489]")}>{m.l}</span>
         </button>
       ))}
     </div>
@@ -1382,10 +1505,10 @@ function MoodPicker({ current, onPick }: { current?: number; onPick: (m: number)
 function UpsellRow({ icon: Icon, label, cost, desc, onClick }: { icon: any; label: string; cost: number; desc: string; onClick: () => void }) {
   return (
     <button onClick={onClick} className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-white/[0.03] transition text-left">
-      <Icon className="w-3.5 h-3.5 text-gold shrink-0" />
+      <Icon className="w-3.5 h-3.5 text-[#C5A572] shrink-0" />
       <div className="flex-1 min-w-0">
-        <div className="text-[12px] text-ink">{label}</div>
-        <div className="text-[10px] text-ink-muted">{desc}</div>
+        <div className="text-[12px] text-[#E8E2D5]">{label}</div>
+        <div className="text-[10px] text-[#9C9489]">{desc}</div>
       </div>
       <Pill variant="gold" className="text-[9px]">{cost} Luck</Pill>
     </button>
@@ -1409,11 +1532,11 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
       <ShellCard className="p-4 mb-5 lum-reveal">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-leaf/15 border border-leaf/30 flex items-center justify-center shrink-0">
-            <Flame className="w-5 h-5 text-leaf" />
+            <Flame className="w-5 h-5 text-[#7A8B6F]" />
           </div>
           <div className="flex-1">
-            <div className="text-[13px] text-ink font-medium">Today's practice complete ✦</div>
-            <div className="text-[11px] text-ink-muted">You've done everything. Come back tomorrow to keep your {streak}-day streak alive.</div>
+            <div className="text-[13px] text-[#E8E2D5] font-medium">Today's practice complete ✦</div>
+            <div className="text-[11px] text-[#9C9489]">You've done everything. Come back tomorrow to keep your {streak}-day streak alive.</div>
           </div>
         </div>
       </ShellCard>
@@ -1422,17 +1545,17 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
 
   return (
     <button onClick={() => onNavigate(next.view)} className="block w-full text-left mb-5 lum-reveal group">
-      <ShellCard className="p-4 hover:border-gold/30 transition">
+      <ShellCard className="p-4 hover:border-[#C5A572]/30 transition">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border" style={{ background: `${next.color}15`, borderColor: `${next.color}40` }}>
             <next.icon className="w-5 h-5" style={{ color: next.color }} />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.2em] text-ink-muted mb-0.5">Recommended next</div>
-            <div className="text-[14px] text-ink font-medium group-hover:text-gold transition">{next.label}</div>
-            <div className="text-[11px] text-ink-muted">{next.desc}</div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-[#9C9489] mb-0.5">Recommended next</div>
+            <div className="text-[14px] text-[#E8E2D5] font-medium group-hover:text-[#C5A572] transition">{next.label}</div>
+            <div className="text-[11px] text-[#9C9489]">{next.desc}</div>
           </div>
-          <ChevronRight className="w-4 h-4 text-ink-muted group-hover:text-gold group-hover:translate-x-0.5 transition shrink-0" />
+          <ChevronRight className="w-4 h-4 text-[#9C9489] group-hover:text-[#C5A572] group-hover:translate-x-0.5 transition shrink-0" />
         </div>
       </ShellCard>
     </button>
@@ -1443,7 +1566,7 @@ function WeeklyStat({ label, value, color }: { label: string; value: number; col
   return (
     <div className="shrink-0 text-center">
       <div className="text-[18px] font-light leading-none" style={{ color }}>{value}</div>
-      <div className="text-[9px] text-ink-muted mt-0.5">{label}</div>
+      <div className="text-[9px] text-[#9C9489] mt-0.5">{label}</div>
     </div>
   );
 }

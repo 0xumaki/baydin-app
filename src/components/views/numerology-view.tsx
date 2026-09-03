@@ -158,8 +158,8 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-full flex items-center justify-center px-6 text-center">
         <div>
-          <Hash className="w-10 h-10 text-ink-muted mx-auto mb-3" />
-          <div className="text-[16px] text-ink mb-1">Sign in to begin</div>
+          <Hash className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to begin</div>
           <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
         </div>
       </div>
@@ -368,10 +368,10 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
             <div className="p-5 lg:p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-gold">Life Path Preview</div>
-                  <div className="text-[14px] text-ink-muted mt-0.5">Your most important number</div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Life Path Preview</div>
+                  <div className="text-[14px] text-[#9C9489] mt-0.5">Your most important number</div>
                 </div>
-                <span className="text-[9px] uppercase tracking-wider px-2 py-1 rounded-full bg-leaf/10 text-leaf border border-leaf/20">Free</span>
+                <span className="text-[9px] uppercase tracking-wider px-2 py-1 rounded-full bg-leaf/10 text-[#7A8B6F] border border-leaf/20">Free</span>
               </div>
               <div className="flex items-center gap-5 mb-4">
                 <div
@@ -386,20 +386,20 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
                   </span>
                 </div>
                 <div className="min-w-0">
-                  <div className="text-[18px] text-ink font-light">{preview.meaning.title}</div>
+                  <div className="text-[18px] text-[#E8E2D5] font-light">{preview.meaning.title}</div>
                   <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                     {preview.meaning.keywords.slice(0, 3).map((k) => (
-                      <span key={k} className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-ink-muted border border-white/10">{k}</span>
+                      <span key={k} className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-[#9C9489] border border-[#2A2722]">{k}</span>
                     ))}
                   </div>
-                  <div className="text-[11px] text-ink-muted mt-1.5">{preview.meaning.element} · {preview.meaning.rulingPlanet}</div>
+                  <div className="text-[11px] text-[#9C9489] mt-1.5">{preview.meaning.element} · {preview.meaning.rulingPlanet}</div>
                 </div>
               </div>
-              <p className="text-[13px] leading-relaxed text-ink/85">{preview.meaning.summary}</p>
+              <p className="text-[13px] leading-relaxed text-[#E8E2D5]/85">{preview.meaning.summary}</p>
 
-              <div className="mt-4 p-3 rounded-sm bg-gold-soft/30 border border-gold/15">
-                <div className="text-[12px] text-gold font-medium mb-1">Unlock the full picture</div>
-                <div className="text-[11px] text-ink-muted leading-relaxed">
+              <div className="mt-4 p-3 rounded-sm bg-[#C5A572]-soft/30 border border-[#C5A572]/15">
+                <div className="text-[12px] text-[#C5A572] font-medium mb-1">Unlock the full picture</div>
+                <div className="text-[11px] text-[#9C9489] leading-relaxed">
                   Your Life Path is just the beginning. The full report reveals your Destiny, Soul Urge, Personality, Maturity, Birthday and Personal Year numbers — plus a synthesis of how they interact, and your lucky days, colors and gems.
                 </div>
                 <GoldButton onClick={doFullReport} disabled={purchasing} className="w-full mt-3 py-2.5 text-[13px]">
@@ -425,23 +425,23 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
                   onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); loadHistory(h.id); } }}
                   className="w-full flex items-center gap-3 p-3 rounded-sm bg-[#0A0908] border border-[#2A2722] hover:border-[#4A4540] transition group cursor-pointer"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-gold-soft/40 border border-gold/15 flex items-center justify-center shrink-0">
-                    <Hash className="w-4 h-4 text-gold" />
+                  <div className="w-9 h-9 rounded-lg bg-[#C5A572]-soft/40 border border-[#C5A572]/15 flex items-center justify-center shrink-0">
+                    <Hash className="w-4 h-4 text-[#C5A572]" />
                   </div>
                   <div className="flex-1 min-w-0 text-left">
-                    <div className="text-[13px] text-ink truncate">{h.input.name}</div>
-                    <div className="text-[10px] text-ink-muted">
+                    <div className="text-[13px] text-[#E8E2D5] truncate">{h.input.name}</div>
+                    <div className="text-[10px] text-[#9C9489]">
                       {new Date(h.input.birthDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })} · {h.system === "chaldean" ? "Chaldean" : "Pythagorean"} · {new Date(h.createdAt).toLocaleDateString()}
                     </div>
                   </div>
                   <button
                     onClick={(e) => deleteHistory(h.id, e)}
-                    className="p-2 text-ink-muted hover:text-red-400 transition opacity-0 group-hover:opacity-100"
+                    className="p-2 text-[#9C9489] hover:text-red-400 transition opacity-0 group-hover:opacity-100"
                     aria-label="Delete reading"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
-                  <ChevronRight className="w-4 h-4 text-ink-muted" />
+                  <ChevronRight className="w-4 h-4 text-[#9C9489]" />
                 </div>
               ))}
             </div>
@@ -472,14 +472,14 @@ function NumberDetail({
             {num}
           </span>
           {num > 9 && (
-            <span className="text-[8px] uppercase tracking-[0.2em] text-gold mt-1">Master</span>
+            <span className="text-[8px] uppercase tracking-[0.2em] text-[#C5A572] mt-1">Master</span>
           )}
         </div>
 
         {/* Title + meta */}
         <div className="flex-1 min-w-0">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-ink-muted">{label} · {sub}</div>
-          <h2 className="text-[22px] lg:text-[26px] font-light text-ink mt-1">{meaning.title}</h2>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-[#9C9489]">{label} · {sub}</div>
+          <h2 className="text-[22px] lg:text-[26px] font-light text-[#E8E2D5] mt-1">{meaning.title}</h2>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             <span
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] border"
@@ -487,36 +487,36 @@ function NumberDetail({
             >
               <ElIcon className="w-2.5 h-2.5" /> {meaning.element}
             </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-ink-muted border border-white/10">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-[#9C9489] border border-[#2A2722]">
               {meaning.rulingPlanet}
             </span>
             {meaning.keywords.map((k) => (
-              <span key={k} className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-ink-muted border border-white/10">{k}</span>
+              <span key={k} className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-[#9C9489] border border-[#2A2722]">{k}</span>
             ))}
           </div>
-          <p className="text-[13px] leading-relaxed text-ink/85 mt-3">{meaning.summary}</p>
+          <p className="text-[13px] leading-relaxed text-[#E8E2D5]/85 mt-3">{meaning.summary}</p>
         </div>
       </div>
 
       {/* Traits + Challenges */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.2em] text-leaf mb-2">Gifts</div>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-[#7A8B6F] mb-2">Gifts</div>
           <ul className="space-y-1.5">
             {meaning.traits.map((t) => (
-              <li key={t} className="text-[12px] text-ink/80 flex items-start gap-2">
-                <span className="text-leaf mt-0.5">·</span>
+              <li key={t} className="text-[12px] text-[#E8E2D5]/80 flex items-start gap-2">
+                <span className="text-[#7A8B6F] mt-0.5">·</span>
                 <span>{t}</span>
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <div className="text-[10px] uppercase tracking-[0.2em] text-amber-400/80 mb-2">Challenges</div>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-[#D4A0B8]/80 mb-2">Challenges</div>
           <ul className="space-y-1.5">
             {meaning.challenges.map((c) => (
-              <li key={c} className="text-[12px] text-ink/80 flex items-start gap-2">
-                <span className="text-amber-400/80 mt-0.5">·</span>
+              <li key={c} className="text-[12px] text-[#E8E2D5]/80 flex items-start gap-2">
+                <span className="text-[#D4A0B8]/80 mt-0.5">·</span>
                 <span>{c}</span>
               </li>
             ))}

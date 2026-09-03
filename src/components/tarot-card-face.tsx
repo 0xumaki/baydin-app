@@ -56,16 +56,17 @@ export function TarotCardFace({
   return (
     <div
       className={cn(
-        "relative shrink-0 select-none",
+        "relative shrink-0 select-none group",
         sizes[size],
         className
       )}
     >
-      {/* Outer gold gradient border frame */}
+      {/* Outer gradient border frame — premium gold with subtle glow on hover */}
       <div
-        className="absolute inset-0 rounded-[16px] p-[1.5px]"
+        className="absolute inset-0 rounded-sm p-[1.5px] transition-all duration-300 group-hover:p-[2px]"
         style={{
           background: `linear-gradient(135deg, ${meta.accent}aa 0%, ${meta.accent}33 40%, rgba(255,255,255,0.08) 70%, ${meta.accent}44 100%)`,
+          boxShadow: `0 0 0 0 ${meta.accent}00`,
         }}
       >
         <FaceSide
@@ -117,7 +118,7 @@ function FaceSide({
 
   return (
     <div
-      className="relative w-full h-full rounded-[14.5px] overflow-hidden"
+      className="relative w-full h-full rounded-sm overflow-hidden"
       style={{
         background: "linear-gradient(165deg, #1a1410 0%, #0a0806 100%)",
       }}
@@ -273,7 +274,7 @@ function FaceSide({
 
       {/* Inner highlight for premium depth */}
       <div
-        className="absolute inset-0 rounded-[14.5px] pointer-events-none"
+        className="absolute inset-0 rounded-sm pointer-events-none"
         style={{
           boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.08)",
         }}
@@ -298,7 +299,7 @@ export function TarotCardBack({
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden rounded-[16px] p-[1.5px]",
+        "relative shrink-0 overflow-hidden rounded-sm p-[1.5px]",
         sizes[size],
         className
       )}
@@ -307,7 +308,7 @@ export function TarotCardBack({
       }}
     >
       <div
-        className="relative w-full h-full rounded-[14.5px] overflow-hidden"
+        className="relative w-full h-full rounded-sm overflow-hidden"
         style={{ background: "linear-gradient(165deg, #1a1410 0%, #050706 100%)" }}
       >
         <img

@@ -35,7 +35,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 
         <div className="flex items-center gap-2 mb-4">
           {(["daily", "weekly", "monthly"] as const).map((t) => (
-            <button key={t} onClick={() => { setType(t); fetchH(undefined, t); }} className={`px-3 py-1.5 rounded-full text-[12px] border transition ${type === t ? "bg-gold/15 text-gold border-gold/30" : "border-white/10 text-ink-muted hover:text-ink"}`}>
+            <button key={t} onClick={() => { setType(t); fetchH(undefined, t); }} className={`px-3 py-1.5 rounded-full text-[12px] border transition ${type === t ? "bg-[#C5A572]/15 text-[#C5A572] border-[#C5A572]/30" : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5]"}`}>
               {t[0].toUpperCase() + t.slice(1)}
             </button>
           ))}
@@ -43,7 +43,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 
         <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5 mb-5">
           {SIGNS.map((s, i) => (
-            <button key={s} onClick={() => { setSign(s); fetchH(s); }} className={`aspect-square rounded-lg flex items-center justify-center text-lg transition ${sign === s ? "bg-gold/15 text-gold border border-gold/30" : "bg-white/[0.02] text-ink-muted hover:text-ink hover:bg-white/[0.04]"}`} title={s}>
+            <button key={s} onClick={() => { setSign(s); fetchH(s); }} className={`aspect-square rounded-lg flex items-center justify-center text-lg transition ${sign === s ? "bg-[#C5A572]/15 text-[#C5A572] border border-[#C5A572]/30" : "bg-white/[0.02] text-[#9C9489] hover:text-[#E8E2D5] hover:bg-white/[0.04]"}`} title={s}>
               {ZODIAC_SYMBOLS[i]}
             </button>
           ))}
@@ -69,11 +69,11 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
         {horoscope && !loading && (
           <GlassCard className="p-5">
             {horoscope.personalized && <Pill variant="gold" className="mb-3">Personalized for your chart</Pill>}
-            <div className="serif prose-editorial text-[14px] text-ink/90">
+            <div className="serif prose-editorial text-[14px] text-[#E8E2D5]/90">
               <ReactMarkdown>{horoscope.content}</ReactMarkdown>
             </div>
             {horoscope.guidance && (
-              <div className="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="mt-4 pt-4 border-t border-[#2A2722] grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {horoscope.guidance.lucky_color && <Stat label="Lucky color" value={horoscope.guidance.lucky_color} />}
                 {horoscope.guidance.lucky_number !== undefined && <Stat label="Lucky number" value={String(horoscope.guidance.lucky_number)} />}
                 {horoscope.guidance.lucky_time && <Stat label="Lucky time" value={horoscope.guidance.lucky_time} />}
@@ -88,7 +88,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
         )}
 
         {!horoscope && !loading && (
-          <div className="text-center py-12 text-ink-muted text-[13px]">Select your sign and read your stars.</div>
+          <div className="text-center py-12 text-[#9C9489] text-[13px]">Select your sign and read your stars.</div>
         )}
       </div>
     </div>
@@ -98,8 +98,8 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-[10px] text-ink-muted uppercase tracking-wide mb-0.5">{label}</div>
-      <div className="text-[13px] text-gold">{value}</div>
+      <div className="text-[10px] text-[#9C9489] uppercase tracking-wide mb-0.5">{label}</div>
+      <div className="text-[13px] text-[#C5A572]">{value}</div>
     </div>
   );
 }

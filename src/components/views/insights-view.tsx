@@ -42,8 +42,8 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-full flex items-center justify-center px-6 text-center">
         <div>
-          <Compass className="w-10 h-10 text-ink-muted mx-auto mb-3" />
-          <div className="text-[16px] text-ink mb-1">Sign in to explore insights</div>
+          <Compass className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to explore insights</div>
           <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
         </div>
       </div>
@@ -60,49 +60,49 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
-          <button onClick={() => { setSelected(null); setResult(null); }} className="flex items-center gap-1.5 text-[12px] text-ink-muted hover:text-gold mb-4 transition">
+          <button onClick={() => { setSelected(null); setResult(null); }} className="flex items-center gap-1.5 text-[12px] text-[#9C9489] hover:text-[#C5A572] mb-4 transition">
             <ArrowLeft className="w-3.5 h-3.5" /> All insights
           </button>
 
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-12 h-12 rounded-sm bg-gold/10 border border-gold/20 flex items-center justify-center text-2xl text-gold">
+            <div className="w-12 h-12 rounded-sm bg-[#C5A572]/10 border border-[#C5A572]/20 flex items-center justify-center text-2xl text-[#C5A572]">
               {skill?.icon || "✦"}
             </div>
             <div className="flex-1">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-gold">Insight · {skill?.name}</div>
-              <div className="text-[18px] font-light text-ink">{skill?.description}</div>
+              <div className="text-[11px] uppercase tracking-[0.2em] text-[#C5A572]">Insight · {skill?.name}</div>
+              <div className="text-[18px] font-light text-[#E8E2D5]">{skill?.description}</div>
             </div>
             {result && <Pill variant="gold" className="text-[10px]">{result.luckSpent} Luck</Pill>}
           </div>
 
           {loading ? (
             <GlassCard className="p-8 text-center">
-              <Loader2 className="w-6 h-6 text-gold animate-spin mx-auto mb-3" />
-              <div className="text-[13px] text-ink-muted">Reading the stars…</div>
-              <div className="text-[11px] text-ink-muted/60 mt-1">This usually takes 10-20 seconds</div>
+              <Loader2 className="w-6 h-6 text-[#C5A572] animate-spin mx-auto mb-3" />
+              <div className="text-[13px] text-[#9C9489]">Reading the stars…</div>
+              <div className="text-[11px] text-[#9C9489]/60 mt-1">This usually takes 10-20 seconds</div>
             </GlassCard>
           ) : result ? (
             <GlassCard className="p-6">
-              <div className="serif prose-editorial text-[14px] text-ink/90 leading-relaxed">
+              <div className="serif prose-editorial text-[14px] text-[#E8E2D5]/90 leading-relaxed">
                 <ReactMarkdown>{result.content}</ReactMarkdown>
               </div>
               {result.highlights?.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-white/5">
-                  <div className="text-[11px] uppercase tracking-wide text-ink-muted mb-2">Highlights</div>
+                <div className="mt-4 pt-4 border-t border-[#2A2722]">
+                  <div className="text-[11px] uppercase tracking-wide text-[#9C9489] mb-2">Highlights</div>
                   <div className="flex flex-wrap gap-1.5">
                     {result.highlights.map((h: string, i: number) => <Pill key={i} variant="gold" className="text-[10px]">{h}</Pill>)}
                   </div>
                 </div>
               )}
               {result.guidance && (result.guidance.remedies || result.guidance.recommendations || result.guidance.warnings) && (
-                <div className="mt-4 pt-4 border-t border-white/5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="mt-4 pt-4 border-t border-[#2A2722] grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {result.guidance.remedies?.length > 0 && <GuidanceList title="Remedies" items={result.guidance.remedies} variant="gold" />}
                   {result.guidance.recommendations?.length > 0 && <GuidanceList title="Recommendations" items={result.guidance.recommendations} variant="leaf" />}
                   {result.guidance.warnings?.length > 0 && <GuidanceList title="Cautions" items={result.guidance.warnings} variant="default" />}
                 </div>
               )}
               {/* Save bookmark */}
-              <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-2">
+              <div className="mt-4 pt-4 border-t border-[#2A2722] flex items-center gap-2">
                 <button
                   onClick={async () => {
                     try {
@@ -110,7 +110,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
                       toast.success("Insight bookmarked ✦");
                     } catch (e: any) { toast.error(e.message); }
                   }}
-                  className="px-3 py-1.5 rounded-full text-[11px] border border-gold/20 bg-gold/10 text-gold hover:bg-gold/20 active:scale-95 transition flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-full text-[11px] border border-[#C5A572]/20 bg-[#C5A572]/10 text-[#C5A572] hover:bg-[#C5A572]/20 active:scale-95 transition flex items-center gap-1.5"
                 >
                   <Bookmark className="w-3 h-3" /> Save this insight
                 </button>
@@ -129,18 +129,18 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
 
         <div className="flex items-center gap-2 mb-4">
           <Pill variant="gold" className="text-[10px]"><Wallet className="w-3 h-3" /> {user.luckBalance} Luck</Pill>
-          <span className="text-[11px] text-ink-muted">Each insight costs 3 Luck</span>
+          <span className="text-[11px] text-[#9C9489]">Each insight costs 3 Luck</span>
         </div>
 
         {/* Optional query */}
         <GlassCard className="p-3 mb-6 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-gold shrink-0" />
+          <Sparkles className="w-4 h-4 text-[#C5A572] shrink-0" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && selected && run(selected)}
             placeholder="Optional: focus your question (e.g. 'when will I marry?')"
-            className="flex-1 bg-transparent outline-none text-[13px] text-ink placeholder:text-ink-muted/60"
+            className="flex-1 bg-transparent outline-none text-[13px] text-[#E8E2D5] placeholder:text-[#9C9489]/60"
           />
         </GlassCard>
 
@@ -150,14 +150,14 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
             <button
               key={s.id}
               onClick={() => run(s.id)}
-              className="group text-left p-4 rounded-sm border border-white/8 bg-white/[0.02] hover:border-gold/30 hover:bg-gold/[0.04] transition-all hover:shadow-[0_0_30px_-8px_rgba(197,168,124,0.25)]"
+              className="group text-left p-4 rounded-sm border border-[#2A2722] bg-white/[0.02] hover:border-[#C5A572]/30 hover:bg-[#C5A572]/[0.04] transition-all hover:shadow-[0_0_30px_-8px_rgba(197,168,124,0.25)]"
             >
               <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{s.icon}</div>
-              <div className="text-[13px] text-ink font-medium mb-0.5">{s.name}</div>
-              <div className="text-[10px] text-ink-muted leading-tight">{s.description}</div>
+              <div className="text-[13px] text-[#E8E2D5] font-medium mb-0.5">{s.name}</div>
+              <div className="text-[10px] text-[#9C9489] leading-tight">{s.description}</div>
               <div className="mt-2 flex items-center justify-between">
                 <Pill variant="gold" className="text-[9px]">3 Luck</Pill>
-                <ChevronRight className="w-3 h-3 text-ink-muted group-hover:text-gold group-hover:translate-x-0.5 transition" />
+                <ChevronRight className="w-3 h-3 text-[#9C9489] group-hover:text-[#C5A572] group-hover:translate-x-0.5 transition" />
               </div>
             </button>
           ))}
@@ -169,10 +169,10 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
 
 function GuidanceList({ title, items, variant }: { title: string; items: string[]; variant: "default" | "gold" | "leaf" }) {
   return (
-    <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
-      <div className="text-[11px] uppercase tracking-wide text-ink-muted mb-1.5">{title}</div>
-      <ul className="space-y-1 text-[12px] text-ink/90">
-        {items.map((it, i) => <li key={i} className="flex gap-1.5"><span className="text-gold">•</span> {it}</li>)}
+    <div className="p-3 rounded-lg bg-white/[0.02] border border-[#2A2722]">
+      <div className="text-[11px] uppercase tracking-wide text-[#9C9489] mb-1.5">{title}</div>
+      <ul className="space-y-1 text-[12px] text-[#E8E2D5]/90">
+        {items.map((it, i) => <li key={i} className="flex gap-1.5"><span className="text-[#C5A572]">•</span> {it}</li>)}
       </ul>
     </div>
   );
@@ -182,9 +182,9 @@ function NeedsBirthData() {
   return (
     <div className="h-full flex items-center justify-center px-6 text-center">
       <ShellCard className="max-w-md w-full p-8">
-        <Star className="w-8 h-8 text-gold mx-auto mb-3" />
-        <div className="text-[15px] text-ink mb-1">Birth details needed</div>
-        <div className="text-[12px] text-ink-muted mb-4">Insights read your natal chart. Open your profile (top-right settings icon) and add your birth date, time, and place.</div>
+        <Star className="w-8 h-8 text-[#C5A572] mx-auto mb-3" />
+        <div className="text-[15px] text-[#E8E2D5] mb-1">Birth details needed</div>
+        <div className="text-[12px] text-[#9C9489] mb-4">Insights read your natal chart. Open your profile (top-right settings icon) and add your birth date, time, and place.</div>
       </ShellCard>
     </div>
   );

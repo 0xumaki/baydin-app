@@ -46,7 +46,7 @@ export function BirthChartView({ onAuth }: { onAuth: () => void }) {
 
         <div className="flex items-center gap-2 mb-4">
           {(["vedic", "western", "mahabote"] as const).map((m) => (
-            <button key={m} onClick={() => setMode(m)} className={`px-3 py-1.5 rounded-full text-[12px] border transition ${mode === m ? "bg-gold/15 text-gold border-gold/30" : "border-white/10 text-ink-muted hover:text-ink"}`}>
+            <button key={m} onClick={() => setMode(m)} className={`px-3 py-1.5 rounded-full text-[12px] border transition ${mode === m ? "bg-[#C5A572]/15 text-[#C5A572] border-[#C5A572]/30" : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5]"}`}>
               {m === "vedic" ? "Vedic (Sidereal)" : m === "western" ? "Western (Tropical)" : "Mahabote"}
             </button>
           ))}
@@ -54,9 +54,9 @@ export function BirthChartView({ onAuth }: { onAuth: () => void }) {
 
         {!user?.birthData ? (
           <GlassCard className="p-6 text-center">
-            <MapPin className="w-8 h-8 text-gold mx-auto mb-3" />
-            <div className="text-[14px] text-ink mb-1">Birth details needed</div>
-            <div className="text-[12px] text-ink-muted mb-4">Open your profile (top-right settings icon) and add your birth date, time, and place.</div>
+            <MapPin className="w-8 h-8 text-[#C5A572] mx-auto mb-3" />
+            <div className="text-[14px] text-[#E8E2D5] mb-1">Birth details needed</div>
+            <div className="text-[12px] text-[#9C9489] mb-4">Open your profile (top-right settings icon) and add your birth date, time, and place.</div>
             {user ? (
               <Pill variant="gold">Tap the settings icon →</Pill>
             ) : (
@@ -84,8 +84,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       <div className="space-y-4">
         <GlassCard className="p-5">
           <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-4 h-4 text-gold" />
-            <span className="text-[13px] text-gold">Mahabote · Myanmar Traditional</span>
+            <Sparkles className="w-4 h-4 text-[#C5A572]" />
+            <span className="text-[13px] text-[#C5A572]">Mahabote · Myanmar Traditional</span>
           </div>
           <div className="grid grid-cols-2 gap-3 text-[13px]">
             <Stat label="Weekday" value={m.weekday} />
@@ -95,13 +95,13 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
           </div>
         </GlassCard>
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3">The Seven Houses</div>
+          <div className="text-[12px] text-[#9C9489] mb-3">The Seven Houses</div>
           <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
             {m.houses.map((h: any) => (
-              <div key={h.house} className="text-center p-1 sm:p-2 rounded-lg bg-white/[0.02] border border-white/5">
-                <div className="text-[8px] sm:text-[9px] text-ink-muted">{h.houseName}</div>
+              <div key={h.house} className="text-center p-1 sm:p-2 rounded-lg bg-white/[0.02] border border-[#2A2722]">
+                <div className="text-[8px] sm:text-[9px] text-[#9C9489]">{h.houseName}</div>
                 <div className="text-sm sm:text-lg my-1">{PLANET_SYMBOLS[h.planet] ?? "?"}</div>
-                <div className="text-[8px] sm:text-[9px] text-gold">{h.planet}</div>
+                <div className="text-[8px] sm:text-[9px] text-[#C5A572]">{h.planet}</div>
               </div>
             ))}
           </div>
@@ -121,14 +121,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <GlassCard className="p-5 flex flex-col items-center">
           <ChartWheel chart={c} />
-          <div className="text-[11px] text-ink-muted mt-3 text-center">
+          <div className="text-[11px] text-[#9C9489] mt-3 text-center">
             Ascendant: {ZODIAC_SYMBOLS[asc.signIndex]} {asc.sign} ({asc.signMy}) · {asc.degree.toFixed(2)}°
             {c.ayanamsa ? <> · Ayanamsa {c.ayanamsa}°</> : null}
           </div>
         </GlassCard>
         {mode === "vedic" && (
           <GlassCard className="p-5 flex flex-col items-center">
-            <div className="text-[11px] text-ink-muted mb-2">South Indian Chart</div>
+            <div className="text-[11px] text-[#9C9489] mb-2">South Indian Chart</div>
             <SouthIndianChart planets={planets} ascendant={asc} className="w-full max-w-[280px]" />
           </GlassCard>
         )}
@@ -136,16 +136,16 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
 
       {/* Planet table */}
       <GlassCard className="p-5">
-        <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2"><Star className="w-3.5 h-3.5 text-gold" /> Planetary Positions</div>
+        <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2"><Star className="w-3.5 h-3.5 text-[#C5A572]" /> Planetary Positions</div>
         <div className="space-y-1.5">
           {planets.map((p: any) => (
-            <div key={p.name} className="flex items-center gap-2 sm:gap-3 text-[12px] sm:text-[13px] py-1.5 border-b border-white/5 last:border-0">
-              <span className="w-5 sm:w-6 text-center text-gold text-sm sm:text-base">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-              <span className="w-16 sm:w-20 text-ink">{p.name}</span>
+            <div key={p.name} className="flex items-center gap-2 sm:gap-3 text-[12px] sm:text-[13px] py-1.5 border-b border-[#2A2722] last:border-0">
+              <span className="w-5 sm:w-6 text-center text-[#C5A572] text-sm sm:text-base">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+              <span className="w-16 sm:w-20 text-[#E8E2D5]">{p.name}</span>
               <span className="w-5 sm:w-6 text-center">{ZODIAC_SYMBOLS[p.signIndex]}</span>
-              <span className="flex-1 text-ink-muted text-[10px] sm:text-[12px] truncate">{p.sign}<span className="hidden sm:inline">{p.signMy ? ` · ${p.signMy}` : ""}</span> · {p.degree.toFixed(1)}°</span>
-              <span className="w-7 sm:w-8 text-center text-[9px] sm:text-[10px] text-ink-muted">H{p.house}</span>
-              {p.retrograde && <span className="text-[9px] text-amber-400">℞</span>}
+              <span className="flex-1 text-[#9C9489] text-[10px] sm:text-[12px] truncate">{p.sign}<span className="hidden sm:inline">{p.signMy ? ` · ${p.signMy}` : ""}</span> · {p.degree.toFixed(1)}°</span>
+              <span className="w-7 sm:w-8 text-center text-[9px] sm:text-[10px] text-[#9C9489]">H{p.house}</span>
+              {p.retrograde && <span className="text-[9px] text-[#D4A0B8]">℞</span>}
               {p.dignity && p.dignity !== "neutral" && <Pill variant={p.dignity === "exalted" ? "gold" : "leaf"} className="text-[8px] sm:text-[9px]">{p.dignity}</Pill>}
             </div>
           ))}
@@ -155,16 +155,16 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Planetary Aspects */}
       {c.aspects && c.aspects.length > 0 && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2"><Star className="w-3.5 h-3.5 text-gold" /> Planetary Aspects</div>
+          <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2"><Star className="w-3.5 h-3.5 text-[#C5A572]" /> Planetary Aspects</div>
           <div className="space-y-1">
             {c.aspects.map((a: any, i: number) => (
-              <div key={i} className="flex items-center gap-2 text-[12px] py-1.5 border-b border-white/5 last:border-0">
+              <div key={i} className="flex items-center gap-2 text-[12px] py-1.5 border-b border-[#2A2722] last:border-0">
                 <span className="w-6 text-center text-sm" style={{ color: a.color }}>{a.symbol}</span>
-                <span className="text-ink w-16">{a.planet1}</span>
-                <span className="text-[10px] text-ink-muted flex-1 text-center">{a.aspect}</span>
-                <span className="text-ink w-16 text-right">{a.planet2}</span>
-                <span className="text-[10px] text-ink-muted w-10 text-right">orb {a.orb.toFixed(1)}°</span>
-                {a.applying && <span className="text-[9px] text-leaf serif-italic">applying</span>}
+                <span className="text-[#E8E2D5] w-16">{a.planet1}</span>
+                <span className="text-[10px] text-[#9C9489] flex-1 text-center">{a.aspect}</span>
+                <span className="text-[#E8E2D5] w-16 text-right">{a.planet2}</span>
+                <span className="text-[10px] text-[#9C9489] w-10 text-right">orb {a.orb.toFixed(1)}°</span>
+                {a.applying && <span className="text-[9px] text-[#7A8B6F] serif-italic">applying</span>}
               </div>
             ))}
           </div>
@@ -174,7 +174,7 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Dasha + Nakshatra */}
       {mode === "vedic" && c.dasha && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2"><Sparkles className="w-3.5 h-3.5 text-gold" /> Vimshottari Dasha</div>
+          <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2"><Sparkles className="w-3.5 h-3.5 text-[#C5A572]" /> Vimshottari Dasha</div>
           <div className="grid grid-cols-2 gap-3 mb-3">
             <Stat label="Moon Nakshatra" value={`${c.nakshatra} (pada ${c.nakshatraPada})`} />
             <Stat label="Birth Dasha" value={`${c.dasha.birth_dasha.lord} · ${c.dasha.birth_dasha.balance_years}y left`} />
@@ -182,7 +182,7 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
           </div>
           <div className="flex gap-1 overflow-x-auto lum-no-scrollbar pb-1">
             {c.dasha.mahadashas.map((d: any, i: number) => (
-              <div key={i} className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[10px] border ${d.lord === c.dasha.current_mahadasha ? "border-gold/30 bg-gold/10 text-gold" : "border-white/5 bg-white/[0.02] text-ink-muted"}`}>
+              <div key={i} className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[10px] border ${d.lord === c.dasha.current_mahadasha ? "border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572]" : "border-[#2A2722] bg-white/[0.02] text-[#9C9489]"}`}>
                 <div className="font-medium">{d.lord}</div>
                 <div>{d.years.toFixed(1)}y</div>
               </div>
@@ -194,7 +194,7 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Panchanga */}
       {c.panchanga && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3">Panchanga (Today)</div>
+          <div className="text-[12px] text-[#9C9489] mb-3">Panchanga (Today)</div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <Stat label="Tithi" value={c.panchanga.tithi} />
             <Stat label="Nakshatra" value={c.panchanga.nakshatra} />
@@ -208,8 +208,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Navamsa (D-9) — Marriage & Dharma
             </div>
             {(() => { const nav = computeNavamsa(c); return <MiniWheel planets={nav.planets} ascendant={nav.ascendant} label="D-9" />; })()}
@@ -219,17 +219,17 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const nav = computeNavamsa(c);
               return nav.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[11px] text-ink-muted mt-2">
+          <div className="text-[11px] text-[#9C9489] mt-2">
             Ascendant: {ZODIAC_SYMBOLS[computeNavamsa(c).ascendant.signIndex]} {computeNavamsa(c).ascendant.sign}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">The D-9 confirms the strength of the D-1 for marriage, relationships & dharma.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">The D-9 confirms the strength of the D-1 for marriage, relationships & dharma.</div>
         </GlassCard>
       )}
 
@@ -237,8 +237,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Dasamsa (D-10) — Career & Profession
             </div>
             {(() => { const d = computeDasamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-10" />; })()}
@@ -248,14 +248,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d10 = computeDasamsa(c);
               return d10.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-10 reveals career potential, professional success & public standing.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-10 reveals career potential, professional success & public standing.</div>
         </GlassCard>
       )}
 
@@ -263,8 +263,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Saptamsa (D-7) — Children & Progeny
             </div>
             {(() => { const d = computeSaptamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-7" />; })()}
@@ -274,14 +274,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d7 = computeSaptamsa(c);
               return d7.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-7 shows the promise and nature of children, creative output & legacy.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-7 shows the promise and nature of children, creative output & legacy.</div>
         </GlassCard>
       )}
 
@@ -289,8 +289,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Hora (D-2) — Wealth & Resources
             </div>
             {(() => { const d = computeHora(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-2" />; })()}
@@ -300,14 +300,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d2 = computeHora(c);
               return d2.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-2 reveals wealth potential, financial resources & material well-being.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-2 reveals wealth potential, financial resources & material well-being.</div>
         </GlassCard>
       )}
 
@@ -315,8 +315,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Dwadasamsa (D-12) — Parents & Ancestry
             </div>
             {(() => { const d = computeDwadasamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-12" />; })()}
@@ -326,14 +326,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d12 = computeDwadasamsa(c);
               return d12.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-12 shows the influence of parents, family lineage & ancestral karma.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-12 shows the influence of parents, family lineage & ancestral karma.</div>
         </GlassCard>
       )}
 
@@ -341,8 +341,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Drekkana (D-3) — Siblings & Courage
             </div>
             {(() => { const d = computeDrekkana(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-3" />; })()}
@@ -352,14 +352,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d3 = computeDrekkana(c);
               return d3.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-3 reveals siblings, courage, self-effort & inner drive.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-3 reveals siblings, courage, self-effort & inner drive.</div>
         </GlassCard>
       )}
 
@@ -367,8 +367,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Chaturthamsa (D-4) — Property & Residence
             </div>
             {(() => { const d = computeChaturthamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-4" />; })()}
@@ -378,14 +378,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d4 = computeChaturthamsa(c);
               return d4.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-4 shows property, fixed assets, residence & land fortune.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-4 shows property, fixed assets, residence & land fortune.</div>
         </GlassCard>
       )}
 
@@ -393,8 +393,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Shodasamsa (D-16) — Vehicles & Comforts
             </div>
             {(() => { const d = computeShodasamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-16" />; })()}
@@ -404,14 +404,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d16 = computeShodasamsa(c);
               return d16.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-16 reveals vehicles, comforts, conveniences & material enjoyments.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-16 reveals vehicles, comforts, conveniences & material enjoyments.</div>
         </GlassCard>
       )}
 
@@ -419,8 +419,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Vimsamsa (D-20) — Spiritual Practices
             </div>
             {(() => { const d = computeVimsamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-20" />; })()}
@@ -430,14 +430,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d20 = computeVimsamsa(c);
               return d20.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-20 shows spiritual pursuits, religious inclinations & inner growth.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-20 shows spiritual pursuits, religious inclinations & inner growth.</div>
         </GlassCard>
       )}
 
@@ -445,8 +445,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Chaturvimsamsa (D-24) — Education & Knowledge
             </div>
             {(() => { const d = computeChaturvimsamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-24" />; })()}
@@ -456,14 +456,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d24 = computeChaturvimsamsa(c);
               return d24.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-24 reveals education, learning, knowledge & intellectual pursuits.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-24 reveals education, learning, knowledge & intellectual pursuits.</div>
         </GlassCard>
       )}
 
@@ -471,8 +471,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Trimsamsa (D-30) — Struggles & Hidden Matters
             </div>
             {(() => { const d = computeTrimsamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-30" />; })()}
@@ -482,14 +482,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d30 = computeTrimsamsa(c);
               return d30.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-30 shows challenges, hidden forces & areas of potential difficulty to transform.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-30 shows challenges, hidden forces & areas of potential difficulty to transform.</div>
         </GlassCard>
       )}
 
@@ -497,8 +497,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Khavedamsa (D-40) — Auspicious & Inauspicious Effects
             </div>
             {(() => { const d = computeKhavedamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-40" />; })()}
@@ -508,14 +508,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d40 = computeKhavedamsa(c);
               return d40.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-40 reveals overall auspicious and inauspicious patterns in life.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-40 reveals overall auspicious and inauspicious patterns in life.</div>
         </GlassCard>
       )}
 
@@ -523,8 +523,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Akshavedamsa (D-45) — General Well-being
             </div>
             {(() => { const d = computeAkshavedamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-45" />; })()}
@@ -534,14 +534,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d45 = computeAkshavedamsa(c);
               return d45.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-45 indicates all general matters and overall life well-being.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-45 indicates all general matters and overall life well-being.</div>
         </GlassCard>
       )}
 
@@ -549,8 +549,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {mode === "vedic" && (
         <GlassCard className="p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-[12px] text-ink-muted flex items-center gap-2">
-              <Star className="w-3.5 h-3.5 text-gold" />
+            <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-[#C5A572]" />
               Shashtiamsa (D-60) — Past Life Karma
             </div>
             {(() => { const d = computeShashtiamsa(c); return <MiniWheel planets={d.planets} ascendant={d.ascendant} label="D-60" />; })()}
@@ -560,22 +560,22 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               const d60 = computeShashtiamsa(c);
               return d60.planets.map((p) => (
                 <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                  <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                  <span className="text-ink">{p.name}</span>
-                  <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                  <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                  <span className="text-[#E8E2D5]">{p.name}</span>
+                  <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                 </div>
               ));
             })()}
           </div>
-          <div className="text-[10px] text-ink-muted/60 mt-1">D-60 reveals karma from past lives & all hidden matters. The most important chart after D-1.</div>
+          <div className="text-[10px] text-[#9C9489]/60 mt-1">D-60 reveals karma from past lives & all hidden matters. The most important chart after D-1.</div>
         </GlassCard>
       )}
 
       {/* Ashtakavarga (BAV + SAV) */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
+          <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-[#C5A572]" />
             Ashtakavarga — Bindu Scores (SAV total: {computeAshtakavarga(c).savTotal})
           </div>
           {(() => {
@@ -585,18 +585,18 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
                 <div className="grid grid-cols-6 sm:grid-cols-12 gap-1 mb-3">
                   {av.sav.map((bindus, i) => (
                     <div key={i} className="text-center p-1 rounded bg-white/[0.02]">
-                      <div className="text-[8px] text-ink-muted">{ZODIAC_SYMBOLS[i]}</div>
-                      <div className={cn("text-[11px] font-medium", bindus >= 28 ? "text-leaf" : bindus < 25 ? "text-destructive" : "text-ink")}>{bindus}</div>
+                      <div className="text-[8px] text-[#9C9489]">{ZODIAC_SYMBOLS[i]}</div>
+                      <div className={cn("text-[11px] font-medium", bindus >= 28 ? "text-[#7A8B6F]" : bindus < 25 ? "text-[#C26B5C]" : "text-[#E8E2D5]")}>{bindus}</div>
                     </div>
                   ))}
                 </div>
                 {av.strong.length > 0 && (
-                  <div className="text-[10px] text-leaf mb-1">Strong: {av.strong.map((s) => `${s.sign} (${s.bindus})`).join(", ")}</div>
+                  <div className="text-[10px] text-[#7A8B6F] mb-1">Strong: {av.strong.map((s) => `${s.sign} (${s.bindus})`).join(", ")}</div>
                 )}
                 {av.weak.length > 0 && (
-                  <div className="text-[10px] text-destructive/70">Weak: {av.weak.map((s) => `${s.sign} (${s.bindus})`).join(", ")}</div>
+                  <div className="text-[10px] text-[#C26B5C]/70">Weak: {av.weak.map((s) => `${s.sign} (${s.bindus})`).join(", ")}</div>
                 )}
-                <div className="text-[9px] text-ink-muted/60 mt-1">SAV shows overall sign strength. 28+ = strong, below 25 = weak (out of 337 total bindus).</div>
+                <div className="text-[9px] text-[#9C9489]/60 mt-1">SAV shows overall sign strength. 28+ = strong, below 25 = weak (out of 337 total bindus).</div>
               </>
             );
           })()}
@@ -606,8 +606,8 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Shadbala (6-fold planetary strength) */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
+          <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2">
+            <Star className="w-3.5 h-3.5 text-[#C5A572]" />
             Shadbala — Planetary Strength (6-fold)
           </div>
           {(() => {
@@ -616,21 +616,21 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
               <div className="space-y-1.5">
                 {sb.planets.map((p) => (
                   <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                    <span className="text-gold">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-                    <span className="text-ink w-16">{p.name}</span>
+                    <span className="text-[#C5A572]">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+                    <span className="text-[#E8E2D5] w-16">{p.name}</span>
                     <div className="flex-1 grid grid-cols-6 gap-0.5 text-center">
-                      <span className="text-[8px] text-ink-muted" title="Sthana">{p.sthana}</span>
-                      <span className="text-[8px] text-ink-muted" title="Dig">{p.dig}</span>
-                      <span className="text-[8px] text-ink-muted" title="Kala">{p.kala}</span>
-                      <span className="text-[8px] text-ink-muted" title="Chesta">{p.chesta}</span>
-                      <span className="text-[8px] text-ink-muted" title="Naisargika">{p.naisargika}</span>
-                      <span className="text-[8px] text-ink-muted" title="Drik">{p.drik}</span>
+                      <span className="text-[8px] text-[#9C9489]" title="Sthana">{p.sthana}</span>
+                      <span className="text-[8px] text-[#9C9489]" title="Dig">{p.dig}</span>
+                      <span className="text-[8px] text-[#9C9489]" title="Kala">{p.kala}</span>
+                      <span className="text-[8px] text-[#9C9489]" title="Chesta">{p.chesta}</span>
+                      <span className="text-[8px] text-[#9C9489]" title="Naisargika">{p.naisargika}</span>
+                      <span className="text-[8px] text-[#9C9489]" title="Drik">{p.drik}</span>
                     </div>
-                    <span className="text-[10px] text-ink w-8 text-right">{p.totalRasis}R</span>
-                    <span className={cn("text-[8px] px-1.5 py-0.5 rounded-full", p.strength === "excellent" ? "bg-leaf/15 text-leaf" : p.strength === "good" ? "bg-gold/15 text-gold" : p.strength === "average" ? "bg-white/5 text-ink-muted" : "bg-destructive/15 text-destructive")}>{p.strength}</span>
+                    <span className="text-[10px] text-[#E8E2D5] w-8 text-right">{p.totalRasis}R</span>
+                    <span className={cn("text-[8px] px-1.5 py-0.5 rounded-full", p.strength === "excellent" ? "bg-leaf/15 text-[#7A8B6F]" : p.strength === "good" ? "bg-[#C5A572]/15 text-[#C5A572]" : p.strength === "average" ? "bg-white/5 text-[#9C9489]" : "bg-[#C26B5C]/15 text-[#C26B5C]")}>{p.strength}</span>
                   </div>
                 ))}
-                <div className="text-[9px] text-ink-muted/60 mt-1 grid grid-cols-6 gap-0.5 text-center pl-[88px]">
+                <div className="text-[9px] text-[#9C9489]/60 mt-1 grid grid-cols-6 gap-0.5 text-center pl-[88px]">
                   <span>Sth</span><span>Dig</span><span>Kala</span><span>Che</span><span>Nai</span><span>Drik</span>
                 </div>
               </div>
@@ -642,26 +642,26 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Solar Return (Varshaphal) — year ahead */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Sun className="w-3.5 h-3.5 text-gold" />
+          <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2">
+            <Sun className="w-3.5 h-3.5 text-[#C5A572]" />
             Solar Return (Varshaphal) — Your Year Ahead
           </div>
           {(() => {
             const sr = computeSolarReturn({ dob: c.meta.birth_datetime.slice(0, 10), tob: "12:00", latitude: c.meta.latitude, longitude: c.meta.longitude, timezone: c.meta.timezone }, c);
-            if (!sr.planets.length) return <div className="text-[12px] text-ink-muted">Could not compute solar return.</div>;
+            if (!sr.planets.length) return <div className="text-[12px] text-[#9C9489]">Could not compute solar return.</div>;
             return (
               <>
-                <div className="text-[11px] text-ink-muted mb-2">Return date: {sr.returnDate} · Sun in {sr.sunSign}</div>
+                <div className="text-[11px] text-[#9C9489] mb-2">Return date: {sr.returnDate} · Sun in {sr.sunSign}</div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {sr.planets.map((p) => (
                     <div key={p.name} className="flex items-center gap-2 text-[11px] py-1 px-2 rounded-lg bg-white/[0.02]">
-                      <span className="text-gold">{p.symbol}</span>
-                      <span className="text-ink">{p.name}</span>
-                      <span className="text-ink-muted ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+                      <span className="text-[#C5A572]">{p.symbol}</span>
+                      <span className="text-[#E8E2D5]">{p.name}</span>
+                      <span className="text-[#9C9489] ml-auto">{ZODIAC_SYMBOLS[p.signIndex]}</span>
                     </div>
                   ))}
                 </div>
-                <div className="text-[10px] text-ink-muted/60 mt-1">Varshaphal shows the themes and energies for your current solar year.</div>
+                <div className="text-[10px] text-[#9C9489]/60 mt-1">Varshaphal shows the themes and energies for your current solar year.</div>
               </>
             );
           })()}
@@ -749,8 +749,8 @@ function MiniWheel({ planets, ascendant, label }: { planets: { name: string; sig
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-[10px] text-ink-muted uppercase tracking-wide mb-0.5">{label}</div>
-      <div className="text-[13px] text-ink">{value}</div>
+      <div className="text-[10px] text-[#9C9489] uppercase tracking-wide mb-0.5">{label}</div>
+      <div className="text-[13px] text-[#E8E2D5]">{value}</div>
     </div>
   );
 }

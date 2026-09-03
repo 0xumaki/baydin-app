@@ -84,23 +84,23 @@ export function ManifestView({ onAuth }: { onAuth: () => void }) {
         {showForm && (
           <ShellCard className="p-5 mb-4 lum-reveal">
             <div className="flex items-center justify-between mb-3">
-              <div className="text-[13px] text-ink flex items-center gap-2"><Sparkles className="w-4 h-4 text-gold" /> New intention</div>
-              <button onClick={() => setShowForm(false)} className="text-ink-muted hover:text-ink"><X className="w-4 h-4" /></button>
+              <div className="text-[13px] text-[#E8E2D5] flex items-center gap-2"><Sparkles className="w-4 h-4 text-[#C5A572]" /> New intention</div>
+              <button onClick={() => setShowForm(false)} className="text-[#9C9489] hover:text-[#E8E2D5]"><X className="w-4 h-4" /></button>
             </div>
             <div className="space-y-3">
               <div>
-                <Label className="text-[12px] text-ink-muted">What do you want to manifest?</Label>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} className="bg-white/[0.03] border-white/10 text-ink mt-1.5" placeholder="e.g. A loving, supportive relationship" />
+                <Label className="text-[12px] text-[#9C9489]">What do you want to manifest?</Label>
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" placeholder="e.g. A loving, supportive relationship" />
               </div>
               <div>
-                <Label className="text-[12px] text-ink-muted">Your affirmation (optional)</Label>
-                <Textarea value={statement} onChange={(e) => setStatement(e.target.value)} className="bg-white/[0.03] border-white/10 text-ink mt-1.5 min-h-[60px]" placeholder="I am worthy of love and it flows to me effortlessly." />
+                <Label className="text-[12px] text-[#9C9489]">Your affirmation (optional)</Label>
+                <Textarea value={statement} onChange={(e) => setStatement(e.target.value)} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5 min-h-[60px]" placeholder="I am worthy of love and it flows to me effortlessly." />
               </div>
               <div>
-                <Label className="text-[12px] text-ink-muted">Daily reminder time (optional)</Label>
-                <Input type="time" value={reminderTime} onChange={(e) => setReminderTime(e.target.value)} className="bg-white/[0.03] border-white/10 text-ink mt-1.5" />
+                <Label className="text-[12px] text-[#9C9489]">Daily reminder time (optional)</Label>
+                <Input type="time" value={reminderTime} onChange={(e) => setReminderTime(e.target.value)} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" />
               </div>
-              <div className="text-[11px] text-ink-muted leading-relaxed">
+              <div className="text-[11px] text-[#9C9489] leading-relaxed">
                 Baydin auto-detects the intention and suggests a Solfeggio frequency ({user.language === "my" ? "မြန်မာ" : "Vedic"} wisdom).
               </div>
               <GradientButton onClick={create} disabled={creating} className="w-full">
@@ -158,20 +158,20 @@ function GoalCard({ goal, onChange }: { goal: any; onChange: () => void }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <div className="text-[14px] text-ink font-medium truncate">{goal.title}</div>
+            <div className="text-[14px] text-[#E8E2D5] font-medium truncate">{goal.title}</div>
             <Pill className="text-[9px]" style={{ borderColor: `${intention.color}30`, color: intention.color }}>{intention.label}</Pill>
           </div>
           {goal.statement && goal.statement !== goal.title && (
-            <div className="text-[12px] text-ink-muted italic mb-2">"{goal.statement}"</div>
+            <div className="text-[12px] text-[#9C9489] italic mb-2">"{goal.statement}"</div>
           )}
-          <div className="flex items-center gap-3 text-[11px] text-ink-muted">
+          <div className="flex items-center gap-3 text-[11px] text-[#9C9489]">
             {goal.streak > 0 && (
-              <span className="flex items-center gap-1 text-leaf">
+              <span className="flex items-center gap-1 text-[#7A8B6F]">
                 <Flame className="w-3 h-3" /> {goal.streak}-day streak
               </span>
             )}
             <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> {goal.totalConfirmations} total</span>
-            {freq && <span className="flex items-center gap-1 text-gold">♪ {freq}Hz</span>}
+            {freq && <span className="flex items-center gap-1 text-[#C5A572]">♪ {freq}Hz</span>}
           </div>
         </div>
         <div className="flex flex-col items-end gap-1.5">
@@ -181,13 +181,13 @@ function GoalCard({ goal, onChange }: { goal: any; onChange: () => void }) {
             className={cn(
               "px-3 py-1.5 rounded-full text-[11px] transition border whitespace-nowrap",
               goal.confirmedToday
-                ? "border-leaf/20 bg-leaf/10 text-leaf"
-                : "border-gold/30 bg-gold/10 text-gold hover:bg-gold/20 active:scale-95"
+                ? "border-leaf/20 bg-leaf/10 text-[#7A8B6F]"
+                : "border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572] hover:bg-[#C5A572]/20 active:scale-95"
             )}
           >
             {goal.confirmedToday ? <span className="flex items-center gap-1"><Check className="w-3 h-3" /> Done</span> : confirming ? "…" : "Confirm"}
           </button>
-          <button onClick={archive} className="text-[10px] text-ink-muted hover:text-destructive transition">Archive</button>
+          <button onClick={archive} className="text-[10px] text-[#9C9489] hover:text-[#C26B5C] transition">Archive</button>
         </div>
       </div>
     </GlassCard>
@@ -197,9 +197,9 @@ function GoalCard({ goal, onChange }: { goal: any; onChange: () => void }) {
 function StatCard({ icon: Icon, label, value, sub }: { icon: any; label: string; value: string; sub?: string }) {
   return (
     <GlassCard className="p-3 text-center">
-      <Icon className="w-4 h-4 text-gold mx-auto mb-1" />
-      <div className="text-[18px] font-light text-ink leading-none">{value}</div>
-      <div className="text-[10px] text-ink-muted mt-0.5">{label}{sub ? ` ${sub}` : ""}</div>
+      <Icon className="w-4 h-4 text-[#C5A572] mx-auto mb-1" />
+      <div className="text-[18px] font-light text-[#E8E2D5] leading-none">{value}</div>
+      <div className="text-[10px] text-[#9C9489] mt-0.5">{label}{sub ? ` ${sub}` : ""}</div>
     </GlassCard>
   );
 }
@@ -208,8 +208,8 @@ function Gate({ onAuth }: { onAuth: () => void }) {
   return (
     <div className="h-full flex items-center justify-center px-6 text-center">
       <div>
-        <Target className="w-10 h-10 text-ink-muted mx-auto mb-3" />
-        <div className="text-[16px] text-ink mb-1">Sign in to manifest</div>
+        <Target className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+        <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to manifest</div>
         <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
       </div>
     </div>
@@ -221,14 +221,14 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
     <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] flex items-center justify-center px-6">
       <ShellCard className="max-w-md w-full p-8 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-leaf/20 to-gold/10 border border-leaf/20 mb-4">
-          <Target className="w-7 h-7 text-leaf" />
+          <Target className="w-7 h-7 text-[#7A8B6F]" />
         </div>
-        <h2 className="text-[20px] font-light text-ink mb-2">What do you want to call in?</h2>
-        <p className="text-[13px] text-ink-muted mb-6 leading-relaxed">
+        <h2 className="text-[20px] font-light text-[#E8E2D5] mb-2">What do you want to call in?</h2>
+        <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">
           Manifestation works through daily repetition. Set an intention, confirm it each day, and watch the universe conspire with you.
         </p>
         <GoldButton onClick={onCreate} className="w-full"><Plus className="w-4 h-4" /> Set your first intention</GoldButton>
-        <div className="mt-3 text-[11px] text-leaf">+1 Luck for every daily confirmation</div>
+        <div className="mt-3 text-[11px] text-[#7A8B6F]">+1 Luck for every daily confirmation</div>
       </ShellCard>
     </div>
   );

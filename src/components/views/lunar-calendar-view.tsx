@@ -83,8 +83,8 @@ export function LunarCalendarView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-full flex items-center justify-center px-6 text-center">
         <div>
-          <Moon className="w-10 h-10 text-ink-muted mx-auto mb-3" />
-          <div className="text-[16px] text-ink mb-1">Sign in to begin</div>
+          <Moon className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to begin</div>
           <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
         </div>
       </div>
@@ -357,9 +357,9 @@ function LegendItem({ emoji, label, desc }: { emoji: string; label: string; desc
     <div className="p-2.5 rounded-sm bg-[#0A0908] border border-[#2A2722]">
       <div className="flex items-center gap-2 mb-0.5">
         <span className="text-[14px]">{emoji}</span>
-        <span className="text-[11px] text-ink font-medium">{label}</span>
+        <span className="text-[11px] text-[#E8E2D5] font-medium">{label}</span>
       </div>
-      <div className="text-[9px] text-ink-muted leading-tight">{desc}</div>
+      <div className="text-[9px] text-[#9C9489] leading-tight">{desc}</div>
     </div>
   );
 }
@@ -375,18 +375,18 @@ function TodayMoonCard({ lunarMonth, onOpenDay }: { lunarMonth: LunarMonth; onOp
     <ShellCard>
       <div className="p-5 lg:p-6">
         <div className="flex items-center gap-2 mb-3">
-          <Moon className="w-4 h-4 text-gold" />
-          <div className="text-[10px] uppercase tracking-[0.2em] text-gold">Today's Moon</div>
+          <Moon className="w-4 h-4 text-[#C5A572]" />
+          <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Today's Moon</div>
         </div>
         <div className="flex items-start gap-5 flex-col sm:flex-row">
           <div className="flex items-center gap-4 shrink-0">
             <MoonPhaseSvg phaseFrac={today.moonPhase.phaseFrac} size={88} />
             <div>
-              <div className="text-[18px] font-light text-ink">{today.moonPhase.name}</div>
-              <div className="text-[11px] text-ink-muted mt-1">
+              <div className="text-[18px] font-light text-[#E8E2D5]">{today.moonPhase.name}</div>
+              <div className="text-[11px] text-[#9C9489] mt-1">
                 {today.moonPhase.emoji} {(today.moonPhase.illumination * 100).toFixed(0)}% illuminated
               </div>
-              <div className="text-[11px] text-ink-muted">
+              <div className="text-[11px] text-[#9C9489]">
                 Age {today.moonPhase.age.toFixed(1)} days · in {today.moonPhase.zodiacSign}
               </div>
             </div>
@@ -410,9 +410,9 @@ function TodayMoonCard({ lunarMonth, onOpenDay }: { lunarMonth: LunarMonth; onOp
 
 function PanchangaMini({ label, value }: { label: string; value: string }) {
   return (
-    <div className="p-2.5 rounded-lg bg-black/20 border border-white/5">
-      <div className="text-[9px] uppercase tracking-[0.18em] text-ink-muted/70">{label}</div>
-      <div className="text-[12px] text-ink mt-0.5 font-medium truncate" title={value}>{value}</div>
+    <div className="p-2.5 rounded-lg bg-black/20 border border-[#2A2722]">
+      <div className="text-[9px] uppercase tracking-[0.18em] text-[#9C9489]/70">{label}</div>
+      <div className="text-[12px] text-[#E8E2D5] mt-0.5 font-medium truncate" title={value}>{value}</div>
     </div>
   );
 }
@@ -432,7 +432,7 @@ function DayDetail({
   return (
     <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
-        <button onClick={onBack} className="text-[12px] text-ink-muted hover:text-gold transition mb-4">
+        <button onClick={onBack} className="text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4">
           ← Back to calendar
         </button>
 
@@ -442,23 +442,23 @@ function DayDetail({
             <MoonPhaseSvg phaseFrac={day.moonPhase.phaseFrac} size={120} />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.2em] text-gold">
+            <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">
               {day.dayOfWeekName}, {dateObj.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
             </div>
-            <h1 className="text-[26px] lg:text-[32px] font-light text-ink mt-1">{day.moonPhase.name}</h1>
+            <h1 className="text-[26px] lg:text-[32px] font-light text-[#E8E2D5] mt-1">{day.moonPhase.name}</h1>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-gold-soft/30 border border-gold/20 text-gold">
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#C5A572]-soft/30 border border-[#C5A572]/20 text-[#C5A572]">
                 {day.moonPhase.emoji} {(day.moonPhase.illumination * 100).toFixed(0)}% lit
               </span>
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-ink-muted">
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/5 border border-[#2A2722] text-[#9C9489]">
                 Age {day.moonPhase.age.toFixed(1)} days
               </span>
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-ink-muted">
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/5 border border-[#2A2722] text-[#9C9489]">
                 Moon in {day.moonPhase.zodiacSign}
               </span>
             </div>
             {day.isToday && (
-              <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-leaf/10 border border-leaf/30 text-leaf text-[10px] font-medium tracking-wide">
+              <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-leaf/10 border border-leaf/30 text-[#7A8B6F] text-[10px] font-medium tracking-wide">
                 <Star className="w-3 h-3" /> TODAY
               </div>
             )}
@@ -510,8 +510,8 @@ function DayDetail({
           <ShellCard className="mb-6">
             <div className="p-5 lg:p-6">
               <div className="flex items-center gap-2 mb-3">
-                <Star className="w-4 h-4 text-gold" />
-                <div className="text-[10px] uppercase tracking-[0.2em] text-gold">
+                <Star className="w-4 h-4 text-[#C5A572]" />
+                <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">
                   Nakshatra · {nakshatraDetail.nakshatra}
                 </div>
               </div>
@@ -521,8 +521,8 @@ function DayDetail({
                 <NakMeta label="Nature" value={nakshatraDetail.nature} />
                 <NakMeta label="Pada" value={String(day.panchanga.nakshatra_pada)} />
               </div>
-              <div className="text-[12px] text-ink-muted leading-relaxed">
-                <span className="text-gold">Meaning:</span> {nakshatraDetail.meaning}
+              <div className="text-[12px] text-[#9C9489] leading-relaxed">
+                <span className="text-[#C5A572]">Meaning:</span> {nakshatraDetail.meaning}
               </div>
             </div>
           </ShellCard>
@@ -570,7 +570,7 @@ function DayDetail({
         )}
 
         {loading && (
-          <div className="flex items-center justify-center gap-2 py-4 text-ink-muted">
+          <div className="flex items-center justify-center gap-2 py-4 text-[#9C9489]">
             <Loader2 className="w-4 h-4 animate-spin" /> Loading nakshatra detail…
           </div>
         )}
@@ -586,10 +586,10 @@ function PanchangaCard({
     <GlassCard className="p-4">
       <div className="flex items-center gap-2 mb-2">
         <Icon className="w-4 h-4" style={{ color: accent }} />
-        <div className="text-[10px] uppercase tracking-[0.18em] text-ink-muted">{label}</div>
+        <div className="text-[10px] uppercase tracking-[0.18em] text-[#9C9489]">{label}</div>
       </div>
-      <div className="text-[15px] text-ink font-medium leading-tight">{value}</div>
-      <div className="text-[10px] text-ink-muted mt-1">{sub}</div>
+      <div className="text-[15px] text-[#E8E2D5] font-medium leading-tight">{value}</div>
+      <div className="text-[10px] text-[#9C9489] mt-1">{sub}</div>
     </GlassCard>
   );
 }
@@ -597,8 +597,8 @@ function PanchangaCard({
 function NakMeta({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-[9px] uppercase tracking-[0.18em] text-ink-muted/70">{label}</div>
-      <div className="text-[12px] text-ink mt-0.5 font-medium">{value}</div>
+      <div className="text-[9px] uppercase tracking-[0.18em] text-[#9C9489]/70">{label}</div>
+      <div className="text-[12px] text-[#E8E2D5] mt-0.5 font-medium">{value}</div>
     </div>
   );
 }
@@ -616,8 +616,8 @@ function SignificanceRow({
           <Icon className="w-4 h-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[14px] text-ink font-medium">{title}</div>
-          <div className="text-[12px] text-ink-muted leading-relaxed mt-1">{desc}</div>
+          <div className="text-[14px] text-[#E8E2D5] font-medium">{title}</div>
+          <div className="text-[12px] text-[#9C9489] leading-relaxed mt-1">{desc}</div>
         </div>
       </div>
     </div>

@@ -29,8 +29,8 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-full flex items-center justify-center px-6 text-center">
         <div>
-          <BarChart3 className="w-10 h-10 text-ink-muted mx-auto mb-3" />
-          <div className="text-[16px] text-ink mb-1">Sign in to view your stats</div>
+          <BarChart3 className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to view your stats</div>
           <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
         </div>
       </div>
@@ -54,13 +54,13 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
         <ShellCard className="p-6 mb-5 relative overflow-hidden">
           <div className="" />
           <div className="relative flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-gold/20 flex items-center justify-center text-3xl shrink-0">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-[#C5A572]/20 flex items-center justify-center text-3xl shrink-0">
               {archetype.icon}
             </div>
             <div className="flex-1">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-gold mb-1">Your archetype</div>
-              <div className="text-[20px] font-light text-ink mb-1">{archetype.name}</div>
-              <div className="text-[12px] text-ink-muted leading-relaxed">{archetype.desc}</div>
+              <div className="text-[11px] uppercase tracking-[0.2em] text-[#C5A572] mb-1">Your archetype</div>
+              <div className="text-[20px] font-light text-[#E8E2D5] mb-1">{archetype.name}</div>
+              <div className="text-[12px] text-[#9C9489] leading-relaxed">{archetype.desc}</div>
             </div>
           </div>
         </ShellCard>
@@ -79,41 +79,41 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
           <GlassCard className="p-5">
             <div className="flex items-center gap-2 mb-2">
-              <Wallet className="w-4 h-4 text-gold" />
-              <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Luck economy</span>
+              <Wallet className="w-4 h-4 text-[#C5A572]" />
+              <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Luck economy</span>
             </div>
             <div className="flex items-baseline gap-4 mb-2">
               <div>
-                <div className="text-[24px] font-light text-gold leading-none">{user.luckBalance}</div>
-                <div className="text-[10px] text-ink-muted">current balance</div>
+                <div className="text-[24px] font-light text-[#C5A572] leading-none">{user.luckBalance}</div>
+                <div className="text-[10px] text-[#9C9489]">current balance</div>
               </div>
               <div>
-                <div className="text-[16px] font-light text-leaf">{totals?.luckEarned ?? 0}</div>
-                <div className="text-[10px] text-ink-muted">earned</div>
+                <div className="text-[16px] font-light text-[#7A8B6F]">{totals?.luckEarned ?? 0}</div>
+                <div className="text-[10px] text-[#9C9489]">earned</div>
               </div>
               <div>
-                <div className="text-[16px] font-light text-ink-muted">{totals?.luckSpent ?? 0}</div>
-                <div className="text-[10px] text-ink-muted">spent</div>
+                <div className="text-[16px] font-light text-[#9C9489]">{totals?.luckSpent ?? 0}</div>
+                <div className="text-[10px] text-[#9C9489]">spent</div>
               </div>
             </div>
           </GlassCard>
           <GlassCard className="p-5">
             <div className="flex items-center gap-2 mb-2">
-              <Flame className="w-4 h-4 text-leaf" />
-              <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Consistency</span>
+              <Flame className="w-4 h-4 text-[#7A8B6F]" />
+              <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Consistency</span>
             </div>
             <div className="flex items-baseline gap-4">
               <div>
-                <div className="text-[24px] font-light text-leaf leading-none">{user.streak}</div>
-                <div className="text-[10px] text-ink-muted">day streak</div>
+                <div className="text-[24px] font-light text-[#7A8B6F] leading-none">{user.streak}</div>
+                <div className="text-[10px] text-[#9C9489]">day streak</div>
               </div>
               <div>
-                <div className="text-[16px] font-light text-ink">{activeDays}/7</div>
-                <div className="text-[10px] text-ink-muted">active this week</div>
+                <div className="text-[16px] font-light text-[#E8E2D5]">{activeDays}/7</div>
+                <div className="text-[10px] text-[#9C9489]">active this week</div>
               </div>
               <div>
-                <div className="text-[16px] font-light text-ink">{totalActionsThisWeek}</div>
-                <div className="text-[10px] text-ink-muted">actions</div>
+                <div className="text-[16px] font-light text-[#E8E2D5]">{totalActionsThisWeek}</div>
+                <div className="text-[10px] text-[#9C9489]">actions</div>
               </div>
             </div>
           </GlassCard>
@@ -121,13 +121,13 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
 
         {/* 7-day activity breakdown */}
         <GlassCard className="p-5 mb-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2"><Calendar className="w-3.5 h-3.5 text-gold" /> 7-day activity breakdown</div>
+          <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2"><Calendar className="w-3.5 h-3.5 text-[#C5A572]" /> 7-day activity breakdown</div>
           <div className="space-y-1.5">
             {days.map((day: any, i: number) => {
               const isToday = i === days.length - 1;
               return (
                 <div key={i} className="flex items-center gap-2">
-                  <span className={cn("w-8 text-[11px]", isToday ? "text-gold font-medium" : "text-ink-muted")}>{day?.label ?? "—"}</span>
+                  <span className={cn("w-8 text-[11px]", isToday ? "text-[#C5A572] font-medium" : "text-[#9C9489]")}>{day?.label ?? "—"}</span>
                   <div className="flex-1 flex items-center gap-1">
                     {day?.activities?.ritual && <ActivityDot icon="🔥" title="Ritual" />}
                     {day?.activities?.tarot > 0 && <ActivityDot icon="✦" title="Tarot" count={day.activities.tarot} />}
@@ -135,9 +135,9 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
                     {day?.activities?.frequency > 0 && <ActivityDot icon="♪" title="Frequency" count={day.activities.frequency} />}
                     {day?.activities?.mood && <ActivityDot icon="♡" title="Mood" />}
                     {day?.activities?.manifest && <ActivityDot icon="◎" title="Manifest" />}
-                    {(day?.total ?? 0) === 0 && <span className="text-[10px] text-ink-muted/40">No activity</span>}
+                    {(day?.total ?? 0) === 0 && <span className="text-[10px] text-[#9C9489]/40">No activity</span>}
                   </div>
-                  <span className="text-[10px] text-ink-muted/60 w-8 text-right">{day?.total ?? 0}</span>
+                  <span className="text-[10px] text-[#9C9489]/60 w-8 text-right">{day?.total ?? 0}</span>
                 </div>
               );
             })}
@@ -148,10 +148,10 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
         <GlassCard className="p-5 mb-5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Award className="w-3.5 h-3.5 text-gold" />
-              <span className="text-[12px] text-ink-muted">Achievements</span>
+              <Award className="w-3.5 h-3.5 text-[#C5A572]" />
+              <span className="text-[12px] text-[#9C9489]">Achievements</span>
             </div>
-            <span className="text-[11px] text-gold">
+            <span className="text-[11px] text-[#C5A572]">
               {totals ? evaluateAchievements({ tarot: totals.tarot, chat: totals.chat, frequency: totals.frequency, manifest: totals.manifest, ritual: totals.ritual, mood: totals.mood, streak: user.streak, luckEarned: totals.luckEarned }).unlocked.length : 0}/{ACHIEVEMENTS.length}
             </span>
           </div>
@@ -183,7 +183,7 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
                       (e.target as HTMLImageElement).parentElement?.appendChild(fallback);
                     }}
                   />
-                  <div className="text-[8px] text-ink-muted leading-tight">{a.name}</div>
+                  <div className="text-[8px] text-[#9C9489] leading-tight">{a.name}</div>
                 </div>
               );
             })}
@@ -195,36 +195,36 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
 
         {/* Account info */}
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2"><Award className="w-3.5 h-3.5 text-gold" /> Account</div>
+          <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2"><Award className="w-3.5 h-3.5 text-[#C5A572]" /> Account</div>
           <div className="grid grid-cols-2 gap-3 text-[12px] mb-4">
             <div>
-              <div className="text-ink-muted text-[10px] uppercase tracking-wide">Email</div>
-              <div className="text-ink truncate">{user.email}</div>
+              <div className="text-[#9C9489] text-[10px] uppercase tracking-wide">Email</div>
+              <div className="text-[#E8E2D5] truncate">{user.email}</div>
             </div>
             <div>
-              <div className="text-ink-muted text-[10px] uppercase tracking-wide">Member since</div>
-              <div className="text-ink">{totals?.memberSince ? new Date(totals.memberSince).toLocaleDateString() : "—"}</div>
+              <div className="text-[#9C9489] text-[10px] uppercase tracking-wide">Member since</div>
+              <div className="text-[#E8E2D5]">{totals?.memberSince ? new Date(totals.memberSince).toLocaleDateString() : "—"}</div>
             </div>
             <div>
-              <div className="text-ink-muted text-[10px] uppercase tracking-wide">Language</div>
-              <div className="text-ink uppercase">{user.language}</div>
+              <div className="text-[#9C9489] text-[10px] uppercase tracking-wide">Language</div>
+              <div className="text-[#E8E2D5] uppercase">{user.language}</div>
             </div>
             <div>
-              <div className="text-ink-muted text-[10px] uppercase tracking-wide">Referral code</div>
-              <div className="text-gold font-mono">{user.referralCode}</div>
+              <div className="text-[#9C9489] text-[10px] uppercase tracking-wide">Referral code</div>
+              <div className="text-[#C5A572] font-mono">{user.referralCode}</div>
             </div>
           </div>
           {/* Data export + delete */}
-          <div className="pt-4 border-t border-white/5 flex items-center gap-2">
+          <div className="pt-4 border-t border-[#2A2722] flex items-center gap-2">
             <button
               onClick={() => window.open("/api/export", "_blank")}
-              className="px-3 py-1.5 rounded-full text-[11px] border border-white/10 text-ink-muted hover:text-gold hover:border-gold/30 transition flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-full text-[11px] border border-[#2A2722] text-[#9C9489] hover:text-[#C5A572] hover:border-[#C5A572]/30 transition flex items-center gap-1.5"
             >
               <Download className="w-3 h-3" /> Export my data
             </button>
             <button
               onClick={() => setShowDelete(true)}
-              className="px-3 py-1.5 rounded-full text-[11px] border border-destructive/20 text-destructive/70 hover:text-destructive hover:border-destructive/40 transition flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-full text-[11px] border border-[#C26B5C]/20 text-[#C26B5C]/70 hover:text-[#C26B5C] hover:border-[#C26B5C]/40 transition flex items-center gap-1.5"
             >
               <Trash2 className="w-3 h-3" /> Delete account
             </button>
@@ -255,15 +255,15 @@ function StatCard({ icon: Icon, label, value, color }: { icon: any; label: strin
   return (
     <GlassCard className="p-3 text-center">
       <Icon className="w-4 h-4 mx-auto mb-1" style={{ color }} />
-      <div className="text-[20px] font-light text-ink leading-none">{value}</div>
-      <div className="text-[9px] text-ink-muted mt-0.5 leading-tight">{label}</div>
+      <div className="text-[20px] font-light text-[#E8E2D5] leading-none">{value}</div>
+      <div className="text-[9px] text-[#9C9489] mt-0.5 leading-tight">{label}</div>
     </GlassCard>
   );
 }
 
 function ActivityDot({ icon, title, count }: { icon: string; title: string; count?: number }) {
   return (
-    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white/[0.04] text-[10px] text-ink" title={title}>
+    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white/[0.04] text-[10px] text-[#E8E2D5]" title={title}>
       {icon}{count && count > 1 ? `×${count}` : ""}
     </span>
   );
@@ -296,22 +296,22 @@ function DeleteAccountModal({ onClose }: { onClose: () => void }) {
       <GlassCard float className="max-w-sm w-full p-6 rounded-sm" >
         <div onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2 text-destructive">
+            <div className="flex items-center gap-2 text-[#C26B5C]">
               <AlertTriangle className="w-5 h-5" />
               <span className="text-[15px] font-medium">Delete account</span>
             </div>
-            <button onClick={onClose} className="text-ink-muted hover:text-ink"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="text-[#9C9489] hover:text-[#E8E2D5]"><X className="w-5 h-5" /></button>
           </div>
-          <div className="text-[12px] text-ink-muted mb-4 leading-relaxed">
+          <div className="text-[12px] text-[#9C9489] mb-4 leading-relaxed">
             This permanently deletes your account and all data — conversations, readings, Luck balance, achievements, and history. This cannot be undone.
           </div>
           <div className="mb-4">
-            <div className="text-[11px] text-ink-muted mb-1.5">Confirm your password to proceed</div>
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-white/[0.03] border-white/10 text-ink" placeholder="Your password" />
+            <div className="text-[11px] text-[#9C9489] mb-1.5">Confirm your password to proceed</div>
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5]" placeholder="Your password" />
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={onClose} className="flex-1 py-2.5 rounded-full text-[12px] text-ink-muted border border-white/10 hover:text-ink transition">Cancel</button>
-            <button onClick={confirm} disabled={deleting || !password} className="flex-1 py-2.5 rounded-full text-[12px] bg-destructive text-white hover:brightness-110 active:scale-95 transition disabled:opacity-40">
+            <button onClick={onClose} className="flex-1 py-2.5 rounded-full text-[12px] text-[#9C9489] border border-[#2A2722] hover:text-[#E8E2D5] transition">Cancel</button>
+            <button onClick={confirm} disabled={deleting || !password} className="flex-1 py-2.5 rounded-full text-[12px] bg-[#C26B5C] text-white hover:brightness-110 active:scale-95 transition disabled:opacity-40">
               {deleting ? "Deleting…" : "Delete forever"}
             </button>
           </div>
@@ -349,34 +349,34 @@ function SavedInsights() {
     <GlassCard className="p-5 mb-5">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Bookmark className="w-3.5 h-3.5 text-gold" />
-          <span className="text-[12px] text-ink-muted">Saved Insights</span>
+          <Bookmark className="w-3.5 h-3.5 text-[#C5A572]" />
+          <span className="text-[12px] text-[#9C9489]">Saved Insights</span>
         </div>
-        <span className="text-[11px] text-gold">{insights.length} bookmarked</span>
+        <span className="text-[11px] text-[#C5A572]">{insights.length} bookmarked</span>
       </div>
       <div className="space-y-2">
         {insights.slice(0, 10).map((ins) => {
           const isOpen = expanded === ins.id;
           return (
-            <div key={ins.id} className="rounded-lg border border-white/5 bg-white/[0.02] overflow-hidden">
+            <div key={ins.id} className="rounded-lg border border-[#2A2722] bg-white/[0.02] overflow-hidden">
               <button
                 onClick={() => setExpanded(isOpen ? null : ins.id)}
                 className="w-full flex items-center gap-2 p-2.5 text-left hover:bg-white/[0.02] transition"
               >
                 <span className="text-base shrink-0">{ins.skillName?.[0] || "✦"}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[12px] text-ink truncate">{ins.skillName || ins.skill}</div>
-                  <div className="text-[10px] text-ink-muted">{new Date(ins.savedAt).toLocaleDateString()}</div>
+                  <div className="text-[12px] text-[#E8E2D5] truncate">{ins.skillName || ins.skill}</div>
+                  <div className="text-[10px] text-[#9C9489]">{new Date(ins.savedAt).toLocaleDateString()}</div>
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); remove(ins.id); }}
-                  className="p-1 rounded text-ink-muted/40 hover:text-destructive transition shrink-0"
+                  className="p-1 rounded text-[#9C9489]/40 hover:text-[#C26B5C] transition shrink-0"
                 >
                   <Trash2 className="w-3 h-3" />
                 </button>
               </button>
               {isOpen && (
-                <div className="px-3 pb-3 border-t border-white/5 pt-2 serif prose-editorial text-[12px] text-ink-muted leading-relaxed max-h-48 overflow-y-auto lumina-scroll">
+                <div className="px-3 pb-3 border-t border-[#2A2722] pt-2 serif prose-editorial text-[12px] text-[#9C9489] leading-relaxed max-h-48 overflow-y-auto lumina-scroll">
                   {ins.content}
                   {ins.highlights?.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">

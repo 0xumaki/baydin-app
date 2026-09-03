@@ -125,8 +125,8 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
     return (
       <div className="h-full flex items-center justify-center px-6 text-center">
         <div>
-          <Waves className="w-10 h-10 text-ink-muted mx-auto mb-3" />
-          <div className="text-[16px] text-ink mb-1">Sign in to tune in</div>
+          <Waves className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to tune in</div>
           <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
         </div>
       </div>
@@ -158,9 +158,9 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                       strokeDasharray={`${(progress / 100) * 440} 440`} style={{ transition: "stroke-dasharray 1s linear" }} />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-ink-muted">{selected.name}</div>
-                    <div className="text-[32px] font-light" style={{ color: selected.color }}>{selected.hz}<span className="text-[14px] text-ink-muted ml-0.5">Hz</span></div>
-                    {playing && <div className="text-[11px] text-ink-muted mt-0.5">{mins}:{secs.toString().padStart(2, "0")} / {totalMins}:00</div>}
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-[#9C9489]">{selected.name}</div>
+                    <div className="text-[32px] font-light" style={{ color: selected.color }}>{selected.hz}<span className="text-[14px] text-[#9C9489] ml-0.5">Hz</span></div>
+                    {playing && <div className="text-[11px] text-[#9C9489] mt-0.5">{mins}:{secs.toString().padStart(2, "0")} / {totalMins}:00</div>}
                   </div>
                   {playing && (
                     <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: `0 0 40px ${selected.color}40`, animation: "lum-pulse-ring 2s ease-out infinite" }} />
@@ -168,7 +168,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                 </div>
                 {/* Controls */}
                 <div className="flex items-center gap-3 mb-3">
-                  <button onClick={toggleMute} className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-ink-muted hover:text-ink transition">
+                  <button onClick={toggleMute} className="w-9 h-9 rounded-full border border-[#2A2722] flex items-center justify-center text-[#9C9489] hover:text-[#E8E2D5] transition">
                     {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                   </button>
                   <button
@@ -183,20 +183,20 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                 {/* Mode selector */}
                 <div className="flex items-center gap-1">
                   {(["pure", "binaural", "pad"] as const).map((m) => (
-                    <button key={m} onClick={() => { if (playing) stopTone(false); setMode(m); }} className={cn("px-2.5 py-1 rounded-full text-[10px] border transition", mode === m ? "border-gold/30 bg-gold/10 text-gold" : "border-white/10 text-ink-muted hover:text-ink")}>
+                    <button key={m} onClick={() => { if (playing) stopTone(false); setMode(m); }} className={cn("px-2.5 py-1 rounded-full text-[10px] border transition", mode === m ? "border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572]" : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5]")}>
                       {m === "pure" ? "Pure Tone" : m === "binaural" ? "Binaural" : "Ambient Pad"}
                     </button>
                   ))}
                 </div>
                 {/* Headphone hint for binaural */}
                 {mode === "binaural" && (
-                  <div className="text-[10px] text-ink-muted mt-1.5">🎧 Use headphones for the binaural effect</div>
+                  <div className="text-[10px] text-[#9C9489] mt-1.5">🎧 Use headphones for the binaural effect</div>
                 )}
                 {/* Ambient bed selector */}
                 <div className="flex items-center gap-1 mt-2">
-                  <span className="text-[9px] text-ink-muted mr-1">Ambient:</span>
+                  <span className="text-[9px] text-[#9C9489] mr-1">Ambient:</span>
                   {(["none", "rain", "ocean", "wind", "stream", "river"] as const).map((a) => (
-                    <button key={a} onClick={() => { if (playing) stopTone(false); setAmbient(a); }} className={cn("px-2 py-0.5 rounded-full text-[9px] transition", ambient === a ? "text-gold" : "text-ink-muted hover:text-ink")}>
+                    <button key={a} onClick={() => { if (playing) stopTone(false); setAmbient(a); }} className={cn("px-2 py-0.5 rounded-full text-[9px] transition", ambient === a ? "text-[#C5A572]" : "text-[#9C9489] hover:text-[#E8E2D5]")}>
                       {a === "none" ? "Off" : a}
                     </button>
                   ))}
@@ -204,7 +204,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                 {/* Duration */}
                 <div className="flex items-center gap-1 mt-2">
                   {[120, 300, 600, 900].map((d) => (
-                    <button key={d} onClick={() => setDuration(d)} className={cn("px-2 py-0.5 rounded-full text-[10px] transition", duration === d ? "text-gold" : "text-ink-muted hover:text-ink")}>
+                    <button key={d} onClick={() => setDuration(d)} className={cn("px-2 py-0.5 rounded-full text-[10px] transition", duration === d ? "text-[#C5A572]" : "text-[#9C9489] hover:text-[#E8E2D5]")}>
                       {d < 60 ? `${d}s` : `${d / 60}m`}
                     </button>
                   ))}
@@ -218,21 +218,21 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
 
           {/* Frequency grid */}
           <div>
-            <div className="text-[11px] uppercase tracking-[0.2em] text-ink-muted mb-3">Choose your intention</div>
+            <div className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-3">Choose your intention</div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {FREQUENCIES.map((f) => (
                 <button
                   key={f.id}
                   onClick={() => { if (playing) stopTone(false); setSelected(f); }}
-                  className={cn("text-left p-3 rounded-sm border transition group", selected.id === f.id ? "border-gold/30 bg-gold/[0.06]" : "border-white/8 bg-white/[0.02] hover:border-white/15")}
+                  className={cn("text-left p-3 rounded-sm border transition group", selected.id === f.id ? "border-[#C5A572]/30 bg-[#C5A572]/[0.06]" : "border-[#2A2722] bg-white/[0.02] hover:border-white/15")}
                   style={selected.id === f.id ? { borderColor: `${f.color}50`, background: `${f.color}10` } : {}}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <div className="w-2 h-2 rounded-full" style={{ background: f.color }} />
-                    <span className="text-[10px] text-ink-muted">{f.hz}Hz</span>
+                    <span className="text-[10px] text-[#9C9489]">{f.hz}Hz</span>
                   </div>
-                  <div className="text-[12px] text-ink font-medium leading-tight">{f.name}</div>
-                  <div className="text-[10px] text-ink-muted leading-tight">{f.description}</div>
+                  <div className="text-[12px] text-[#E8E2D5] font-medium leading-tight">{f.name}</div>
+                  <div className="text-[10px] text-[#9C9489] leading-tight">{f.description}</div>
                 </button>
               ))}
             </div>
@@ -273,13 +273,13 @@ function BreathingPacer({ active, color }: { active: boolean; color: string }) {
       </div>
       <div className="flex-1">
         <div className="flex items-center gap-1.5 mb-1">
-          <Wind className="w-3.5 h-3.5 text-gold" />
-          <span className="text-[12px] text-ink">Box Breathing</span>
+          <Wind className="w-3.5 h-3.5 text-[#C5A572]" />
+          <span className="text-[12px] text-[#E8E2D5]">Box Breathing</span>
         </div>
         {active ? (
           <div className="text-[13px] capitalize" style={{ color }}>{phase} · {count}</div>
         ) : (
-          <div className="text-[11px] text-ink-muted">Start a session to activate the pacer (4-4-4-4)</div>
+          <div className="text-[11px] text-[#9C9489]">Start a session to activate the pacer (4-4-4-4)</div>
         )}
       </div>
     </GlassCard>

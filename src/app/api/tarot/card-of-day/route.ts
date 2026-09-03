@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { drawCards, type DrawnCardWithMeta } from "@/lib/tarot";
+import { TAROT_DECK } from "@/lib/tarot-data";
 import { interpretReading } from "@/lib/ai-tarot";
 import { creditLuck } from "@/lib/luck";
 
@@ -28,17 +29,24 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
   if (existing) {
+    // Parse cardsJson and attach full card data
+    let cardsData: any[] = [];
+    try { cardsData = JSON.parse(existing.cardsJson); } catch {}
+    const cardsWithMeta = cardsData.map((c) => {
+      const fullCard = TAROT_DECK.find((t) => t.id === c.id);
+      return { ...c, card: fullCard || c };
+    });
     return NextResponse.json({
       reading: {
         id: existing.id, question: existing.question, spreadType: existing.spreadType,
         interpretation: existing.interpretation,
         cardsJson: existing.cardsJson,
+        cards: cardsWithMeta,
         reflection: existing.reflection,
       },
     });
   }
   // Generate today's card deterministically
-  const { TAROT_DECK } = await import("@/lib/tarot-data");
   const hash = hashStr(user.id + today);
   const cardIdx = hash % TAROT_DECK.length;
   const reversed = (hash >> 8) % 100 < 38;
@@ -54,7 +62,7 @@ export async function GET() {
       interpretation,
     },
   });
-  return NextResponse.json({ reading: { id: reading.id, interpretation, cardsJson: reading.cardsJson, question: reading.question, spreadType: "card-of-day", reflection: null } });
+  return NextResponse.json({ reading: { id: reading.id, interpretation, cardsJson: reading.cardsJson, cards: [{ id: card.id, reversed, position: "Card of the Day", card }], question: reading.question, spreadType: "card-of-day", reflection: null } });
 }
 
 /** PATCH — save/update the user's reflection note on today's card-of-day. Awards +1 Luck. */
