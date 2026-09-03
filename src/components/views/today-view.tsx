@@ -49,6 +49,12 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [rahuKaal, setRahuKaal] = React.useState<any>(null);
   const [choghadiya, setChoghadiya] = React.useState<any>(null);
   const [nadi, setNadi] = React.useState<any>(null);
+  const [dashaEffects, setDashaEffects] = React.useState<any>(null);
+  const [grahaBala, setGrahaBala] = React.useState<any>(null);
+  const [avastha, setAvastha] = React.useState<any>(null);
+  const [panchaMahapurusha, setPanchaMahapurusha] = React.useState<any>(null);
+  const [gocharPhala, setGocharPhala] = React.useState<any>(null);
+  const [remedyTiming, setRemedyTiming] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -109,6 +115,18 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/choghadiya").then((r) => r.json()).then((d) => { setChoghadiya(d.choghadiya); }).catch(() => {});
     // Load nadi
     fetch("/api/nadi").then((r) => r.json()).then((d) => { setNadi(d.nadi); }).catch(() => {});
+    // Load dasha effects
+    fetch("/api/dasha-effects").then((r) => r.json()).then((d) => { setDashaEffects(d.dashaEffects); }).catch(() => {});
+    // Load graha bala
+    fetch("/api/graha-bala").then((r) => r.json()).then((d) => { setGrahaBala(d.grahaBala); }).catch(() => {});
+    // Load avastha
+    fetch("/api/avastha").then((r) => r.json()).then((d) => { setAvastha(d.avastha); }).catch(() => {});
+    // Load pancha mahapurusha
+    fetch("/api/pancha-mahapurusha").then((r) => r.json()).then((d) => { setPanchaMahapurusha(d.yogas); }).catch(() => {});
+    // Load gochar phala
+    fetch("/api/gochar-phala").then((r) => r.json()).then((d) => { setGocharPhala(d.gocharPhala); }).catch(() => {});
+    // Load remedy timing
+    fetch("/api/remedy-timing").then((r) => r.json()).then((d) => { setRemedyTiming(d.timing); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -600,6 +618,119 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 <div className="text-[10px] text-ink-muted mb-2"><span className="text-gold">Spiritual:</span> {nadi.spiritual}</div>
                 <div className="text-[10px] text-ink-muted mb-1"><span className="text-gold">Marriage:</span> {nadi.incompatible}</div>
                 <div className="text-[10px] text-ink-muted"><span className="text-gold">Remedies:</span> {nadi.remedies[0]}</div>
+              </GlassCard>
+            )}
+
+            {/* Dasha effects */}
+            {dashaEffects?.current && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Dasha Effects</span>
+                  </div>
+                  <span className={cn("text-[10px] px-2 py-0.5 rounded-full", dashaEffects.current.placementEffect === "beneficial" ? "bg-leaf/15 text-leaf" : dashaEffects.current.placementEffect === "challenging" ? "bg-destructive/15 text-destructive" : "bg-gold/15 text-gold")}>
+                    {dashaEffects.current.mahadasha}
+                  </span>
+                </div>
+                <div className="text-[12px] text-ink mb-1">{dashaEffects.current.general}</div>
+                <div className="text-[10px] text-ink-muted mb-2">{dashaEffects.current.natalPlacement}</div>
+                <div className="text-[10px] text-leaf mb-1">✓ {dashaEffects.current.beneficial}</div>
+                <div className="text-[10px] text-destructive/70 mb-2">⚠ {dashaEffects.current.challenging}</div>
+                <div className="text-[10px] text-gold">Remedy: {dashaEffects.current.remedies[0]}</div>
+              </GlassCard>
+            )}
+
+            {/* Graha Bala (planetary power ranking) */}
+            {grahaBala?.planets?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-4 h-4 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Graha Bala — Power Ranking</span>
+                </div>
+                <div className="space-y-1">
+                  {grahaBala.planets.slice(0, 5).map((p: any, i: number) => (
+                    <div key={i} className="flex items-center gap-2 text-[11px]">
+                      <span className="text-gold w-4">{i + 1}.</span>
+                      <span className="text-base w-5 text-center">{p.symbol}</span>
+                      <span className="text-ink w-16">{p.planet}</span>
+                      <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${p.power}%`, background: p.color }} />
+                      </div>
+                      <span className={cn("text-[9px] w-12 text-right", p.rating === "dominant" ? "text-leaf" : p.rating === "strong" ? "text-gold" : p.rating === "weak" ? "text-destructive/70" : "text-ink-muted")}>{p.power}</span>
+                    </div>
+                  ))}
+                </div>
+                {grahaBala.dominant && (
+                  <div className="text-[10px] text-ink-muted mt-2">{grahaBala.dominant.summary}</div>
+                )}
+              </GlassCard>
+            )}
+
+            {/* Pancha Mahapurusha Yoga */}
+            {panchaMahapurusha?.formedCount > 0 && (
+              <GlassCard className="p-5 relative overflow-hidden">
+                <div className="lum-glow-gold absolute inset-0 opacity-30" />
+                <div className="relative">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Star className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-gold">Pancha Mahapurusha Yoga</span>
+                  </div>
+                  {panchaMahapurusha.formed.map((y: any, i: number) => (
+                    <div key={i} className="mb-2 p-2 rounded-lg bg-gold/[0.04] border border-gold/10">
+                      <div className="text-[12px] text-gold font-medium">{y.yoga} ({y.sanskrit})</div>
+                      <div className="text-[10px] text-ink-muted">{y.qualities}</div>
+                      <div className="text-[9px] text-ink-muted/60">{y.effects}</div>
+                    </div>
+                  ))}
+                  <div className="text-[10px] text-gold/70">Exceptionally rare and auspicious!</div>
+                </div>
+              </GlassCard>
+            )}
+
+            {/* Gochar Phala (transit effects) */}
+            {gocharPhala?.majorTransits?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Sun className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Gochar Phala — Transit Effects</span>
+                  </div>
+                  <span className="text-[10px] text-ink-muted">{gocharPhala.beneficialCount} beneficial · {gocharPhala.challengingCount} challenging</span>
+                </div>
+                <div className="space-y-1.5">
+                  {gocharPhala.majorTransits.map((t: any, i: number) => (
+                    <div key={i} className="p-2 rounded-lg bg-white/[0.02]">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-[11px] text-gold font-medium">{t.planet}</span>
+                        <span className="text-[9px] text-ink-muted">{t.duration}</span>
+                      </div>
+                      <div className="text-[10px] text-ink-muted">{t.sign} · {t.houseFromMoon}{ordinalSuffix(t.houseFromMoon)} from Moon</div>
+                      <div className="text-[9px] text-ink-muted/70 mt-0.5">{t.houseEffect}</div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
+            {/* Remedy timing */}
+            {remedyTiming?.recommendations?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-4 h-4 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Remedy Timing</span>
+                </div>
+                <div className="space-y-1">
+                  {remedyTiming.recommendations.slice(0, 5).map((r: any, i: number) => (
+                    <div key={i} className={cn("flex items-start gap-2 p-1.5 rounded-lg", r.priority === "high" ? "bg-gold/[0.04]" : "bg-white/[0.02]")}>
+                      <span className={cn("text-[8px] px-1 py-0.5 rounded-full shrink-0", r.priority === "high" ? "bg-gold/15 text-gold" : "bg-white/5 text-ink-muted")}>{r.priority}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[10px] text-ink">{r.remedy}</div>
+                        <div className="text-[9px] text-ink-muted">⏰ {r.bestHour}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </GlassCard>
             )}
 
@@ -1163,4 +1294,10 @@ function WeeklyStat({ label, value, color }: { label: string; value: number; col
       <div className="text-[9px] text-ink-muted mt-0.5">{label}</div>
     </div>
   );
+}
+
+function ordinalSuffix(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return s[(v - 20) % 10] || s[v] || s[0];
 }
