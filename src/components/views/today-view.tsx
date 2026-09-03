@@ -176,13 +176,13 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
       <div className="max-w-4xl mx-auto px-4 py-6 lg:py-8">
         {/* Hero greeting */}
         <div className="mb-6 lum-anim-float-up">
-          <div className="flex items-center gap-2 text-[11px] text-gold uppercase tracking-[0.2em] mb-1">
+          <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-gold uppercase tracking-[0.2em] mb-1">
             <Calendar className="w-3 h-3" /> {dateStr}
           </div>
-          <h1 className="text-[28px] font-light tracking-tight text-ink mb-1">
+          <h1 className="text-[22px] sm:text-[28px] font-light tracking-tight text-ink mb-1">
             {greeting()}, {user.name?.split(" ")[0] || user.email.split("@")[0]} <span className="lum-text-gold">✦</span>
           </h1>
-          <p className="text-[13px] text-ink-muted">
+          <p className="text-[12px] sm:text-[13px] text-ink-muted">
             {user.streak > 0 ? `${user.streak}-day streak — keep it alive ✦` : "Begin your daily practice — claim your free Luck below."}
           </p>
         </div>

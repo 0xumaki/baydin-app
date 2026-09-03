@@ -264,7 +264,7 @@ function Sidebar(props: {
                       key={item.view}
                       onClick={() => props.onNav(item)}
                       className={cn(
-                        "group w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] transition-all border",
+                        "group w-full flex items-center gap-3 px-3 py-2.5 min-h-[40px] rounded-xl text-[13px] transition-all border",
                         props.currentView === item.view
                           ? "bg-gold-soft text-gold border-gold/20 shadow-[inset_0_0_0_1px_rgba(197,168,124,0.08)]"
                           : "text-ink-muted hover:text-ink hover:bg-white/[0.03] border-transparent"

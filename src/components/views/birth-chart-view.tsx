@@ -94,12 +94,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
         </GlassCard>
         <GlassCard className="p-5">
           <div className="text-[12px] text-ink-muted mb-3">The Seven Houses</div>
-          <div className="grid grid-cols-7 gap-1.5">
+          <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
             {m.houses.map((h: any) => (
-              <div key={h.house} className="text-center p-2 rounded-lg bg-white/[0.02] border border-white/5">
-                <div className="text-[9px] text-ink-muted">{h.houseName}</div>
-                <div className="text-lg my-1">{PLANET_SYMBOLS[h.planet] ?? "?"}</div>
-                <div className="text-[9px] text-gold">{h.planet}</div>
+              <div key={h.house} className="text-center p-1 sm:p-2 rounded-lg bg-white/[0.02] border border-white/5">
+                <div className="text-[8px] sm:text-[9px] text-ink-muted">{h.houseName}</div>
+                <div className="text-sm sm:text-lg my-1">{PLANET_SYMBOLS[h.planet] ?? "?"}</div>
+                <div className="text-[8px] sm:text-[9px] text-gold">{h.planet}</div>
               </div>
             ))}
           </div>
@@ -129,14 +129,14 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
         <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2"><Star className="w-3.5 h-3.5 text-gold" /> Planetary Positions</div>
         <div className="space-y-1.5">
           {planets.map((p: any) => (
-            <div key={p.name} className="flex items-center gap-3 text-[13px] py-1.5 border-b border-white/5 last:border-0">
-              <span className="w-6 text-center text-gold text-base">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
-              <span className="w-20 text-ink">{p.name}</span>
-              <span className="w-6 text-center">{ZODIAC_SYMBOLS[p.signIndex]}</span>
-              <span className="flex-1 text-ink-muted text-[12px]">{p.sign}{p.signMy ? ` · ${p.signMy}` : ""} · {p.degree.toFixed(2)}°</span>
-              <span className="w-8 text-center text-[10px] text-ink-muted">H{p.house}</span>
+            <div key={p.name} className="flex items-center gap-2 sm:gap-3 text-[12px] sm:text-[13px] py-1.5 border-b border-white/5 last:border-0">
+              <span className="w-5 sm:w-6 text-center text-gold text-sm sm:text-base">{PLANET_SYMBOLS[p.name] ?? "•"}</span>
+              <span className="w-16 sm:w-20 text-ink">{p.name}</span>
+              <span className="w-5 sm:w-6 text-center">{ZODIAC_SYMBOLS[p.signIndex]}</span>
+              <span className="flex-1 text-ink-muted text-[10px] sm:text-[12px] truncate">{p.sign}<span className="hidden sm:inline">{p.signMy ? ` · ${p.signMy}` : ""}</span> · {p.degree.toFixed(1)}°</span>
+              <span className="w-7 sm:w-8 text-center text-[9px] sm:text-[10px] text-ink-muted">H{p.house}</span>
               {p.retrograde && <span className="text-[9px] text-amber-400">℞</span>}
-              {p.dignity && p.dignity !== "neutral" && <Pill variant={p.dignity === "exalted" ? "gold" : "leaf"} className="text-[9px]">{p.dignity}</Pill>}
+              {p.dignity && p.dignity !== "neutral" && <Pill variant={p.dignity === "exalted" ? "gold" : "leaf"} className="text-[8px] sm:text-[9px]">{p.dignity}</Pill>}
             </div>
           ))}
         </div>
