@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useMe, api } from "@/lib/api-client";
 import { TarotCardFace, TarotCardBack } from "@/components/tarot-card-face";
+import { CardDetailModal } from "@/components/card-detail-modal";
 import { Sparkles, Shuffle, Star, Share2, Save, BookOpen, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
@@ -33,6 +34,9 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
   const [loading, setLoading] = React.useState(false);
   const [revealed, setRevealed] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
+  const [detailCard, setDetailCard] = React.useState<any>(null);
+  const [detailReversed, setDetailReversed] = React.useState(false);
+  const [detailOpen, setDetailOpen] = React.useState(false);
 
   async function draw() {
     if (!user) { onAuth(); return; }
@@ -173,11 +177,20 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                       <div className="text-[11px] text-[#6B6358] mb-2 font-medium">{c.position}</div>
                     )}
                     {revealed ? (
-                      <TarotCardFace
-                        card={c.card}
-                        reversed={c.reversed}
-                        size="md"
-                      />
+                      <button
+                        onClick={() => {
+                          setDetailCard(c.card);
+                          setDetailReversed(c.reversed);
+                          setDetailOpen(true);
+                        }}
+                        className="cursor-pointer focus-ring rounded-sm"
+                      >
+                        <TarotCardFace
+                          card={c.card}
+                          reversed={c.reversed}
+                          size="md"
+                        />
+                      </button>
                     ) : (
                       <TarotCardBack size="md" />
                     )}
@@ -253,6 +266,14 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
           </div>
         )}
       </div>
+
+      {/* Card detail modal */}
+      <CardDetailModal
+        card={detailCard}
+        reversed={detailReversed}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+      />
     </div>
   );
 }

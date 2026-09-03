@@ -433,12 +433,25 @@ export type PlanetPosition = {
   retrograde: boolean;
   dignity?: string;
   house: number;
+  speed?: number; // degrees/day (for applying/separating aspect detection)
+};
+
+export type Aspect = {
+  planet1: string;
+  planet2: string;
+  aspect: "conjunction" | "opposition" | "trine" | "square" | "sextile" | "quincunx";
+  angle: number; // 0, 60, 90, 120, 150, 180
+  orb: number; // actual deviation from exact angle
+  applying: boolean; // true if aspect is tightening
+  symbol: string; // ☌ ☍ △ □ ⚹ ⚻
+  color: string; // for UI styling
 };
 
 export type NatalChart = {
   mode: AstrologyMode;
   ascendant: PlanetPosition;
   planets: PlanetPosition[];
+  aspects?: Aspect[];
   ayanamsa: number;
   nakshatra: string;
   nakshatraPada: number;
@@ -454,6 +467,47 @@ export type NatalChart = {
     calculation_version: string;
   };
 };
+
+/** Compute aspects between all planet pairs. */
+export function computeAspects(planets: PlanetPosition[]): Aspect[] {
+  const ASPECT_DEFS: { angle: number; name: Aspect["aspect"]; symbol: string; color: string; orb: number }[] = [
+    { angle: 0, name: "conjunction", symbol: "☌", color: "#C5A87C", orb: 8 },
+    { angle: 60, name: "sextile", symbol: "⚹", color: "#7A8B6F", orb: 6 },
+    { angle: 90, name: "square", symbol: "□", color: "#B8553F", orb: 8 },
+    { angle: 120, name: "trine", symbol: "△", color: "#8FA37E", orb: 8 },
+    { angle: 150, name: "quincunx", symbol: "⚻", color: "#9CA8A3", orb: 3 },
+    { angle: 180, name: "opposition", symbol: "☍", color: "#C26B5C", orb: 8 },
+  ];
+  const results: Aspect[] = [];
+  for (let i = 0; i < planets.length; i++) {
+    for (let j = i + 1; j < planets.length; j++) {
+      const p1 = planets[i];
+      const p2 = planets[j];
+      const diff = Math.abs(rev(p1.longitude - p2.longitude));
+      const complement = 360 - diff;
+      const closer = Math.min(diff, complement);
+      for (const def of ASPECT_DEFS) {
+        const orb = Math.abs(closer - def.angle);
+        if (orb <= def.orb) {
+          const applying = (diff < def.angle && p1.speed > p2.speed) ||
+                           (diff > def.angle && p1.speed < p2.speed);
+          results.push({
+            planet1: p1.name,
+            planet2: p2.name,
+            aspect: def.name,
+            angle: def.angle,
+            orb: Math.round(orb * 100) / 100,
+            applying,
+            symbol: def.symbol,
+            color: def.color,
+          });
+          break; // one aspect per pair (nearest)
+        }
+      }
+    }
+  }
+  return results;
+}
 
 /** Compose ISO birth datetime with offset from IANA tz. (v2 — padded offset) */
 export function buildBirthDatetime(ctx: BirthContext): string {
@@ -535,7 +589,7 @@ export function computeNatalChart(ctx: BirthContext, mode: AstrologyMode = "vedi
   // Houses (whole sign): 1st house = ascendant sign
   const ascSign = signOf(ascSid);
 
-  const makePlanet = (name: string, lon: number, retro: boolean): PlanetPosition => {
+  const makePlanet = (name: string, lon: number, retro: boolean, speed = 0): PlanetPosition => {
     const sid = sidereal(lon);
     const signIdx = signOf(sid);
     const house = ((signIdx - ascSign + 12) % 12) + 1;
@@ -552,6 +606,7 @@ export function computeNatalChart(ctx: BirthContext, mode: AstrologyMode = "vedi
       retrograde: retro,
       dignity: mode === "vedic" ? dignityOf(name, sid) : undefined,
       house,
+      speed: retro ? -Math.abs(speed) : Math.abs(speed),
     };
   };
 
@@ -577,10 +632,14 @@ export function computeNatalChart(ctx: BirthContext, mode: AstrologyMode = "vedi
     return { number: i + 1, sign: ZODIAC_SIGNS[idx], signIndex: idx };
   });
 
+  // Compute aspects between all planets
+  const aspects = computeAspects(planets);
+
   return {
     mode,
     ascendant: makePlanet("Ascendant", ascTrop, false),
     planets,
+    aspects,
     ayanamsa: +ayanamsa.toFixed(4),
     nakshatra: moonNak.name,
     nakshatraPada: moonNak.pada,

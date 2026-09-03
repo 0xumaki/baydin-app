@@ -162,12 +162,28 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
               return (
                 <div
                   key={a.id}
-                  className={cn("flex flex-col items-center gap-1 p-2 rounded-lg border text-center transition", unlocked ? "border-white/10 bg-white/[0.03]" : "border-white/5 bg-white/[0.01] opacity-40")}
+                  className={cn(
+                    "flex flex-col items-center gap-1 p-2 text-center transition",
+                    unlocked
+                      ? "opacity-100"
+                      : "opacity-30"
+                  )}
                   title={`${a.name} — ${a.description}`}
                 >
-                  <div className="text-xl" style={{ filter: unlocked ? "none" : "grayscale(1)" }}>{a.icon}</div>
+                  <img
+                    src={`/badges/${a.badge || "star-bearer"}.svg`}
+                    alt={a.name}
+                    className="w-10 h-10"
+                    style={{ filter: unlocked ? `drop-shadow(0 0 6px ${color}40)` : "grayscale(1)" }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                      const fallback = document.createElement("span");
+                      fallback.textContent = a.icon;
+                      fallback.style.fontSize = "20px";
+                      (e.target as HTMLImageElement).parentElement?.appendChild(fallback);
+                    }}
+                  />
                   <div className="text-[8px] text-ink-muted leading-tight">{a.name}</div>
-                  {!unlocked && <Lock className="w-2.5 h-2.5 text-ink-muted/50" />}
                 </div>
               );
             })}

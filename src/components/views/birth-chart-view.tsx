@@ -7,6 +7,7 @@ import { Star, Wallet, Sparkles, MapPin, Sun } from "lucide-react";
 import { toast } from "sonner";
 import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn, computeShodasamsa, computeVimsamsa, computeChaturvimsamsa, computeTrimsamsa, computeKhavedamsa, computeAkshavedamsa, computeShashtiamsa, computeAshtakavarga, computeShadbala } from "@/lib/astrology";
 import { useQuery } from "@tanstack/react-query";
+import { SouthIndianChart } from "@/components/south-indian-chart";
 
 const PLANET_SYMBOLS: Record<string, string> = {
   Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
@@ -115,14 +116,22 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
 
   return (
     <div className="space-y-4">
-      {/* Chart wheel (SVG) */}
-      <GlassCard className="p-5 flex flex-col items-center">
-        <ChartWheel chart={c} />
-        <div className="text-[11px] text-ink-muted mt-3 text-center">
-          Ascendant: {ZODIAC_SYMBOLS[asc.signIndex]} {asc.sign} ({asc.signMy}) · {asc.degree.toFixed(2)}°
-          {c.ayanamsa ? <> · Ayanamsa {c.ayanamsa}°</> : null}
-        </div>
-      </GlassCard>
+      {/* Chart wheel (SVG) + South Indian grid side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <GlassCard className="p-5 flex flex-col items-center">
+          <ChartWheel chart={c} />
+          <div className="text-[11px] text-ink-muted mt-3 text-center">
+            Ascendant: {ZODIAC_SYMBOLS[asc.signIndex]} {asc.sign} ({asc.signMy}) · {asc.degree.toFixed(2)}°
+            {c.ayanamsa ? <> · Ayanamsa {c.ayanamsa}°</> : null}
+          </div>
+        </GlassCard>
+        {mode === "vedic" && (
+          <GlassCard className="p-5 flex flex-col items-center">
+            <div className="text-[11px] text-ink-muted mb-2">South Indian Chart</div>
+            <SouthIndianChart planets={planets} ascendant={asc} className="w-full max-w-[280px]" />
+          </GlassCard>
+        )}
+      </div>
 
       {/* Planet table */}
       <GlassCard className="p-5">
@@ -141,6 +150,25 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
           ))}
         </div>
       </GlassCard>
+
+      {/* Planetary Aspects */}
+      {c.aspects && c.aspects.length > 0 && (
+        <GlassCard className="p-5">
+          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2"><Star className="w-3.5 h-3.5 text-gold" /> Planetary Aspects</div>
+          <div className="space-y-1">
+            {c.aspects.map((a: any, i: number) => (
+              <div key={i} className="flex items-center gap-2 text-[12px] py-1.5 border-b border-white/5 last:border-0">
+                <span className="w-6 text-center text-sm" style={{ color: a.color }}>{a.symbol}</span>
+                <span className="text-ink w-16">{a.planet1}</span>
+                <span className="text-[10px] text-ink-muted flex-1 text-center">{a.aspect}</span>
+                <span className="text-ink w-16 text-right">{a.planet2}</span>
+                <span className="text-[10px] text-ink-muted w-10 text-right">orb {a.orb.toFixed(1)}°</span>
+                {a.applying && <span className="text-[9px] text-leaf serif-italic">applying</span>}
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+      )}
 
       {/* Dasha + Nakshatra */}
       {mode === "vedic" && c.dasha && (
