@@ -55,6 +55,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [panchaMahapurusha, setPanchaMahapurusha] = React.useState<any>(null);
   const [gocharPhala, setGocharPhala] = React.useState<any>(null);
   const [remedyTiming, setRemedyTiming] = React.useState<any>(null);
+  const [arishta, setArishta] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -127,6 +128,8 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/gochar-phala").then((r) => r.json()).then((d) => { setGocharPhala(d.gocharPhala); }).catch(() => {});
     // Load remedy timing
     fetch("/api/remedy-timing").then((r) => r.json()).then((d) => { setRemedyTiming(d.timing); }).catch(() => {});
+    // Load arishta (afflictions)
+    fetch("/api/arishta").then((r) => r.json()).then((d) => { setArishta(d.arishta); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -728,6 +731,34 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                         <div className="text-[10px] text-ink">{r.remedy}</div>
                         <div className="text-[9px] text-ink-muted">⏰ {r.bestHour}</div>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
+            {/* Arishta (afflictions) */}
+            {arishta && arishta.total > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Arishta — Afflictions</span>
+                  </div>
+                  <span className={cn("text-[10px] px-2 py-0.5 rounded-full", arishta.overall === "minimal" ? "bg-leaf/15 text-leaf" : arishta.overall === "mild" ? "bg-gold/15 text-gold" : "bg-destructive/15 text-destructive")}>
+                    {arishta.overall}
+                  </span>
+                </div>
+                <div className="text-[10px] text-ink-muted mb-3">{arishta.summary}</div>
+                <div className="space-y-1.5">
+                  {arishta.afflictions.slice(0, 5).map((a: any, i: number) => (
+                    <div key={i} className="p-2 rounded-lg bg-white/[0.02]">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-[11px] text-ink font-medium">{a.name}</span>
+                        <span className={cn("text-[8px] px-1.5 py-0.5 rounded-full", a.severity === "high" ? "bg-destructive/15 text-destructive" : a.severity === "medium" ? "bg-gold/15 text-gold" : "bg-white/5 text-ink-muted")}>{a.severity}</span>
+                      </div>
+                      <div className="text-[9px] text-ink-muted">{a.description}</div>
+                      <div className="text-[9px] text-gold/70 mt-0.5">Remedy: {a.remedy}</div>
                     </div>
                   ))}
                 </div>
