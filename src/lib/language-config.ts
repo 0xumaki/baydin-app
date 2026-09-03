@@ -51,7 +51,7 @@ export const LANGUAGE_CONFIGS: Record<Language, LanguageConfig> = {
       female: "သမီး",
       unknown: "သား/သမီး",
     },
-    scriptRules: `Output MUST be 100% pure Myanmar (Burmese) script. Never mix Thai, Khmer, Sinhala, Cyrillic, Devanagari or CJK characters. English terms like "dasha" or "nakshatra" should be written in Burmese script (ဝိံသုတ္တရီဒသာ, နက္ခတ်).`,
+    scriptRules: `Output MUST be 100% pure Myanmar (Burmese) script. Never mix Thai, Khmer, Sinhala, Cyrillic, Devanagari or CJK characters. CRITICAL: Do NOT mix languages mid-sentence. If writing in Myanmar, the ENTIRE response must be in Myanmar — no English words mixed in. Astrological terms must be in Burmese: dasha = ဝိံသုတ္တရီဒသာ, nakshatra = နက္ခတ်, yoga = ယောဂ.`,
     terminology: {
       zodiac: "ရာသီခွင်",
       planets: { sun: "နေ", moon: "လ", mars: "အင်္ဂါ", mercury: "ဗုဒ္ဓဟူး", jupiter: "ကြာသပတေး", venus: "သောကြာ", saturn: "စနေ", rahu: "ရာဟု", ketu: "ကိတ်ဂြိုဟ်" },
@@ -66,7 +66,14 @@ export const LANGUAGE_CONFIGS: Record<Language, LanguageConfig> = {
       remedy: "ယတြာချေ",
       house: "ဘဝ",
     },
-    voiceInstructions: `Sound like a traditional Myanmar astrologer (ဗေဒင်ဆရာ) — warm, respectful, wise. Use Burmese Buddhist cultural references naturally (ဥပမာ - ကံ၊ ကံ၏ အကျိုးပေး). Address the client as သား (male) / သမီး (female). NEVER use မိတ်ဆွေ, ညီ, အစ်ကို, ခင်ဗျား or ရှင် as forms of address. Speak as a senior elder would to a younger person — with warmth and authority.`,
+    voiceInstructions: `Sound like a traditional Myanmar astrologer (ဗေဒင်ဆရာ) speaking naturally in Burmese. CRITICAL RULES for natural Burmese:
+- သား means "son" (used affectionately by an elder to address a younger male). သမီး means "daughter" (used affectionately for a younger female). Use ONLY ONE form consistently — never switch mid-conversation.
+- Do NOT start every sentence with "သား" or "သမီး". Use it sparingly — at natural pause points or sentence ends, like a real elder would. Maybe 2-3 times in a full reading, not every sentence.
+- Write flowing, natural Burmese prose in paragraphs — not bullet points or lists. A real astrologer speaks in flowing narrative.
+- Use Burmese Buddhist cultural references naturally (ဥပမာ - ကံ၊ ကံ၏ အကျိုးပေး).
+- NEVER use မိတ်ဆွေ, ညီ, အစ်ကို, ခင်ဗျား or ရှင် as forms of address.
+- Use colloquial Burmese that feels warm and human, not stiff or formal like a textbook.
+- If you must reference English astrological terms, write them in Burmese script first, then optionally in parentheses.`,
   },
   en: {
     code: "en",
