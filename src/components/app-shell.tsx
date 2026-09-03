@@ -18,6 +18,7 @@ import { RitualView } from "@/components/views/ritual-view";
 import { InsightsView } from "@/components/views/insights-view";
 import { LifeReportView } from "@/components/views/life-report-view";
 import { NumerologyView } from "@/components/views/numerology-view";
+import { LunarCalendarView } from "@/components/views/lunar-calendar-view";
 import { FrequencyView } from "@/components/views/frequency-view";
 import { PositivityView } from "@/components/views/positivity-view";
 import { CompatibilityView } from "@/components/views/compatibility-view";
@@ -34,7 +35,7 @@ import { PWARegister } from "@/components/pwa-register";
 import {
   Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
   Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
-  Waves, Heart, Users, Flame, BarChart3, Hash,
+  Waves, Heart, Users, Flame, BarChart3, Hash, Calendar,
 } from "lucide-react";
 
 const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group?: string }[] = [
@@ -43,6 +44,7 @@ const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean;
   { view: "tarot", label: "Tarot", icon: Sparkles, group: "Daily" },
   { view: "tarot-history", label: "Tarot History", icon: BookOpen, needsAuth: true, group: "Daily" },
   { view: "horoscope", label: "Horoscope", icon: Moon, needsAuth: true, group: "Daily" },
+  { view: "lunar-calendar", label: "Lunar Calendar", icon: Calendar, needsAuth: true, group: "Daily" },
   { view: "manifest", label: "Manifest", icon: Target, needsAuth: true, group: "Practice" },
   { view: "ritual", label: "Ritual", icon: Flame, needsAuth: true, group: "Practice" },
   { view: "frequency", label: "Frequencies", icon: Waves, needsAuth: true, group: "Practice" },
@@ -184,6 +186,7 @@ export function AppShell() {
                 {view === "tarot" && <TarotView onAuth={() => setAuthOpen(true)} />}
             {view === "tarot-history" && <TarotHistoryView onAuth={() => setAuthOpen(true)} />}
                 {view === "horoscope" && <HoroscopeView onAuth={() => setAuthOpen(true)} />}
+                {view === "lunar-calendar" && <LunarCalendarView onAuth={() => setAuthOpen(true)} />}
                 {view === "manifest" && <ManifestView onAuth={() => setAuthOpen(true)} />}
                 {view === "ritual" && <RitualView onAuth={() => setAuthOpen(true)} />}
                 {view === "frequency" && <FrequencyView onAuth={() => setAuthOpen(true)} />}

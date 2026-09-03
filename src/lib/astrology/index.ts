@@ -345,7 +345,7 @@ function birthJdToTime(jd: number): number {
 }
 
 // ---------- Panchanga (simplified) ----------
-const TITHI_NAMES = [
+export const TITHI_NAMES = [
   "Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashthi",
   "Saptami", "Ashtami", "Navami", "Dashami", "Ekadashi", "Dwadashi",
   "Trayodashi", "Chaturdashi", "Purnima",
@@ -353,7 +353,20 @@ const TITHI_NAMES = [
 const YOGA_NAMES_COUNT = 27;
 const KARANAS_COUNT = 11;
 
-function panchanga(jd: number) {
+export const YOGA_NAMES = [
+  "Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda",
+  "Sukarma", "Dhriti", "Shula", "Ganda", "Vriddhi", "Dhruva", "Vyaghata",
+  "Harshana", "Vajra", "Siddhi", "Vyatipata", "Variyana", "Parigha", "Shiva",
+  "Siddha", "Sadhya", "Shubha", "Shukla", "Brahma", "Indra", "Vaidhriti",
+];
+
+export const KARANA_NAMES = [
+  "Bava", "Balava", "Kaulava", "Taitila", "Garija", "Vanija", "Vishti",
+  "Shakuni", "Chatushpada", "Naga", "Kimstughna",
+];
+
+/** Exported panchanga for any Julian day. */
+export function panchanga(jd: number) {
   const d = daysSinceJ2000(jd);
   const sun = sunPosition(d).lon;
   const moon = moonPosition(d).lon;
@@ -369,10 +382,14 @@ function panchanga(jd: number) {
   return {
     tithi: tithiName,
     tithi_number: tithiIdx,
+    tithi_paksha: tithiIdx < 15 ? "Shukla" : "Krishna",
     nakshatra: nak.name,
+    nakshatra_index: nak.index,
     nakshatra_pada: nak.pada,
-    yoga: yogaIdx + 1,
-    karana: karanaIdx + 1,
+    yoga: YOGA_NAMES[yogaIdx] || `Yoga ${yogaIdx + 1}`,
+    yoga_index: yogaIdx + 1,
+    karana: KARANA_NAMES[karanaIdx] || `Karana ${karanaIdx + 1}`,
+    karana_index: karanaIdx + 1,
   };
 }
 

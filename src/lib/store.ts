@@ -15,6 +15,7 @@ export type AppView =
   | "tarot-history" // Past tarot readings with save/bookmark
   | "birth-chart"   // Natal chart tool
   | "horoscope"     // Daily/weekly horoscope
+  | "lunar-calendar" // Monthly moon phase + panchanga calendar
   | "manifest"     // Manifestation goals + confirmations (free, daily-use)
   | "ritual"        // 4-step daily ritual tracker (free, daily-use)
   | "frequency"    // Solfeggio tone sessions + breathing pacer (free, daily-use)
