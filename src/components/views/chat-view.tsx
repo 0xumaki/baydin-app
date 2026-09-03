@@ -320,11 +320,25 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
   const qc = useQueryClient();
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
+  const [searchResults, setSearchResults] = React.useState<any[] | null>(null);
   const [renameId, setRenameId] = React.useState<string | null>(null);
   const [renameText, setRenameText] = React.useState("");
   const active = conversations.find((c) => c.id === activeId);
-  const filtered = search ? conversations.filter((c) => c.title?.toLowerCase().includes(search.toLowerCase())) : conversations;
-  const sorted = [...filtered].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+  // Debounced server-side search (includes message content)
+  React.useEffect(() => {
+    if (!search.trim()) { setSearchResults(null); return; }
+    const t = setTimeout(async () => {
+      try {
+        const res = await api<{ conversations: any[] }>(`/api/conversations?q=${encodeURIComponent(search)}`);
+        setSearchResults(res.conversations);
+      } catch { setSearchResults(null); }
+    }, 300);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  const displayConversations = searchResults ?? conversations;
+  const sorted = [...displayConversations].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 
   async function togglePin(id: string, pinned: boolean, e: React.MouseEvent) {
     e.stopPropagation();
@@ -394,7 +408,7 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
             </div>
             <div className="overflow-y-auto lumina-scroll flex-1">
               {sorted.length === 0 ? (
-                <div className="px-2.5 py-3 text-[11px] text-ink-muted text-center">{search ? "No matches" : "No consultations yet"}</div>
+                <div className="px-2.5 py-3 text-[11px] text-ink-muted text-center">{search ? `No matches for "${search}"` : "No consultations yet"}</div>
               ) : (
                 sorted.map((c) => (
                   <div key={c.id} className="flex items-center gap-1 group">
