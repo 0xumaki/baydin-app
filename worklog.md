@@ -2076,3 +2076,79 @@ The preview gateway serves the app at https://preview-chat-*.space-z.ai but prox
 - FREE for journaling (create/list/edit/delete); 2 Luck for AI interpretation (admin bypass applies)
 - 84 API routes (was 83), 20 views (was 19), lint clean
 - Committed and pushed
+
+---
+Task ID: 58 (Insights Dashboard — analytics + visualization)
+Agent: Orchestrator (Z.ai Code)
+Task: Add an Insights Dashboard that aggregates all user activity into a single visual view
+
+## Completed Modifications
+
+### 1. Analytics aggregation engine — `src/lib/analytics.ts`
+- `buildAnalytics(userId)` runs 11 parallel DB queries across:
+  - DreamJournal, TarotReading, Conversation, Message, FrequencySession
+  - PositivitySession, MoodEntry, Goal, RitualLog, LuckTransaction, User
+- Returns a single AnalyticsPayload with:
+  - **totals**: dreams, tarotReadings, conversations, chatMessages, frequencySessions, positivitySessions, moodEntries, goals, ritualsCompleted, daysActive
+  - **luck**: balance, totalEarned, totalSpent, spentByFeature[], earnedByType[]
+  - **dreamsByMood**: { mood, count }[]
+  - **dreamsByMoonPhase**: { phase, emoji, count }[] (parsed from lunarContext JSON)
+  - **moodTrend**: last 30 days of mood entries
+  - **ritualStreak**: { current, longest, last7[] } (contiguous-day walk-back algorithm)
+  - **practiceActivity**: last 14 days × activity count (mood + ritual + frequency + positivity + tarot + dream)
+  - **topDreamSymbols**: top 8 symbols by frequency (parsed from symbols JSON)
+  - **tarotBySpread**: spreadType → count
+
+### 2. API route — `src/app/api/analytics/route.ts`
+- GET /api/analytics → returns full AnalyticsPayload. FREE feature.
+
+### 3. View — `src/components/views/analytics-dashboard-view.tsx`
+- **Header**: BarChart3 icon + "Insights Dashboard" + subtitle
+- **Empty state**: hero + "Start using Baydin's features..." CTA when no activity
+- **8 stat cards** (grid 2×4 on mobile, 4×2 on desktop): Dreams/Tarot/Chat/Days Active/Rituals/Frequencies/Affirmations/Goals — each with colored icon + large number
+- **Luck Economy card**: 3 LuckStat blocks (Balance/Total Earned/Total Spent) + horizontal bar chart for "Spent by Feature" (gradient gold bars with feature label + amount + count) + chips for "Earned by Source" (leaf-colored: purchase, daily_reward, referral_bonus, etc.)
+- **Two-column section**:
+  - **Ritual Streak card**: current vs longest number, 7-day dot row (✦ for completed, · for missed) with day-of-week labels
+  - **Practice Activity card**: 14-day heatmap grid (7 columns × 2 rows), gold intensity by activity count, "Less / More" gradient legend
+- **Dream Patterns section** (only if dreams > 0):
+  - **Dreams by Mood**: horizontal bars colored by mood (peaceful/vivid/nightmare/lucid/prophetic/neutral)
+  - **Dreams by Moon Phase**: horizontal bars with moon phase emoji + name
+- **Top Dream Symbols**: pill chips, #1 highlighted in gold
+- **Tarot Spreads Used**: grid of small cards with spread name + count
+- **Mood Trend**: SVG line chart (last 30 days) with gradient area fill, grid lines 1-5, gold points
+
+### 4. Navigation wiring
+- Added `analytics` to AppView union
+- Added to NAV_ITEMS in "Account" group with LineChart icon
+- Wired view render in app-shell.tsx
+- Added to PWA deep-link VALID_VIEWS list
+
+## Verification Results
+
+### API test (curl with admin cookie)
+- GET /api/analytics → 200, returned:
+  - totals: { dreams:1, tarotReadings:1, conversations:1, chatMessages:1, daysActive:1, ... }
+  - luck balance: 99999, totalEarned: 99999, totalSpent: 0
+  - dreamsByMood: [{mood:"prophetic", count:1}]
+  - dreamsByMoonPhase: [{phase:"Waning Crescent", emoji:"🌘", count:1}]
+  - topDreamSymbols: [snake, water, flower, moon] each ×1
+  - ritualStreak: {current:0, longest:0, last7:[7 days]}
+  - practiceActivity: 13 zeros + 2 (today's activity)
+
+### Browser test (agent-browser as admin)
+- Opened /?view=analytics → renders all sections:
+  - 8 stat cards with correct counts (Dreams:1, Tarot:1, Chat:1, Days Active:1)
+  - Luck Economy: Balance 99999 / Earned 99999 / Spent 0
+  - Ritual Streak: 0 current / 0 longest + 7-day dots (F S S M T W T)
+  - Practice Activity 14-day heatmap with day numbers 21-3
+  - Dreams by Mood: ⭐ Prophetic ×1
+  - Dreams by Moon Phase: 🌘 Waning Crescent ×1
+  - Top Dream Symbols: #snake #water #flower #moon (all ×1)
+  - Tarot Spreads Used: Card of Day ×1
+
+## Stage Summary
+- New feature: comprehensive Insights Dashboard aggregating all user activity into visualizations
+- FREE feature — encourages engagement by showing patterns users care about
+- 8 different chart types: stat cards, horizontal bars, dot grid, heatmap, pill chips, line chart, mini cards, Luck bars
+- Helps users see: which moon phase their dreams cluster on, their ritual streak progress, Luck spending breakdown, mood trends over time
+- 85 API routes (was 84), 21 views (was 20), lint clean

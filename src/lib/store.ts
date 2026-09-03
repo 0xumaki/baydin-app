@@ -27,6 +27,7 @@ export type AppView =
   | "numerology"    // Pythagorean + Chaldean name/date numerology
   | "luck-store"    // Buy Luck
   | "profile"       // Stats, achievements, lifetime totals
+  | "analytics"     // Insights dashboard — dreams/mood/Luck/practice analytics
   | "reseller"      // Reseller portal (whitelist-gated)
   | "admin";        // Admin panel (admin-gated)
 

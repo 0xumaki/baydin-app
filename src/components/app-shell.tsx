@@ -20,6 +20,7 @@ import { LifeReportView } from "@/components/views/life-report-view";
 import { NumerologyView } from "@/components/views/numerology-view";
 import { LunarCalendarView } from "@/components/views/lunar-calendar-view";
 import { DreamJournalView } from "@/components/views/dream-journal-view";
+import { AnalyticsDashboardView } from "@/components/views/analytics-dashboard-view";
 import { FrequencyView } from "@/components/views/frequency-view";
 import { PositivityView } from "@/components/views/positivity-view";
 import { CompatibilityView } from "@/components/views/compatibility-view";
@@ -36,7 +37,7 @@ import { PWARegister } from "@/components/pwa-register";
 import {
   Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
   Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
-  Waves, Heart, Users, Flame, BarChart3, Hash, Calendar, CloudMoon,
+  Waves, Heart, Users, Flame, BarChart3, Hash, Calendar, CloudMoon, LineChart,
 } from "lucide-react";
 
 const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group?: string }[] = [
@@ -58,6 +59,7 @@ const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean;
   { view: "life-report", label: "Life Report", icon: BookOpen, needsAuth: true, group: "Astrology" },
   { view: "luck-store", label: "Buy Luck", icon: Wallet, needsAuth: true, group: "Account" },
   { view: "profile", label: "Profile & Stats", icon: BarChart3, needsAuth: true, group: "Account" },
+  { view: "analytics", label: "Insights Dashboard", icon: LineChart, needsAuth: true, group: "Account" },
   { view: "reseller", label: "Reseller", icon: Store, resellerOnly: true, needsAuth: true, group: "Account" },
   { view: "admin", label: "Admin", icon: Shield, adminOnly: true, needsAuth: true, group: "Account" },
 ];
@@ -201,6 +203,7 @@ export function AppShell() {
                 {view === "numerology" && <NumerologyView onAuth={() => setAuthOpen(true)} />}
                 {view === "luck-store" && <LuckStoreView onAuth={() => setAuthOpen(true)} />}
             {view === "profile" && <ProfileView onAuth={() => setAuthOpen(true)} />}
+                {view === "analytics" && <AnalyticsDashboardView onAuth={() => setAuthOpen(true)} />}
                 {view === "reseller" && <ResellerView onAuth={() => setAuthOpen(true)} />}
                 {view === "admin" && <AdminView />}
               </motion.div>

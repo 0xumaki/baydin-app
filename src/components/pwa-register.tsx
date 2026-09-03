@@ -8,7 +8,7 @@ const VALID_VIEWS: AppView[] = [
   "lunar-calendar", "dream-journal",
   "manifest", "ritual", "frequency", "positivity", "insights",
   "compatibility", "life-report", "numerology", "luck-store",
-  "profile", "reseller", "admin",
+  "profile", "analytics", "reseller", "admin",
 ];
 
 /**
