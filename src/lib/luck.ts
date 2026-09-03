@@ -187,7 +187,8 @@ export type FeatureId =
   | "compatibility"
   | "mahabote"
   | "horoscope_personal"
-  | "tarot_premium";
+  | "tarot_premium"
+  | "numerology";
 
 export const FEATURE_COSTS: Record<FeatureId, number> = {
   astrologer_chat: 2, // per message — ~134-200 MMK (vs 30K-250K real life)
@@ -198,6 +199,7 @@ export const FEATURE_COSTS: Record<FeatureId, number> = {
   mahabote: 3, // Myanmar traditional reading
   horoscope_personal: 2, // personalized daily/weekly horoscope
   tarot_premium: 1, // premium tarot spreads (beyond 2 free/day)
+  numerology: 3, // full numerology report (life path + destiny + soul urge + ...)
 };
 
 /** Free daily limits for freebie features. */

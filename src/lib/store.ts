@@ -22,6 +22,7 @@ export type AppView =
   | "insights"      // Skill-based deep readings (yogas, transits, etc.)
   | "compatibility" // Partner matching (Ashtakoota + synastry)
   | "life-report"   // 7-section comprehensive report
+  | "numerology"    // Pythagorean + Chaldean name/date numerology
   | "luck-store"    // Buy Luck
   | "profile"       // Stats, achievements, lifetime totals
   | "reseller"      // Reseller portal (whitelist-gated)

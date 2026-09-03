@@ -6,7 +6,8 @@ import { useStore, type AppView } from "@/lib/store";
 const VALID_VIEWS: AppView[] = [
   "today", "chat", "tarot", "tarot-history", "birth-chart", "horoscope",
   "manifest", "ritual", "frequency", "positivity", "insights",
-  "compatibility", "life-report", "luck-store", "profile", "reseller", "admin",
+  "compatibility", "life-report", "numerology", "luck-store",
+  "profile", "reseller", "admin",
 ];
 
 /**

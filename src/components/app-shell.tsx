@@ -17,6 +17,7 @@ import { ManifestView } from "@/components/views/manifest-view";
 import { RitualView } from "@/components/views/ritual-view";
 import { InsightsView } from "@/components/views/insights-view";
 import { LifeReportView } from "@/components/views/life-report-view";
+import { NumerologyView } from "@/components/views/numerology-view";
 import { FrequencyView } from "@/components/views/frequency-view";
 import { PositivityView } from "@/components/views/positivity-view";
 import { CompatibilityView } from "@/components/views/compatibility-view";
@@ -33,7 +34,7 @@ import { PWARegister } from "@/components/pwa-register";
 import {
   Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
   Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
-  Waves, Heart, Users, Flame, BarChart3,
+  Waves, Heart, Users, Flame, BarChart3, Hash,
 } from "lucide-react";
 
 const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group?: string }[] = [
@@ -47,6 +48,7 @@ const NAV_ITEMS: { view: AppView; label: string; icon: any; needsAuth?: boolean;
   { view: "frequency", label: "Frequencies", icon: Waves, needsAuth: true, group: "Practice" },
   { view: "positivity", label: "Positivity", icon: Heart, needsAuth: true, group: "Practice" },
   { view: "birth-chart", label: "Birth Chart", icon: Star, needsAuth: true, group: "Astrology" },
+  { view: "numerology", label: "Numerology", icon: Hash, needsAuth: true, group: "Astrology" },
   { view: "insights", label: "Insights", icon: Compass, needsAuth: true, group: "Astrology" },
   { view: "compatibility", label: "Compatibility", icon: Users, needsAuth: true, group: "Astrology" },
   { view: "life-report", label: "Life Report", icon: BookOpen, needsAuth: true, group: "Astrology" },
@@ -177,6 +179,7 @@ export function AppShell() {
                 {view === "insights" && <InsightsView onAuth={() => setAuthOpen(true)} />}
                 {view === "compatibility" && <CompatibilityView onAuth={() => setAuthOpen(true)} />}
                 {view === "life-report" && <LifeReportView onAuth={() => setAuthOpen(true)} />}
+                {view === "numerology" && <NumerologyView onAuth={() => setAuthOpen(true)} />}
                 {view === "luck-store" && <LuckStoreView onAuth={() => setAuthOpen(true)} />}
             {view === "profile" && <ProfileView onAuth={() => setAuthOpen(true)} />}
                 {view === "reseller" && <ResellerView onAuth={() => setAuthOpen(true)} />}

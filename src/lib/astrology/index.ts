@@ -26,7 +26,7 @@ export type AstrologyMode = "vedic" | "western" | "mahabote";
 // ---------- math helpers ----------
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
-const rev = (x: number) => ((x % 360) + 360) % 360;
+export const rev = (x: number) => ((x % 360) + 360) % 360;
 const sind = (x: number) => Math.sin(x * D2R);
 const cosd = (x: number) => Math.cos(x * D2R);
 const tand = (x: number) => Math.tan(x * D2R);
@@ -68,14 +68,14 @@ function obliquity(jd: number): number {
 
 /** Lahiri ayanamsa (degrees) — precession from the sidereal zero point.
  *  Lahiri value at J2000 ≈ 23.85°, precessing ~50.3"/year. */
-function lahiriAyanamsa(jd: number): number {
+export function lahiriAyanamsa(jd: number): number {
   const t = T(jd);
   // 23.85° at J2000 + ~50.29"/yr precession
   return 23.85 + (50.29 / 3600) * t * 100;
 }
 
 // ---------- Sun (Schlyter) ----------
-function sunPosition(d: number) {
+export function sunPosition(d: number) {
   const w = 282.9404 + 4.70935e-5 * d;
   const e = 0.016709 - 1.151e-9 * d;
   const M = rev(356.047 + 0.9856002585 * d);
@@ -89,7 +89,7 @@ function sunPosition(d: number) {
 }
 
 // ---------- Moon (Schlyter, simplified ELP) ----------
-function moonPosition(d: number) {
+export function moonPosition(d: number) {
   const N = 125.1228 - 0.0529538083 * d;
   const i = 5.1454;
   const w = 318.0634 + 0.1643573223 * d;
@@ -221,7 +221,7 @@ function geocentricPlanet(name: string, d: number) {
 }
 
 // ---------- Mean lunar node (Rahu/Ketu) ----------
-function meanNode(jd: number): number {
+export function meanNode(jd: number): number {
   const t = T(jd);
   // Meeus 22.4: Ω = 125.0445479 - 1934.1362891*T + 0.0020754*T² + ...
   return rev(125.04452 - 1934.136261 * t);

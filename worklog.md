@@ -1751,3 +1751,100 @@ Stage Summary:
 - Files: 7 PNG icons + 2 SVG icons + manifest.json + sw.js + offline.html + pwa-register.tsx
 - Lint clean, dev server 200 OK, all PWA assets serve 200
 - Verified via agent-browser: <link rel="manifest"> present, navigator.serviceWorker present, apple-touch-icon present, theme-color #000000, deep-link `/?view=today` consumed correctly
+
+---
+Task ID: 54 (Numerology feature + critical regression fix)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Numerology view (Pythagorean + Chaldean) + fix broken astrology exports
+
+## Completed Modifications
+
+### 1. CRITICAL FIX — Broken astrology library exports (regression)
+- `src/app/api/nakshatra/route.ts`, `mantra/route.ts`, `tara-bala/route.ts`, `remedy-timing/route.ts`, `tithi/route.ts`, `karana/route.ts`, `rahu-kaal/route.ts`, `yoga-today/route.ts`, `prashna/route.ts` all imported `lahiriAyanamsa`, `sunPosition`, `moonPosition`, `meanNode`, `rev` from `@/lib/astrology` but those functions existed WITHOUT the `export` keyword.
+- This caused Turbopack to fail compiling ALL these routes (500 errors), which broke the entire app's API surface (every API request returned the HTML error page).
+- Fix: Added `export` to `lahiriAyanamsa`, `sunPosition`, `moonPosition`, `meanNode`, `rev` in `src/lib/astrology/index.ts`.
+- After fix + dev server restart: all 80+ API routes return 200 OK.
+
+### 2. Numerology calculation engine — `src/lib/numerology.ts`
+- Pythagorean system (A=1,B=2,C=3,I=9,J=1...) + Chaldean system (values 1-8, no 9)
+- 7 numbers computed from name + birth date:
+  - Life Path (full birth date reduction, master numbers preserved)
+  - Destiny / Expression (full name letters)
+  - Soul Urge (vowels only)
+  - Personality (consonants only)
+  - Birthday (day of month)
+  - Maturity (Life Path + Destiny)
+  - Personal Year (birth month + day + current year)
+  - Personal Month (Personal Year + current month)
+- 12 NumberMeaning entries (1-9, 11, 22, 33) with: title, keywords, traits, challenges, element, rulingPlanet, color, summary
+- Lucky days/colors/gems/numbers per life path number
+- Synthesis generator combining Life Path + Destiny + Soul Urge + Personality
+
+### 3. Prisma model — `NumerologyReading`
+- Added `NumerologyReading` model (id, userId, input JSON, report JSON, system, createdAt)
+- Added back-relation `numerologyReadings NumerologyReading[]` on User
+- Pushed schema to SQLite
+
+### 4. Luck economy
+- Added `numerology` to `FeatureId` union
+- Cost: 3 Luck per full report (free Life Path preview)
+
+### 5. API routes
+- `POST /api/numerology` — body: { name, birthDate, system, preview? }
+  - preview=true → returns Life Path only (free)
+  - preview=false → charges 3 Luck, persists full report, returns balance
+  - 402 if insufficient Luck
+- `GET /api/numerology` — list user's saved reports (last 20)
+- `GET /api/numerology/[id]` — fetch single saved report
+- `DELETE /api/numerology?id=...` — delete a saved report
+
+### 6. Numerology View — `src/components/views/numerology-view.tsx`
+- Beautiful form with: name input, date input, system toggle (Pythagorean/Chaldean), two CTAs
+- Free preview shows Life Path number in big colored card with title, keywords, element, ruling planet, summary
+- "Unlock the full picture" CTA inside preview card
+- Full report shows:
+  - 8 number cards grid (clickable to switch active detail)
+  - Active Number Detail: big number, title, element icon, keywords, summary, Gifts (green), Challenges (amber)
+  - Synthesis section with multi-paragraph interpretation
+  - 3 Lucky Cards: Lucky Days, Lucky Colors, Lucky Gems
+  - Lucky numbers row
+- Past Readings list (load/delete saved reports)
+- Fixed button-in-button hydration error (changed outer button to div with role=button)
+- Validation: name ≥2 chars, birth year ≥1800 (was 1900, lowered for historical figures)
+
+### 7. Navigation wiring
+- Added `numerology` to `AppView` union in store.ts
+- Added NumerologyView import + view render in app-shell.tsx
+- Added to NAV_ITEMS in "Astrology" group with Hash icon
+- Added to PWA deep-link VALID_VIEWS list
+
+## Verification Results (agent-browser)
+
+### Test 1: Calculation correctness (bun CLI)
+- Aung San (1945-02-13) Pythagorean:
+  - Life Path 7 The Seeker ✓ (1+9+4+5→1, 0+2→2, 1+3→4 → 1+2+4=7)
+  - Destiny 5 The Freedom-Seeker ✓
+  - Soul Urge 5, Personality 9, Birthday 4, Maturity 3, Personal Year 7
+
+### Test 2: API end-to-end (curl with session cookie)
+- POST /api/numerology preview=true → 200, returns Life Path 7 + meaning
+- POST /api/numerology (full) → 200, charges 3 Luck (5→2), saves report with id, returns full report JSON with synthesis (1442 chars), lucky days (Monday, Wednesday), etc.
+- POST with insufficient Luck → 402 with `{error, balance, cost}`
+
+### Test 3: Browser end-to-end (agent-browser)
+- Logged in as test user, navigated to /?view=numerology
+- Form renders: name input, date input, Pythagorean/Chaldean toggle, Reveal + Full report buttons
+- Filled "Aung San" + 1945-02-13, clicked Full report
+- Verified render: "Numerology Report" heading, 8 number cards (Life Path 7, Destiny 5, Soul Urge 5, Personality 9, Birthday 4, Maturity 3, Personal Year 7, Personal Month 7), active detail with element/keywords/summary/Gifts/Challenges, Synthesis section, Lucky Days/Colors/Gems/numbers, "New reading" button
+- Tested "New reading" returns to form
+- Tested preview flow with "Marie Curie" (1867-11-07) → Life Path 4 The Builder renders with summary + "Unlock the full picture" CTA
+- Past Readings list shows saved "Aung San · Feb 13, 1945 · Pythagorean · 9/3/2026" entry
+
+### Test 4: Regression check
+- All previously-broken routes now return 200: /api/nakshatra, /api/mantra, /api/tara-bala, /api/remedy-timing, /api/tithi, /api/karana, /api/rahu-kaal, /api/yoga-today, /api/prashna, /api/avastha, /api/pancha-mahapurusha, /api/ishta-devata, /api/arishta, /api/drishti, /api/aspects-today, /api/spiritual-practice, /api/argala, /api/achievements, /api/luck/daily-reward, /api/me, /api/notifications
+
+## Stage Summary
+- New feature: full Numerology module (8 numbers + interpretations + synthesis + lucky elements) with Pythagorean/Chaldean systems, free preview + 3 Luck full report
+- Critical regression fixed: 5 missing `export` keywords in `src/lib/astrology/index.ts` had broken ~20 API routes since an earlier refactor
+- Lint clean, dev server up, all 81+ API routes return 200
+- 82 API routes total now (was 81), 18 views (was 17)

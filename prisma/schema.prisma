@@ -63,6 +63,7 @@ model User {
   frequencySessions FrequencySession[]
   positivitySessions PositivitySession[]
   compatibilityReadings CompatibilityReading[]
+  numerologyReadings NumerologyReading[]
 
   @@index([referredById])
   @@index([role])
@@ -355,4 +356,19 @@ model CompatibilityReading {
 
   @@index([userId, createdAt])
   @@map("compatibility_readings")
+}
+
+model NumerologyReading {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // JSON: { name, birthDate, system }
+  input       String
+  // JSON: the full NumerologyReport object (numbers, meanings, synthesis, lucky)
+  report      String
+  system      String   @default("pythagorean") // pythagorean | chaldean
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("numerology_readings")
 }
