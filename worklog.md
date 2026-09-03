@@ -1572,3 +1572,77 @@ Task: Add Pancha Mahapurusha Yoga + Gochar Phala, git push — 80 API routes mil
 ## Current App State (80 API routes, 17 views, 5 global components)
 **GitHub**: https://github.com/0xumaki/baydin-app
 Milestone: 80 API routes! The most comprehensive pure-TypeScript Vedic astrology engine ever built.
+
+---
+Task ID: 48 (webDevReview cron round 44)
+Agent: Orchestrator (Z.ai Code)
+Task: Add Arishta (affliction detection), git push
+
+## Completed Modifications
+
+### 1. Arishta (Affliction Detection)
+- `GET /api/arishta` — detects 6 types of classical Vedic Arishta:
+  1. Papakartari Yoga (Moon/Lagna hemmed between malefics on both sides)
+  2. Debilitated lords of key houses (1st, 4th, 7th, 9th, 10th from Lagna)
+  3. Malefics in dusthana houses (6th, 8th, 12th)
+  4. Kemadruma Yoga (no planets in 2nd/12th from Moon)
+  5. Graha Yuddha (planetary war — planets within 1° of each other)
+  6. Combust planets (within 10° of the Sun, within same sign)
+  Each affliction: severity (high/medium/low), description, specific remedy
+  Overall assessment: minimal/mild/moderate/significant
+- Widget on Today dashboard with severity-colored badges and remedies
+
+### 2. Git Push
+- 81 API routes, 17 views, lint clean
+
+## Current App State (81 API routes, 17 views, 5 global components)
+**GitHub**: https://github.com/0xumaki/baydin-app
+
+## Remaining Features Roadmap (per the user's original request)
+The user asked how many things are still left. Here is the comprehensive status:
+
+### COMPLETED (100%):
+✅ Lumina Tarot frontend (ChatGPT-style interface, dark-first theme)
+✅ GURU backend (Vedic/Western/Mahabote calculation engine, AI astrologer)
+✅ Both apps merged under Lumina design system (brand: Baydin)
+✅ Credit-based "Luck" system (MMK pricing, 6 tiers + 4 reseller tiers)
+✅ Reseller plans (whitelist-gated, min 50,000 MMK)
+✅ Daily-use addictive features (streaks, daily rewards, achievements, onboarding)
+✅ Google Gemini model for language output (5 languages: my/en/th/kh/lo)
+✅ Pay-as-you-go model (all GURU features cost Luck, Lumina freebies kept)
+✅ Referral system (10 Luck per signup)
+✅ Vedic astrology engine (16 Shodasavarga + Solar Return + Ashtakavarga + Shadbala + Avastha)
+✅ Full Panchanga (5 limbs + Choghadiya + Planetary Hours + Rahu Kaal)
+✅ Yoga detection (7 classical + 5 Pancha Mahapurusha)
+✅ Matching (Ashtakoota /36 + Mahendra + Vedha + Rajju + Stree-Deergha + Nadi Dosha)
+✅ Remedies (Yadaya + Panchasara + Mantra + Gemstone + Shraaddha + Remedy timing)
+✅ Spiritual (Ishta Devata + Spiritual practice + Namkaran)
+✅ Horary (Prashna Yes/No/Maybe with confidence)
+✅ Forecasting (Gochar + Gochar Phala + Weekly + Varshaphal)
+✅ Nadi (3 doshas with health/spiritual/marriage analysis)
+✅ Affliction detection (Arishta — 6 types with remedies)
+✅ Tarot (6 spreads + history + reflection journal + share)
+✅ Daily practice (Manifest + Ritual + Frequencies + Positivity + Mood)
+✅ Economy (Luck purchase, transactions, daily reward, referral, reseller)
+✅ Gamification (20 achievements + confetti celebration + notification badges)
+✅ Account (Data export, delete account, theme toggle, onboarding)
+✅ Social (Share chat/tarot/card-of-day/lucky numbers, conversation search/pin/rename/delete/export)
+✅ 90%+ profit margin (verified: 2 Luck per chat ≈ 2 MMK LLM cost vs 134 MMK charge = ~98% margin)
+✅ Admin panel (user management, Luck grants, reseller whitelisting, stats)
+
+### REMAINING (optional enhancements, not blocking):
+1. Mobile responsive audit at 375px (code is responsive, but untested)
+2. Socket.io reminder mini-service (port 3003) — goal reminder notifications
+3. D-60 chart SVG visualization (currently text-only)
+4. More divisional chart visualizations (SVG wheels for all 16 charts)
+5. Conversation search by message content (currently title-only search)
+6. Weekly practice summary email (optional, requires email service)
+7. Push notification support (requires FCM setup)
+8. Payment integration with real KBZ/Wave/CB (currently manual payment reference)
+9. Mobile app (PWA is installable, but no native app)
+10. Multi-language UI localization (currently LLM generates native language, but UI is English)
+11. Dark/light theme variations beyond Luminary (currently dark + Luminary warm)
+12. Batch conversation operations (bulk delete/pin)
+13. User data import (export exists, import does not)
+14. Real-time shared consultations (multi-user chat)
+15. API rate limiting refinement (basic exists, could be enhanced)
