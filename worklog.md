@@ -1646,3 +1646,30 @@ The user asked how many things are still left. Here is the comprehensive status:
 13. User data import (export exists, import does not)
 14. Real-time shared consultations (multi-user chat)
 15. API rate limiting refinement (basic exists, could be enhanced)
+
+---
+Task ID: 50 (webDevReview cron round 47)
+Agent: Orchestrator (Z.ai Code)
+Task: Add SVG MiniWheel for divisional charts + mobile responsive fixes, git push
+
+## Completed Modifications
+
+### 1. MiniWheel SVG Component
+- New `MiniWheel` component (140px SVG) for divisional charts
+  Shows 12 zodiac signs, all planet symbols, ascendant marker
+  Much smaller than the main 280px ChartWheel
+  Added to Navamsa (D-9) card with chart header
+  Can be easily added to all other divisional chart cards
+
+### 2. ChartWheel Responsive Fix
+- Added `max-w-full` to ChartWheel SVG for responsive sizing
+- Defensive degree fallback (`p.degree ?? 15`) to prevent undefined errors
+
+### 3. Mobile Responsive Improvements (from previous round)
+- Today dashboard greeting: responsive text sizes (22px mobile → 28px desktop)
+- Birth-chart Mahabote: smaller padding/text on mobile for 7-column grid
+- Birth-chart planet table: compact layout with hidden Myanmar names on mobile
+- Sidebar nav buttons: min-h-[40px] for touch-friendly tap targets
+
+### 4. Git Push
+- 81 API routes, 17 views, lint clean
