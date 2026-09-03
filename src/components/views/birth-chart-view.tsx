@@ -5,6 +5,7 @@ import { GlassCard, GoldButton, Pill, SectionTitle } from "@/components/lumina/p
 import { useMe, api } from "@/lib/api-client";
 import { Star, Wallet, Sparkles, MapPin, Sun } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import { ZODIAC_SYMBOLS, ZODIAC_MY, PLANET_MY, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn, computeShodasamsa, computeVimsamsa, computeChaturvimsamsa, computeTrimsamsa, computeKhavedamsa, computeAkshavedamsa, computeShashtiamsa, computeAshtakavarga, computeShadbala } from "@/lib/astrology";
 import { useQuery } from "@tanstack/react-query";
 import { SouthIndianChart } from "@/components/south-indian-chart";
