@@ -18,6 +18,7 @@ export type AppView =
   | "lunar-calendar" // Monthly moon phase + panchanga calendar
   | "manifest"     // Manifestation goals + confirmations (free, daily-use)
   | "ritual"        // 4-step daily ritual tracker (free, daily-use)
+  | "dream-journal" // Dream journal with lunar context + AI interpretation
   | "frequency"    // Solfeggio tone sessions + breathing pacer (free, daily-use)
   | "positivity"   // Affirmation generator (1 free/day, then Luck)
   | "insights"      // Skill-based deep readings (yogas, transits, etc.)

@@ -64,6 +64,7 @@ model User {
   positivitySessions PositivitySession[]
   compatibilityReadings CompatibilityReading[]
   numerologyReadings NumerologyReading[]
+  dreamJournals   DreamJournal[]
 
   @@index([referredById])
   @@index([role])
@@ -371,4 +372,29 @@ model NumerologyReading {
 
   @@index([userId, createdAt])
   @@map("numerology_readings")
+}
+
+model DreamJournal {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // The dream date (when the user had the dream, not when they recorded it)
+  dreamDate     String   @map("dream_date") // YYYY-MM-DD
+  title         String
+  content       String   // The dream narrative
+  mood          String   @default("neutral") // peaceful | vivid | nightmare | lucid | prophetic | neutral
+  isRecurring   Boolean  @default(false)    // Is this a recurring dream theme?
+  // AI interpretation (LLM-generated)
+  interpretation String?
+  // Computed lunar context at time of dream
+  lunarContext  String?  // JSON: { moonPhase, nakshatra, tithi }
+  // Auto-detected symbols from the content
+  symbols       String?  // JSON: string[]
+  isFavorite    Boolean  @default(false)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([userId, dreamDate])
+  @@index([userId, isFavorite])
+  @@map("dream_journal")
 }

@@ -1990,3 +1990,89 @@ Task: Add a Lunar Calendar view showing monthly moon phases + Vedic panchanga (t
 - Accurate SVG moon phase rendering (not emoji) — handles crescent/gibbous correctly
 - 83 API routes (was 82), 19 views (was 18), lint clean
 - Lint clean, committed, pushed
+
+---
+Task ID: 57 (Auth fix + Dream Journal feature)
+Agent: Orchestrator (Z.ai Code)
+Task: Fix broken signin/signup/admin bypass + add Dream Journal feature
+
+## Part 1: CRITICAL FIX — Auth broken on preview gateway
+
+### Root cause
+The preview gateway serves the app at https://preview-chat-*.space-z.ai but proxies to http://localhost:3000. The session cookie was set with `SameSite=lax` + no `Secure` flag. When accessed via the preview HTTPS gateway:
+- The cookie was accepted (HTTPS → not secure-only blocked)
+- But on subsequent cross-origin fetch() calls from the preview domain, browsers silently dropped the `SameSite=lax` cookie
+- Result: login/signup/demo-admin returned 200 OK, but /api/me showed unauthenticated, so the user appeared still logged-out
+
+### Fix
+1. **src/lib/auth.ts** — `createSession()` now reads `X-Forwarded-Proto` header:
+   - If HTTPS proxy detected: cookie = `Secure; HttpOnly; SameSite=none` (travels with cross-origin fetches)
+   - If direct dev (HTTP): cookie = `HttpOnly; SameSite=lax` (convenient for localhost)
+2. **src/proxy.ts** (Next.js 16 proxy convention, formerly middleware.ts):
+   - Adds CORS headers: `Access-Control-Allow-Origin: <request origin>`, `Access-Control-Allow-Credentials: true`
+   - Handles OPTIONS preflight with 204 No Content
+   - Only sets CORS headers when Origin present + HTTPS detected
+3. **next.config.ts** — added `allowedDevOrigins: ["*.space-z.ai"]` to silence cross-origin dev warning
+
+### Verification
+- curl with `-H "X-Forwarded-Proto: https" -H "Origin: https://preview-chat-...space-z.ai"`:
+  - Set-Cookie: `...; Secure; HttpOnly; SameSite=none` ✓
+  - Access-Control-Allow-Credentials: true ✓
+  - Access-Control-Allow-Origin: https://preview-chat-...space-z.ai ✓
+- agent-browser (3 flows tested): Demo Admin button ✓, email/password login ✓, new account signup ✓ — all close modal, user visible with Luck balance
+
+## Part 2: Dream Journal feature
+
+### 1. Prisma model — `DreamJournal`
+- Fields: dreamDate, title, content, mood (peaceful/vivid/nightmare/lucid/prophetic/neutral), isRecurring, interpretation (AI), lunarContext (JSON), symbols (JSON string[]), isFavorite
+- Back-relation added on User
+
+### 2. Dream symbol dictionary — `src/lib/dream-symbols.ts`
+- 40+ curated symbols across 7 categories: animal, nature, object, person, action, emotion, setting
+- Each symbol has: keyword, aliases, Vedic meaning, Jungian meaning, element, polarity (auspicious/warning/neutral/transformative)
+- `detectSymbols(content)` — word-boundary regex match against symbol keywords + aliases
+- DREAM_MOODS constant with emoji + color per mood
+
+### 3. API routes
+- `GET /api/dream-journal` — list (filter by date/month/favorites)
+- `POST /api/dream-journal` — create (auto-detects symbols, computes lunar context)
+- `GET /api/dream-journal/[id]` — fetch single
+- `PATCH /api/dream-journal/[id]` — update (title/content/mood/isFavorite/isRecurring)
+- `DELETE /api/dream-journal/[id]`
+- `POST /api/dream-journal/[id]/interpret` — AI interpretation (2 Luck, admin bypass applies)
+  - System prompt: Vedic + Jungian dream interpreter
+  - Draws on: dream content, auto-detected symbols (Vedic + Jungian meanings), lunar context (moon phase, nakshatra, tithi, yoga, Purnima/Amavasya/Ekadashi flags), user's natal context
+  - Returns: interpretation text + detected symbols with meanings
+  - Temperature 0.8, maxTokens 1200
+
+### 4. View — `src/components/views/dream-journal-view.tsx`
+- **List view**: stats pills (count/favorites/recurring/interpreted), filter favorites toggle, entry cards with mood emoji + title + content preview + lunar emoji + symbol hashtags
+- **Empty state**: hero + "Record your first dream" CTA
+- **Entry form**: dream date, title, mood selector (6 emojis), narrative textarea (with char count + "symbols will be auto-detected"), recurring checkbox
+- **Entry detail**: mood hero, date, title, badges, dream narrative card, Lunar Context card (4 mini: moon phase/nakshatra/tithi/yoga + Purnima/Amavasya/Ekadashi pills), Symbols Detected card (each symbol with category icon, polarity badge, Vedic + Jungian meanings), AI Interpretation card (or CTA "Interpret with AI · 2 Luck" if not yet interpreted), favorite + delete buttons
+
+### 5. Wiring
+- Added `dream-journal` to AppView union
+- Added to NAV_ITEMS in "Daily" group with CloudMoon icon
+- Wired view render in app-shell.tsx
+- Added to PWA deep-link VALID_VIEWS list
+
+## Verification Results
+
+### API test (curl with admin cookie)
+- POST /api/dream-journal → 200, entry created with id, auto-detected symbols [snake, water, flower, moon], lunar context (Waning Crescent 2%, Ardra pada 1, Ashtami Krishna, Variyana yoga)
+- POST /api/dream-journal/[id]/interpret → 200, cost:0 (admin bypass), interpretation generated drawing on Kundalini (Vedic serpent) + lunar context (Ardra/Rudra's tears) + Jungian shadow perspective + closing question
+
+### Browser test (agent-browser as admin)
+- Opened /?view=dream-journal → empty state renders
+- Clicked "Record dream" → form opens with date/title/mood/narrative/recurring fields
+- Filled "The Serpent at the River" with rich dream narrative
+- Saved → entry created, detail view opens
+- Detail shows: Prophetic badge + Recurring badge, dream narrative, Lunar Context (Waning Crescent 2% lit, Ardra pada 1, Ashtami Krishna, Variyana), Symbols Detected (#snake #water #flower #moon), AI Interpretation (multi-paragraph: Kundalini energy, Ardra nakshatra = Rudra's tears, Jungian shadow as ally, closing question "What part of yourself have you been waiting to recognize as already whole?")
+
+## Stage Summary
+- Auth fixed: signin/signup/admin bypass now work on the preview gateway via CORS + SameSite=None+Secure cookie
+- New feature: Dream Journal with auto symbol detection (40+ symbols), lunar context computation, AI interpretation (Vedic + Jungian, 2 Luck)
+- FREE for journaling (create/list/edit/delete); 2 Luck for AI interpretation (admin bypass applies)
+- 84 API routes (was 83), 20 views (was 19), lint clean
+- Committed and pushed
