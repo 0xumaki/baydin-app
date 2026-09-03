@@ -56,6 +56,11 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [gocharPhala, setGocharPhala] = React.useState<any>(null);
   const [remedyTiming, setRemedyTiming] = React.useState<any>(null);
   const [arishta, setArishta] = React.useState<any>(null);
+  const [ishtaDevata, setIshtaDevata] = React.useState<any>(null);
+  const [spiritualPractice, setSpiritualPractice] = React.useState<any>(null);
+  const [argala, setArgala] = React.useState<any>(null);
+  const [drishti, setDrishti] = React.useState<any>(null);
+  const [aspectsToday, setAspectsToday] = React.useState<any>(null);
 
   // Load card of day
   React.useEffect(() => {
@@ -130,6 +135,16 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
     fetch("/api/remedy-timing").then((r) => r.json()).then((d) => { setRemedyTiming(d.timing); }).catch(() => {});
     // Load arishta (afflictions)
     fetch("/api/arishta").then((r) => r.json()).then((d) => { setArishta(d.arishta); }).catch(() => {});
+    // Load ishta devata
+    fetch("/api/ishta-devata").then((r) => r.json()).then((d) => { setIshtaDevata(d.ishtaDevata); }).catch(() => {});
+    // Load spiritual practice
+    fetch("/api/spiritual-practice").then((r) => r.json()).then((d) => { setSpiritualPractice(d.practice); }).catch(() => {});
+    // Load argala
+    fetch("/api/argala").then((r) => r.json()).then((d) => { setArgala(d.argala); }).catch(() => {});
+    // Load drishti
+    fetch("/api/drishti").then((r) => r.json()).then((d) => { setDrishti(d.drishti); }).catch(() => {});
+    // Load aspects today
+    fetch("/api/aspects-today").then((r) => r.json()).then((d) => { setAspectsToday(d.aspects); }).catch(() => {});
   }, [user]);
 
   if (!user) {
@@ -759,6 +774,80 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                       </div>
                       <div className="text-[9px] text-ink-muted">{a.description}</div>
                       <div className="text-[9px] text-gold/70 mt-0.5">Remedy: {a.remedy}</div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            )}
+
+            {/* Ishta Devata (personal deity) */}
+            {ishtaDevata?.primary && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-4 h-4 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Ishta Devata</span>
+                </div>
+                <div className="text-[13px] text-gold font-medium mb-1">{ishtaDevata.primary.deity}</div>
+                <div className="text-[10px] text-ink-muted mb-2">{ishtaDevata.primary.description}</div>
+                <div className="p-2 rounded-lg bg-white/[0.02] mb-2">
+                  <div className="text-[10px] text-gold">Mantra</div>
+                  <div className="text-[11px] text-ink">{ishtaDevata.primary.mantra}</div>
+                </div>
+                <div className="text-[10px] text-ink-muted">{ishtaDevata.primary.form}</div>
+                {ishtaDevata.nakshatraDevata && (
+                  <div className="text-[9px] text-ink-muted/60 mt-1">Nakshatra Devata: {ishtaDevata.nakshatraDevata.deity}</div>
+                )}
+              </GlassCard>
+            )}
+
+            {/* Today's spiritual practice */}
+            {spiritualPractice?.morning && (
+              <GlassCard className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-4 h-4 text-gold" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Spiritual Practice</span>
+                </div>
+                <div className="text-[10px] text-ink-muted mb-1">{spiritualPractice.day} · {spiritualPractice.dayLord} day · {spiritualPractice.nadi}</div>
+                <div className="p-2 rounded-lg bg-gold/[0.04] mb-2">
+                  <div className="text-[10px] text-gold mb-0.5">🌅 Morning ({spiritualPractice.morning.time.split("—")[0].trim()})</div>
+                  <div className="text-[10px] text-ink">{spiritualPractice.morning.primary}</div>
+                  <div className="text-[9px] text-ink-muted mt-0.5">{spiritualPractice.morning.mantra}</div>
+                </div>
+                <div className="p-2 rounded-lg bg-white/[0.02] mb-2">
+                  <div className="text-[10px] text-gold mb-0.5">☀️ Afternoon</div>
+                  <div className="text-[10px] text-ink-muted">{spiritualPractice.afternoon.practice}</div>
+                </div>
+                <div className="p-2 rounded-lg bg-white/[0.02] mb-2">
+                  <div className="text-[10px] text-gold mb-0.5">🌙 Evening</div>
+                  <div className="text-[10px] text-ink-muted">{spiritualPractice.evening.practice}</div>
+                </div>
+                <div className="text-[9px] text-ink-muted">📿 {spiritualPractice.dailyActivity}</div>
+                <div className="text-[9px] text-leaf">🤲 {spiritualPractice.charity}</div>
+              </GlassCard>
+            )}
+
+            {/* Today's aspects */}
+            {aspectsToday?.aspects?.length > 0 && (
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Sun className="w-4 h-4 text-gold" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Today's Aspects</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[9px]">
+                    <span className="text-leaf">{aspectsToday.beneficial} beneficial</span>
+                    <span className="text-destructive/70">{aspectsToday.malefic} challenging</span>
+                  </div>
+                </div>
+                <div className="text-[10px] text-ink-muted mb-2">{aspectsToday.summary}</div>
+                <div className="space-y-1">
+                  {aspectsToday.aspects.slice(0, 5).map((a: any, i: number) => (
+                    <div key={i} className="flex items-start gap-2 p-1.5 rounded-lg bg-white/[0.02]">
+                      <span className={cn("text-[8px] px-1 py-0.5 rounded-full shrink-0", a.nature === "benefic" ? "bg-leaf/15 text-leaf" : "bg-destructive/15 text-destructive")}>{a.aspectType.split(" ")[0]}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[10px] text-ink">{a.transitPlanet} → {a.natalPlanet}</div>
+                        <div className="text-[9px] text-ink-muted">{a.effect}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
