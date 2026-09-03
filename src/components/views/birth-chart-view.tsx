@@ -178,9 +178,12 @@ function ChartDisplay({ chart, mode }: { chart: any; mode: string }) {
       {/* Navamsa (D-9) divisional chart */}
       {mode === "vedic" && (
         <GlassCard className="p-5">
-          <div className="text-[12px] text-ink-muted mb-3 flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-gold" />
-            Navamsa (D-9) — Marriage & Dharma
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[12px] text-ink-muted flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-gold" />
+              Navamsa (D-9) — Marriage & Dharma
+            </div>
+            {(() => { const nav = computeNavamsa(c); return <MiniWheel planets={nav.planets} ascendant={nav.ascendant} label="D-9" />; })()}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(() => {
@@ -605,14 +608,13 @@ function ChartWheel({ chart }: { chart: any }) {
   const size = 280;
   const cx = size / 2, cy = size / 2;
   const rOuter = size / 2 - 4, rInner = size / 2 - 30, rInnerMost = size / 2 - 60;
-  // 12 sign divisions
   const signs = Array.from({ length: 12 }, (_, i) => {
     const a0 = (i * 30 - 90) * Math.PI / 180;
     const a1 = ((i + 1) * 30 - 90) * Math.PI / 180;
     return { i, a0, a1, mid: (a0 + a1) / 2 };
   });
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible max-w-full">
       <circle cx={cx} cy={cy} r={rOuter} fill="none" stroke="rgba(197,168,124,0.3)" strokeWidth="1" />
       <circle cx={cx} cy={cy} r={rInner} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
       <circle cx={cx} cy={cy} r={rInnerMost} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
@@ -622,9 +624,8 @@ function ChartWheel({ chart }: { chart: any }) {
           <text x={cx + (rOuter - 14) * Math.cos(s.mid)} y={cy + (rOuter - 14) * Math.sin(s.mid)} fill="#C5A87C" fontSize="14" textAnchor="middle" dominantBaseline="central">{ZODIAC_SYMBOLS[s.i]}</text>
         </g>
       ))}
-      {/* planets */}
       {planets.map((p: any, i: number) => {
-        const angle = (p.signIndex * 30 + p.degree - 90) * Math.PI / 180;
+        const angle = (p.signIndex * 30 + (p.degree ?? 15) - 90) * Math.PI / 180;
         const r = rInnerMost - (i % 2) * 12;
         const x = cx + r * Math.cos(angle);
         const y = cy + r * Math.sin(angle);
@@ -636,6 +637,43 @@ function ChartWheel({ chart }: { chart: any }) {
         );
       })}
       <circle cx={cx} cy={cy} r="2" fill="#C5A87C" />
+    </svg>
+  );
+}
+
+/** Mini chart wheel for divisional charts (smaller, planet-only) */
+function MiniWheel({ planets, ascendant, label }: { planets: { name: string; signIndex: number }[]; ascendant?: { signIndex: number }; label?: string }) {
+  const size = 140;
+  const cx = size / 2, cy = size / 2;
+  const rOuter = size / 2 - 4, rInner = size / 2 - 16;
+  const signs = Array.from({ length: 12 }, (_, i) => {
+    const a0 = (i * 30 - 90) * Math.PI / 180;
+    const a1 = ((i + 1) * 30 - 90) * Math.PI / 180;
+    return { i, a0, a1, mid: (a0 + a1) / 2 };
+  });
+  const allPlanets = [...planets];
+  if (ascendant) allPlanets.push({ name: "Asc", signIndex: ascendant.signIndex });
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible max-w-full">
+      <circle cx={cx} cy={cy} r={rOuter} fill="none" stroke="rgba(197,168,124,0.2)" strokeWidth="0.5" />
+      <circle cx={cx} cy={cy} r={rInner} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" />
+      {signs.map((s) => (
+        <g key={s.i}>
+          <line x1={cx + rOuter * Math.cos(s.a0)} y1={cy + rOuter * Math.sin(s.a0)} x2={cx + rInner * Math.cos(s.a0)} y2={cy + rInner * Math.sin(s.a0)} stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />
+          <text x={cx + (rOuter - 7) * Math.cos(s.mid)} y={cy + (rOuter - 7) * Math.sin(s.mid)} fill="rgba(197,168,124,0.6)" fontSize="7" textAnchor="middle" dominantBaseline="central">{ZODIAC_SYMBOLS[s.i]}</text>
+        </g>
+      ))}
+      {allPlanets.map((p: any, i: number) => {
+        const angle = (p.signIndex * 30 + 15 - 90) * Math.PI / 180;
+        const r = rInner - 8 - (i % 2) * 8;
+        const x = cx + r * Math.cos(angle);
+        const y = cy + r * Math.sin(angle);
+        return (
+          <text key={p.name + i} x={x} y={y} fill={p.name === "Asc" ? "#E7D2A8" : "#E8EBE9"} fontSize="8" textAnchor="middle" dominantBaseline="central">{PLANET_SYMBOLS[p.name] ?? "•"}</text>
+        );
+      })}
+      <circle cx={cx} cy={cy} r="1" fill="#C5A87C" />
+      {label && <text x={cx} y={size - 2} fill="rgba(156,168,163,0.5)" fontSize="7" textAnchor="middle">{label}</text>}
     </svg>
   );
 }
