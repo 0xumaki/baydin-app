@@ -2,6 +2,8 @@ import "server-only";
 import ZAI from "z-ai-web-dev-sdk";
 import type { AstrologyMode, BirthContext, NatalChart } from "@/lib/astrology";
 import { PLANET_MY, ZODIAC_MY } from "@/lib/astrology";
+import { buildLanguageInstructions, getAddress } from "@/lib/language-config";
+import type { Language } from "@/lib/i18n";
 
 /**
  * BAYDIN LLM layer — renders GURU's skill prompts (shared persona + chat +
@@ -162,11 +164,15 @@ export function renderChatPrompt(params: {
 }) {
   const { mode, language, gender, chart, transits, history, userMessage, userMemory } = params;
 
-  const system = `${SHARED_PERSONA}\n\n${CHAT_SKILL}`;
+  // Build language-specific instructions for natural, native-sounding output
+  const langInstructions = buildLanguageInstructions(
+    (language as Language) || "en",
+    gender ?? null
+  );
 
-  let user = `Write ENTIRE interpretation NATIVELY in language code "${language}". Address the client as ${
-    gender === "male" ? "သား" : gender === "female" ? "သမီး" : "သား/သမီး"
-  }. Mode: ${mode}.\n\n`;
+  const system = `${SHARED_PERSONA}${langInstructions}\n\n${CHAT_SKILL}`;
+
+  let user = `Mode: ${mode}.\n\n`;
 
   if (chart) {
     user += `CALCULATION DATA (interpret ONLY this — never re-derive numbers):\n\`\`\`json\n${JSON.stringify(chart, null, 2)}\n\`\`\`\n\n`;
@@ -200,8 +206,9 @@ export function renderHoroscopePrompt(params: {
   transits: any;
 }) {
   const { language, sign, date, period, transits } = params;
-  const system = `${SHARED_PERSONA}\n\n${HOROSCOPE_SKILL}`;
-  const user = `Write ENTIRELY in language code "${language}". Period: ${period}. Sign: ${sign}. Date: ${date}.\n\nCALCULATION DATA:\n\`\`\`json\n${JSON.stringify(transits, null, 2)}\n\`\`\`\n\nReturn the JSON object per the output contract.`;
+  const langInstructions = buildLanguageInstructions((language as Language) || "en", null);
+  const system = `${SHARED_PERSONA}${langInstructions}\n\n${HOROSCOPE_SKILL}`;
+  const user = `Period: ${period}. Sign: ${sign}. Date: ${date}.\n\nCALCULATION DATA:\n\`\`\`json\n${JSON.stringify(transits, null, 2)}\n\`\`\`\n\nReturn the JSON object per the output contract.`;
   return { system, user };
 }
 
@@ -401,8 +408,8 @@ export function renderInsightPrompt(params: {
   extraContext?: Record<string, any>;
 }) {
   const { language, gender, skill, query, chart, transits, extraContext } = params;
-  const system = `${SHARED_PERSONA}\n\n${INSIGHT_SKILL_PROMPT}`;
-  let user = `Write ENTIRELY in language code "${language}". Address the client as ${gender === "male" ? "သား" : gender === "female" ? "သမီး" : "သား/သမီး"}.\n\n`;
+  const system = `${SHARED_PERSONA}${buildLanguageInstructions((language as Language) || "en", gender ?? null)}\n\n${INSIGHT_SKILL_PROMPT}`;
+  let user = ``;
   user += `CALCULATION DATA:\n\`\`\`json\n${JSON.stringify(chart, null, 2)}\n\`\`\`\n\n`;
   if (transits) user += `TRANSIT CALCULATION DATA:\n\`\`\`json\n${JSON.stringify(transits, null, 2)}\n\`\`\`\n\n`;
   user += `ADDITIONAL CONTEXT: ${JSON.stringify({ skill, language, gender: gender ?? null, query: query ?? null, ...extraContext })}\n\n`;
@@ -447,8 +454,8 @@ export function renderLifeReportSectionPrompt(params: {
   enhancedData?: any;
 }) {
   const { language, gender, sectionName, chart, enhancedData } = params;
-  const system = `${SHARED_PERSONA}\n\n${LIFE_REPORT_SKILL}`;
-  let user = `Write ENTIRELY in language code "${language}". Address the client as ${gender === "male" ? "သား" : gender === "female" ? "သမီး" : "သား/သမီး"}.\n\n`;
+  const system = `${SHARED_PERSONA}${buildLanguageInstructions((language as Language) || "en", gender ?? null)}\n\n${LIFE_REPORT_SKILL}`;
+  let user = ``;
   user += `CALCULATION DATA:\n\`\`\`json\n${JSON.stringify(chart, null, 2)}\n\`\`\`\n\n`;
   if (enhancedData) user += `ENHANCED DATA (yogas, shadbala, dasha):\n\`\`\`json\n${JSON.stringify(enhancedData, null, 2)}\n\`\`\`\n\n`;
   user += `ADDITIONAL CONTEXT: { "section_name": "${sectionName}", "language": "${language}", "gender": ${gender ? `"${gender}"` : "null"} }\n\n`;
@@ -482,8 +489,8 @@ export function renderPositivityPrompt(params: {
   intention?: string;
 }) {
   const { language, gender, category, intention } = params;
-  const system = `${SHARED_PERSONA}\n\n${POSITIVITY_SKILL}`;
-  let user = `Write ENTIRELY in language code "${language}". Address the client as ${gender === "male" ? "သား" : gender === "female" ? "သမီး" : "သား/သမီး"}.\n\n`;
+  const system = `${SHARED_PERSONA}${buildLanguageInstructions((language as Language) || "en", gender ?? null)}\n\n${POSITIVITY_SKILL}`;
+  let user = ``;
   user += `ADDITIONAL CONTEXT: ${JSON.stringify({ category, intention: intention ?? null, language, gender: gender ?? null })}\n\n`;
   user += `Return the JSON object per the output contract.`;
   return { system, user };
@@ -517,8 +524,8 @@ export function renderCompatibilityPrompt(params: {
   relationshipType: string;
 }) {
   const { language, gender, compatibility, relationshipType } = params;
-  const system = `${SHARED_PERSONA}\n\n${COMPATIBILITY_SKILL}`;
-  let user = `Write ENTIRELY in language code "${language}". Address the client as ${gender === "male" ? "သား" : gender === "female" ? "သမီး" : "သား/သမီး"}.\n\n`;
+  const system = `${SHARED_PERSONA}${buildLanguageInstructions((language as Language) || "en", gender ?? null)}\n\n${COMPATIBILITY_SKILL}`;
+  let user = ``;
   user += `COMPATIBILITY CALCULATION DATA:\n\`\`\`json\n${JSON.stringify(compatibility, null, 2)}\n\`\`\`\n\n`;
   user += `ADDITIONAL CONTEXT: ${JSON.stringify({ relationship_type: relationshipType, language, gender: gender ?? null })}\n\n`;
   user += `Return the JSON object per the output contract.`;

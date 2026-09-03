@@ -41,24 +41,24 @@ import {
   Waves, Heart, Users, Flame, BarChart3, Hash, Calendar, CloudMoon, LineChart,
 } from "lucide-react";
 
-const NAV_ITEMS: { view: AppView; labelKey: string; icon: any; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group: string }[] = [
-  { view: "today", labelKey: "nav_today", icon: CalendarDays, needsAuth: true, group: "Daily" },
-  { view: "chat", labelKey: "nav_astrologer", icon: MessageCircle, needsAuth: true, group: "Daily" },
-  { view: "tarot", labelKey: "nav_tarot", icon: Sparkles, group: "Daily" },
+const NAV_ITEMS: { view: AppView; labelKey: string; icon: any; customIcon?: string; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group: string }[] = [
+  { view: "today", labelKey: "nav_today", icon: CalendarDays, customIcon: "nav-today", needsAuth: true, group: "Daily" },
+  { view: "chat", labelKey: "nav_astrologer", icon: MessageCircle, customIcon: "nav-astrologer", needsAuth: true, group: "Daily" },
+  { view: "tarot", labelKey: "nav_tarot", icon: Sparkles, customIcon: "nav-tarot", group: "Daily" },
   { view: "tarot-history", labelKey: "nav_tarot_history", icon: BookOpen, needsAuth: true, group: "Daily" },
-  { view: "horoscope", labelKey: "nav_horoscope", icon: Moon, needsAuth: true, group: "Daily" },
-  { view: "lunar-calendar", labelKey: "nav_lunar_calendar", icon: Calendar, needsAuth: true, group: "Daily" },
-  { view: "dream-journal", labelKey: "nav_dream_journal", icon: CloudMoon, needsAuth: true, group: "Daily" },
-  { view: "manifest", labelKey: "nav_manifest", icon: Target, needsAuth: true, group: "Practice" },
-  { view: "ritual", labelKey: "nav_ritual", icon: Flame, needsAuth: true, group: "Practice" },
-  { view: "frequency", labelKey: "nav_frequencies", icon: Waves, needsAuth: true, group: "Practice" },
-  { view: "positivity", labelKey: "nav_positivity", icon: Heart, needsAuth: true, group: "Practice" },
-  { view: "birth-chart", labelKey: "nav_birth_chart", icon: Star, needsAuth: true, group: "Astrology" },
-  { view: "numerology", labelKey: "nav_numerology", icon: Hash, needsAuth: true, group: "Astrology" },
+  { view: "horoscope", labelKey: "nav_horoscope", icon: Moon, customIcon: "nav-horoscope", needsAuth: true, group: "Daily" },
+  { view: "lunar-calendar", labelKey: "nav_lunar_calendar", icon: Calendar, customIcon: "nav-lunar-calendar", needsAuth: true, group: "Daily" },
+  { view: "dream-journal", labelKey: "nav_dream_journal", icon: CloudMoon, customIcon: "nav-dream-journal", needsAuth: true, group: "Daily" },
+  { view: "manifest", labelKey: "nav_manifest", icon: Target, customIcon: "nav-manifest", needsAuth: true, group: "Practice" },
+  { view: "ritual", labelKey: "nav_ritual", icon: Flame, customIcon: "nav-ritual", needsAuth: true, group: "Practice" },
+  { view: "frequency", labelKey: "nav_frequencies", icon: Waves, customIcon: "nav-frequencies", needsAuth: true, group: "Practice" },
+  { view: "positivity", labelKey: "nav_positivity", icon: Heart, customIcon: "nav-positivity", needsAuth: true, group: "Practice" },
+  { view: "birth-chart", labelKey: "nav_birth_chart", icon: Star, customIcon: "nav-birth-chart", needsAuth: true, group: "Astrology" },
+  { view: "numerology", labelKey: "nav_numerology", icon: Hash, customIcon: "nav-numerology", needsAuth: true, group: "Astrology" },
   { view: "insights", labelKey: "nav_insights", icon: Compass, needsAuth: true, group: "Astrology" },
-  { view: "compatibility", labelKey: "nav_compatibility", icon: Users, needsAuth: true, group: "Astrology" },
-  { view: "life-report", labelKey: "nav_life_report", icon: BookOpen, needsAuth: true, group: "Astrology" },
-  { view: "luck-store", labelKey: "nav_earn_luck", icon: Wallet, needsAuth: true, group: "Account" },
+  { view: "compatibility", labelKey: "nav_compatibility", icon: Users, customIcon: "nav-compatibility", needsAuth: true, group: "Astrology" },
+  { view: "life-report", labelKey: "nav_life_report", icon: BookOpen, customIcon: "nav-life-report", needsAuth: true, group: "Astrology" },
+  { view: "luck-store", labelKey: "nav_earn_luck", icon: Wallet, customIcon: "nav-earn-luck", needsAuth: true, group: "Account" },
   { view: "profile", labelKey: "nav_profile", icon: BarChart3, needsAuth: true, group: "Account" },
   { view: "analytics", labelKey: "nav_analytics", icon: LineChart, needsAuth: true, group: "Account" },
   { view: "reseller", labelKey: "nav_reseller", icon: Store, resellerOnly: true, needsAuth: true, group: "Account" },
@@ -299,7 +299,25 @@ function Sidebar(props: {
                           : "text-[#9C9489] hover:text-[#E8E2D5] hover:bg-[#0F0D0B]"
                       )}
                     >
-                      <item.icon className={cn("w-[15px] h-[15px] shrink-0", props.currentView === item.view && "text-[#C5A572]")} />
+                      {item.customIcon ? (
+                        <img
+                          src={item.customIcon.endsWith('.svg') ? `/icons/${item.customIcon}` : `/icons/${item.customIcon}.png`}
+                          alt=""
+                          className={cn("w-[15px] h-[15px] shrink-0 transition-opacity", props.currentView === item.view ? "opacity-100" : "opacity-60 group-hover:opacity-100")}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            const parent = (e.target as HTMLImageElement).parentElement;
+                            if (parent) {
+                              const Icon = item.icon;
+                              const iconEl = document.createElement('span');
+                              iconEl.style.display = 'inline-flex';
+                              parent.prepend(iconEl);
+                            }
+                          }}
+                        />
+                      ) : (
+                        <item.icon className={cn("w-[15px] h-[15px] shrink-0", props.currentView === item.view && "text-[#C5A572]")} />
+                      )}
                       <span className="flex-1 text-left">{t(item.labelKey)}</span>
                       {(() => { const b = badgeFor(item.view); return b ? <span className="text-[10px] text-[#C5A572] tabular-nums">{b}</span> : null; })()}
                     </button>

@@ -2,13 +2,14 @@
 
 import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { GlassCard, GoldButton, GhostButton, Pill } from "@/components/lumina/primitives";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { useMe, api } from "@/lib/api-client";
-import { MessageSquare, Send, Sparkles, Plus, Clock, ChevronDown, Star, Moon, Sun, Heart, Download, Share2, Search, Pin, Pencil, Trash2, HelpCircle, X } from "lucide-react";
+import { useT } from "@/lib/use-t";
+import { Send, Plus, ChevronDown, Star, Moon, Sun, Heart, Download, Share2, Search, Pin, Pencil, Trash2, HelpCircle, X, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 const SUGGESTIONS = [
   { icon: Star, text: "Read my birth chart", mode: "vedic" },
@@ -24,6 +25,7 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
   const user = data?.user;
   const { activeConversationId, setActiveConversation } = useStore();
   const qc = useQueryClient();
+  const t = useT();
   const [messages, setMessages] = React.useState<Msg[]>([]);
   const [streaming, setStreaming] = React.useState(false);
   const [streamText, setStreamText] = React.useState("");
@@ -83,7 +85,7 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
       try { await navigator.share(shareData); } catch {}
     } else {
       await navigator.clipboard.writeText(shareData.text + "\n\n" + shareData.url);
-      toast.success("Reading copied to clipboard — share it anywhere ✦");
+      toast.success("Reading copied to clipboard");
     }
   }
 
@@ -129,7 +131,7 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
               else if (eventType === "done") { finalData = d; }
               else if (eventType === "error") {
                 if (d.code === "insufficient_luck") {
-                  finalData = { content: `_You're out of Luck. Visit **Buy Luck** to top up and continue your consultation._`, error: true };
+                  finalData = { content: `_You're out of Luck. Visit **Earn Luck** to top up and continue your consultation._`, error: true };
                   toast.error(d.message);
                 } else toast.error(d.message || "Something went wrong");
               }
@@ -152,78 +154,78 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
     }
   }
 
-  if (!user) return <EmptyState onAuth={onAuth} />;
+  if (!user) return <EmptyState onAuth={onAuth} t={t} />;
 
   return (
     <div className="flex flex-col h-[100dvh] lg:h-[calc(100dvh-57px)]">
-      <div className="flex items-center gap-2 px-4 lg:px-6 py-2.5 border-b border-white/5 lum-glass overflow-x-auto lum-no-scrollbar">
+      {/* Top bar — mode selector + conversation picker */}
+      <div className="flex items-center gap-3 px-6 py-3 border-b border-[#2A2722] overflow-x-auto" style={{ scrollbarWidth: "none" }}>
         <ModeSelector mode={mode} onChange={setMode} />
-        <div className="h-5 w-px bg-white/10" />
+        <div className="w-px h-4 bg-[#2A2722] shrink-0" />
         <ConvPicker
           conversations={convData?.conversations ?? []}
           activeId={activeConversationId}
           onPick={setActiveConversation}
           onNew={() => setActiveConversation(null)}
         />
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="ml-auto flex items-center gap-2 shrink-0">
+          {hasBirthData ? (
+            <span className="text-[11px] text-[#7A8B6F]">Birth data set</span>
+          ) : (
+            <span className="text-[11px] text-[#C26B5C]">Add birth data in profile</span>
+          )}
           <button
             onClick={() => setShowPrashna(true)}
-            className="px-2 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1 shrink-0"
+            className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition focus-ring rounded-sm"
             title="Ask a Yes/No question (Prashna)"
           >
-            <HelpCircle className="w-3 h-3" /> <span className="hidden sm:inline">Prashna</span>
+            Prashna
           </button>
-          {hasBirthData ? (
-            <Pill variant="leaf" className="text-[10px] hidden sm:inline-flex">Birth data set</Pill>
-          ) : (
-            <Pill className="text-[10px] text-amber-400/80 border-amber-400/20 bg-amber-400/5 hidden sm:inline-flex">Add birth data →</Pill>
-          )}
           {activeConversationId && messages.length > 0 && (
             <>
               <button
                 onClick={() => shareLastReading()}
-                className="px-2 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1"
-                title="Share this consultation"
+                className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition focus-ring rounded-sm"
               >
-                <Share2 className="w-3 h-3" /> <span className="hidden sm:inline">Share</span>
+                Share
               </button>
               <button
                 onClick={() => window.open(`/api/conversations/${activeConversationId}/export`, "_blank")}
-                className="px-2 py-1 rounded-full text-[10px] text-ink-muted hover:text-gold border border-white/10 hover:border-gold/30 transition flex items-center gap-1"
-                title="Download this consultation as markdown"
+                className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition focus-ring rounded-sm"
               >
-                <Download className="w-3 h-3" /> <span className="hidden sm:inline">Export</span>
+                Export
               </button>
             </>
           )}
         </div>
       </div>
 
+      {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto lumina-scroll">
         {messages.length === 0 && !streaming ? (
           <WelcomeState user={user} onSuggestion={(t) => send(t)} hasBirthData={hasBirthData} mode={mode} />
         ) : (
-          <div className="max-w-3xl mx-auto px-4 lg:px-6 py-6 space-y-5">
+          <div className="max-w-3xl mx-auto px-6 py-8 lg:py-10 space-y-6">
             {messages.map((m, i) => (
               <MessageBubble key={m.id || i} msg={m} />
             ))}
             {streaming && (
-              <MessageBubble msg={{ role: "assistant", content: streamText || "✦ Reading the stars…" }} streaming />
+              <MessageBubble msg={{ role: "assistant", content: streamText || "" }} streaming />
             )}
           </div>
         )}
       </div>
 
-      <div className="border-t border-white/5 lum-glass p-3 lg:p-4 lum-pb-safe">
+      {/* Composer */}
+      <div className="border-t border-[#2A2722] p-4 lg:p-5 lum-pb-safe">
         <div className="max-w-3xl mx-auto">
           <Composer inputRef={inputRef} disabled={streaming} onSubmit={send} luckCost={messages.length === 0 ? 0 : 2} balance={user.luckBalance} />
-          <div className="text-center text-[10px] text-ink-muted mt-1.5">
+          <div className="text-center text-[11px] text-[#6B6358] mt-2">
             {messages.length === 0 ? "First turn is free" : "2 Luck per message"} · Use discernment with all guidance.
           </div>
         </div>
       </div>
 
-      {/* Prashna (horary) modal */}
       {showPrashna && <PrashnaModal onClose={() => setShowPrashna(false)} />}
     </div>
   );
@@ -233,33 +235,45 @@ function MessageBubble({ msg, streaming }: { msg: Msg; streaming?: boolean }) {
   const isUser = msg.role === "user";
   if (isUser) {
     return (
-      <div className="flex justify-end lum-anim-float-up">
-        <div className="max-w-[85%] rounded-2xl rounded-tr-md bg-gold/10 border border-gold/15 px-4 py-2.5 text-[14px] text-ink leading-relaxed">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex justify-end"
+      >
+        <div className="max-w-[80%] px-4 py-2.5 text-[14px] text-[#E8E2D5] leading-[1.6] bg-[#1A1714] border border-[#2A2722] rounded-sm">
           {msg.content}
         </div>
-      </div>
+      </motion.div>
     );
   }
   return (
-    <div className="flex gap-3 lum-anim-float-up">
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold/30 to-leaf/20 border border-gold/20 flex items-center justify-center text-gold shrink-0 mt-0.5">
-        <Sparkles className="w-4 h-4" />
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex gap-4"
+    >
+      <div className="w-8 h-8 rounded-sm bg-[#1A1714] border border-[#2A2722] flex items-center justify-center text-[#C5A572] shrink-0 mt-0.5">
+        <Star className="w-3.5 h-3.5" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="lum-prose text-[14px] text-ink/90 leading-relaxed">
-          <ReactMarkdown>{msg.content}</ReactMarkdown>
+        <div className="serif text-[15px] text-[#E8E2D5] leading-[1.8] prose-editorial">
+          {msg.content ? <ReactMarkdown>{msg.content}</ReactMarkdown> : (streaming ? <span className="text-[#6B6358]">Reading the stars…</span> : null)}
         </div>
-        {streaming && <span className="inline-block w-2 h-4 bg-gold/60 ml-0.5 align-middle animate-pulse" />}
+        {streaming && msg.content && (
+          <span className="inline-block w-1.5 h-4 bg-[#C5A572] ml-0.5 align-middle animate-pulse" />
+        )}
         {msg.metadata?.guidance && <GuidanceCard guidance={msg.metadata.guidance} />}
         {msg.metadata?.highlights?.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-3">
+          <div className="flex flex-wrap gap-2 mt-3">
             {msg.metadata.highlights.map((h: string, i: number) => (
-              <Pill key={i} variant="gold" className="text-[10px]">{h}</Pill>
+              <span key={i} className="text-[12px] px-3 py-1 text-[#C5A572] serif-italic border border-[#C5A572]/20">
+                {h}
+              </span>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -267,26 +281,26 @@ function GuidanceCard({ guidance }: { guidance: any }) {
   const [open, setOpen] = React.useState(false);
   if (!guidance) return null;
   const items: { label: string; value: any; icon: any }[] = [];
-  if (guidance.remedies?.length) items.push({ label: "Remedies", value: guidance.remedies, icon: Sparkles });
+  if (guidance.remedies?.length) items.push({ label: "Remedies", value: guidance.remedies, icon: Star });
   if (guidance.lucky_numbers?.length) items.push({ label: "Lucky numbers", value: guidance.lucky_numbers.join(", "), icon: Star });
   if (guidance.lucky_colors?.length) items.push({ label: "Lucky colors", value: guidance.lucky_colors.join(", "), icon: Star });
   if (guidance.warnings?.length) items.push({ label: "Cautions", value: guidance.warnings, icon: Moon });
-  if (guidance.recommendations?.length) items.push({ label: "Recommendations", value: guidance.recommendations, icon: Sparkles });
+  if (guidance.recommendations?.length) items.push({ label: "Recommendations", value: guidance.recommendations, icon: Star });
   if (items.length === 0) return null;
   return (
-    <div className="mt-3">
-      <button onClick={() => setOpen((o) => !o)} className="text-[11px] text-gold/80 hover:text-gold flex items-center gap-1">
-        <ChevronDown className={cn("w-3 h-3 transition", open && "rotate-180")} />
+    <div className="mt-4">
+      <button onClick={() => setOpen((o) => !o)} className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition flex items-center gap-1.5 focus-ring rounded-sm">
+        <ChevronDown className={cn("w-3 h-3 transition-transform", open && "rotate-180")} />
         {open ? "Hide guidance" : "Show guidance & remedies"}
       </button>
       {open && (
-        <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
           {items.map((it, i) => (
-            <div key={i} className="p-2.5 rounded-lg bg-white/[0.02] border border-white/5">
-              <div className="flex items-center gap-1.5 mb-1 text-[11px] text-ink-muted">
-                <it.icon className="w-3 h-3 text-gold" /> {it.label}
+            <div key={i} className="p-3 border border-[#2A2722]">
+              <div className="flex items-center gap-1.5 mb-1.5 text-[12px] text-[#6B6358] font-medium">
+                <it.icon className="w-3 h-3 text-[#C5A572]" /> {it.label}
               </div>
-              <div className="text-[12px] text-ink/90">
+              <div className="text-[13px] text-[#9C9489]">
                 {Array.isArray(it.value) ? (
                   <ul className="space-y-0.5">{it.value.map((v: string, j: number) => <li key={j}>• {v}</li>)}</ul>
                 ) : it.value}
@@ -301,15 +315,24 @@ function GuidanceCard({ guidance }: { guidance: any }) {
 
 function ModeSelector({ mode, onChange }: { mode: "vedic" | "western" | "mahabote"; onChange: (m: any) => void }) {
   const modes = [
-    { id: "vedic" as const, label: "Vedic", icon: Star },
-    { id: "western" as const, label: "Western", icon: Moon },
-    { id: "mahabote" as const, label: "Mahabote", icon: Sun },
+    { id: "vedic" as const, label: "Vedic" },
+    { id: "western" as const, label: "Western" },
+    { id: "mahabote" as const, label: "Mahabote" },
   ];
   return (
     <div className="flex items-center gap-0.5 shrink-0">
       {modes.map((m) => (
-        <button key={m.id} onClick={() => onChange(m.id)} className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-[11px] transition", mode === m.id ? "bg-gold/15 text-gold border border-gold/20" : "text-ink-muted hover:text-ink")}>
-          <m.icon className="w-3 h-3" /> <span className="hidden xs:inline sm:inline">{m.label}</span>
+        <button
+          key={m.id}
+          onClick={() => onChange(m.id)}
+          className={cn(
+            "px-3 py-1.5 text-[12px] border-b-2 transition focus-ring rounded-sm",
+            mode === m.id
+              ? "border-[#C5A572] text-[#E8E2D5] font-medium"
+              : "border-transparent text-[#6B6358] hover:text-[#9C9489]"
+          )}
+        >
+          {m.label}
         </button>
       ))}
     </div>
@@ -323,9 +346,9 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
   const [searchResults, setSearchResults] = React.useState<any[] | null>(null);
   const [renameId, setRenameId] = React.useState<string | null>(null);
   const [renameText, setRenameText] = React.useState("");
+  const [deleteId, setDeleteId] = React.useState<string | null>(null);
   const active = conversations.find((c) => c.id === activeId);
 
-  // Debounced server-side search (includes message content)
   React.useEffect(() => {
     if (!search.trim()) { setSearchResults(null); return; }
     const t = setTimeout(async () => {
@@ -363,8 +386,6 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
     } catch {}
   }
 
-  const [deleteId, setDeleteId] = React.useState<string | null>(null);
-
   async function deleteConv(id: string, e: React.MouseEvent) {
     e.stopPropagation();
     setDeleteId(id);
@@ -383,32 +404,30 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
 
   return (
     <div className="relative">
-      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-1.5 px-2 py-1 text-[12px] text-ink-muted hover:text-ink">
-        <Clock className="w-3.5 h-3.5" />
-        <span className="max-w-[140px] truncate">{active?.title || "History"}</span>
+      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-1.5 px-2 py-1 text-[12px] text-[#6B6358] hover:text-[#E8E2D5] transition">
+        <span className="max-w-[120px] truncate">{active?.title || "History"}</span>
         <ChevronDown className="w-3 h-3" />
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute top-full left-0 mt-1 w-72 max-h-96 rounded-xl lum-glass-float border border-white/10 z-20 p-1.5 flex flex-col">
-            <button onClick={() => { onNew(); setOpen(false); }} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[12px] text-gold hover:bg-gold/10 shrink-0">
+          <div className="absolute top-full left-0 mt-1 w-72 max-h-96 bg-[#0A0908] border border-[#2A2722] z-20 p-2 flex flex-col rounded-sm">
+            <button onClick={() => { onNew(); setOpen(false); }} className="w-full flex items-center gap-2 px-2.5 py-2 text-[12px] text-[#C5A572] hover:bg-[#0F0D0B] transition shrink-0 rounded-sm">
               <Plus className="w-3.5 h-3.5" /> New consultation
             </button>
-            <div className="h-px bg-white/5 my-1 shrink-0" />
-            {/* Search box */}
+            <div className="h-px bg-[#2A2722] my-1 shrink-0" />
             <div className="relative shrink-0 mb-1">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-ink-muted/60" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#6B6358]" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search consultations…"
-                className="w-full pl-7 pr-2 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 text-[11px] text-ink placeholder:text-ink-muted/50 outline-none focus:border-gold/20"
+                className="w-full pl-7 pr-2 py-1.5 bg-transparent border-b border-[#2A2722] text-[12px] text-[#E8E2D5] placeholder:text-[#4A4540] outline-none focus:border-[#C5A572] transition"
               />
             </div>
             <div className="overflow-y-auto lumina-scroll flex-1">
               {sorted.length === 0 ? (
-                <div className="px-2.5 py-3 text-[11px] text-ink-muted text-center">{search ? `No matches for "${search}"` : "No consultations yet"}</div>
+                <div className="px-2.5 py-3 text-[12px] text-[#6B6358] text-center">{search ? `No matches for "${search}"` : "No consultations yet"}</div>
               ) : (
                 sorted.map((c) => (
                   <div key={c.id} className="flex items-center gap-1 group">
@@ -419,33 +438,21 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
                         onChange={(e) => setRenameText(e.target.value)}
                         onKeyDown={confirmRename}
                         onBlur={() => setRenameId(null)}
-                        className="flex-1 px-2.5 py-2 rounded-lg text-[12px] bg-white/[0.05] border border-gold/30 text-ink outline-none"
+                        className="flex-1 px-2.5 py-2 text-[12px] bg-[#1A1714] border border-[#C5A572]/30 text-[#E8E2D5] outline-none rounded-sm"
                       />
                     ) : (
                       <>
-                        <button onClick={() => { onPick(c.id); setOpen(false); }} className={cn("flex-1 text-left px-2.5 py-2 rounded-lg text-[12px] hover:bg-white/5 transition truncate", c.id === activeId ? "text-gold bg-gold/5" : "text-ink-muted")}>
-                          {c.pinned && <Pin className="w-2.5 h-2.5 inline mr-1 text-gold/60" />}
+                        <button onClick={() => { onPick(c.id); setOpen(false); }} className={cn("flex-1 text-left px-2.5 py-2 text-[12px] hover:bg-[#0F0D0B] transition truncate rounded-sm", c.id === activeId ? "text-[#C5A572]" : "text-[#9C9489]")}>
+                          {c.pinned && <Pin className="w-2.5 h-2.5 inline mr-1 text-[#C5A572]" />}
                           {c.title}
                         </button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); startRename(c.id, c.title); }}
-                          className="p-1 rounded shrink-0 transition opacity-0 group-hover:opacity-100 text-ink-muted/40 hover:text-ink-muted"
-                          title="Rename"
-                        >
+                        <button onClick={(e) => { e.stopPropagation(); startRename(c.id, c.title); }} className="p-1 shrink-0 transition opacity-0 group-hover:opacity-100 text-[#6B6358] hover:text-[#9C9489]" title="Rename">
                           <Pencil className="w-3 h-3" />
                         </button>
-                        <button
-                          onClick={(e) => togglePin(c.id, c.pinned, e)}
-                          className={cn("p-1 rounded shrink-0 transition opacity-0 group-hover:opacity-100", c.pinned ? "text-gold opacity-100" : "text-ink-muted/40 hover:text-ink-muted")}
-                          title={c.pinned ? "Unpin" : "Pin to top"}
-                        >
+                        <button onClick={(e) => togglePin(c.id, c.pinned, e)} className={cn("p-1 shrink-0 transition opacity-0 group-hover:opacity-100", c.pinned ? "text-[#C5A572] opacity-100" : "text-[#6B6358] hover:text-[#9C9489]")} title={c.pinned ? "Unpin" : "Pin to top"}>
                           <Pin className="w-3 h-3" fill={c.pinned ? "currentColor" : "none"} />
                         </button>
-                        <button
-                          onClick={(e) => deleteConv(c.id, e)}
-                          className="p-1 rounded shrink-0 transition opacity-0 group-hover:opacity-100 text-ink-muted/40 hover:text-destructive"
-                          title="Delete"
-                        >
+                        <button onClick={(e) => deleteConv(c.id, e)} className="p-1 shrink-0 transition opacity-0 group-hover:opacity-100 text-[#6B6358] hover:text-[#C26B5C]" title="Delete">
                           <Trash2 className="w-3 h-3" />
                         </button>
                       </>
@@ -458,22 +465,19 @@ function ConvPicker({ conversations, activeId, onPick, onNew }: { conversations:
         </>
       )}
 
-      {/* Delete confirmation modal */}
       {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={() => setDeleteId(null)}>
-          <div className="lum-glass-float rounded-2xl p-6 max-w-xs w-full border border-destructive/20" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center gap-2 mb-3 text-destructive">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85" onClick={() => setDeleteId(null)}>
+          <div className="bg-[#0A0908] border border-[#C26B5C]/30 p-6 max-w-xs w-full rounded-sm" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2 mb-3 text-[#C26B5C]">
               <Trash2 className="w-5 h-5" />
-              <span className="text-[15px] font-medium">Delete consultation?</span>
+              <span className="serif text-[15px]">Delete consultation?</span>
             </div>
-            <div className="text-[12px] text-ink-muted mb-5 leading-relaxed">
-              This will permanently delete this consultation and all its messages. This cannot be undone.
+            <div className="text-[13px] text-[#9C9489] mb-5 leading-[1.6]">
+              This permanently deletes this consultation and all its messages. This cannot be undone.
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 rounded-full text-[12px] text-ink-muted border border-white/10 hover:text-ink transition">Cancel</button>
-              <button onClick={confirmDelete} className="flex-1 py-2.5 rounded-full text-[12px] bg-destructive text-white hover:brightness-110 active:scale-95 transition">
-                Delete
-              </button>
+              <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 text-[13px] text-[#9C9489] hover:text-[#E8E2D5] border border-[#2A2722] hover:border-[#4A4540] transition rounded-sm">Cancel</button>
+              <button onClick={confirmDelete} className="flex-1 py-2.5 text-[13px] bg-[#C26B5C] text-white hover:brightness-110 active:scale-95 transition rounded-sm">Delete</button>
             </div>
           </div>
         </div>
@@ -491,7 +495,7 @@ function Composer({ inputRef, disabled, onSubmit, luckCost, balance }: { inputRe
     setText("");
   }
   return (
-    <div className="flex items-end gap-2 rounded-2xl lum-glass border border-white/10 px-3 py-2 focus-within:border-gold/30 transition">
+    <div className="flex items-end gap-2 border-b border-[#2A2722] px-1 py-1 focus-within:border-[#C5A572] transition">
       <textarea
         ref={inputRef}
         value={text}
@@ -500,11 +504,21 @@ function Composer({ inputRef, disabled, onSubmit, luckCost, balance }: { inputRe
         disabled={disabled}
         rows={1}
         placeholder="Ask the astrologer anything…"
-        className="flex-1 bg-transparent resize-none outline-none text-[14px] text-ink placeholder:text-ink-muted/60 py-1.5 max-h-32 overflow-y-auto lumina-scroll"
+        className="flex-1 bg-transparent resize-none outline-none text-[15px] text-[#E8E2D5] placeholder:text-[#4A4540] py-2 max-h-32 overflow-y-auto lumina-scroll"
         style={{ minHeight: "24px" }}
       />
-      <button onClick={handleSend} disabled={disabled || !text.trim()} className={cn("w-9 h-9 rounded-full flex items-center justify-center transition shrink-0", disabled || !text.trim() ? "bg-white/5 text-ink-muted/40" : "bg-[linear-gradient(135deg,#FBEFC8,#D4B27A,#8A6A2F)] text-[#0A0805] hover:brightness-110 active:scale-95 shadow-[0_4px_16px_-4px_rgba(197,168,124,0.5)]")}>
-        <Send className="w-4 h-4" />
+      <button
+        onClick={handleSend}
+        disabled={disabled || !text.trim()}
+        className={cn(
+          "w-9 h-9 rounded-sm flex items-center justify-center transition shrink-0 focus-ring",
+          disabled || !text.trim()
+            ? "bg-[#1A1714] text-[#4A4540]"
+            : "bg-[#E8E2D5] text-[#0A0908] hover:bg-white active:scale-95"
+        )}
+        aria-label="Send message"
+      >
+        {disabled ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
       </button>
     </div>
   );
@@ -512,49 +526,59 @@ function Composer({ inputRef, disabled, onSubmit, luckCost, balance }: { inputRe
 
 function WelcomeState({ user, onSuggestion, hasBirthData, mode }: { user: any; onSuggestion: (t: string) => void; hasBirthData: boolean; mode: string }) {
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10 lg:py-16">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-gold/20 mb-4">
-          <Sparkles className="w-7 h-7 text-gold" />
-        </div>
-        <h1 className="text-[26px] font-light tracking-tight text-ink mb-2">
-          Welcome{user.name ? `, ${user.name}` : ""} <span className="lum-text-gold">✦</span>
+    <div className="max-w-2xl mx-auto px-6 py-12 lg:py-16">
+      <div className="mb-8 lum-reveal">
+        <div className="text-[13px] text-[#6B6358] mb-2">Your astrologer</div>
+        <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.1] tracking-tight mb-3">
+          {user.name ? `Welcome, ${user.name.split(" ")[0]}.` : "Welcome."}
         </h1>
-        <p className="text-[14px] text-ink-muted leading-relaxed max-w-md mx-auto">
-          I'm your Baydin astrologer — versed in Vedic, Western & Myanmar Mahabote traditions.
-          {hasBirthData ? " Ask me anything about your chart, your day, or your future." : " Add your birth details in profile for a full reading."}
+        <p className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch]">
+          {hasBirthData
+            ? "Ask me anything about your chart, your day, or what the stars hold for you."
+            : "Add your birth details in your profile settings for a full reading of your natal chart."}
         </p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        {SUGGESTIONS.map((s, i) => (
-          <button key={i} onClick={() => onSuggestion(s.text)} className="text-left p-3.5 rounded-xl lum-glass border border-white/5 hover:border-gold/20 hover:bg-gold/[0.03] transition group">
-            <div className="flex items-center gap-2 mb-1">
-              <s.icon className="w-4 h-4 text-gold" />
-              <span className="text-[11px] text-ink-muted uppercase tracking-wide">{s.mode}</span>
-            </div>
-            <div className="text-[13px] text-ink group-hover:text-gold transition">{s.text}</div>
-          </button>
-        ))}
+      <div className="pt-8 border-t border-[#2A2722]">
+        <div className="text-[12px] text-[#6B6358] font-medium mb-4">Try asking</div>
+        <div className="space-y-2">
+          {SUGGESTIONS.map((s, i) => (
+            <button
+              key={i}
+              onClick={() => onSuggestion(s.text)}
+              className="w-full text-left p-3 border border-[#2A2722] hover:border-[#4A4540] hover:bg-[#0F0D0B] transition group focus-ring rounded-sm flex items-center gap-3"
+            >
+              <s.icon className="w-3.5 h-3.5 text-[#C5A572] shrink-0" />
+              <span className="text-[13px] text-[#9C9489] group-hover:text-[#E8E2D5] transition flex-1">{s.text}</span>
+              <span className="text-[10px] text-[#6B6358] serif-italic">{s.mode}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-function EmptyState({ onAuth }: { onAuth: () => void }) {
+function EmptyState({ onAuth, t }: { onAuth: () => void; t: (k: string) => string }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full px-6 text-center">
-      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-gold/20 mb-5">
-        <Sparkles className="w-9 h-9 text-gold" />
+    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+      <div className="max-w-2xl mx-auto px-6 py-12 lg:py-16">
+        <div className="lum-reveal">
+          <div className="text-[13px] text-[#6B6358] mb-2">Your astrologer</div>
+          <h1 className="serif-display text-[2.5rem] sm:text-[3rem] text-[#E8E2D5] leading-[1.05] tracking-tight mb-4">
+            Consult the stars.
+          </h1>
+          <p className="t-body-lg text-[#9C9489] leading-[1.7] max-w-[55ch] mb-8">
+            Vedic, Western, and Myanmar Mahabote readings drawn from your birth chart and the moon overhead. Each consultation turn costs 2 Luck. The first turn is free.
+          </p>
+          <button
+            onClick={onAuth}
+            className="inline-flex items-center gap-2 py-3 px-6 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition rounded-sm focus-ring"
+          >
+            {t("begin")}
+          </button>
+          <div className="mt-3 text-[12px] text-[#6B6358]">5 Luck free on signup · No card required</div>
+        </div>
       </div>
-      <h1 className="text-[28px] font-light tracking-tight text-ink mb-2">
-        Baydin <span className="lum-text-gold">✦</span>
-      </h1>
-      <p className="text-[14px] text-ink-muted max-w-md mb-6 leading-relaxed">
-        Your AI astrologer — Vedic, Western & Myanmar Mahabote readings. Tarot, horoscopes, rituals.
-        Each consultation turn costs 2 Luck. The first turn is free.
-      </p>
-      <GoldButton onClick={onAuth} className="px-8">Begin your consultation</GoldButton>
-      <div className="mt-4 text-[11px] text-ink-muted">5 Luck free on signup · No card required</div>
     </div>
   );
 }
@@ -580,23 +604,20 @@ function PrashnaModal({ onClose }: { onClose: () => void }) {
     finally { setLoading(false); }
   }
 
-  const answerColor = result?.answer === "yes" ? "#B5CD7E" : result?.answer === "no" ? "#b5463a" : "#C5A87C";
+  const answerColor = result?.answer === "yes" ? "#7A8B6F" : result?.answer === "no" ? "#C26B5C" : "#C5A572";
   const answerIcon = result?.answer === "yes" ? "✓" : result?.answer === "no" ? "✕" : "?";
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={onClose}>
-      <div className="lum-glass-float rounded-2xl p-6 max-w-md w-full border border-gold/20" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/85" onClick={onClose}>
+      <div className="bg-[#0A0908] border border-[#2A2722] p-6 max-w-md w-full rounded-sm" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-gold" />
-            <span className="text-[15px] font-medium text-ink">Prashna — Horary</span>
-          </div>
-          <button onClick={onClose} className="text-ink-muted hover:text-ink"><X className="w-5 h-5" /></button>
+          <div className="serif-display text-[1.25rem] text-[#E8E2D5]">Prashna — Horary</div>
+          <button onClick={onClose} aria-label="Close" className="text-[#6B6358] hover:text-[#E8E2D5] transition"><X className="w-4 h-4" /></button>
         </div>
 
         {!result && !loading && (
           <>
-            <div className="text-[12px] text-ink-muted mb-3 leading-relaxed">
+            <div className="text-[13px] text-[#9C9489] mb-4 leading-[1.6]">
               Ask a Yes/No question. The answer is determined by casting a chart at this exact moment.
             </div>
             <input
@@ -605,59 +626,66 @@ function PrashnaModal({ onClose }: { onClose: () => void }) {
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && ask()}
               placeholder="e.g. Will I get the job?"
-              className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[14px] text-ink placeholder:text-ink-muted/50 outline-none focus:border-gold/30 mb-3"
+              className="w-full bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] placeholder:text-[#4A4540] focus:outline-none focus:border-[#C5A572] transition mb-4"
             />
-            <GoldButton onClick={ask} disabled={!question.trim()} className="w-full">
-              <Sparkles className="w-4 h-4" /> Ask the stars
-            </GoldButton>
+            <button
+              onClick={ask}
+              disabled={!question.trim()}
+              className="w-full py-3 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition rounded-sm disabled:opacity-50 focus-ring"
+            >
+              Ask the stars
+            </button>
           </>
         )}
 
         {loading && (
           <div className="text-center py-8">
-            <Sparkles className="w-8 h-8 text-gold animate-pulse mx-auto mb-2" />
-            <div className="text-[13px] text-ink-muted">Casting the Prashna chart…</div>
+            <Loader2 className="w-6 h-6 text-[#C5A572] animate-spin mx-auto mb-3" />
+            <div className="text-[13px] text-[#6B6358]">Casting the Prashna chart…</div>
           </div>
         )}
 
         {result && !loading && (
           <div>
             <div className="text-center mb-4">
-              <div className="text-[11px] text-ink-muted mb-1">Your question</div>
-              <div className="text-[13px] text-ink mb-4">{result.question}</div>
+              <div className="text-[12px] text-[#6B6358] mb-1">Your question</div>
+              <div className="text-[14px] text-[#E8E2D5] mb-4">{result.question}</div>
               <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-3xl font-light mb-2 border-2"
                 style={{ borderColor: answerColor, color: answerColor, background: `${answerColor}15` }}>
                 {answerIcon}
               </div>
-              <div className="text-[24px] font-light capitalize" style={{ color: answerColor }}>{result.answer}</div>
-              <div className="text-[11px] text-ink-muted mt-1">{result.confidence}% confidence</div>
+              <div className="serif-display text-[1.5rem] capitalize" style={{ color: answerColor }}>{result.answer}</div>
+              <div className="text-[12px] text-[#6B6358] mt-1">{result.confidence}% confidence</div>
             </div>
-            <div className="p-3 rounded-xl bg-white/[0.02] mb-3">
-              <div className="text-[10px] uppercase tracking-wide text-ink-muted mb-1">Reasoning</div>
-              <div className="text-[11px] text-ink-muted leading-relaxed">{result.reasoning}</div>
+            <div className="p-3 border border-[#2A2722] mb-3">
+              <div className="text-[12px] text-[#6B6358] font-medium mb-1">Reasoning</div>
+              <div className="text-[12px] text-[#9C9489] leading-[1.6]">{result.reasoning}</div>
             </div>
-            <div className="text-[11px] text-gold mb-3">{result.timing}</div>
+            <div className="text-[12px] text-[#C5A572] serif-italic mb-3">{result.timing}</div>
             <div className="grid grid-cols-2 gap-2 mb-4">
-              <div className="p-2 rounded-lg bg-white/[0.02]">
-                <div className="text-[9px] text-ink-muted">Lagna</div>
-                <div className="text-[12px] text-ink">{result.chart.lagnaSign}</div>
+              <div className="p-2 border border-[#2A2722]">
+                <div className="text-[11px] text-[#6B6358]">Lagna</div>
+                <div className="text-[13px] text-[#E8E2D5]">{result.chart.lagnaSign}</div>
               </div>
-              <div className="p-2 rounded-lg bg-white/[0.02]">
-                <div className="text-[9px] text-ink-muted">Moon</div>
-                <div className="text-[12px] text-ink">{result.chart.moonSign}</div>
+              <div className="p-2 border border-[#2A2722]">
+                <div className="text-[11px] text-[#6B6358]">Moon</div>
+                <div className="text-[13px] text-[#E8E2D5]">{result.chart.moonSign}</div>
               </div>
-              <div className="p-2 rounded-lg bg-white/[0.02]">
-                <div className="text-[9px] text-ink-muted">Nakshatra</div>
-                <div className="text-[12px] text-ink">{result.chart.moonNakshatra}</div>
+              <div className="p-2 border border-[#2A2722]">
+                <div className="text-[11px] text-[#6B6358]">Nakshatra</div>
+                <div className="text-[13px] text-[#E8E2D5]">{result.chart.moonNakshatra}</div>
               </div>
-              <div className="p-2 rounded-lg bg-white/[0.02]">
-                <div className="text-[9px] text-ink-muted">Nak Lord</div>
-                <div className="text-[12px] text-ink">{result.chart.nakshatraLord}</div>
+              <div className="p-2 border border-[#2A2722]">
+                <div className="text-[11px] text-[#6B6358]">Nak Lord</div>
+                <div className="text-[13px] text-[#E8E2D5]">{result.chart.nakshatraLord}</div>
               </div>
             </div>
-            <GhostButton onClick={() => { setResult(null); setQuestion(""); }} className="w-full">
+            <button
+              onClick={() => { setResult(null); setQuestion(""); }}
+              className="w-full py-3 text-[14px] text-[#9C9489] hover:text-[#E8E2D5] border border-[#2A2722] hover:border-[#4A4540] transition rounded-sm focus-ring"
+            >
               Ask another question
-            </GhostButton>
+            </button>
           </div>
         )}
       </div>
