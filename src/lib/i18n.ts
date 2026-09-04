@@ -49,6 +49,7 @@ const DICT: Dict = {
   nav_manifest: { en: "Manifest", my: "ဆုတောင်း", th: "การอธิษฐาน", kh: "ការអធិស្ឋាន", lo: "ການອະທິຖານ" },
   nav_ritual: { en: "Ritual", my: "ပူဇော်ပွဲ", th: "พิธีกรรม", kh: "ពិធី", lo: "ພິທີ" },
   nav_frequencies: { en: "Frequencies", my: "ကြိမ်နှုန်း", th: "ความถี่", kh: "ប្រេកង់", lo: "ຄວາມຖີ່" },
+  nav_breath: { en: "Breath", my: "အသက်ရှူ", th: "ลมหายใจ", kh: "ដង្ហើម", lo: "ລົມຫາຍໃຈ" },
   nav_positivity: { en: "Positivity", my: "အပြုသဘော", th: "ความเชิงบวก", kh: "ភាពវិជ្ជមាន", lo: "ຄວາມເປັນບວກ" },
   nav_birth_chart: { en: "Birth Chart", my: "ွင်းချက်", th: "แผนผังกำเนิด", kh: "ផ្ទាំងកំណើត", lo: "ແຜນຜັງການເກີດ" },
   nav_numerology: { en: "Numerology", my: "အရေအတွက်ဗေဒင်", th: "เลขศาสตร์", kh: "លេខសាស្ត្រ", lo: "ເລກສາດ" },

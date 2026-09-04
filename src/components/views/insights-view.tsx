@@ -58,7 +58,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
   if (selected && (result || loading)) {
     const skill = skills.find((s) => s.id === selected);
     return (
-      <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+      <div className="h-full overflow-y-auto lumina-scroll">
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
           <button onClick={() => { setSelected(null); setResult(null); }} className="flex items-center gap-1.5 text-[12px] text-[#9C9489] hover:text-[#C5A572] mb-4 transition">
             <ArrowLeft className="w-3.5 h-3.5" /> All insights
@@ -123,7 +123,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
   }
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
         <SectionTitle eyebrow="Deep astrology · 3 Luck each" title="Insights" subtitle="Skill-based readings grounded in your natal chart." className="mb-6" />
 

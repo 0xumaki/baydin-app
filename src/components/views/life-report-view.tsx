@@ -84,7 +84,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
 
   if (!user.birthData) {
     return (
-      <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] flex items-center justify-center px-6">
+      <div className="h-full flex items-center justify-center px-6">
         <div className="max-w-md text-center">
           <Star className="w-8 h-8 text-[#C5A572] mx-auto mb-4" />
           <h1 className="serif-display text-[1.5rem] text-[#E8E2D5] mb-3">Birth details needed</h1>
@@ -99,7 +99,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
   // Generating state — show which section is being written
   if (loading) {
     return (
-      <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] flex items-center justify-center px-6">
+      <div className="h-full flex items-center justify-center px-6">
         <div className="max-w-md w-full text-center">
           {/* Progress indicator — section names cycling */}
           <div className="mb-8">
@@ -149,7 +149,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
   if (report) {
     const section = report.sections[activeSection];
     return (
-      <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] flex flex-col">
+      <div className="h-full flex flex-col">
         {/* Section navigation */}
         <div className="flex items-center gap-2 px-6 py-3 border-b border-[#2A2722] overflow-x-auto" style={{ scrollbarWidth: "none" }}>
           <button
@@ -230,7 +230,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
 
   // Initial state
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-6 py-10 lg:py-14">
         {/* Hero */}
         <div className="mb-10 lum-reveal">

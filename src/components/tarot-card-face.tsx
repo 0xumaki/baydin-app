@@ -74,7 +74,7 @@ export function TarotCardFace({
           meta={meta}
           size={size}
           reversed={reversed}
-          showImage={showImage && imgOk !== false}
+          showImage={true}
           onImgError={() => setImgOk(false)}
           onImgLoad={() => setImgOk(true)}
         />
@@ -208,69 +208,7 @@ function FaceSide({
         </>
       )}
 
-      {/* SVG composition fallback (when no image) */}
-      {!showImageLayer && (
-        <div
-          className="absolute inset-0 flex flex-col items-center justify-between"
-          style={{ padding: size === "sm" ? 6 : 10 }}
-        >
-          {/* Top: roman numeral + suit glyph */}
-          <div className="w-full flex items-center justify-between" style={{ color: meta.accent }}>
-            <span style={{ fontSize: numSize, fontWeight: 500, letterSpacing: "0.04em", opacity: 0.9 }}>
-              {card.arcana === "major" ? roman(card.number) : card.number}
-            </span>
-            <span style={{ fontSize: numSize, opacity: 0.8 }}>{meta.glyph}</span>
-          </div>
-
-          {/* Center glyph */}
-          <div className="flex flex-col items-center gap-1.5 -mt-1">
-            <div className="relative flex items-center justify-center" style={{ width: glyphSize, height: glyphSize }}>
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: `radial-gradient(circle at 50% 45%, ${meta.accent}33 0%, ${meta.accent}08 50%, transparent 75%)`,
-                  filter: "blur(2px)",
-                }}
-              />
-              <svg className="absolute inset-0 w-full h-full" style={{ color: meta.accent }} aria-hidden>
-                <circle cx="50%" cy="50%" r="47%" fill="none" stroke="currentColor" strokeOpacity="0.25" strokeWidth="0.8" />
-                <circle cx="50%" cy="50%" r="40%" fill="none" stroke="currentColor" strokeOpacity="0.12" strokeWidth="0.5" strokeDasharray="2 3" />
-              </svg>
-              <motion.span
-                animate={{ rotate: reversed ? 180 : 0 }}
-                transition={{ duration: 0.6, ease: [0.2, 0, 0, 1] }}
-                style={{
-                  color: meta.color,
-                  fontSize: glyphSize * 0.46,
-                  lineHeight: 1,
-                  textShadow: `0 0 12px ${meta.accent}66`,
-                  position: "relative",
-                  zIndex: 1,
-                  display: "inline-block",
-                }}
-              >
-                {card.symbol}
-              </motion.span>
-            </div>
-          </div>
-
-          {/* Bottom: name */}
-          <div className="w-full text-center">
-            <div
-              className="font-medium tracking-[0.02em] text-ink"
-              style={{ fontSize: nameSize, lineHeight: 1.15 }}
-            >
-              {card.nameShort}
-            </div>
-            <div
-              className="uppercase tracking-[0.18em] mt-0.5"
-              style={{ fontSize: nameSize * 0.62, color: meta.accent, opacity: 0.7 }}
-            >
-              {meta.label.split(" · ")[0]}
-            </div>
-          </div>
-        </div>
-      )}
+      
 
       {/* Inner highlight for premium depth */}
       <div

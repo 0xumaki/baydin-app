@@ -125,7 +125,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
   }
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-6 py-10 lg:py-14">
 
         {/* ===== PHASE: ASK ===== */}

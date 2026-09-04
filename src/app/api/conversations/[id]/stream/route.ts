@@ -146,7 +146,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           }
           if (r.value) {
             fullText += r.value;
-            send("writing", { delta: r.value, tail: fullText.slice(-200) });
+            send("writing", { delta: r.value, tail: fullText });
           }
         }
       } catch (err: any) {

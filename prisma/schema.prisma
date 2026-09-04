@@ -398,3 +398,18 @@ model DreamJournal {
   @@index([userId, isFavorite])
   @@map("dream_journal")
 }
+
+model HoroscopeCache {
+  id          String   @id @default(cuid())
+  sign        String
+  type        String
+  dateStr     String   @map("date_str")
+  language    String
+  content     String
+  highlights  String?
+  guidance    String?
+  personalized Boolean @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  @@unique([sign, type, dateStr, language, personalized])
+  @@map("horoscope_cache")
+}

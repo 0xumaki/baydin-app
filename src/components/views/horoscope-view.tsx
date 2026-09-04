@@ -28,14 +28,18 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
     finally { setLoading(false); }
   }
 
+  // Sign/period change does NOT auto-fetch — user must click "Read horoscope" to spend Luck
+  function changeSign(s: string) { setSign(s); setHoroscope(null); }
+  function changeType(t: typeof type) { setType(t); setHoroscope(null); }
+
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
         <SectionTitle eyebrow="Daily guidance" title="Horoscope" subtitle="Written by Gemini from live transit data." className="mb-6" />
 
         <div className="flex items-center gap-2 mb-4">
           {(["daily", "weekly", "monthly"] as const).map((t) => (
-            <button key={t} onClick={() => { setType(t); fetchH(undefined, t); }} className={`px-3 py-1.5 rounded-full text-[12px] border transition ${type === t ? "bg-[#C5A572]/15 text-[#C5A572] border-[#C5A572]/30" : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5]"}`}>
+            <button key={t} onClick={() => changeType(t)} className={`px-3 py-1.5 rounded-full text-[12px] border transition ${type === t ? "bg-[#C5A572]/15 text-[#C5A572] border-[#C5A572]/30" : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5]"}`}>
               {t[0].toUpperCase() + t.slice(1)}
             </button>
           ))}
@@ -43,7 +47,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 
         <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5 mb-5">
           {SIGNS.map((s, i) => (
-            <button key={s} onClick={() => { setSign(s); fetchH(s); }} className={`aspect-square rounded-lg flex items-center justify-center text-lg transition ${sign === s ? "bg-[#C5A572]/15 text-[#C5A572] border border-[#C5A572]/30" : "bg-white/[0.02] text-[#9C9489] hover:text-[#E8E2D5] hover:bg-white/[0.04]"}`} title={s}>
+            <button key={s} onClick={() => changeSign(s)} className={`aspect-square rounded-lg flex items-center justify-center text-lg transition ${sign === s ? "bg-[#C5A572]/15 text-[#C5A572] border border-[#C5A572]/30" : "bg-white/[0.02] text-[#9C9489] hover:text-[#E8E2D5] hover:bg-white/[0.04]"}`} title={s}>
               {ZODIAC_SYMBOLS[i]}
             </button>
           ))}

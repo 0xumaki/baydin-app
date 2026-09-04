@@ -47,7 +47,7 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
   }
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
         <div className="flex items-center gap-2 mb-1">
           <Store className="w-5 h-5 text-[#7A8B6F]" />

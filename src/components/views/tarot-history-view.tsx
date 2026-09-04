@@ -58,7 +58,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
   }
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
         <div className="flex items-center justify-between mb-6">
           <SectionTitle eyebrow="Your past readings" title="Tarot History" subtitle="Browse, bookmark & share your past tarot readings." />
@@ -91,9 +91,9 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
               return (
                 <GlassCard key={r.id} className="overflow-hidden">
                   {/* Header row */}
-                  <button
+                  <div
                     onClick={() => setExpanded(isExpanded ? null : r.id)}
-                    className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition"
+                    className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition cursor-pointer"
                   >
                     {/* Card thumbnails */}
                     <div className="flex -space-x-2 shrink-0">
@@ -134,7 +134,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                       </button>
                       {isExpanded ? <ChevronDown className="w-4 h-4 text-[#9C9489]" /> : <ChevronRight className="w-4 h-4 text-[#9C9489]" />}
                     </div>
-                  </button>
+                  </div>
 
                   {/* Expanded content */}
                   {isExpanded && (

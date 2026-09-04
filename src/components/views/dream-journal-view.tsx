@@ -168,7 +168,7 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
   }
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-5xl mx-auto px-6 py-10 lg:py-14">
         {/* Header — serif headline */}
         <div className="flex items-end justify-between mb-8 flex-wrap gap-4 lum-reveal">
@@ -377,7 +377,7 @@ function EntryForm({
   }
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <form onSubmit={submit} className="max-w-2xl mx-auto px-6 py-12 lg:py-16">
         <button type="button" onClick={onCancel} className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition mb-4 focus-ring rounded-sm">
           ← Cancel
@@ -529,7 +529,7 @@ function EntryDetail({
   }
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
         <button onClick={onClose} className="text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4">
           ← Back to journal

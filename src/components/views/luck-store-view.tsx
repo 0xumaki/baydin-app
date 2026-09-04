@@ -88,7 +88,7 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
   const selectedTier = [...tiers.regular, ...(tiers.reseller || [])].find((t) => t.id === selected);
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-4xl mx-auto px-6 py-10 lg:py-14">
         {/* Hero */}
         <div className="mb-10 lum-reveal">

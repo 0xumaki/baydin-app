@@ -210,6 +210,7 @@ export function renderHoroscopePrompt(params: {
 const zaiPromise = ZAI.create();
 
 type LLMResult = {
+  failed?: boolean;
   content: string;
   raw: string;
   parsed?: { content: string; highlights: string[]; guidance: any | null };
@@ -271,7 +272,7 @@ export async function* streamAstrologerLLM(system: string, user: string, opts?: 
   const zai = await zaiPromise;
   let full = "";
   try {
-    const completion = await withTimeout(
+    const streamBody: any = await withTimeout(
       zai.chat.completions.create({
         messages: [
           { role: "system", content: system },
@@ -279,15 +280,39 @@ export async function* streamAstrologerLLM(system: string, user: string, opts?: 
         ],
         temperature: opts?.temperature ?? 0.7,
         maxTokens: opts?.maxTokens ?? 2048,
+        stream: true,
       } as any),
       LLM_TIMEOUT_MS_STREAM,
       "LLM stream"
     );
-    full = completion.choices?.[0]?.message?.content?.trim() ?? "";
-    // Simulate streaming: yield the text in ~12-char word-boundary chunks
-    const tokens = full.match(/\S+\s*/g) ?? [full];
-    for (const t of tokens) {
-      yield t;
+    // Real streaming via SSE parsing
+    if (streamBody && typeof streamBody.getReader === "function") {
+      const reader = streamBody.getReader();
+      const decoder = new TextDecoder();
+      let sseBuffer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        sseBuffer += decoder.decode(value, { stream: true });
+        const events = sseBuffer.split("\n\n");
+        sseBuffer = events.pop() || "";
+        for (const evt of events) {
+          const dataLines = evt.split("\n").filter((l) => l.startsWith("data:"));
+          for (const line of dataLines) {
+            const payload = line.slice(6).trim();
+            if (payload === "[DONE]") continue;
+            try {
+              const obj = JSON.parse(payload);
+              const delta = obj.choices?.[0]?.delta?.content ?? "";
+              if (delta) { full += delta; yield delta; }
+            } catch {}
+          }
+        }
+      }
+    } else {
+      full = streamBody?.choices?.[0]?.message?.content?.trim() ?? "";
+      const tokens = full.match(/\S+\s*/g) ?? [full];
+      for (const t of tokens) yield t;
     }
   } catch (err) {
     console.error("Astrologer stream failed:", err);

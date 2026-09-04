@@ -40,7 +40,7 @@ export function BirthChartView({ onAuth }: { onAuth: () => void }) {
   }
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
         <SectionTitle eyebrow="Natal chart" title="Your Birth Chart" subtitle="Computed with astronomical precision. Interpreted by Gemini." className="mb-6" />
 

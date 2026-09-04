@@ -100,7 +100,7 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
     const startIdx = Math.max(0, wordIndex - 8);
     const isFinished = wordIndex >= words.length;
     return (
-      <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+      <div className="h-full overflow-y-auto lumina-scroll">
         <div className="max-w-2xl mx-auto px-6 py-10 lg:py-14">
           <button onClick={() => { pause(); setScript(""); setSelectedCat(null); }} className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition mb-6 focus-ring rounded-sm">← All categories</button>
 
@@ -193,7 +193,7 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
   // Loading state
   if (loading && cat) {
     return (
-      <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] flex items-center justify-center px-6 text-center">
+      <div className="h-full flex items-center justify-center px-6 text-center">
         <div>
           <Loader2 className="w-8 h-8 text-[#C5A572] animate-spin mx-auto mb-3" style={{ color: cat.color }} />
           <div className="text-[14px] text-[#E8E2D5]">Writing your {cat.name} affirmation…</div>
@@ -205,7 +205,7 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
 
   // Category grid
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
         <SectionTitle eyebrow="Daily practice · 1 free/day" title="Positivity Generator" subtitle="AI-crafted affirmation scripts. Read along as each word lights up." className="mb-6" />
 

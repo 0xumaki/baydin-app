@@ -55,7 +55,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
     const pct = (score / max) * 100;
     const verdict = pct >= 75 ? { label: "Excellent Match", color: "#B5CD7E" } : pct >= 50 ? { label: "Good Match", color: "#C5A87C" } : pct >= 30 ? { label: "Average Match", color: "#F09A3D" } : { label: "Challenging Match", color: "#b5463a" };
     return (
-      <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+      <div className="h-full overflow-y-auto lumina-scroll">
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
           <button onClick={() => setResult(null)} className="flex items-center gap-1.5 text-[12px] text-[#9C9489] hover:text-[#C5A572] mb-4 transition">
             <ArrowLeft className="w-3.5 h-3.5" /> New reading
@@ -140,7 +140,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
   // Loading state
   if (loading) {
     return (
-      <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] flex items-center justify-center px-6 text-center">
+      <div className="h-full flex items-center justify-center px-6 text-center">
         <div>
           <div className="relative w-20 h-20 mx-auto mb-4">
             <Heart className="w-20 h-20 text-[#C5A572]/20 absolute" />
@@ -155,7 +155,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
 
   // Form view
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-2xl mx-auto px-4 py-6 lg:py-8">
         <SectionTitle eyebrow="Partner matching · 5 Luck" title="Compatibility" subtitle="Vedic Ashtakoota (8-fold /36) + Venus synastry + Mahabote weekday." className="mb-6" />
 

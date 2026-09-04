@@ -77,7 +77,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
   const progress = (completedSteps / totalSteps) * 100;
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
         <SectionTitle eyebrow="Daily practice · Free" title="Daily Ritual" subtitle="A 4-step morning practice. Complete it for a Luck bonus." className="mb-6" />
 

@@ -139,7 +139,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
   const progress = duration > 0 ? (elapsed / duration) * 100 : 0;
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-4xl mx-auto px-4 py-6 lg:py-8">
         <SectionTitle eyebrow="Daily practice · Free" title="Solfeggio Frequencies" subtitle="Tune your mind. Pure tones, binaural beats & ambient pads via Web Audio." className="mb-6" />
 

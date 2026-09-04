@@ -178,7 +178,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
       : numberCards[0];
 
     return (
-      <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+      <div className="h-full overflow-y-auto lumina-scroll">
         <div className="max-w-5xl mx-auto px-6 py-8 lg:py-12">
           {/* Header — serif headline, sentence-case */}
           <div className="mb-10 lum-reveal">
@@ -265,7 +265,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
 
   // ---- Form / Preview ----
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-2xl mx-auto px-6 py-12 lg:py-16">
         {/* Hero — serif, no icon-in-circle */}
         <div className="mb-10 lum-reveal">

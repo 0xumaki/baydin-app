@@ -92,7 +92,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
   const hasAnyActivity = analytics.totals.daysActive > 0;
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-5xl mx-auto px-6 py-10 lg:py-14">
         {/* Header — serif, no icon-in-row */}
         <div className="mb-10 lum-reveal">

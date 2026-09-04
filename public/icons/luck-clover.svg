@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="url(#baydinCloverGold)" stroke="url(#baydinCloverGoldStroke)" stroke-width="0.35" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Baydin luck clover">
+  <title>Baydin luck clover</title>
+  <defs>
+    <linearGradient id="baydinCloverGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5E6C2"/>
+      <stop offset="35%" stop-color="#E7D2A8"/>
+      <stop offset="65%" stop-color="#C5A87C"/>
+      <stop offset="100%" stop-color="#9C7F54"/>
+    </linearGradient>
+    <linearGradient id="baydinCloverGoldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9C7F54"/>
+      <stop offset="100%" stop-color="#6B4E2E"/>
+    </linearGradient>
+    <radialGradient id="baydinCloverSheen" cx="50%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g>
+    <path d="M 12,12 C 9,11 7,10 7,7 C 7,4 10,4 12,5 C 14,4 17,4 17,7 C 17,10 15,11 12,12 Z" transform="rotate(45 12 12)"/>
+    <path d="M 12,12 C 9,11 7,10 7,7 C 7,4 10,4 12,5 C 14,4 17,4 17,7 C 17,10 15,11 12,12 Z" transform="rotate(135 12 12)"/>
+    <path d="M 12,12 C 9,11 7,10 7,7 C 7,4 10,4 12,5 C 14,4 17,4 17,7 C 17,10 15,11 12,12 Z" transform="rotate(225 12 12)"/>
+    <path d="M 12,12 C 9,11 7,10 7,7 C 7,4 10,4 12,5 C 14,4 17,4 17,7 C 17,10 15,11 12,12 Z" transform="rotate(315 12 12)"/>
+    <!-- Sheen overlay for each leaf -->
+    <g opacity="0.85">
+      <path d="M 12,12 C 9,11 7,10 7,7 C 7,4 10,4 12,5 C 14,4 17,4 17,7 C 17,10 15,11 12,12 Z" transform="rotate(45 12 12)" fill="url(#baydinCloverSheen)" stroke="none"/>
+      <path d="M 12,12 C 9,11 7,10 7,7 C 7,4 10,4 12,5 C 14,4 17,4 17,7 C 17,10 15,11 12,12 Z" transform="rotate(135 12 12)" fill="url(#baydinCloverSheen)" stroke="none"/>
+      <path d="M 12,12 C 9,11 7,10 7,7 C 7,4 10,4 12,5 C 14,4 17,4 17,7 C 17,10 15,11 12,12 Z" transform="rotate(225 12 12)" fill="url(#baydinCloverSheen)" stroke="none"/>
+      <path d="M 12,12 C 9,11 7,10 7,7 C 7,4 10,4 12,5 C 14,4 17,4 17,7 C 17,10 15,11 12,12 Z" transform="rotate(315 12 12)" fill="url(#baydinCloverSheen)" stroke="none"/>
+    </g>
+    <!-- Center vein dot -->
+    <circle cx="12" cy="12" r="0.55" fill="#6B4E2E" stroke="none"/>
+  </g>
+  <path d="M 12,12 C 11.5,15 12.5,18 12,21" fill="none" stroke="url(#baydinCloverGoldStroke)" stroke-width="0.7" stroke-linecap="round"/>
+</svg>

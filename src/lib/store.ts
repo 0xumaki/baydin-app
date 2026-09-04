@@ -20,6 +20,7 @@ export type AppView =
   | "ritual"        // 4-step daily ritual tracker (free, daily-use)
   | "dream-journal" // Dream journal with lunar context + AI interpretation
   | "frequency"    // Solfeggio tone sessions + breathing pacer (free, daily-use)
+  | "breath"       // Breath guide — Calm/Headspace-style pacer (free, daily-use)
   | "positivity"   // Affirmation generator (1 free/day, then Luck)
   | "insights"      // Skill-based deep readings (yogas, transits, etc.)
   | "compatibility" // Partner matching (Ashtakoota + synastry)

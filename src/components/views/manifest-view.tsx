@@ -63,7 +63,7 @@ export function ManifestView({ onAuth }: { onAuth: () => void }) {
   }
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
         <div className="flex items-center justify-between mb-6">
           <SectionTitle eyebrow="Daily practice · Free" title="Manifest" subtitle="Set intentions. Confirm daily. Watch them grow." />
@@ -218,7 +218,7 @@ function Gate({ onAuth }: { onAuth: () => void }) {
 
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] flex items-center justify-center px-6">
+    <div className="h-full flex items-center justify-center px-6">
       <ShellCard className="max-w-md w-full p-8 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-leaf/20 to-gold/10 border border-leaf/20 mb-4">
           <Target className="w-7 h-7 text-[#7A8B6F]" />

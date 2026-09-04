@@ -51,7 +51,7 @@ export function julianDay(year: number, month: number, day: number, ut = 0): num
 }
 
 /** Days since J2000.0 (JD 2451545.0). */
-function daysSinceJ2000(jd: number): number {
+export function daysSinceJ2000(jd: number): number {
   return jd - 2451545.0;
 }
 
@@ -61,7 +61,7 @@ function T(jd: number): number {
 }
 
 // ---------- obliquity & ayanamsa ----------
-function obliquity(jd: number): number {
+export function obliquity(jd: number): number {
   const t = T(jd);
   return 23.4392911 - 0.0130042 * t - 1.64e-7 * t * t + 5.04e-7 * t * t * t;
 }
@@ -129,7 +129,7 @@ export function moonPosition(d: number) {
   return { lon, r };
 }
 
-function sunMeanAnomaly(d: number): number {
+export function sunMeanAnomaly(d: number): number {
   return rev(356.047 + 0.9856002585 * d);
 }
 
@@ -181,7 +181,7 @@ const PLANET_PARAMS: Record<string, (d: number) => PlanetParams> = {
   }),
 };
 
-function planetHeliocentric(name: string, d: number) {
+export function planetHeliocentric(name: string, d: number) {
   const p = PLANET_PARAMS[name](d);
   const E = p.M + (180 / Math.PI) * p.e * sind(p.M) * (1 + p.e * cosd(p.M));
   const xv = p.a * (cosd(E) - p.e);
@@ -198,13 +198,13 @@ function planetHeliocentric(name: string, d: number) {
 }
 
 /** Earth's heliocentric position (needed for geocentric planet conversion). */
-function earthPosition(d: number) {
+export function earthPosition(d: number) {
   // Earth = Sun position reflected: heliocentric earth = -sun
   const s = sunPosition(d);
   return { lon: rev(s.lon + 180), r: s.r };
 }
 
-function geocentricPlanet(name: string, d: number) {
+export function geocentricPlanet(name: string, d: number) {
   const p = planetHeliocentric(name, d);
   const earth = earthPosition(d);
   // Convert both to rectangular heliocentric ecliptic, then subtract
@@ -228,7 +228,7 @@ export function meanNode(jd: number): number {
 }
 
 // ---------- Local Sidereal Time ----------
-function gmst(jd: number): number {
+export function gmst(jd: number): number {
   const t = T(jd);
   const gmst =
     280.46061837 +
@@ -238,7 +238,7 @@ function gmst(jd: number): number {
   return rev(gmst);
 }
 
-function lst(jd: number, longitude: number): number {
+export function lst(jd: number, longitude: number): number {
   return rev(gmst(jd) + longitude);
 }
 

@@ -124,7 +124,7 @@ export function LunarCalendarView({ onAuth }: { onAuth: () => void }) {
   } : null;
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-6xl mx-auto px-6 py-10 lg:py-14">
         {/* Header — serif headline + month nav */}
         <div className="flex items-end justify-between mb-8 flex-wrap gap-4 lum-reveal">
@@ -430,7 +430,7 @@ function DayDetail({
 }) {
   const dateObj = new Date(day.date + "T12:00:00");
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
         <button onClick={onBack} className="text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4">
           ← Back to calendar

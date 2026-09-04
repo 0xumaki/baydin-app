@@ -22,6 +22,7 @@ import { LunarCalendarView } from "@/components/views/lunar-calendar-view";
 import { DreamJournalView } from "@/components/views/dream-journal-view";
 import { AnalyticsDashboardView } from "@/components/views/analytics-dashboard-view";
 import { FrequencyView } from "@/components/views/frequency-view";
+import { BreathView } from "@/components/views/breath-view";
 import { PositivityView } from "@/components/views/positivity-view";
 import { CompatibilityView } from "@/components/views/compatibility-view";
 import { ProfileView } from "@/components/views/profile-view";
@@ -38,7 +39,7 @@ import { useT } from "@/lib/use-t";
 import {
   Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
   Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
-  Waves, Heart, Users, Flame, BarChart3, Hash, Calendar, CloudMoon, LineChart,
+  Waves, Heart, Users, Flame, BarChart3, Hash, Calendar, CloudMoon, LineChart, Wind,
 } from "lucide-react";
 
 const NAV_ITEMS: { view: AppView; labelKey: string; icon: any; customIcon?: string; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group: string }[] = [
@@ -52,6 +53,7 @@ const NAV_ITEMS: { view: AppView; labelKey: string; icon: any; customIcon?: stri
   { view: "manifest", labelKey: "nav_manifest", icon: Target, customIcon: "nav-manifest", needsAuth: true, group: "Practice" },
   { view: "ritual", labelKey: "nav_ritual", icon: Flame, customIcon: "nav-ritual", needsAuth: true, group: "Practice" },
   { view: "frequency", labelKey: "nav_frequencies", icon: Waves, customIcon: "nav-frequencies", needsAuth: true, group: "Practice" },
+  { view: "breath", labelKey: "nav_breath", icon: Wind, customIcon: "nav-breath", needsAuth: true, group: "Practice" },
   { view: "positivity", labelKey: "nav_positivity", icon: Heart, customIcon: "nav-positivity", needsAuth: true, group: "Practice" },
   { view: "birth-chart", labelKey: "nav_birth_chart", icon: Star, customIcon: "nav-birth-chart", needsAuth: true, group: "Astrology" },
   { view: "numerology", labelKey: "nav_numerology", icon: Hash, customIcon: "nav-numerology", needsAuth: true, group: "Astrology" },
@@ -99,7 +101,7 @@ export function AppShell() {
   }
 
   return (
-    <div className="relative min-h-[100dvh] flex flex-col bg-background overflow-hidden">
+    <div className="relative h-[100dvh] flex flex-col bg-background overflow-hidden">
       {/* Mobile top bar */}
       <header className="lg:hidden sticky top-0 z-30 bg-[#0A0908] border-b border-[#2A2722] px-4 py-3 flex items-center justify-between lum-pt-safe">
         <button onClick={() => setSidebarOpen(true)} aria-label="Open navigation menu" className="p-2 -ml-2 text-[#6B6358] hover:text-[#E8E2D5] transition">
@@ -118,7 +120,7 @@ export function AppShell() {
         )}
       </header>
 
-      <div className="flex-1 flex relative z-10">
+      <div className="flex-1 flex relative z-10 min-h-0 overflow-hidden">
         {/* Sidebar */}
         <Sidebar
           open={sidebarOpen}
@@ -134,7 +136,7 @@ export function AppShell() {
         />
 
         {/* Main area */}
-        <main className="flex-1 min-w-0 flex flex-col">
+        <main className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
           {/* Desktop top bar — quiet, no glass, no sparkle */}
           <div className="hidden lg:flex items-center justify-between px-8 py-4 border-b border-[#2A2722] bg-[#0A0908]">
             <div className="flex items-baseline gap-3">
@@ -173,7 +175,7 @@ export function AppShell() {
           </div>
 
           {/* View content */}
-          <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-hidden h-full">
             <AnimatePresence mode="wait">
               <motion.div
                 key={view}
@@ -181,7 +183,7 @@ export function AppShell() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.25, ease: [0.2, 0, 0, 1] }}
-                className="h-full"
+                className="h-full overflow-hidden"
               >
                 {view === "today" && <TodayView onAuth={() => setAuthOpen(true)} />}
                 {view === "chat" && <ChatView onAuth={() => setAuthOpen(true)} />}
@@ -193,6 +195,7 @@ export function AppShell() {
                 {view === "manifest" && <ManifestView onAuth={() => setAuthOpen(true)} />}
                 {view === "ritual" && <RitualView onAuth={() => setAuthOpen(true)} />}
                 {view === "frequency" && <FrequencyView onAuth={() => setAuthOpen(true)} />}
+                {view === "breath" && <BreathView onAuth={() => setAuthOpen(true)} />}
                 {view === "positivity" && <PositivityView onAuth={() => setAuthOpen(true)} />}
                 {view === "birth-chart" && <BirthChartView onAuth={() => setAuthOpen(true)} />}
                 {view === "insights" && <InsightsView onAuth={() => setAuthOpen(true)} />}

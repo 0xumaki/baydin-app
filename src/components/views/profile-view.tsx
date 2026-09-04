@@ -46,7 +46,7 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
   const archetype = determineArchetype(totals);
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
         <SectionTitle eyebrow="Your journey" title="Profile & Stats" subtitle="Your spiritual practice at a glance." className="mb-6" />
 

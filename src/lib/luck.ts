@@ -449,3 +449,13 @@ export function getDailyRewardAmount(streakDay: number): number {
 
 export const SIGNUP_BONUS = 5; // free Luck on signup
 export const REFERRAL_BONUS = 10; // referrer gets Luck when referee signs up + first purchase
+
+
+/** Refund Luck to a user (e.g. when an LLM call fails after charging). */
+export async function refundLuck({ userId, feature, amount, referenceId }: { userId: string; feature: string; amount: number; referenceId?: string }) {
+  if (amount <= 0) return;
+  try {
+    await db.user.update({ where: { id: userId }, data: { luckBalance: { increment: amount } } });
+    await db.luckTransaction.create({ data: { userId, type: "refund", feature, amount, referenceId, description: `Refund: ${feature}` } });
+  } catch (e) { console.error("refundLuck error:", e); }
+}

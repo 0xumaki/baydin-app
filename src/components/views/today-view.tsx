@@ -154,7 +154,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
 
   if (!user) {
     return (
-      <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+      <div className="h-full overflow-y-auto lumina-scroll">
         <div className="max-w-2xl mx-auto px-6 py-12 lg:py-20">
           {/* The one distinctive moment — serif headline, no card chrome */}
           <div className="lum-reveal">
@@ -207,7 +207,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const dateStr = today.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
   return (
-    <div className="h-[100dvh] lg:h-[calc(100dvh-57px)] overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-y-auto lumina-scroll">
       <div className="max-w-4xl mx-auto px-4 py-6 lg:py-8">
         {/* Hero — serif greeting, sentence-case date, no ALL-CAPS eyebrow */}
         <div className="mb-8 lum-reveal">
