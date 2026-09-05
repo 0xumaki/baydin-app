@@ -17,10 +17,12 @@ export const POST = withAuth(async (req: NextRequest) => {
   }
   const target = await db.user.findUnique({ where: { email: (userEmail as string).toLowerCase() } });
   if (!target) return NextResponse.json({ error: "User not found." }, { status: 404 });
+  // Don't downgrade admins to reseller — preserve their admin role.
+  const newRole = target.role === "admin" ? "admin" : "reseller";
   const updated = await db.user.update({
     where: { id: target.id },
     data: {
-      role: "reseller",
+      role: newRole,
       resellerTier: tier || "bronze",
       resellerSince: new Date(),
     },

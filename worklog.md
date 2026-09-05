@@ -2752,3 +2752,60 @@ The task spec listed `import { resellerTierColor } from "@/lib/luck"` — but `s
 5. **`/api/reseller/certificate/history` response**: `{issuedToMe: [...], issuedByMe: [...]}`. Both arrays contain `ResellerCertificate` rows. Self-service certs appear in BOTH arrays (since the user self-issues them) — the `RecentCertificates` component dedupes by id.
 
 6. **AppShell URL sync**: uses `replaceState` (not `pushState`) per spec. Browser back/forward will NOT navigate between views — that's intentional. The watch-view `useEffect` runs on every view change including indirect ones (e.g. `setActiveConversation(null)` which sets view to "chat" via the store).
+
+---
+
+## Task RECOVER-PREMIUM-CERT — Recover premium certificate design on BrandedImageCard client component
+
+**Task ID:** RECOVER-PREMIUM-CERT
+**Agent:** RECOVER-PREMIUM-CERT (Z.ai Code)
+**Date:** $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+The BrandedImageCard client component had lost its premium certificate design. The server-side SVG mirror (`src/lib/branded-image.ts`) had the full premium design (double gold border, 4 corner clover ornaments, shield badge, seal of authenticity, signature line, radial background gradient) — but the client React component was just embedding the SVG string via `dangerouslySetInnerHTML`, with no React-level control over individual premium elements.
+
+### What was done
+
+Full rewrite of `src/components/branded-image/branded-image-card.tsx` (199 → 1601 lines). New architecture: native React mirror of the server SVG, using inline `style` props for ALL colors / backgrounds / borders / opacities (html-to-image compatibility) and inline `<svg>` elements for vector primitives.
+
+**Component tree:**
+- Premium design tokens (GOLD, GOLD_LIGHT, GOLD_DARK, PARCHMENT, INK, INK_DIM, SURFACE, SURFACE_2, SERIF, SANS) — verbatim copies of the SVG constants.
+- Helpers: `truncate`, `titleCase`, `formalIssueDate` ("Issued on the Nth day of Month, Year"), `shortIssueDate` ("October 15, 2024"), `generateCertId`.
+- `Text` component — SVG-like positioned text (baseline offset = `fontSize * 0.85`), supports `align: start | middle | end`.
+- Inline SVG primitives: `CloverMark` (4-leaf clover + center dot, mirrors `cloverMark()`), `CornerOrnament` (L-shape filigree, mirrors `cornerOrnament()`), `ShieldBadge` (shield outline + inner diamond, mirrors `shieldBadge()`), `SealOfAuthenticity` (concentric circles + BAYDIN/AUTHENTIC text, mirrors `sealOfAuthenticity()`).
+- `BackgroundLayers` — linear gradient (mirrors `url(#bg)`) + radial sheen (mirrors `url(#sheen)`) + optional large central clover watermark at opacity 0.04.
+- `OuterChrome` — double border (outer 2.5px gold + inner 0.6px gold at 50% opacity, 12px gap = 8px between borders) + 4 corner ornaments. Configurable per-variant (defaults match cert; leaderboard uses 2px/0.5px/0.4 opacity/24px corners; flyer & referral use 20/30 inset, 22px corners).
+- 4 variant content renderers: `CertificateContent` (900×560), `LeaderboardContent` (900×H), `CampaignFlyerContent` (600×800), `ReferralShareContent` (600×700). Each reproduces the SVG layout pixel-for-pixel (every Text element at the exact (x, y) coords from the SVG).
+- Main `BrandedImageCard = React.forwardRef<HTMLDivElement, BrandedImageCardProps>` — fixed pixel dimensions per variant (so hidden download mounts with `position: fixed; left: -99999` shrink-to-fit to natural SVG size). Live-preview pulse dot (top-left, not scaled) with all colors inlined; new optional `hideLiveBadge` prop for cleaner PNG export.
+
+**Premium elements delivered (matching the SVG):**
+- Double gold border (outer 2.5px + inner 0.6px at 50% opacity, 8px gap)
+- 4 corner clover ornaments (28×28 cert, 24×24 leaderboard, 22×22 flyer/referral)
+- Shield-shaped tier badge (SVG path, scale 1.4, at cx=560 cy=484)
+- Seal of authenticity (circular gold seal r=40 at cx=720 cy=488 with BAYDIN/AUTHENTIC text)
+- Signature line at bottom-left ("Baydin Astrology Council" + "Authorized Signatory")
+- Large central CloverIcon watermark (opacity 0.04)
+- Subtle radial background gradient (mirrors SVG `url(#sheen)`)
+- Formal issue date in premium metadata area + short date in footer cert ID line
+- Premium metadata area between tier block and signature line
+
+**Constraints honored:**
+- TypeScript strict throughout (no `any`, no `as any`)
+- NO test code
+- NO new packages installed
+- Inline `style` props for ALL colors / backgrounds / borders / opacities (Tailwind only for `animate-ping` keyframe)
+- `fontFamily: 'Georgia, "Times New Roman", serif'` for serif text
+- forwardRef component
+- All 7 variants supported
+- Existing call sites in admin-view / reseller-view / profile-view remain functional (prop contract preserved; only new optional `hideLiveBadge` prop added)
+
+### Verification
+- `bun run lint` → exit 0, 0 errors, 0 warnings
+- `bunx tsc --noEmit` → 0 errors in `src/` (only pre-existing errors in out-of-scope `repo-scan/` and `examples/`)
+- Dev server stable: `GET / 200` repeated in dev.log, no compile errors
+
+### One fix applied during build
+- `react-hooks/use-memo` lint rule requires the first argument to be an inline function expression. Changed `React.useMemo(generateCertId, [])` to `React.useMemo(() => generateCertId(), [])`.
+
+### Files
+- Modified: `src/components/branded-image/branded-image-card.tsx` (199 → 1601 lines, full rewrite as forwardRef + native React mirror)
+- Created: `/home/z/my-project/agent-ctx/RECOVER-PREMIUM-CERT-z.ai-code.md` (this task record)

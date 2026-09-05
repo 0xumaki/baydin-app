@@ -2119,7 +2119,10 @@ function CampaignsTab() {
 
         {/* Live flyer preview */}
         <AuroraGlowCard className="p-5 lg:col-span-1">
-          <SectionLabel icon={ImageIcon}>Flyer preview</SectionLabel>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#7A8B6F] animate-pulse" aria-hidden />
+            <SectionLabel icon={ImageIcon}>Live flyer preview</SectionLabel>
+          </div>
           {previewCampaign ? (
             <>
               <div ref={previewRef}>

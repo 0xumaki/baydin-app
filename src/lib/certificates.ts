@@ -1,5 +1,6 @@
 import "server-only";
 import { db } from "@/lib/db";
+import { renderCertificateSvg } from "@/lib/branded-image";
 
 /**
  * BAYDIN — Reseller certificate issuance helper.
@@ -121,7 +122,7 @@ export async function issueCertificate(params: IssueCertParams): Promise<IssuedC
   });
   if (!user) throw new Error("User not found");
 
-  const svg = buildCertificateSvg({
+  const svg = renderCertificateSvg({
     userName: user.name,
     userEmail: user.email,
     tier,
