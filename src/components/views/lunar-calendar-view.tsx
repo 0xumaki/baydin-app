@@ -88,7 +88,7 @@ export function LunarCalendarView({ onAuth }: { onAuth: () => void }) {
 
   if (!user) {
     return (
-      <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="h-full overflow-hidden relative">
         <div className="fixed inset-0 pointer-events-none z-0">
           <AnimatedGradientBackground variant="cosmic" />
           <StarField count={30} />

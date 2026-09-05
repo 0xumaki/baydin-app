@@ -205,7 +205,7 @@ export function AppShell() {
           </div>
 
           {/* View content */}
-          <div className="flex-1 min-h-0 overflow-hidden h-full">
+          <div className="flex-1 min-h-0 h-full overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={view}
@@ -213,7 +213,7 @@ export function AppShell() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.25, ease: [0.2, 0, 0, 1] }}
-                className="h-full overflow-hidden"
+                className="h-full overflow-y-auto lumina-scroll"
               >
                 {view === "today" && <TodayView onAuth={() => setAuthOpen(true)} />}
                 {view === "chat" && <ChatView onAuth={() => setAuthOpen(true)} />}

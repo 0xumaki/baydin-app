@@ -432,7 +432,7 @@ export function BreathView({ onAuth }: { onAuth: () => void }) {
   // ----- Sign-in gate (after all hooks) -----
   if (!user) {
     return (
-      <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="h-full overflow-hidden relative">
         <div className="fixed inset-0 pointer-events-none z-0">
           <AnimatedGradientBackground variant="warm" />
           <StarField count={30} />

@@ -320,13 +320,18 @@ export function AnimatedGradientBackground({
       {colors.map((c, i) => (
         <motion.div
           key={i}
-          className="lum-aurora-blob"
           style={{
             background: c,
             width: 360 + i * 80,
             height: 360 + i * 80,
             top: `${10 + i * 25}%`,
             left: `${-10 + i * 35}%`,
+            borderRadius: "50%",
+            filter: "blur(80px)",
+            opacity: 0.12,
+            mixBlendMode: "screen",
+            position: "absolute",
+            pointerEvents: "none",
           }}
           animate={{
             x: [0, 40, -30, 0],

@@ -141,7 +141,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
   const progress = duration > 0 ? (elapsed / duration) * 100 : 0;
 
   return (
-    <div className="h-full overflow-y-auto lumina-scroll relative">
+    <div className="h-full overflow-hidden relative">
       <div className="fixed inset-0 pointer-events-none z-0">
         <AnimatedGradientBackground variant="warm" />
         <StarField count={30} />

@@ -179,6 +179,15 @@
     filter: blur(40px);
     animation: lum-aurora-drift 18s ease-in-out infinite alternate;
   }
+  /* AnimatedGradientBackground blobs — blur + opacity so they look like aurora, not squares */
+  .lum-aurora-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
   .lum-text-gold {
     background: linear-gradient(180deg, #E7D2A8 0%, #C5A87C 60%, #9c7f54 100%);
     -webkit-background-clip: text;

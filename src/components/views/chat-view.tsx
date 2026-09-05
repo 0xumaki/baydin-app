@@ -631,7 +631,7 @@ function WelcomeState({ user, onSuggestion, hasBirthData }: { user: any; onSugge
 // ============================================================
 function EmptyState({ onAuth, t }: { onAuth: () => void; t: (k: string) => string }) {
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
+    <div className="h-full overflow-hidden">
       <div className="max-w-2xl mx-auto px-6 py-12 lg:py-16">
         <div className="lum-reveal">
           <div className="text-[13px] text-[#6B6358] mb-2">Your astrologer</div>
