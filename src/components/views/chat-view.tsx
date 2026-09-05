@@ -11,6 +11,8 @@ import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThinkingAnimation } from "@/components/thinking-animation";
+import { GlowPill, AnimatedGradientBackground } from "@/components/lumina/premium-ui";
+import { StarField } from "@/components/lumina/primitives";
 
 const SUGGESTIONS = [
   { icon: Star, text: "Read my birth chart", mode: "vedic" as const },
@@ -160,7 +162,12 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
   if (!user) return <EmptyState onAuth={onAuth} t={t} />;
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="flex h-full overflow-hidden relative">
+      {/* Subtle cosmic backdrop */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="cosmic" />
+        <StarField count={20} />
+      </div>
       {/* ===== SIDEBAR: Conversation history (ChatGPT-style) ===== */}
       <ChatSidebar
         conversations={conversations}
@@ -188,11 +195,11 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
           <ModeSelector mode={mode} onChange={setMode} />
 
           {/* Status indicators */}
-          <div className="ml-auto flex items-center gap-3 shrink-0">
+          <div className="ml-auto flex items-center gap-3 shrink-0 relative z-10">
             {hasBirthData ? (
-              <span className="text-[11px] text-[#7A8B6F] hidden sm:inline">Birth data set</span>
+              <GlowPill color="#7A8B6F" className="hidden sm:inline-flex normal-case tracking-normal">Birth data set</GlowPill>
             ) : (
-              <span className="text-[11px] text-[#C26B5C] hidden sm:inline">Add birth data</span>
+              <GlowPill color="#C26B5C" className="hidden sm:inline-flex normal-case tracking-normal">Add birth data</GlowPill>
             )}
             <button
               onClick={() => setShowPrashna(true)}

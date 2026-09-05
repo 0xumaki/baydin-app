@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { withAuth } from "@/lib/api-handler";
 import { db } from "@/lib/db";
+import { ALL_TIERS } from "@/lib/luck";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,6 +30,15 @@ export const POST = withAuth(async (req: NextRequest) => {
   }
   if (!tierId || typeof tierId !== "string") {
     return NextResponse.json({ error: "tierId is required." }, { status: 400 });
+  }
+  // Validate tierId is a known tier
+  const knownTier = ALL_TIERS.find((t) => t.id === tierId);
+  if (!knownTier) {
+    return NextResponse.json({ error: `tierId "${tierId}" is not a known tier.` }, { status: 400 });
+  }
+  // Validate tier kind matches campaign kind
+  if (knownTier.kind !== kind) {
+    return NextResponse.json({ error: `tier "${tierId}" is a ${knownTier.kind} tier, not a ${kind} tier.` }, { status: 400 });
   }
   const from = validFrom ? new Date(validFrom) : new Date();
   const until = validUntil ? new Date(validUntil) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);

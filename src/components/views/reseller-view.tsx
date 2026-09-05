@@ -649,7 +649,7 @@ function TopUpBalanceBanner({
 }
 
 // ============================================================
-// PartnerResources — three wired-up "coming soon" CTAs.
+// PartnerResources — three wired-up CTAs (marketing kit download, terms sheet, mailto).
 //   • Marketing kit        → downloads branded welcome card PNG
 //   • Terms & Policies     → opens Sheet with 6-section agreement
 //   • Partner support      → mailto: link

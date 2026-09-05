@@ -16,7 +16,10 @@ export const POST = withAuth(async (req: NextRequest) => {
   }
   const body = await req.json().catch(() => ({}));
   const validKinds: CertKind[] = ["promotion", "tier_upgrade", "welcome"];
-  const kind: CertKind = validKinds.includes(body.kind) ? body.kind : "welcome";
+  if (body.kind && !validKinds.includes(body.kind)) {
+    return NextResponse.json({ error: `kind must be one of: ${validKinds.join(", ")}` }, { status: 400 });
+  }
+  const kind: CertKind = body.kind || "welcome";
 
   const cert = await issueCertificate({
     userId: me.id,
