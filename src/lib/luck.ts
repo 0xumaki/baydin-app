@@ -455,7 +455,21 @@ export const REFERRAL_BONUS = 10; // referrer gets Luck when referee signs up + 
 export async function refundLuck({ userId, feature, amount, referenceId }: { userId: string; feature: string; amount: number; referenceId?: string }) {
   if (amount <= 0) return;
   try {
-    await db.user.update({ where: { id: userId }, data: { luckBalance: { increment: amount } } });
-    await db.luckTransaction.create({ data: { userId, type: "refund", feature, amount, referenceId, description: `Refund: ${feature}` } });
+    const updated = await db.user.update({
+      where: { id: userId },
+      data: { luckBalance: { increment: amount } },
+      select: { luckBalance: true },
+    });
+    await db.luckTransaction.create({
+      data: {
+        userId,
+        type: "refund",
+        feature: feature ?? null,
+        amount,
+        balanceAfter: updated.luckBalance,
+        referenceId: referenceId ?? null,
+        description: `Refund: ${feature}`,
+      },
+    });
   } catch (e) { console.error("refundLuck error:", e); }
 }
