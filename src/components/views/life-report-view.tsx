@@ -10,9 +10,8 @@ import {
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinLifeReport, BaydinLoader, BaydinStar, BaydinChevronRight, BaydinChevronLeft } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
-import { BookOpen, Loader2, Star, ChevronRight, ChevronLeft } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -93,7 +92,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
           <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-8 text-center">
             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[#C5A572]/10 border border-[#C5A572]/30 flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-[#C5A572]" />
+              <BaydinLifeReport className="w-6 h-6 text-[#C5A572]" />
             </div>
             <LiquidMetalText as="h1" className="text-[20px] mb-1">Sign in for your Life Report</LiquidMetalText>
             <p className="text-[12px] text-[#9C9489] mb-4 max-w-sm mx-auto">
@@ -116,7 +115,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden flex items-center justify-center">
           <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.15} className="p-8 max-w-md w-full text-center">
             <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#C5A572]/10 border border-[#C5A572]/30 flex items-center justify-center">
-              <Star className="w-6 h-6 text-[#C5A572]" />
+              <BaydinStar className="w-6 h-6 text-[#C5A572]" />
             </div>
             <LiquidMetalText as="h1" className="text-[20px] mb-2">Birth details needed</LiquidMetalText>
             <p className="text-[12px] text-[#9C9489] leading-relaxed">
@@ -139,7 +138,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
           <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.2} className="p-8">
             <div className="mb-8 text-center">
-              <Loader2 className="w-6 h-6 text-[#C5A572] animate-spin mx-auto mb-4" />
+              <BaydinLoader className="w-6 h-6 text-[#C5A572] mx-auto mb-4" />
               <GlowPill color="#9E8AC9" className="text-[10px] mb-3">Generating</GlowPill>
               <AnimatePresence mode="wait">
                 <motion.div
@@ -198,7 +197,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
             onClick={() => setReport(null)}
             className="flex items-center gap-1.5 text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4 focus-ring rounded-sm"
           >
-            <ChevronLeft className="w-3.5 h-3.5" /> All sections
+            <BaydinChevronLeft className="w-3.5 h-3.5" /> All sections
           </button>
 
           <AuroraGlowCard glowColor={accent} glowIntensity={0.18} className="p-6 lg:p-8">
@@ -236,7 +235,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
                   <div className="text-[12px] text-[#9C9489]">Next</div>
                   <div className="serif text-[15px] text-[#E8E2D5] mt-0.5">{report.sections[activeSection + 1].name}</div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-[#9C9489]" />
+                <BaydinChevronRight className="w-4 h-4 text-[#9C9489]" />
               </button>
             )}
           </AuroraGlowCard>
@@ -276,7 +275,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
         {/* Hero */}
         <div className="mb-8">
           <GlowPill color="#9E8AC9" className="text-[10px] mb-3">
-            <BookOpen className="w-2.5 h-2.5" /> Comprehensive reading · {LIFE_REPORT_COST} Luck
+            <BaydinLifeReport className="w-2.5 h-2.5" /> Comprehensive reading · {LIFE_REPORT_COST} Luck
           </GlowPill>
           <LiquidMetalText as="h1" className="text-[28px] lg:text-[32px] mb-3 leading-[1.1]">
             Life Report
@@ -289,7 +288,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
         {/* Generate CTA */}
         <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-6 mb-8">
           <ShimmerButton onClick={generate} disabled={user.luckBalance < LIFE_REPORT_COST} className="w-full sm:w-auto">
-            <BookOpen className="w-4 h-4" /> Generate full report
+            <BaydinLifeReport className="w-4 h-4" /> Generate full report
             <span className="inline-flex items-center gap-1 opacity-80">
               <CloverIcon className="w-3 h-3" /> <NumberTicker value={LIFE_REPORT_COST} />
             </span>
@@ -355,7 +354,7 @@ export function LifeReportView({ onAuth }: { onAuth: () => void }) {
                         {new Date(r.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-[#9C9489]" />
+                    <BaydinChevronRight className="w-4 h-4 text-[#9C9489]" />
                   </button>
                 </AuroraGlowCard>
               ))}

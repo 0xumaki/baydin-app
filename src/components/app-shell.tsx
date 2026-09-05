@@ -37,34 +37,37 @@ import { ReminderService } from "@/components/reminder-service";
 import { PWARegister } from "@/components/pwa-register";
 import { useT } from "@/lib/use-t";
 import {
-  Sparkles, MessageCircle, Moon, Star, Sun, Wallet, Store, Shield,
-  Menu, X, Plus, LogOut, Settings, Gift, ChevronRight, Target, Compass, BookOpen, CalendarDays,
-  Waves, Heart, Users, Flame, BarChart3, Hash, Calendar, CloudMoon, LineChart, Wind,
-} from "lucide-react";
+  BaydinStar, BaydinAstrologer, BaydinTarot, BaydinBookmark, BaydinMoon,
+  BaydinLunarCalendar, BaydinDream, BaydinManifest, BaydinRitual, BaydinFrequency,
+  BaydinBreath, BaydinPositivity, BaydinBirthChart, BaydinNumerology, BaydinInsights,
+  BaydinCompatibility, BaydinLifeReport, BaydinStore, BaydinUsers, BaydinTrending,
+  BaydinAdmin, BaydinMenu, BaydinX, BaydinPlus, BaydinGift, BaydinCalendar,
+} from "@/components/lumina/baydin-icons";
+import { BaydinHelp as Settings } from "@/components/lumina/baydin-icons";
 
 const NAV_ITEMS: { view: AppView; labelKey: string; icon: any; customIcon?: string; needsAuth?: boolean; resellerOnly?: boolean; adminOnly?: boolean; group: string }[] = [
-  { view: "today", labelKey: "nav_today", icon: CalendarDays, customIcon: "nav-today", needsAuth: true, group: "Daily" },
-  { view: "chat", labelKey: "nav_astrologer", icon: MessageCircle, customIcon: "nav-astrologer", needsAuth: true, group: "Daily" },
-  { view: "tarot", labelKey: "nav_tarot", icon: Sparkles, customIcon: "nav-tarot", group: "Daily" },
-  { view: "tarot-history", labelKey: "nav_tarot_history", icon: BookOpen, needsAuth: true, group: "Daily" },
-  { view: "horoscope", labelKey: "nav_horoscope", icon: Moon, customIcon: "nav-horoscope", needsAuth: true, group: "Daily" },
-  { view: "lunar-calendar", labelKey: "nav_lunar_calendar", icon: Calendar, customIcon: "nav-lunar-calendar", needsAuth: true, group: "Daily" },
-  { view: "dream-journal", labelKey: "nav_dream_journal", icon: CloudMoon, customIcon: "nav-dream-journal", needsAuth: true, group: "Daily" },
-  { view: "manifest", labelKey: "nav_manifest", icon: Target, customIcon: "nav-manifest", needsAuth: true, group: "Practice" },
-  { view: "ritual", labelKey: "nav_ritual", icon: Flame, customIcon: "nav-ritual", needsAuth: true, group: "Practice" },
-  { view: "frequency", labelKey: "nav_frequencies", icon: Waves, customIcon: "nav-frequencies", needsAuth: true, group: "Practice" },
-  { view: "breath", labelKey: "nav_breath", icon: Wind, customIcon: "nav-breath", needsAuth: true, group: "Practice" },
-  { view: "positivity", labelKey: "nav_positivity", icon: Heart, customIcon: "nav-positivity", needsAuth: true, group: "Practice" },
-  { view: "birth-chart", labelKey: "nav_birth_chart", icon: Star, customIcon: "nav-birth-chart", needsAuth: true, group: "Astrology" },
-  { view: "numerology", labelKey: "nav_numerology", icon: Hash, customIcon: "nav-numerology", needsAuth: true, group: "Astrology" },
-  { view: "insights", labelKey: "nav_insights", icon: Compass, needsAuth: true, group: "Astrology" },
-  { view: "compatibility", labelKey: "nav_compatibility", icon: Users, customIcon: "nav-compatibility", needsAuth: true, group: "Astrology" },
-  { view: "life-report", labelKey: "nav_life_report", icon: BookOpen, customIcon: "nav-life-report", needsAuth: true, group: "Astrology" },
-  { view: "luck-store", labelKey: "nav_earn_luck", icon: Wallet, customIcon: "nav-earn-luck", needsAuth: true, group: "Account" },
-  { view: "profile", labelKey: "nav_profile", icon: BarChart3, needsAuth: true, group: "Account" },
-  { view: "analytics", labelKey: "nav_analytics", icon: LineChart, needsAuth: true, group: "Account" },
-  { view: "reseller", labelKey: "nav_reseller", icon: Store, resellerOnly: true, needsAuth: true, group: "Account" },
-  { view: "admin", labelKey: "nav_admin", icon: Shield, adminOnly: true, needsAuth: true, group: "Account" },
+  { view: "today", labelKey: "nav_today", icon: BaydinCalendar, customIcon: "nav-today", needsAuth: true, group: "Daily" },
+  { view: "chat", labelKey: "nav_astrologer", icon: BaydinAstrologer, customIcon: "nav-astrologer", needsAuth: true, group: "Daily" },
+  { view: "tarot", labelKey: "nav_tarot", icon: BaydinTarot, customIcon: "nav-tarot", group: "Daily" },
+  { view: "tarot-history", labelKey: "nav_tarot_history", icon: BaydinBookmark, needsAuth: true, group: "Daily" },
+  { view: "horoscope", labelKey: "nav_horoscope", icon: BaydinMoon, customIcon: "nav-horoscope", needsAuth: true, group: "Daily" },
+  { view: "lunar-calendar", labelKey: "nav_lunar_calendar", icon: BaydinLunarCalendar, customIcon: "nav-lunar-calendar", needsAuth: true, group: "Daily" },
+  { view: "dream-journal", labelKey: "nav_dream_journal", icon: BaydinDream, customIcon: "nav-dream-journal", needsAuth: true, group: "Daily" },
+  { view: "manifest", labelKey: "nav_manifest", icon: BaydinManifest, customIcon: "nav-manifest", needsAuth: true, group: "Practice" },
+  { view: "ritual", labelKey: "nav_ritual", icon: BaydinRitual, customIcon: "nav-ritual", needsAuth: true, group: "Practice" },
+  { view: "frequency", labelKey: "nav_frequencies", icon: BaydinFrequency, customIcon: "nav-frequencies", needsAuth: true, group: "Practice" },
+  { view: "breath", labelKey: "nav_breath", icon: BaydinBreath, customIcon: "nav-breath", needsAuth: true, group: "Practice" },
+  { view: "positivity", labelKey: "nav_positivity", icon: BaydinPositivity, customIcon: "nav-positivity", needsAuth: true, group: "Practice" },
+  { view: "birth-chart", labelKey: "nav_birth_chart", icon: BaydinBirthChart, customIcon: "nav-birth-chart", needsAuth: true, group: "Astrology" },
+  { view: "numerology", labelKey: "nav_numerology", icon: BaydinNumerology, customIcon: "nav-numerology", needsAuth: true, group: "Astrology" },
+  { view: "insights", labelKey: "nav_insights", icon: BaydinInsights, needsAuth: true, group: "Astrology" },
+  { view: "compatibility", labelKey: "nav_compatibility", icon: BaydinCompatibility, customIcon: "nav-compatibility", needsAuth: true, group: "Astrology" },
+  { view: "life-report", labelKey: "nav_life_report", icon: BaydinLifeReport, customIcon: "nav-life-report", needsAuth: true, group: "Astrology" },
+  { view: "luck-store", labelKey: "nav_earn_luck", icon: BaydinStore, customIcon: "nav-earn-luck", needsAuth: true, group: "Account" },
+  { view: "profile", labelKey: "nav_profile", icon: BaydinUsers, needsAuth: true, group: "Account" },
+  { view: "analytics", labelKey: "nav_analytics", icon: BaydinTrending, needsAuth: true, group: "Account" },
+  { view: "reseller", labelKey: "nav_reseller", icon: BaydinStore, resellerOnly: true, needsAuth: true, group: "Account" },
+  { view: "admin", labelKey: "nav_admin", icon: BaydinAdmin, adminOnly: true, needsAuth: true, group: "Account" },
 ];
 
 export function AppShell() {
@@ -135,7 +138,7 @@ export function AppShell() {
       {/* Mobile top bar */}
       <header className="lg:hidden sticky top-0 z-30 bg-[#0A0908] border-b border-[#2A2722] px-4 py-3 flex items-center justify-between lum-pt-safe">
         <button onClick={() => setSidebarOpen(true)} aria-label="Open navigation menu" className="p-2 -ml-2 text-[#6B6358] hover:text-[#E8E2D5] transition">
-          <Menu className="w-5 h-5" />
+          <BaydinMenu className="w-5 h-5" />
         </button>
         <div className="serif-display text-[1.125rem] text-[#E8E2D5] leading-none">Baydin</div>
         {user ? (
@@ -293,7 +296,7 @@ function Sidebar(props: {
             <div className="text-[11px] text-[#6B6358] mt-1">Fortune, stars, ritual</div>
           </div>
           <button onClick={props.onClose} aria-label="Close navigation menu" className="lg:hidden p-1 text-[#6B6358] hover:text-[#E8E2D5] transition">
-            <X className="w-5 h-5" />
+            <BaydinX className="w-5 h-5" />
           </button>
         </div>
 
@@ -303,7 +306,7 @@ function Sidebar(props: {
             onClick={props.onNewChat}
             className="w-full flex items-center gap-2 py-2.5 text-[13px] text-[#E8E2D5] hover:text-[#C5A572] transition border-b border-[#2A2722] focus-ring rounded-sm"
           >
-            <Plus className="w-3.5 h-3.5" /> {t("new_consultation")}
+            <BaydinPlus className="w-3.5 h-3.5" /> {t("new_consultation")}
           </button>
         </div>
 
@@ -437,7 +440,7 @@ function DailyRewardCard({ compact }: { compact?: boolean }) {
             : "border-leaf/30 bg-leaf/10 text-leaf hover:bg-leaf/20"
         )}
       >
-        <Gift className="w-3 h-3" />
+        <BaydinGift className="w-3 h-3" />
         {claimedBool ? "Claimed" : `+${Math.max(1, amount)} Luck`}
       </button>
     );
@@ -455,7 +458,7 @@ function DailyRewardCard({ compact }: { compact?: boolean }) {
       )}
     >
       <div className="flex items-center gap-2 mb-1">
-        <Gift className={cn("w-4 h-4", claimedBool ? "text-ink-muted" : "text-leaf")} />
+        <BaydinGift className={cn("w-4 h-4", claimedBool ? "text-ink-muted" : "text-leaf")} />
         <span className={cn("text-[12px] font-medium", claimedBool ? "text-ink-muted" : "text-leaf")}>
           {claimedBool ? "Today's Luck claimed" : "Claim daily Luck"}
         </span>

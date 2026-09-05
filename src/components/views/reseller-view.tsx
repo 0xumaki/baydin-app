@@ -13,7 +13,6 @@ import {
 } from "@/components/lumina/premium-ui";
 import { BrandedImageCard, brandedFilename } from "@/components/branded-image";
 import { useBrandedImageDownload } from "@/lib/use-branded-image-download";
-import { CloverIcon, CloverPNG } from "@/components/lumina/baydin-icons";
 import {
   Sheet,
   SheetContent,
@@ -32,12 +31,8 @@ import {
 import { useMe, api } from "@/lib/api-client";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import {
-  Store, Wallet, Send, TrendingUp, Package,
-  Sparkles, Award, Megaphone, Download, FileText, LifeBuoy,
-  Calendar, Users, DollarSign, ArrowUpRight, ArrowDownRight,
-  Clock, ChevronRight, BarChart3, Crown, Activity,
-} from "lucide-react";
+import { CloverIcon, CloverPNG, BaydinStore, BaydinWallet, BaydinSend, BaydinTrending, BaydinStar, BaydinDownload, BaydinCalendar, BaydinUsers, BaydinClock, BaydinChevronRight, BaydinGift } from "@/components/lumina/baydin-icons";
+import { BaydinStore as Package, BaydinStar as Award, BaydinShare as Megaphone, BaydinLifeReport as FileText, BaydinHelp as LifeBuoy, BaydinWallet as DollarSign, BaydinTrending as ArrowUpRight, BaydinTrending as ArrowDownRight, BaydinTrending as BarChart3, BaydinStar as Crown, BaydinTrending as Activity } from "@/components/lumina/baydin-icons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -201,13 +196,13 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
           {/* Hero */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <Store className="w-5 h-5 text-[#C5A572]" />
+              <BaydinStore className="w-5 h-5 text-[#C5A572]" />
               <GlowPill color="#C5A572" className="!text-[10px] uppercase tracking-wide">
                 Reseller Portal
               </GlowPill>
               {user.resellerTier && (
                 <GlowPill color={tierColorStr}>
-                  <Crown className="w-3 h-3" /> {resellerTierName(user.resellerTier)}
+                  <BaydinGift className="w-3 h-3" /> {resellerTierName(user.resellerTier)}
                 </GlowPill>
               )}
               <GlowPill color="#7A8B6F" className="!text-[10px]">
@@ -241,7 +236,7 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
               showClover
             />
             <StatCard
-              icon={Wallet}
+              icon={BaydinWallet}
               label="Your Balance"
               value={user.luckBalance}
               sub="Spendable Luck"
@@ -249,7 +244,7 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
               showClover
             />
             <StatCard
-              icon={TrendingUp}
+              icon={BaydinTrending}
               label="Total Sold"
               value={totalSold}
               sub="Luck transferred"
@@ -257,7 +252,7 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
               showClover
             />
             <StatCard
-              icon={Users}
+              icon={BaydinUsers}
               label="Active Clients"
               value={totalClients}
               sub={`${totalTransfers} transfers`}
@@ -271,7 +266,7 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
             <AuroraGlowCard className="p-5 lg:col-span-2" glowColor="#C5A572" glowIntensity={0.1}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinTrending className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[12px] text-[#E8E2D5] font-medium">6-Month Sales Trend</span>
                 </div>
                 <GlowPill color="#C5A572" className="text-[10px]">
@@ -336,15 +331,15 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
                 onClick={() => setView("luck-store")}
                 className="w-full py-2.5"
               >
-                <Wallet className="w-4 h-4" /> Browse Wholesale Packs
-                <ChevronRight className="w-3 h-3" />
+                <BaydinWallet className="w-4 h-4" /> Browse Wholesale Packs
+                <BaydinChevronRight className="w-3 h-3" />
               </ShimmerButton>
             </AuroraGlowCard>
 
             {/* Sell Luck to a client */}
             <AuroraGlowCard className="p-5" glowColor="#9E8AC9" glowIntensity={0.12}>
               <div className="flex items-center gap-2 mb-3">
-                <Send className="w-4 h-4 text-[#C5A572]" />
+                <BaydinSend className="w-4 h-4 text-[#C5A572]" />
                 <span className="text-[13px] text-[#E8E2D5] font-medium">Sell Luck to a client</span>
               </div>
               <div className="grid grid-cols-2 gap-3 mb-3">
@@ -384,7 +379,7 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
                 disabled={transferring || !toEmail || !amount}
                 className="w-full py-2.5"
               >
-                <Send className="w-4 h-4" />
+                <BaydinSend className="w-4 h-4" />
                 {transferring ? "Transferring…" : `Transfer ${amount || ""} Luck`}
               </ShimmerButton>
             </AuroraGlowCard>
@@ -428,7 +423,7 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
                           {t.saleMmk ? `${t.saleMmk.toLocaleString()} MMK` : "—"}
                         </div>
                         <div className="text-[#9C9489] text-[10px] flex items-center gap-1 justify-end">
-                          <Clock className="w-2.5 h-2.5" />
+                          <BaydinClock className="w-2.5 h-2.5" />
                           {new Date(t.createdAt).toLocaleDateString()}
                         </div>
                       </div>
@@ -631,7 +626,7 @@ function TopUpBalanceBanner({
           </div>
           {isEmpty && (
             <div className="mt-3 rounded-sm border border-[#C5A572]/20 bg-[#C5A572]/5 px-3 py-2 text-[11px] text-[#C5A572] leading-relaxed flex items-start gap-2">
-              <Sparkles className="w-3 h-3 shrink-0 mt-0.5" />
+              <BaydinStar className="w-3 h-3 shrink-0 mt-0.5" />
               <span>
                 Top up required to start reselling. Reseller packs start at 50,000 MMK with up to 54% bonus.
               </span>
@@ -640,7 +635,7 @@ function TopUpBalanceBanner({
         </div>
         <div className="shrink-0 sm:self-center">
           <ShimmerButton onClick={onTopUp} tone="gold" className="px-6 py-3 text-[14px]">
-            <Wallet className="w-4 h-4" /> Top Up More Luck
+            <BaydinWallet className="w-4 h-4" /> Top Up More Luck
           </ShimmerButton>
         </div>
       </div>
@@ -683,7 +678,7 @@ function PartnerResources({ user }: { user: any }) {
           disabled={downloading}
           className="flex items-start gap-3 p-3.5 rounded-sm border border-[#2A2722] bg-[#0F0D0B] hover:border-[#C5A572]/30 hover:bg-[#1A1714] transition text-left disabled:opacity-50"
         >
-          <Download className="w-4 h-4 text-[#C5A572] shrink-0 mt-0.5" />
+          <BaydinDownload className="w-4 h-4 text-[#C5A572] shrink-0 mt-0.5" />
           <div className="min-w-0">
             <div className="text-[12px] text-[#E8E2D5] font-medium">Marketing kit</div>
             <div className="text-[10px] text-[#9C9489] mt-0.5">
@@ -829,7 +824,7 @@ const CERT_CARDS: CertCardDef[] = [
     kind: "welcome",
     title: "Welcome Certificate",
     desc: "A branded welcome card you can share with new clients to introduce Baydin.",
-    icon: Sparkles,
+    icon: BaydinStar,
     color: "#7A8B6F",
     variant: "certificate-welcome",
   },
@@ -940,11 +935,11 @@ function BrandedCertificatesSection({ user }: { user: any }) {
               >
                 {generating === c.kind ? (
                   <>
-                    <Sparkles className="w-3 h-3 animate-pulse" /> Generating…
+                    <BaydinStar className="w-3 h-3 animate-pulse" /> Generating…
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-3 h-3" /> Generate &amp; Download
+                    <BaydinStar className="w-3 h-3" /> Generate &amp; Download
                   </>
                 )}
               </ShimmerButton>
@@ -975,7 +970,7 @@ function BrandedCertificatesSection({ user }: { user: any }) {
               disabled={certBusy || !activeCert}
               className="px-5 py-2.5"
             >
-              <Download className="w-4 h-4" />
+              <BaydinDownload className="w-4 h-4" />
               {downloading ? "Preparing PNG…" : "Download PNG"}
             </ShimmerButton>
           </DialogFooter>
@@ -1072,7 +1067,7 @@ function RecentCertificates() {
           >
             <div className="flex items-center gap-2 min-w-0">
               <div className="w-6 h-6 rounded-full bg-[#C5A572]/10 border border-[#C5A572]/20 flex items-center justify-center shrink-0">
-                {c.kind === "welcome" && <Sparkles className="w-3 h-3 text-[#7A8B6F]" />}
+                {c.kind === "welcome" && <BaydinStar className="w-3 h-3 text-[#7A8B6F]" />}
                 {c.kind === "tier_upgrade" && <Award className="w-3 h-3 text-[#C5A572]" />}
                 {c.kind === "promotion" && <Megaphone className="w-3 h-3 text-[#9E8AC9]" />}
               </div>
@@ -1086,7 +1081,7 @@ function RecentCertificates() {
               )}
             </div>
             <div className="text-[10px] text-[#9C9489] shrink-0 flex items-center gap-1">
-              <Clock className="w-2.5 h-2.5" />
+              <BaydinClock className="w-2.5 h-2.5" />
               {new Date(c.createdAt).toLocaleString()}
             </div>
           </div>
@@ -1110,7 +1105,7 @@ function Gate({ onAuth, title, desc }: { onAuth: () => void; title: string; desc
       <div className="relative z-10 min-w-0 flex-1 flex items-center justify-center px-6 text-center">
         <div>
           <div className="w-14 h-14 rounded-full bg-[#C5A572]/10 border border-[#C5A572]/20 flex items-center justify-center mx-auto mb-4">
-            <Store className="w-7 h-7 text-[#C5A572]" />
+            <BaydinStore className="w-7 h-7 text-[#C5A572]" />
           </div>
           <div className="text-[16px] text-[#E8E2D5] mb-1 font-medium">{title}</div>
           {desc && <div className="text-[12px] text-[#9C9489] max-w-sm">{desc}</div>}

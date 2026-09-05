@@ -31,56 +31,12 @@ import {
   LiquidMetalText,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinAdmin, BaydinUsers, BaydinWallet, BaydinTrending, BaydinStore, BaydinGift, BaydinEye, BaydinDownload, BaydinPlus, BaydinEdit, BaydinTrash, BaydinCheck, BaydinX, BaydinStar, BaydinSend, BaydinCalendar, BaydinManifest, BaydinChevronRight, BaydinChevronLeft, BaydinSearch, BaydinCopy, BaydinShare } from "@/components/lumina/baydin-icons";
 import { BrandedImageCard, brandedFilename } from "@/components/branded-image";
 import { useBrandedImageDownload } from "@/lib/use-branded-image-download";
 import { useMe, api } from "@/lib/api-client";
 import { FEATURE_COSTS, FEATURE_LABELS, type FeatureId } from "@/lib/luck-config";
-import {
-  Shield,
-  Users,
-  Wallet,
-  TrendingUp,
-  Store,
-  Gift,
-  UserCog,
-  Crown,
-  Ban,
-  Eye,
-  Download,
-  Plus,
-  Pencil,
-  Trash2,
-  Check,
-  X,
-  Sparkles,
-  Layers,
-  BarChart3,
-  Activity,
-  Trophy,
-  Award,
-  Filter,
-  Send,
-  Package,
-  CalendarClock,
-  Target,
-  PieChart as PieIcon,
-  LineChart as LineIcon,
-  ChevronRight,
-  ChevronLeft,
-  Star,
-  Search,
-  ArrowUpDown,
-  Coins,
-  Zap,
-  Database,
-  ListChecks,
-  Copy,
-  CheckCircle2,
-  XCircle,
-  Share2,
-  Settings,
-} from "lucide-react";
+import { BaydinStar as UserCog, BaydinStar as Crown, BaydinX as Ban, BaydinInsights as Layers, BaydinTrending as BarChart3, BaydinStar as Trophy, BaydinStar as Award, BaydinSearch as Filter, BaydinStore as Package, BaydinStar as PieIcon, BaydinStar as LineIcon, BaydinChevronDown as ArrowUpDown, CloverIcon as Coins, BaydinStar as Zap, BaydinAdmin as Database, BaydinCheck as ListChecks, BaydinCheck as CheckCircle2, BaydinX as XCircle, BaydinHelp as Settings, BaydinTrending as Activity, BaydinCalendar as CalendarClock } from "@/components/lumina/baydin-icons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -258,7 +214,7 @@ function Gate({ title, desc }: { title: string; desc?: string }) {
   return (
     <div className="h-full flex items-center justify-center px-6 text-center">
       <div>
-        <Shield className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+        <BaydinAdmin className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
         <div className="text-[16px] text-[#E8E2D5] mb-1">{title}</div>
         {desc && <div className="text-[12px] text-[#9C9489] max-w-sm">{desc}</div>}
       </div>
@@ -577,8 +533,8 @@ function HealthCard({
 
 function SubTabNav({ value, onChange }: { value: SubTab; onChange: (v: SubTab) => void }) {
   const tabs: { id: SubTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { id: "users", label: "Users", icon: Users },
-    { id: "resellers", label: "Resellers", icon: Store },
+    { id: "users", label: "Users", icon: BaydinUsers },
+    { id: "resellers", label: "Resellers", icon: BaydinStore },
     { id: "campaigns", label: "Campaigns", icon: CalendarClock },
     { id: "luck-packs", label: "Luck Packs", icon: Package },
     { id: "system-viz", label: "System Viz", icon: BarChart3 },
@@ -1710,7 +1666,7 @@ function Leaderboard({ kind, onRefresh }: { kind: "user" | "reseller"; onRefresh
             onClick={shareLink}
             title="Share leaderboard link"
           >
-            <Share2 className="w-3.5 h-3.5" />
+            <BaydinShare className="w-3.5 h-3.5" />
             Share
           </ShimmerButton>
           <ShimmerButton
@@ -1719,7 +1675,7 @@ function Leaderboard({ kind, onRefresh }: { kind: "user" | "reseller"; onRefresh
             onClick={() => download(hiddenCardRef.current, brandedFilename(`leaderboard-${kind}`))}
             disabled={downloading || entries.length === 0}
           >
-            <Download className="w-3.5 h-3.5" />
+            <BaydinDownload className="w-3.5 h-3.5" />
             {downloading ? "Exporting…" : "PNG"}
           </ShimmerButton>
         </div>
@@ -1890,7 +1846,7 @@ function BulkActionBar({
           className="h-8 flex-1 min-w-[160px] bg-white/[0.03] border-[#2A2722] text-[12px] text-[#E8E2D5]"
         />
         <ShimmerButton tone="gold" className="h-8 px-3 py-1.5 text-[12px]" onClick={grantBulk} disabled={busy}>
-          <Send className="w-3.5 h-3.5" />
+          <BaydinSend className="w-3.5 h-3.5" />
           {busy ? "Granting…" : `Grant Luck to ${selected.length}`}
         </ShimmerButton>
         <button type="button" onClick={onClear} className="h-8 px-2 py-1 text-[12px] text-[#9C9489] hover:text-[#E8E2D5]">
@@ -1958,7 +1914,7 @@ function UserDetailSheet({
       >
         <SheetHeader>
           <SheetTitle className="text-[#E8E2D5] flex items-center gap-2">
-            <Eye className="w-4 h-4 text-[#C5A572]" />
+            <BaydinEye className="w-4 h-4 text-[#C5A572]" />
             <span className="truncate">{user?.email}</span>
           </SheetTitle>
           <SheetDescription className="text-[#9C9489]">
@@ -2023,7 +1979,7 @@ function UserDetailSheet({
             {/* Revenue contribution */}
             {data.analytics?.purchaseSummary && (
               <GlassCard className="p-3">
-                <SectionLabel icon={Wallet}>Revenue contribution</SectionLabel>
+                <SectionLabel icon={BaydinWallet}>Revenue contribution</SectionLabel>
                 <div className="grid grid-cols-2 gap-2 text-[11px]">
                   <KV label="Total MMK"><NumberTicker value={data.analytics.purchaseSummary.totalMmk} /></KV>
                   <KV label="Total Luck"><NumberTicker value={data.analytics.purchaseSummary.totalLuck} /></KV>
@@ -2035,7 +1991,7 @@ function UserDetailSheet({
 
             {/* 12-week retention curve */}
             <GlassCard className="p-3">
-              <SectionLabel icon={TrendingUp}>12-week retention curve</SectionLabel>
+              <SectionLabel icon={BaydinTrending}>12-week retention curve</SectionLabel>
               <MiniSparkline data={retention} color="#C5A572" W={420} H={80} />
               <div className="text-[10px] text-[#9C9489] mt-1 text-center">Daily-reward activity per week (last 12 weeks)</div>
             </GlassCard>
@@ -2087,7 +2043,7 @@ function UserDetailSheet({
             {/* Referral stats */}
             {data.analytics && (
               <GlassCard className="p-3">
-                <SectionLabel icon={Users}>Referrals & certificates</SectionLabel>
+                <SectionLabel icon={BaydinUsers}>Referrals & certificates</SectionLabel>
                 <div className="grid grid-cols-2 gap-2 text-[11px]">
                   <KV label="Referrals"><NumberTicker value={data.analytics.referralCount ?? 0} /></KV>
                   <KV label="Certificates"><NumberTicker value={data.analytics.certificateCount ?? 0} /></KV>
@@ -2210,7 +2166,7 @@ function ResellerDetailSheet({
       >
         <SheetHeader>
           <SheetTitle className="text-[#E8E2D5] flex items-center gap-2">
-            <Store className="w-4 h-4 text-[#C5A572]" />
+            <BaydinStore className="w-4 h-4 text-[#C5A572]" />
             <span className="truncate">{reseller?.email}</span>
           </SheetTitle>
           <SheetDescription className="text-[#9C9489]">
@@ -2266,9 +2222,9 @@ function ResellerDetailSheet({
 
             {/* avgSaleSize / repeatRate / conversionPct */}
             <div className="grid grid-cols-3 gap-2">
-              <OverviewStat icon={Target} label="Avg sale" value={analytics?.avgPricePerLuck ?? 0} suffix=" MMK/Luck" />
+              <OverviewStat icon={BaydinManifest} label="Avg sale" value={analytics?.avgPricePerLuck ?? 0} suffix=" MMK/Luck" />
               <OverviewStat icon={Activity} label="Transfers" value={analytics?.transfersCount ?? 0} />
-              <OverviewStat icon={Users} label="Clients" value={analytics?.resellerPurchaseCount ?? 0} />
+              <OverviewStat icon={BaydinUsers} label="Clients" value={analytics?.resellerPurchaseCount ?? 0} />
             </div>
 
             {/* 6-month sales trend mini SVG */}
@@ -2279,7 +2235,7 @@ function ResellerDetailSheet({
 
             {/* Top clients list */}
             <GlassCard className="p-3">
-              <SectionLabel icon={Users}>Top clients</SectionLabel>
+              <SectionLabel icon={BaydinUsers}>Top clients</SectionLabel>
               {analytics?.topRecipients?.length ? (
                 <div className="max-h-48 overflow-y-auto lumina-scroll space-y-1">
                   {analytics.topRecipients.map((c: any, i: number) => (
@@ -2298,7 +2254,7 @@ function ResellerDetailSheet({
 
             {/* Tier progress bar */}
             <GlassCard className="p-3">
-              <SectionLabel icon={TrendingUp}>Tier progress</SectionLabel>
+              <SectionLabel icon={BaydinTrending}>Tier progress</SectionLabel>
               <div className="flex items-center justify-between text-[11px] mb-2">
                 <span className="text-[#E8E2D5]">{tierName(r?.resellerTier)}</span>
                 <span className="text-[#9C9489]">
@@ -2330,7 +2286,7 @@ function ResellerDetailSheet({
                 className="h-8 px-3 py-1.5 text-[12px]"
                 onClick={() => reseller && onUpgradeTier(reseller)}
               >
-                <TrendingUp className="w-3.5 h-3.5" />
+                <BaydinTrending className="w-3.5 h-3.5" />
                 Upgrade Tier
               </ShimmerButton>
             )}
@@ -2441,7 +2397,7 @@ function CertificateModal({
                 onClick={() => download(hiddenCardRef.current, brandedFilename(variant))}
                 disabled={downloading}
               >
-                <Download className="w-3.5 h-3.5" />
+                <BaydinDownload className="w-3.5 h-3.5" />
                 {downloading ? "Exporting…" : "Download PNG"}
               </ShimmerButton>
             </div>
@@ -2521,7 +2477,7 @@ function SpecialRankForm({ userId, currentRank, onApplied }: { userId: string; c
         </SelectContent>
       </Select>
       <ShimmerButton tone="gold" className="h-8 px-3 py-1.5 text-[12px]" onClick={apply} disabled={busy}>
-        <Check className="w-3.5 h-3.5" />
+        <BaydinCheck className="w-3.5 h-3.5" />
         {busy ? "Applying…" : "Apply"}
       </ShimmerButton>
     </div>
@@ -2750,14 +2706,14 @@ function UsersTab() {
       {/* A. User Analytics Overview */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <OverviewStat
-          icon={Users}
+          icon={BaydinUsers}
           label="Total users"
           value={totalUsers}
           sub="registered"
           trend={{ dir: growthPct >= 0 ? "up" : "down", text: `${Math.abs(growthPct)}% MoM` }}
         />
         <OverviewStat icon={Activity} label="Active today" value={activeToday} sub="last 24h" />
-        <OverviewStat icon={Sparkles} label="New this week" value={newThisWeek} sub="last 7 days" />
+        <OverviewStat icon={BaydinStar} label="New this week" value={newThisWeek} sub="last 7 days" />
         <OverviewStat
           icon={Coins}
           label="Avg Luck balance"
@@ -2788,7 +2744,7 @@ function UsersTab() {
       {/* E. User Directory */}
       <GlassCard className="p-5">
         <SectionHeading
-          icon={Users}
+          icon={BaydinUsers}
           eyebrow="Directory"
           title="User directory"
           desc="Search, filter, and grant Luck to individual users."
@@ -2799,7 +2755,7 @@ function UsersTab() {
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <Label className="text-[11px] text-[#9C9489]">Search</Label>
             <div className="relative mt-1">
-              <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-[#9C9489]" />
+              <BaydinSearch className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-[#9C9489]" />
               <Input
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(0); }}
@@ -2968,13 +2924,13 @@ function UsersTab() {
                         <div className="inline-flex items-center gap-1">
                           <RowIconButton icon={Zap} title="Quick grant +10" tone="gold" onClick={() => quickGrant({ id: u.id, email: u.email }, 10)} />
                           <RowIconButton
-                            icon={Gift}
+                            icon={BaydinGift}
                             title="Custom grant"
                             tone="purple"
                             onClick={() => setGrantTarget({ id: u.id, email: u.email })}
                           />
                           <RowIconButton
-                            icon={Copy}
+                            icon={BaydinCopy}
                             title="Copy email"
                             tone="default"
                             onClick={() => {
@@ -2982,7 +2938,7 @@ function UsersTab() {
                             }}
                           />
                           <RowIconButton
-                            icon={Eye}
+                            icon={BaydinEye}
                             title="View details"
                             tone="default"
                             onClick={() => {
@@ -2996,7 +2952,7 @@ function UsersTab() {
                             className="ml-1 text-[#9C9489] hover:text-[#C5A572] p-1"
                             title="Expand"
                           >
-                            <ChevronRight className={cn("w-3.5 h-3.5 transition-transform", expanded && "rotate-90")} />
+                            <BaydinChevronRight className={cn("w-3.5 h-3.5 transition-transform", expanded && "rotate-90")} />
                           </button>
                         </div>
                       </td>
@@ -3073,7 +3029,7 @@ function UsersTab() {
                 disabled={page === 0}
                 className="h-8 w-8 rounded-sm border border-[#2A2722] flex items-center justify-center disabled:opacity-30 hover:text-[#C5A572]"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <BaydinChevronLeft className="w-3.5 h-3.5" />
               </button>
               <button
                 type="button"
@@ -3081,7 +3037,7 @@ function UsersTab() {
                 disabled={page === totalPages - 1}
                 className="h-8 w-8 rounded-sm border border-[#2A2722] flex items-center justify-center disabled:opacity-30 hover:text-[#C5A572]"
               >
-                <ChevronRight className="w-3.5 h-3.5" />
+                <BaydinChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -3093,7 +3049,7 @@ function UsersTab() {
         <DialogContent className="bg-[#0A0908] border-[#2A2722] text-[#E8E2D5]">
           <DialogHeader>
             <DialogTitle className="text-[#E8E2D5] flex items-center gap-2">
-              <Gift className="w-4 h-4 text-[#C5A572]" />
+              <BaydinGift className="w-4 h-4 text-[#C5A572]" />
               Custom Luck grant
             </DialogTitle>
             <DialogDescription className="text-[#9C9489]">
@@ -3415,10 +3371,10 @@ function ResellersTab() {
     <div className="space-y-6">
       {/* A. Reseller Analytics Overview */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <OverviewStat icon={Store} label="Total resellers" value={totalResellers} sub="whitelisted" />
+        <OverviewStat icon={BaydinStore} label="Total resellers" value={totalResellers} sub="whitelisted" />
         <OverviewStat icon={Activity} label="Active resellers" value={activeResellers} sub="with stock" />
         <OverviewStat icon={Coins} label="Total Luck sold" value={totalLuckSold} sub="lifetime" />
-        <OverviewStat icon={Wallet} label="Total revenue" value={totalRevenue} suffix=" MMK" sub="lifetime" />
+        <OverviewStat icon={BaydinWallet} label="Total revenue" value={totalRevenue} suffix=" MMK" sub="lifetime" />
       </div>
 
       {/* B. Reseller Performance Visualizations (2+1 grid) */}
@@ -3441,7 +3397,7 @@ function ResellersTab() {
       {/* C. Reseller Directory */}
       <GlassCard className="p-5">
         <SectionHeading
-          icon={Store}
+          icon={BaydinStore}
           eyebrow="Directory"
           title="Reseller directory"
           desc="Manage reseller pools, tiers, and status."
@@ -3452,7 +3408,7 @@ function ResellersTab() {
           <div className="col-span-2">
             <Label className="text-[11px] text-[#9C9489]">Search</Label>
             <div className="relative mt-1">
-              <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-[#9C9489]" />
+              <BaydinSearch className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-[#9C9489]" />
               <Input
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(0); }}
@@ -3572,7 +3528,7 @@ function ResellersTab() {
                       <td className="py-2 px-2 text-center text-[#9C9489]">{fmtDate(r.createdAt)}</td>
                       <td className="py-2 px-2 text-right">
                         <div className="inline-flex items-center gap-1">
-                          <RowIconButton icon={Wallet} title="Adjust pool" tone="gold" onClick={() => setPoolAdjust({ id: r.id, amount: "" })} />
+                          <RowIconButton icon={BaydinWallet} title="Adjust pool" tone="gold" onClick={() => setPoolAdjust({ id: r.id, amount: "" })} />
                           <Select
                             value={r.resellerTier ?? NONE}
                             onValueChange={(v) => {
@@ -3605,7 +3561,7 @@ function ResellersTab() {
                             }}
                           />
                           <RowIconButton
-                            icon={Eye}
+                            icon={BaydinEye}
                             title="View details"
                             tone="default"
                             onClick={() => {
@@ -3693,7 +3649,7 @@ function ResellersTab() {
                 disabled={page === 0}
                 className="h-8 w-8 rounded-sm border border-[#2A2722] flex items-center justify-center disabled:opacity-30 hover:text-[#C5A572]"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <BaydinChevronLeft className="w-3.5 h-3.5" />
               </button>
               <button
                 type="button"
@@ -3701,7 +3657,7 @@ function ResellersTab() {
                 disabled={page === totalPages - 1}
                 className="h-8 w-8 rounded-sm border border-[#2A2722] flex items-center justify-center disabled:opacity-30 hover:text-[#C5A572]"
               >
-                <ChevronRight className="w-3.5 h-3.5" />
+                <BaydinChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -3919,7 +3875,7 @@ function CampaignsTab() {
       {/* A. Campaign CRUD form */}
       <GlassCard className="p-5">
         <div className="flex items-center justify-between mb-3">
-          <SectionLabel icon={Pencil}>
+          <SectionLabel icon={BaydinEdit}>
             {editing ? `Editing: ${editing.name}` : "Create new campaign"}
           </SectionLabel>
           {editing && (
@@ -4032,7 +3988,7 @@ function CampaignsTab() {
               <Label className="text-[12px] text-[#E8E2D5]">Active</Label>
             </div>
             <ShimmerButton tone="gold" className="h-9 px-4 py-2 text-[12px]" onClick={saveCampaign} disabled={saving}>
-              <Plus className="w-3.5 h-3.5" />
+              <BaydinPlus className="w-3.5 h-3.5" />
               {saving ? "Saving…" : editing ? "Update campaign" : "Create new campaign"}
             </ShimmerButton>
           </div>
@@ -4055,7 +4011,7 @@ function CampaignsTab() {
                   onClick={() => download(hiddenFlyerRef.current, brandedFilename("campaign-flyer", formName || "draft"))}
                   disabled={downloading || formTierId === NONE}
                 >
-                  <Download className="w-3.5 h-3.5" />
+                  <BaydinDownload className="w-3.5 h-3.5" />
                   {downloading ? "Exporting…" : "Download PNG"}
                 </ShimmerButton>
               </div>
@@ -4113,9 +4069,9 @@ function CampaignsTab() {
                       </td>
                       <td className="py-2 px-2 text-right">
                         <div className="inline-flex items-center gap-1">
-                          <RowIconButton icon={Pencil} title="Edit" tone="gold" onClick={() => editCampaign(c)} />
+                          <RowIconButton icon={BaydinEdit} title="Edit" tone="gold" onClick={() => editCampaign(c)} />
                           <RowIconButton
-                            icon={Download}
+                            icon={BaydinDownload}
                             title="Download flyer"
                             tone="default"
                             onClick={() => {
@@ -4130,7 +4086,7 @@ function CampaignsTab() {
                             }}
                           />
                           <RowIconButton
-                            icon={X}
+                            icon={BaydinX}
                             title="Deactivate"
                             tone="red"
                             onClick={() => deactivateCampaign(c)}
@@ -4327,10 +4283,10 @@ function LuckPacksTab() {
           <ChartCard
             title={`Regular user packs (${regular.length + customRegular.length})`}
             subtitle="Base 6 tiers + custom additions"
-            icon={Users}
+            icon={BaydinUsers}
             rightSlot={
               <ShimmerButton tone="gold" className="h-8 px-3 py-1.5 text-[12px]" onClick={() => { resetCreate(); setShowCreate(true); }}>
-                <Plus className="w-3.5 h-3.5" />
+                <BaydinPlus className="w-3.5 h-3.5" />
                 Create custom tier
               </ShimmerButton>
             }
@@ -4365,7 +4321,7 @@ function LuckPacksTab() {
                             </GlowPill>
                             {t.popular && (
                               <GlowPill color="#C5A572" className="!text-[9px]">
-                                <Star className="w-2.5 h-2.5" /> popular
+                                <BaydinStar className="w-2.5 h-2.5" /> popular
                               </GlowPill>
                             )}
                           </div>
@@ -4397,16 +4353,16 @@ function LuckPacksTab() {
                         <td className="py-2 px-2 text-right">
                           <div className="inline-flex items-center gap-1">
                             {isCustom && (
-                              <RowIconButton icon={Pencil} title="Edit" tone="gold" onClick={() => editTier(t)} />
+                              <RowIconButton icon={BaydinEdit} title="Edit" tone="gold" onClick={() => editTier(t)} />
                             )}
                             <RowIconButton
-                              icon={t.active !== false ? X : Check}
+                              icon={t.active !== false ? BaydinX : BaydinCheck}
                               title={t.active !== false ? "Deactivate" : "Activate"}
                               tone={t.active !== false ? "red" : "green"}
                               onClick={() => toggleTierActive(t)}
                             />
                             {isCustom && (
-                              <RowIconButton icon={Trash2} title="Delete" tone="red" onClick={() => deleteTier(t)} />
+                              <RowIconButton icon={BaydinTrash} title="Delete" tone="red" onClick={() => deleteTier(t)} />
                             )}
                           </div>
                         </td>
@@ -4422,7 +4378,7 @@ function LuckPacksTab() {
           <ChartCard
             title={`Reseller packs (${reseller.length + customReseller.length})`}
             subtitle="Base 7 tiers (capped at 54% bonus) + custom additions"
-            icon={Store}
+            icon={BaydinStore}
           >
             <div className="overflow-x-auto lumina-scroll">
               <table className="w-full text-[12px]">
@@ -4480,16 +4436,16 @@ function LuckPacksTab() {
                         <td className="py-2 px-2 text-right">
                           <div className="inline-flex items-center gap-1">
                             {isCustom && (
-                              <RowIconButton icon={Pencil} title="Edit" tone="gold" onClick={() => editTier(t)} />
+                              <RowIconButton icon={BaydinEdit} title="Edit" tone="gold" onClick={() => editTier(t)} />
                             )}
                             <RowIconButton
-                              icon={t.active !== false ? X : Check}
+                              icon={t.active !== false ? BaydinX : BaydinCheck}
                               title={t.active !== false ? "Deactivate" : "Activate"}
                               tone={t.active !== false ? "red" : "green"}
                               onClick={() => toggleTierActive(t)}
                             />
                             {isCustom && (
-                              <RowIconButton icon={Trash2} title="Delete" tone="red" onClick={() => deleteTier(t)} />
+                              <RowIconButton icon={BaydinTrash} title="Delete" tone="red" onClick={() => deleteTier(t)} />
                             )}
                           </div>
                         </td>
@@ -4829,11 +4785,11 @@ function SystemVizTab() {
 
       {/* Summary stats */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <StatCard icon={Users} label="Total users" value={totalUsers} sub="all time" />
-        <StatCard icon={Wallet} label="Total MMK" value={totalMmk} sub="lifetime revenue" />
+        <StatCard icon={BaydinUsers} label="Total users" value={totalUsers} sub="all time" />
+        <StatCard icon={BaydinWallet} label="Total MMK" value={totalMmk} sub="lifetime revenue" />
         <StatCard icon={Coins} label="Total Luck" value={totalLuck} sub="credits sold" />
-        <StatCard icon={Gift} label="Bonus Luck" value={totalBonus} sub="credits granted" />
-        <StatCard icon={Target} label="Avg MMK / purchase" value={avgMmk} sub="all completed" />
+        <StatCard icon={BaydinGift} label="Bonus Luck" value={totalBonus} sub="credits granted" />
+        <StatCard icon={BaydinManifest} label="Avg MMK / purchase" value={avgMmk} sub="all completed" />
       </div>
 
       {/* 1. Cohort Retention Heatmap */}
@@ -4927,7 +4883,7 @@ function SystemVizTab() {
       {/* Refresh button */}
       <div className="flex justify-end">
         <ShimmerButton tone="gold" className="h-8 px-3 py-1.5 text-[12px]" onClick={load} disabled={loading}>
-          <Sparkles className="w-3.5 h-3.5" />
+          <BaydinStar className="w-3.5 h-3.5" />
           {loading ? "Refreshing…" : "Refresh analytics"}
         </ShimmerButton>
       </div>
@@ -4993,7 +4949,7 @@ export function AdminView() {
           {/* Hero */}
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-2">
-              <Shield className="w-5 h-5 text-[#C5A572]" />
+              <BaydinAdmin className="w-5 h-5 text-[#C5A572]" />
               <GlowPill color="#C5A572" className="!text-[10px] uppercase tracking-wide">
                 Admin Access
               </GlowPill>
@@ -5010,8 +4966,8 @@ export function AdminView() {
 
             {/* Hero quick stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
-              <HeroQuickStat icon={Users} label="Total users" value={stats?.totalUsers ?? 0} sub="registered accounts" />
-              <HeroQuickStat icon={Store} label="Resellers" value={stats?.resellers ?? 0} sub="active reseller tier" />
+              <HeroQuickStat icon={BaydinUsers} label="Total users" value={stats?.totalUsers ?? 0} sub="registered accounts" />
+              <HeroQuickStat icon={BaydinStore} label="Resellers" value={stats?.resellers ?? 0} sub="active reseller tier" />
               <HeroQuickStat
                 icon={CloverIcon}
                 label="Luck in system"
@@ -5024,7 +4980,7 @@ export function AdminView() {
           {/* Quick grant banner */}
           <AuroraGlowCard className="p-4 mb-6" glowColor="#C5A572" glowIntensity={0.1}>
             <div className="flex flex-wrap items-center gap-2">
-              <Gift className="w-4 h-4 text-[#C5A572]" />
+              <BaydinGift className="w-4 h-4 text-[#C5A572]" />
               <span className="text-[12px] text-[#E8E2D5]">Quick grant:</span>
               <Input
                 value={grantEmail}
@@ -5040,12 +4996,12 @@ export function AdminView() {
                 className="h-8 w-24 bg-white/[0.03] border-[#2A2722] text-[12px] text-[#E8E2D5]"
               />
               <ShimmerButton tone="gold" className="h-8 px-3 py-1.5 text-[12px]" onClick={grant} disabled={!grantEmail || !grantAmount}>
-                <Send className="w-3.5 h-3.5" />
+                <BaydinSend className="w-3.5 h-3.5" />
                 Grant
               </ShimmerButton>
               <div className="ml-auto">
                 <ShimmerButton tone="parchment" className="h-8 px-3 py-1.5 text-[12px]" onClick={loadStats}>
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <BaydinStar className="w-3.5 h-3.5" />
                   Refresh stats
                 </ShimmerButton>
               </div>

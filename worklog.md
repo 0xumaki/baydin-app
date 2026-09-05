@@ -3401,3 +3401,154 @@ Every view now follows the required premium layout pattern (CRITICAL: `variant="
 5. **lunar-calendar-view DayCell ring**: today's cell uses `ring-1 ring-[#C5A572]/40` (Tailwind ring) instead of background-only highlight for clearer visibility against the AuroraGlowCard parent backdrop.
 6. **Stale dev.log error**: `tail dev.log` shows a stale `Module not found: Can't resolve '@lib/utils'` error in tarot-view.tsx from a previous session. The tarot-view file is already fixed (`@/lib/utils`). This stale log entry will be cleared when dev server recompiles. New compiles are clean — `bun run lint` exit 0, `bunx tsc --noEmit` shows zero errors in `src/components/views/`.
 7. **`void waxing;` trick**: when a local variable is computed but the rendering logic uses a different (redundant) boolean derived from the same source, eslint flags the unused one. Adding `void waxing;` is the cleanest way to suppress TS6133 without restructuring the algorithm.
+
+---
+
+## CUSTOM-ICONS — Custom Black-and-Gold SVG Icon System (78 new icons)
+
+**Task ID:** CUSTOM-ICONS · **Agent:** z.ai-code · **Date:** 2025-09-05
+**File:** `src/components/lumina/baydin-icons.tsx` (220 → 1315 lines, +1095)
+
+### What shipped
+
+Extended `baydin-icons.tsx` with **78 hand-crafted SVG icons** + **1 helper**,
+all using a unified gold line-art aesthetic via an internal `BaydinSvg` shell
+(viewBox 24×24, `stroke="currentColor"`, 1.5px stroke, round caps/joins,
+`aria-hidden="true"` default). Every icon accepts `BaydinIconProps`
+(extends `React.SVGProps<SVGSVGElement>` with `filled?` + `strokeWidth?`).
+
+### Categories
+
+| # | Category | Count | Examples |
+|---|---|---|---|
+| 1 | UI actions | 40 | `BaydinSend`, `BaydinSearch`, `BaydinCheck`, `BaydinStar`, `BaydinHeart`, `BaydinLoader` (auto-`animate-spin`), `BaydinChevronRight/Left/Down`, `BaydinRefresh`, `BaydinTrending`, `BaydinUsers`, `BaydinWallet`, `BaydinGlobe`, … |
+| 2 | Zodiac signs | 12 | `ZodiacAries` … `ZodiacPisces` — each glyph hand-drawn as SVG paths (NOT unicode) |
+| 3 | Feature / practice | 17 | `BaydinTarot`, `BaydinAstrologer`, `BaydinManifest`, `BaydinRitual`, `BaydinFrequency`, `BaydinBreath`, `BaydinPositivity`, `BaydinDream`, `BaydinNumerology`, `BaydinCompatibility`, `BaydinLifeReport`, `BaydinBirthChart`, `BaydinLunarCalendar`, `BaydinInsights`, `BaydinStore`, `BaydinAdmin`, `BaydinGift` |
+| 4 | Planets | 9 | `PlanetSun/Moon/Mercury/Venus/Mars/Jupiter/Saturn/Rahu/Ketu` |
+| — | Helper | 1 | `ZodiacIcon({ sign, className, style })` — case-insensitive sign lookup, falls back to `BaydinStar` |
+
+### Design rules applied
+
+- **`stroke="currentColor"`** on every icon — inherits gold `#C5A572` when
+  placed inside gold elements, parchment `#E8E2D5` in normal contexts.
+- **`fill="none"`** by default; `filled` prop flips the SVG-level fill to
+  `currentColor` (works naturally for Star, Heart, Play, etc.).
+- **Accent dots** (e.g., on `BaydinHelp`, `BaydinAlert`, `BaydinMenu`,
+  `BaydinLunarCalendar` full moon) use `fill="currentColor" stroke="none"`
+  on the individual path so they're always filled regardless of `filled` prop.
+- **`aria-hidden="true"`** default; if `aria-label` supplied, role="img" and
+  aria-hidden cleared (accessible label path).
+- **No external assets** — every path hand-crafted (no auto-generation).
+
+### Export mechanism decision (important)
+
+Originally planned to use `export function BaydinSend() {}` declarations plus
+a barrel `export { BaydinSend }` at the end. **Tested with `bunx tsc`** —
+TypeScript **rejects** duplicate exports
+(`TS2484: Export declaration conflicts with exported declaration`).
+
+**Resolution:** converted ALL icon declarations (including existing
+`CloverIcon`, `CloverPNG`, `BaydinLogo`, `LotusIcon`, `StarGlyphIcon`) from
+`export function` → plain `function`, and consolidated every name into a
+single barrel `export { ... }` block at the end of the file (84 names total:
+5 original + 78 new + `ZodiacIcon`).
+
+**`export interface`** declarations (`CloverIconProps`, `BaydinLogoProps`)
+and the new `export type BaydinIconProps` remain inline — types are exempt
+from the duplicate-export rule.
+
+**Compatibility preserved:** all 20 view files doing
+`import { CloverIcon, LotusIcon, StarGlyphIcon } from "@/components/lumina/baydin-icons"`
+continue to resolve unchanged — named imports work identically whether the
+binding is exported via `export function` or via a barrel `export { }`.
+
+### Internal helper: `BaydinSvg`
+
+```tsx
+function BaydinSvg({ children, filled, strokeWidth = 1.5, className, style,
+  "aria-label": ariaLabel, "aria-hidden": ariaHidden, ...props
+}: BaydinIconProps & { children: React.ReactNode }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} style={style}
+      fill={filled ? "currentColor" : "none"} stroke="currentColor"
+      strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"
+      role={ariaLabel ? "img" : undefined}
+      aria-hidden={ariaLabel ? undefined : ariaHidden ?? "true"}
+      aria-label={ariaLabel} {...props}>
+      {children}
+    </svg>
+  );
+}
+```
+
+Each icon then collapses to 3–6 lines:
+
+```tsx
+function BaydinSend(props: BaydinIconProps) {
+  return (
+    <BaydinSvg {...props}>
+      <path d="M22 2 L15 22 L11 13 L2 9 Z" />
+      <path d="M22 2 L11 13" />
+      <path d="M4 17 C 7 15 9 14 11 13" opacity="0.5" />
+    </BaydinSvg>
+  );
+}
+```
+
+`BaydinLoader` is the one exception — it pulls `className` out of props and
+merges `animate-spin` via `cn("animate-spin", className)`:
+
+```tsx
+function BaydinLoader({ className, ...props }: BaydinIconProps) {
+  return (
+    <BaydinSvg {...props} className={cn("animate-spin", className)}>
+      <path d="M21 12 A 9 9 0 1 1 12 3" />
+    </BaydinSvg>
+  );
+}
+```
+
+### Quality gates
+
+| Check | Result |
+|---|---|
+| `bunx tsc --noEmit` | ✅ ZERO errors in `baydin-icons.tsx` (only pre-existing out-of-scope errors in `examples/`, `repo-scan/`, `skills/`) |
+| `bun run lint` | ✅ exit 0, 0 errors, 0 warnings |
+| Dev server recompile | ✅ `✓ Compiled in 1332ms`, all routes return 200 |
+| Existing imports (`CloverIcon`, `CloverPNG`, `LotusIcon`, `StarGlyphIcon` across 20 view files) | ✅ Still resolvable via barrel |
+
+### Constraints honored
+
+- ✓ TypeScript strict throughout — every icon component fully typed.
+- ✓ NO test code.
+- ✓ NO new packages installed.
+- ✓ PRESERVED existing 5 icons (`CloverIcon`, `CloverPNG`, `BaydinLogo`,
+  `LotusIcon`, `StarGlyphIcon`) — same props, same behavior, same rendering.
+  Only the `export` keyword moved from per-declaration to the barrel.
+- ✓ Every icon's SVG path is hand-crafted.
+- ✓ 24×24 viewBox, 1.5px stroke, round caps & joins — consistent across all 78.
+- ✓ Barrel export matches the task spec (includes all original + new icons +
+  `ZodiacIcon` helper).
+
+### Notes for downstream agents
+
+1. **Import any icon** from `@/components/lumina/baydin-icons`:
+   ```tsx
+   import { BaydinStar, ZodiacLeo, PlanetSun, ZodiacIcon, BaydinLoader } from "@/components/lumina/baydin-icons";
+   <BaydinStar className="h-5 w-5 text-[#C5A572]" filled />
+   <ZodiacIcon sign="leo" className="h-4 w-4" />
+   <BaydinLoader className="h-4 w-4" />
+   ```
+2. **Color inheritance**: don't hardcode gold. Wrap the icon in a parent with
+   `text-[#C5A572]` (or any color) and the icon inherits via `currentColor`.
+3. **`BaydinLoader`** auto-merges `animate-spin` — no need to add the class manually.
+4. **`ZodiacIcon`** helper takes `sign` (case-insensitive string) and renders
+   the right zodiac icon, falling back to `BaydinStar` for unknown signs.
+5. **`BaydinSvg` shell is internal** (not exported). To add a new icon,
+   declare `function NewIcon(props: BaydinIconProps) { return <BaydinSvg {...props}>...</BaydinSvg>; }`
+   and append `NewIcon` to the barrel `export { ... }` at the end of the file.
+6. **Filled accent dots** (`BaydinHelp`, `BaydinAlert`, `BaydinMenu`,
+   `BaydinBookmark`, `BaydinWallet`, `PlanetSun` core, `PlanetMoon` craters,
+   `PlanetRahu` eyes, `BaydinLunarCalendar` full moon, `BaydinAdmin` star)
+   always render as gold accents regardless of the `filled` prop on the
+   parent icon — useful for emphasizing specific design elements.

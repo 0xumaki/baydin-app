@@ -14,8 +14,7 @@ import {
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon } from "@/components/lumina/baydin-icons";
-import { Sparkles, Shuffle, Star, Share2, Save, BookOpen, Loader2, RotateCw, Moon } from "lucide-react";
+import { CloverIcon, BaydinStar, BaydinShuffle, BaydinShare, BaydinSave, BaydinBookmark, BaydinLoader, BaydinRefresh, BaydinMoon, BaydinTarot } from "@/components/lumina/baydin-icons";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -129,7 +128,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
         <div className="max-w-3xl mx-auto px-4 py-10 lg:py-14 relative z-10 min-w-0 overflow-hidden flex flex-col items-center justify-center text-center">
           <div className="flex justify-center mb-4">
             <div className="w-14 h-14 rounded-full border border-[#C5A572]/30 bg-[#C5A572]/5 flex items-center justify-center">
-              <Sparkles className="w-7 h-7 text-[#C5A572]" />
+              <BaydinStar className="w-7 h-7 text-[#C5A572]" />
             </div>
           </div>
           <LiquidMetalText as="h1" className="serif-display text-[1.75rem] text-[#E8E2D5] tracking-tight block mb-2">
@@ -164,7 +163,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
             {/* Hero */}
             <div className="mb-8">
               <GlowPill className="mb-3">
-                <Moon className="w-3 h-3" /> Rider-Waite-Smith deck
+                <BaydinMoon className="w-3 h-3" /> Rider-Waite-Smith deck
               </GlowPill>
               <LiquidMetalText as="h1" className="serif-display text-[2rem] lg:text-[2.5rem] leading-[1.1] tracking-tight block mb-3">
                 Tarot Reading
@@ -190,7 +189,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
             {/* Spread selector */}
             <div className="mb-3">
               <div className="flex items-center gap-2 mb-3">
-                <Star className="w-3.5 h-3.5 text-[#C5A572]" />
+                <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
                 <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Choose a spread</span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
@@ -232,7 +231,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
               disabled={!question.trim()}
               className="w-full py-3.5 mb-8"
             >
-              <Shuffle className="w-4 h-4" /> Shuffle & Draw {SPREADS.find(s => s.id === spread)?.count} card{SPREADS.find(s => s.id === spread)!.count > 1 ? "s" : ""}
+              <BaydinShuffle className="w-4 h-4" /> Shuffle & Draw {SPREADS.find(s => s.id === spread)?.count} card{SPREADS.find(s => s.id === spread)!.count > 1 ? "s" : ""}
             </ShimmerButton>
 
             {/* Past readings */}
@@ -241,7 +240,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                 onClick={() => setView("tarot-history")}
                 className="inline-flex items-center gap-2 text-[13px] text-[#9C9489] hover:text-[#C5A572] transition focus-ring rounded-sm"
               >
-                <BookOpen className="w-3.5 h-3.5" /> View past readings
+                <BaydinBookmark className="w-3.5 h-3.5" /> View past readings
               </button>
             </div>
           </motion.div>
@@ -274,7 +273,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
               ))}
             </div>
             <div className="mt-8 flex items-center gap-2 text-[#C5A572]">
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <BaydinLoader className="w-4 h-4" />
               <span className="text-[13px] tracking-[0.04em]">Shuffling the deck…</span>
             </div>
             <p className="text-[12px] text-[#6B6358] mt-2 serif-italic">Breathe. Hold your question lightly.</p>
@@ -357,7 +356,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                 <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                      <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                       <span className="text-[12px] uppercase tracking-[0.2em] text-[#9C9489]">The reading</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -365,7 +364,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                         onClick={shareReading}
                         className="text-[12px] text-[#9C9489] hover:text-[#E8E2D5] transition focus-ring rounded-sm px-3 py-1.5 border border-[#2A2722] hover:border-[#4A4540]"
                       >
-                        <Share2 className="w-3 h-3 inline mr-1" /> Share
+                        <BaydinShare className="w-3 h-3 inline mr-1" /> Share
                       </button>
                       <button
                         onClick={saveReading}
@@ -377,7 +376,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                             : "text-[#9C9489] hover:text-[#E8E2D5] border-[#2A2722] hover:border-[#4A4540]"
                         )}
                       >
-                        {saved ? <><Save className="w-3 h-3 inline mr-1" /> Saved</> : <><Save className="w-3 h-3 inline mr-1" /> Save</>}
+                        {saved ? <><BaydinSave className="w-3 h-3 inline mr-1" /> Saved</> : <><BaydinSave className="w-3 h-3 inline mr-1" /> Save</>}
                       </button>
                     </div>
                   </div>
@@ -399,7 +398,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                   tone="parchment"
                   className="py-3 px-6"
                 >
-                  <RotateCw className="w-3.5 h-3.5" /> Ask another question
+                  <BaydinRefresh className="w-3.5 h-3.5" /> Ask another question
                 </ShimmerButton>
               </motion.div>
             )}

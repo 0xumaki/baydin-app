@@ -14,8 +14,7 @@ import {
   NumberTicker,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon, CloverPNG } from "@/components/lumina/baydin-icons";
-import { Wallet, Check, Gift, Moon, Star, Sparkles, Heart, Hash, CalendarClock, Copy, Share2 } from "lucide-react";
+import { CloverIcon, CloverPNG, BaydinStore, BaydinCheck, BaydinGift, BaydinMoon, BaydinStar, BaydinHeart, BaydinNumerology, BaydinCalendar, BaydinCopy, BaydinShare } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -88,19 +87,19 @@ const PAYMENT_METHODS = [
 
 // Feature cost reference shown to the user
 const FEATURE_COSTS = [
-  { feature: "Astrologer chat (per turn)", cost: 2, icon: Sparkles },
-  { feature: "Tarot reading (after 2 free/day)", cost: 1, icon: Star },
-  { feature: "Birth chart", cost: 3, icon: Star },
-  { feature: "Numerology report", cost: 3, icon: Hash },
-  { feature: "Personal horoscope", cost: 2, icon: Moon },
-  { feature: "Compatibility", cost: 5, icon: Heart },
-  { feature: "Dream interpretation", cost: 2, icon: Moon },
-  { feature: "Life report", cost: 15, icon: Star },
+  { feature: "Astrologer chat (per turn)", cost: 2, icon: BaydinStar },
+  { feature: "Tarot reading (after 2 free/day)", cost: 1, icon: BaydinStar },
+  { feature: "Birth chart", cost: 3, icon: BaydinStar },
+  { feature: "Numerology report", cost: 3, icon: BaydinNumerology },
+  { feature: "Personal horoscope", cost: 2, icon: BaydinMoon },
+  { feature: "Compatibility", cost: 5, icon: BaydinHeart },
+  { feature: "Dream interpretation", cost: 2, icon: BaydinMoon },
+  { feature: "Life report", cost: 15, icon: BaydinStar },
 ];
 
 function MessageCircleIcon(props: any) {
   // Local stub to avoid importing the chat icon name clash
-  return <Sparkles {...props} />;
+  return <BaydinStar {...props} />;
 }
 
 export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
@@ -167,7 +166,7 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
         <div className="relative z-10 min-w-0 flex-1 flex items-center justify-center px-6 text-center">
           <div>
             <div className="w-14 h-14 rounded-full bg-[#C5A572]/10 border border-[#C5A572]/20 flex items-center justify-center mx-auto mb-4">
-              <Wallet className="w-7 h-7 text-[#C5A572]" />
+              <BaydinStore className="w-7 h-7 text-[#C5A572]" />
             </div>
             <div className="text-[16px] text-[#E8E2D5] mb-1">{t("luck_earn")}</div>
             <ShimmerButton tone="gold" onClick={onAuth} className="mt-4">
@@ -194,7 +193,7 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
           {/* Hero */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <Wallet className="w-5 h-5 text-[#C5A572]" />
+              <BaydinStore className="w-5 h-5 text-[#C5A572]" />
               <GlowPill color="#C5A572" className="!text-[10px] uppercase tracking-wide">
                 In-app credit
               </GlowPill>
@@ -233,7 +232,7 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
             <div className="text-[12px] text-[#9C9489] font-medium mb-3 uppercase tracking-wide">{t("luck_ways_to_earn")}</div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <EarnMethodCard
-                icon={Gift}
+                icon={BaydinGift}
                 title="Daily reward"
                 body="Claim 1–5 Luck each day. Streaks grow the reward."
                 cta="Claim in sidebar"
@@ -247,7 +246,7 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
                 color="#7A8B6F"
               />
               <EarnMethodCard
-                icon={Sparkles}
+                icon={BaydinStar}
                 title="Practice daily"
                 body="Complete rituals, mood checks, and frequency sessions for streak Luck."
                 cta="See practices"
@@ -288,7 +287,7 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
               className="absolute -right-4 -bottom-4 w-28 h-28 opacity-[0.06] pointer-events-none"
             />
             <div className="relative z-10 flex items-center gap-4">
-              <Gift className="w-5 h-5 text-[#C5A572] shrink-0" />
+              <BaydinGift className="w-5 h-5 text-[#C5A572] shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="text-[13px] text-[#E8E2D5] font-medium">Share your referral code</div>
                 <div className="text-[11px] text-[#9C9489] mt-0.5">10 Luck for each friend who joins</div>
@@ -300,13 +299,13 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
                 onClick={copyReferralLink}
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-sm text-[12px] border border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#4A4540] transition"
               >
-                <Copy className="w-3.5 h-3.5" /> Copy link
+                <BaydinCopy className="w-3.5 h-3.5" /> Copy link
               </button>
               <button
                 onClick={shareReferral}
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-sm text-[12px] border border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#4A4540] transition"
               >
-                <Share2 className="w-3.5 h-3.5" /> Share
+                <BaydinShare className="w-3.5 h-3.5" /> Share
               </button>
             </div>
           </AuroraGlowCard>
@@ -388,7 +387,7 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
                       : "border-[#C5A572]/30 bg-[#C5A572]/5",
                   )}
                 >
-                  <CalendarClock
+                  <BaydinCalendar
                     className={cn(
                       "w-4 h-4 shrink-0 mt-0.5",
                       expiringSoon ? "text-[#D8788A]" : "text-[#C5A572]",
@@ -603,7 +602,7 @@ function TierCard({
         >
           {selected ? (
             <>
-              <Check className="w-3.5 h-3.5" /> Selected
+              <BaydinCheck className="w-3.5 h-3.5" /> Selected
             </>
           ) : (
             "Purchase"
@@ -612,7 +611,7 @@ function TierCard({
       </div>
       {selected && (
         <div className="absolute bottom-3 right-3 z-40 w-5 h-5 rounded-full bg-[#C5A572] flex items-center justify-center pointer-events-none">
-          <Check className="w-3 h-3 text-[#0A0908]" />
+          <BaydinCheck className="w-3 h-3 text-[#0A0908]" />
         </div>
       )}
     </AuroraGlowCard>

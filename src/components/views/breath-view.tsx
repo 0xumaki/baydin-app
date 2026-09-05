@@ -12,12 +12,12 @@ import {
   NumberTicker,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon, LotusIcon, StarGlyphIcon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, LotusIcon, StarGlyphIcon, BaydinBreath, BaydinPlay, BaydinPause, BaydinBell, BaydinRefresh, BaydinCheck } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/use-t";
 import { toast } from "sonner";
-import { Wind, Play, Pause, Bell, BellOff, RotateCcw, Check } from "lucide-react";
+import { BaydinBell as BellOff } from "@/components/lumina/baydin-icons";
 
 /* ============================================================
    BREATH VIEW — Calm / Headspace-style breath guide
@@ -521,7 +521,7 @@ function WelcomeScreen({
         {/* ===== Hero ===== */}
         <div className="mb-6 lum-reveal">
           <GlowPill className="mb-3" color={pattern.color}>
-            <Wind className="w-3 h-3" /> Practice · Breath
+            <BaydinBreath className="w-3 h-3" /> Practice · Breath
           </GlowPill>
           <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-2">
             Breathwork
@@ -601,14 +601,14 @@ function WelcomeScreen({
               <ToggleRow
                 active={state.chime}
                 onClick={() => dispatch({ type: "set_chime", chime: !state.chime })}
-                icon={state.chime ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
+                icon={state.chime ? <BaydinBell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
                 label="Phase chime"
                 hint="Soft tone at each phase change (A440)"
               />
               <ToggleRow
                 active={state.ambient}
                 onClick={() => dispatch({ type: "set_ambient", ambient: !state.ambient })}
-                icon={<Wind className="w-4 h-4" />}
+                icon={<BaydinBreath className="w-4 h-4" />}
                 label="Ambient pad"
                 hint="Drone via Tone.js (uses data)"
               />
@@ -653,7 +653,7 @@ function WelcomeScreen({
             tone="gold"
             className="px-8 py-3 text-[14px]"
           >
-            <Play className="w-4 h-4 mr-1" />
+            <BaydinPlay className="w-4 h-4 mr-1" />
             Begin session
           </ShimmerButton>
           <div className="text-[11px] text-[#6B6358]">
@@ -768,7 +768,7 @@ function ActiveScreen({
         </div>
         <div className="flex items-center gap-3 text-[11px] text-[#9C9489] tabular-nums">
           <span className="flex items-center gap-1">
-            <Wind className="w-3 h-3 text-[#C5A572]" />
+            <BaydinBreath className="w-3 h-3 text-[#C5A572]" />
             <NumberTicker value={Math.floor(totalRemaining / 60)} suffix=":" />
             {(totalRemaining % 60).toString().padStart(2, "0")} left
           </span>
@@ -898,7 +898,7 @@ function ActiveScreen({
           className="w-11 h-11 rounded-full border border-[#2A2722] flex items-center justify-center text-[#9C9489] hover:text-[#E8E2D5] hover:border-white/15 transition"
           aria-label={state.paused ? "Resume breathing" : "Pause breathing"}
         >
-          {state.paused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+          {state.paused ? <BaydinPlay className="w-4 h-4" /> : <BaydinPause className="w-4 h-4" />}
         </button>
         <button
           onClick={onEnd}
@@ -947,7 +947,7 @@ function CompleteScreen({
             boxShadow: `0 0 40px ${pattern.color}33`,
           }}
         >
-          <Check className="w-8 h-8" style={{ color: pattern.color }} />
+          <BaydinCheck className="w-8 h-8" style={{ color: pattern.color }} />
         </motion.div>
 
         <LiquidMetalText as="h1" className="serif-display text-[1.5rem] block mb-2">
@@ -990,7 +990,7 @@ function CompleteScreen({
             onClick={() => dispatch({ type: "restart" })}
             className="px-6 py-2.5"
           >
-            <RotateCcw className="w-4 h-4 mr-1.5" />
+            <BaydinRefresh className="w-4 h-4 mr-1.5" />
             Breathe again
           </ShimmerButton>
           <ShimmerButton

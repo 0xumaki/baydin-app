@@ -10,9 +10,8 @@ import {
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinUsers, BaydinStar, BaydinMoon, BaydinHeart, BaydinLoader, BaydinChevronRight, BaydinArrowLeft } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
-import { Users, Star, Moon, Heart, Loader2, ChevronRight, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -55,7 +54,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
           <AuroraGlowCard glowColor="#D876A0" glowIntensity={0.18} className="p-8 text-center">
             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[#D876A0]/15 border border-[#D876A0]/30 flex items-center justify-center">
-              <Users className="w-6 h-6 text-[#D876A0]" />
+              <BaydinUsers className="w-6 h-6 text-[#D876A0]" />
             </div>
             <LiquidMetalText as="h1" className="text-[20px] mb-1">Sign in to check compatibility</LiquidMetalText>
             <p className="text-[12px] text-[#9C9489] mb-4 max-w-sm mx-auto">
@@ -82,7 +81,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
         </div>
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
           <button onClick={() => setResult(null)} className="flex items-center gap-1.5 text-[12px] text-[#9C9489] hover:text-[#C5A572] mb-4 transition">
-            <ArrowLeft className="w-3.5 h-3.5" /> New reading
+            <BaydinArrowLeft className="w-3.5 h-3.5" /> New reading
           </button>
 
           {/* Score card */}
@@ -113,7 +112,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
 
           {/* Breakdown */}
           <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-5 mb-4">
-            <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2"><Star className="w-3.5 h-3.5 text-[#C5A572]" /> 8-Fold Compatibility Breakdown</div>
+            <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2"><BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" /> 8-Fold Compatibility Breakdown</div>
             <div className="space-y-2">
               {result.ashtakoota.breakdown.map((b: any, i: number) => {
                 const ratio = b.score / b.max;
@@ -148,7 +147,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
 
           {/* Interpretation */}
           <AuroraGlowCard glowColor={verdict.color} glowIntensity={0.18} className="p-6">
-            <GlowPill color={verdict.color} className="text-[10px] mb-3"><Heart className="w-2.5 h-2.5" /> Interpretation</GlowPill>
+            <GlowPill color={verdict.color} className="text-[10px] mb-3"><BaydinHeart className="w-2.5 h-2.5" /> Interpretation</GlowPill>
             <div className="serif prose-editorial text-[14px] text-[#E8E2D5]/90 leading-relaxed">
               <ReactMarkdown>{result.interpretation}</ReactMarkdown>
             </div>
@@ -184,8 +183,8 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden flex items-center justify-center">
           <AuroraGlowCard glowColor="#D876A0" glowIntensity={0.2} className="p-8 text-center">
             <div className="relative w-20 h-20 mx-auto mb-4">
-              <Heart className="w-20 h-20 text-[#D876A0]/20 absolute" />
-              <Heart className="w-20 h-20 text-[#D876A0] absolute animate-pulse" style={{ clipPath: "polygon(0 0, 50% 0, 50% 100%, 0 100%)" }} />
+              <BaydinHeart className="w-20 h-20 text-[#D876A0]/20 absolute" />
+              <BaydinHeart className="w-20 h-20 text-[#D876A0] absolute animate-pulse" style={{ clipPath: "polygon(0 0, 50% 0, 50% 100%, 0 100%)" }} />
             </div>
             <LiquidMetalText as="div" className="text-[16px] mb-1">Reading your compatibility…</LiquidMetalText>
             <div className="text-[11px] text-[#9C9489] mt-1">Computing Ashtakoota + Venus synastry</div>
@@ -206,7 +205,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
         {/* Hero */}
         <div className="mb-6">
           <GlowPill color="#D876A0" className="text-[10px] mb-3">
-            <Users className="w-2.5 h-2.5" /> Partner matching · {COMPAT_COST} Luck
+            <BaydinUsers className="w-2.5 h-2.5" /> Partner matching · {COMPAT_COST} Luck
           </GlowPill>
           <LiquidMetalText as="h1" className="text-[28px] lg:text-[32px] mb-2">Compatibility</LiquidMetalText>
           <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch]">
@@ -217,7 +216,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
         {!user.birthData ? (
           <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-6 text-center">
             <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#C5A572]/10 border border-[#C5A572]/30 flex items-center justify-center">
-              <Star className="w-6 h-6 text-[#C5A572]" />
+              <BaydinStar className="w-6 h-6 text-[#C5A572]" />
             </div>
             <LiquidMetalText as="h2" className="text-[16px] mb-2">Your birth details needed</LiquidMetalText>
             <p className="text-[12px] text-[#9C9489]">
@@ -227,7 +226,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
         ) : (
           <AuroraGlowCard glowColor="#D876A0" glowIntensity={0.15} className="p-5">
             <div className="text-[13px] text-[#E8E2D5] mb-4 flex items-center gap-2">
-              <Heart className="w-4 h-4 text-[#D876A0]" /> Partner's birth details
+              <BaydinHeart className="w-4 h-4 text-[#D876A0]" /> Partner's birth details
             </div>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
@@ -283,7 +282,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
               <span className="text-[11px] text-[#9C9489]">Ashtakoota + Mahendra + Vedha + Rajju + Stree-Deergha + Nadi</span>
             </div>
             <ShimmerButton onClick={run} disabled={!partner.dob} className="w-full">
-              <Users className="w-4 h-4" /> Analyze compatibility
+              <BaydinUsers className="w-4 h-4" /> Analyze compatibility
             </ShimmerButton>
           </AuroraGlowCard>
         )}

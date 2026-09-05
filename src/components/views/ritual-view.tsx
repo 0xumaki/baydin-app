@@ -11,21 +11,18 @@ import {
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinFlame, BaydinFrequency, BaydinManifest, BaydinStar, BaydinCheck, BaydinLoader, BaydinChevronRight, BaydinCalendar, BaydinClock } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import {
-  Flame, Waves, Target, Sparkles, Check, Loader2, ChevronRight,
-  Calendar, Crown, Clock,
-} from "lucide-react";
+import { BaydinStar as Crown } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
 
 const STEPS = [
-  { id: "step1Cleanse", num: 1, name: "Cleanse", desc: "Tune to a Solfeggio frequency to clear your field", icon: Waves, color: "#9CA8A3", action: "frequency", cta: "Open Frequencies", optional: false },
-  { id: "step2Manifest", num: 2, name: "Manifest", desc: "Confirm your daily intention to anchor it", icon: Target, color: "#B5CD7E", action: "manifest", cta: "Open Manifest", optional: false },
-  { id: "step3Tarot", num: 3, name: "Ask the Cards", desc: "Draw a card for guidance (optional)", icon: Sparkles, color: "#C5A87C", action: "tarot", cta: "Draw Tarot", optional: true },
-  { id: "step4Balance", num: 4, name: "Balance", desc: "A frequency session to close your ritual", icon: Waves, color: "#5FA9C7", action: "frequency", cta: "Open Frequencies", optional: false },
+  { id: "step1Cleanse", num: 1, name: "Cleanse", desc: "Tune to a Solfeggio frequency to clear your field", icon: BaydinFrequency, color: "#9CA8A3", action: "frequency", cta: "Open Frequencies", optional: false },
+  { id: "step2Manifest", num: 2, name: "Manifest", desc: "Confirm your daily intention to anchor it", icon: BaydinManifest, color: "#B5CD7E", action: "manifest", cta: "Open Manifest", optional: false },
+  { id: "step3Tarot", num: 3, name: "Ask the Cards", desc: "Draw a card for guidance (optional)", icon: BaydinStar, color: "#C5A87C", action: "tarot", cta: "Draw Tarot", optional: true },
+  { id: "step4Balance", num: 4, name: "Balance", desc: "A frequency session to close your ritual", icon: BaydinFrequency, color: "#5FA9C7", action: "frequency", cta: "Open Frequencies", optional: false },
 ] as const;
 
 export function RitualView({ onAuth }: { onAuth: () => void }) {
@@ -86,7 +83,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
         {/* ===== Hero ===== */}
         <div className="mb-6 lum-reveal">
           <GlowPill className="mb-3" color="#F09A3D">
-            <Flame className="w-3 h-3" /> Daily practice · Free
+            <BaydinFlame className="w-3 h-3" /> Daily practice · Free
           </GlowPill>
           <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-2">
             Daily Ritual
@@ -124,7 +121,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 {isComplete ? (
-                  <Check className="w-7 h-7 text-[#7A8B6F]" />
+                  <BaydinCheck className="w-7 h-7 text-[#7A8B6F]" />
                 ) : (
                   <div className="flex items-baseline">
                     <NumberTicker value={completedSteps} className="text-[20px] font-light text-[#C5A572] leading-none" />
@@ -135,7 +132,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-1">
-                <Calendar className="w-3 h-3" />
+                <BaydinCalendar className="w-3 h-3" />
                 {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
               </div>
               <div className="text-[20px] font-light text-[#E8E2D5] mb-1.5">
@@ -143,7 +140,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
               </div>
               <div className="flex items-center gap-3 text-[12px] flex-wrap">
                 <span className="flex items-center gap-1 text-[#F09A3D]">
-                  <Flame className="w-3.5 h-3.5" />
+                  <BaydinFlame className="w-3.5 h-3.5" />
                   <NumberTicker value={streak} suffix="-day streak" className="tabular-nums" />
                 </span>
                 <span className="text-[#9C9489]">·</span>
@@ -164,7 +161,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
               className="w-full py-3"
             >
               {marking ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Marking…</>
+                <><BaydinLoader className="w-4 h-4" /> Marking…</>
               ) : (
                 <><Crown className="w-4 h-4" /> Complete ritual · claim +3 Luck bonus</>
               )}
@@ -195,9 +192,9 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
                       }}
                     >
                       {done ? (
-                        <Check className="w-5 h-5" style={{ color: step.color }} />
+                        <BaydinCheck className="w-5 h-5" style={{ color: step.color }} />
                       ) : isMarking ? (
-                        <Loader2 className="w-5 h-5 text-[#9C9489] animate-spin" />
+                        <BaydinLoader className="w-5 h-5 text-[#9C9489]" />
                       ) : (
                         <step.icon className="w-5 h-5" style={{ color: step.color }} />
                       )}
@@ -219,7 +216,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
                       )}
                       {done && (
                         <GlowPill color={step.color} className="text-[10px]">
-                          <Check className="w-3 h-3" /> done
+                          <BaydinCheck className="w-3 h-3" /> done
                         </GlowPill>
                       )}
                     </div>
@@ -247,7 +244,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
                         onClick={() => setView(step.action as any)}
                         className="px-3 py-1.5 rounded-full text-[11px] text-[#9C9489] hover:text-[#C5A572] transition flex items-center gap-0.5 focus-ring"
                       >
-                        {step.cta} <ChevronRight className="w-3 h-3" />
+                        {step.cta} <BaydinChevronRight className="w-3 h-3" />
                       </button>
                     </div>
                   </div>
@@ -260,7 +257,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
         {/* Streak info */}
         <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-4 mt-5">
           <div className="flex items-center gap-2 mb-2">
-            <Clock className="w-4 h-4 text-[#C5A572]" />
+            <BaydinClock className="w-4 h-4 text-[#C5A572]" />
             <span className="text-[12px] text-[#9C9489] font-medium">How streaks work</span>
           </div>
           <div className="text-[12px] text-[#9C9489] leading-relaxed">
@@ -286,7 +283,7 @@ function Gate({ onAuth }: { onAuth: () => void }) {
         <div className="flex flex-col items-center justify-center text-center py-20">
           <AuroraGlowCard glowColor="#F09A3D" glowIntensity={0.15} className="max-w-sm w-full p-10 text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 border border-[#F09A3D]/30" style={{ background: "#F09A3D10" }}>
-              <Flame className="w-7 h-7 text-[#F09A3D]" />
+              <BaydinFlame className="w-7 h-7 text-[#F09A3D]" />
             </div>
             <LiquidMetalText as="h1" className="serif-display text-[1.75rem] block mb-2">Sign in to begin</LiquidMetalText>
             <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">

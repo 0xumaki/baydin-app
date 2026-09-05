@@ -19,9 +19,11 @@ import { useStore } from "@/lib/store";
 import { useT } from "@/lib/use-t";
 import { cn } from "@/lib/utils";
 import {
-  Sparkles, Moon, Star, Sun, Flame, Gift, ChevronRight, Heart, Calendar,
-  TrendingUp, Target, Compass, BookOpen, Share2, Snowflake, Clock,
-} from "lucide-react";
+  BaydinStar, BaydinMoon, BaydinSun, BaydinFlame, BaydinGift, BaydinChevronRight,
+  BaydinHeart, BaydinCalendar, BaydinTrending, BaydinManifest, BaydinInsights,
+  BaydinLifeReport, BaydinShare, BaydinClock,
+} from "@/components/lumina/baydin-icons";
+import { BaydinStar as Snowflake } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -171,7 +173,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
           {/* The one distinctive moment — serif headline, no card chrome */}
           <div className="lum-reveal">
             <GlowPill className="mb-4">
-              <Sparkles className="w-3 h-3" /> Welcome
+              <BaydinStar className="w-3 h-3" /> Welcome
             </GlowPill>
             <LiquidMetalText as="h1" className="serif-display text-[2.75rem] sm:text-[3.5rem] leading-[1.05] tracking-tight block mb-5">
               {t("hero_read_sky")}
@@ -181,7 +183,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             </p>
             <ShimmerButton onClick={onAuth} className="px-6 py-3">
               Begin
-              <ChevronRight className="w-4 h-4" />
+              <BaydinChevronRight className="w-4 h-4" />
             </ShimmerButton>
             <div className="mt-3 text-[12px] text-[#6B6358] flex items-center gap-1.5">
               <CloverIcon className="w-3.5 h-3.5" /> 5 Luck to start. No card required.
@@ -267,14 +269,14 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
         <AuroraGlowCard glowColor="#C5A572" glowIntensity={alreadyClaimedToday ? 0.1 : 0.25} className="p-4 mb-5 lum-reveal">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-full bg-[#C5A572]/15 border border-[#C5A572]/30 flex items-center justify-center shrink-0">
-              <Gift className="w-5 h-5 text-[#C5A572]" />
+              <BaydinGift className="w-5 h-5 text-[#C5A572]" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
                 <span className="text-[10px] uppercase tracking-[0.2em] text-[#9C9489]">Daily reward</span>
                 {alreadyClaimedToday && (
                   <GlowPill color="#7A8B6F" className="text-[9px]">
-                    <Flame className="w-3 h-3" /> Claimed
+                    <BaydinFlame className="w-3 h-3" /> Claimed
                   </GlowPill>
                 )}
               </div>
@@ -317,10 +319,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
 
         {/* Quick actions grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
-          <QuickAction icon={Sparkles} label="Ask Astrologer" desc="Chat" onClick={() => setView("chat")} />
-          <QuickAction icon={Star} label="Draw Tarot" desc="Free daily" onClick={() => setView("tarot")} />
-          <QuickAction icon={Moon} label="Horoscope" desc="Daily stars" onClick={() => setView("horoscope")} />
-          <QuickAction icon={Target} label="Manifest" desc="Confirm goals" onClick={() => setView("manifest")} badge={goals.filter((g) => !g.confirmedToday).length} />
+          <QuickAction icon={BaydinStar} label="Ask Astrologer" desc="Chat" onClick={() => setView("chat")} />
+          <QuickAction icon={BaydinStar} label="Draw Tarot" desc="Free daily" onClick={() => setView("tarot")} />
+          <QuickAction icon={BaydinMoon} label="Horoscope" desc="Daily stars" onClick={() => setView("horoscope")} />
+          <QuickAction icon={BaydinManifest} label="Manifest" desc="Confirm goals" onClick={() => setView("manifest")} badge={goals.filter((g) => !g.confirmedToday).length} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -330,7 +332,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {activity.length > 0 && (
               <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.15} className="p-4 flex items-center gap-4">
                 <div className="flex items-center gap-2 shrink-0">
-                  <TrendingUp className="w-4 h-4 text-[#7A8B6F]" />
+                  <BaydinTrending className="w-4 h-4 text-[#7A8B6F]" />
                   <span className="text-[11px] uppercase tracking-[0.15em] text-[#9C9489] hidden sm:inline">This Week</span>
                 </div>
                 <div className="flex items-center gap-4 flex-1 overflow-x-auto lum-no-scrollbar">
@@ -370,7 +372,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sun className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinSun className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Transits</span>
                   </div>
                 </div>
@@ -401,7 +403,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {gemstones?.recommendations?.length > 0 && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Your Gemstones</span>
                 </div>
                 <div className="space-y-2">
@@ -428,7 +430,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {mantras?.recommendations?.length > 0 && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Star className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Mantras</span>
                 </div>
                 <div className="space-y-2">
@@ -451,7 +453,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Your Yogas</span>
                   </div>
                   <span className="text-[10px] text-[#C5A572]">{yogas.count} found</span>
@@ -475,7 +477,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {namkaran && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Star className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Namkaran — Name Suggestions</span>
                 </div>
                 <div className="text-[11px] text-[#9C9489] mb-2">
@@ -500,7 +502,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Yadaya — Remedies</span>
                   </div>
                   <span className="text-[10px] text-[#C5A572]">{yadaya.count} needed</span>
@@ -528,7 +530,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Panchasara — 5-Fold Remedy</span>
                   </div>
                   <span className="text-[10px] text-[#C5A572]">for {panchasara.planet}</span>
@@ -551,7 +553,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {panchasara && panchasara.status === "balanced" && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <Star className="w-4 h-4 text-[#7A8B6F]" />
+                  <BaydinStar className="w-4 h-4 text-[#7A8B6F]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Panchasara — Chart Balanced</span>
                 </div>
                 <div className="text-[12px] text-[#7A8B6F] leading-relaxed">{panchasara.message}</div>
@@ -563,7 +565,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinCalendar className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">7-Day Forecast</span>
                   </div>
                   <div className="flex items-center gap-2 text-[10px]">
@@ -591,7 +593,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {shraaddha && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Star className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Shraaddha — Ancestral Rites</span>
                 </div>
                 <div className="text-[12px] text-[#E8E2D5] mb-2 leading-relaxed">{shraaddha.practice}</div>
@@ -618,7 +620,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {varshaphal && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sun className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinSun className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Varshaphal — Year Ahead</span>
                 </div>
                 <div className="flex items-center gap-3 mb-3">
@@ -643,7 +645,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {marriageMatch && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Heart className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinHeart className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Marriage Matching</span>
                 </div>
                 <div className="text-[11px] text-[#9C9489] mb-2">Based on {marriageMatch.yourNakshatra} nakshatra</div>
@@ -665,7 +667,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {gochar?.predictions?.length > 0 && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sun className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinSun className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Gochar — Transit Predictions</span>
                 </div>
                 <div className="space-y-1.5">
@@ -687,7 +689,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Activities</span>
                   </div>
                   <div className="flex items-center gap-2 text-[9px]">
@@ -714,7 +716,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Tara Bala</span>
                   </div>
                   <span className={cn("text-[10px] px-2 py-0.5 rounded-full", taraBala.currentTara.nature === "auspicious" ? "bg-leaf/15 text-[#7A8B6F]" : "bg-[#C26B5C]/15 text-[#C26B5C]")}>
@@ -739,7 +741,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Heart className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinHeart className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Nadi — {nadi.nadiName}</span>
                   </div>
                   <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full", nadi.dosha === "Vata" ? "bg-purple-500/15 text-purple-300" : nadi.dosha === "Pitta" ? "bg-[#C26B5C]/15 text-[#C26B5C]" : "bg-leaf/15 text-[#7A8B6F]")}>
@@ -760,7 +762,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Dasha Effects</span>
                   </div>
                   <span className={cn("text-[10px] px-2 py-0.5 rounded-full", dashaEffects.current.placementEffect === "beneficial" ? "bg-leaf/15 text-[#7A8B6F]" : dashaEffects.current.placementEffect === "challenging" ? "bg-[#C26B5C]/15 text-[#C26B5C]" : "bg-[#C5A572]/15 text-[#C5A572]")}>
@@ -779,7 +781,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {grahaBala?.planets?.length > 0 && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Star className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Graha Bala — Power Ranking</span>
                 </div>
                 <div className="space-y-1">
@@ -807,7 +809,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 <div className="" />
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-3">
-                    <Star className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#C5A572]">Pancha Mahapurusha Yoga</span>
                   </div>
                   {panchaMahapurusha.formed.map((y: any, i: number) => (
@@ -827,7 +829,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sun className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinSun className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Gochar Phala — Transit Effects</span>
                   </div>
                   <span className="text-[10px] text-[#9C9489]">{gocharPhala.beneficialCount} beneficial · {gocharPhala.challengingCount} challenging</span>
@@ -851,7 +853,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {remedyTiming?.recommendations?.length > 0 && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Remedy Timing</span>
                 </div>
                 <div className="space-y-1">
@@ -873,7 +875,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinFlame className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Arishta — Afflictions</span>
                   </div>
                   <span className={cn("text-[10px] px-2 py-0.5 rounded-full", arishta.overall === "minimal" ? "bg-leaf/15 text-[#7A8B6F]" : arishta.overall === "mild" ? "bg-[#C5A572]/15 text-[#C5A572]" : "bg-[#C26B5C]/15 text-[#C26B5C]")}>
@@ -900,7 +902,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {ishtaDevata?.primary && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Ishta Devata</span>
                 </div>
                 <div className="text-[13px] text-[#C5A572] font-medium mb-1">{ishtaDevata.primary.deity}</div>
@@ -920,7 +922,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {spiritualPractice?.morning && (
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Star className="w-4 h-4 text-[#C5A572]" />
+                  <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Spiritual Practice</span>
                 </div>
                 <div className="text-[10px] text-[#9C9489] mb-1">{spiritualPractice.day} · {spiritualPractice.dayLord} day · {spiritualPractice.nadi}</div>
@@ -947,7 +949,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sun className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinSun className="w-4 h-4 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Aspects</span>
                   </div>
                   <div className="flex items-center gap-2 text-[9px]">
@@ -974,11 +976,11 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             <GlassCard className="p-5">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4 text-[#7A8B6F]" />
+                  <BaydinManifest className="w-4 h-4 text-[#7A8B6F]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's intentions</span>
                 </div>
                 <button onClick={() => setView("manifest")} className="text-[11px] text-[#C5A572] hover:underline flex items-center gap-0.5">
-                  All <ChevronRight className="w-3 h-3" />
+                  All <BaydinChevronRight className="w-3 h-3" />
                 </button>
               </div>
               {goals.length === 0 ? (
@@ -998,7 +1000,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {/* Mood check-in */}
             <GlassCard className="p-5">
               <div className="flex items-center gap-2 mb-3">
-                <Heart className="w-4 h-4 text-[#C5A572]" />
+                <BaydinHeart className="w-4 h-4 text-[#C5A572]" />
                 <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Mood</span>
               </div>
               <MoodPicker current={mood?.mood} onPick={async (m) => {
@@ -1043,7 +1045,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.15} className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">7-day practice</span>
-                <Flame className="w-3.5 h-3.5 text-[#7A8B6F]" />
+                <BaydinFlame className="w-3.5 h-3.5 text-[#7A8B6F]" />
               </div>
               <div className="flex items-end justify-between gap-1.5 h-16">
                 {(activity.length > 0 ? activity : Array(7).fill(null)).map((day: any, i: number) => {
@@ -1122,7 +1124,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {planetaryHours?.current && (
               <GlassCard className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Clock className="w-3.5 h-3.5 text-[#C5A572]" />
+                  <BaydinClock className="w-3.5 h-3.5 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Planetary Hours</span>
                 </div>
                 <div className="flex items-center gap-3 mb-3">
@@ -1148,7 +1150,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {rahuKaal?.periods?.length > 0 && (
               <GlassCard className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Clock className="w-3.5 h-3.5 text-[#C5A572]" />
+                  <BaydinClock className="w-3.5 h-3.5 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Rahu Kaal Timings</span>
                 </div>
                 {rahuKaal.currentlyInauspicious && (
@@ -1175,7 +1177,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <GlassCard className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Clock className="w-3.5 h-3.5 text-[#C5A572]" />
+                    <BaydinClock className="w-3.5 h-3.5 text-[#C5A572]" />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Choghadiya</span>
                   </div>
                   <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full", choghadiya.current.nature === "auspicious" ? "bg-leaf/15 text-[#7A8B6F]" : "bg-[#C26B5C]/15 text-[#C26B5C]")}>
@@ -1217,7 +1219,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                     className="p-1 rounded-full text-[#9C9489]/50 hover:text-[#C5A572] transition"
                     title="Share lucky numbers"
                   >
-                    <Share2 className="w-3 h-3" />
+                    <BaydinShare className="w-3 h-3" />
                   </button>
                 </div>
                 <div className="flex items-center gap-2 mb-3">
@@ -1244,7 +1246,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {muhurta && (
               <GlassCard className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Clock className="w-3.5 h-3.5 text-[#C5A572]" />
+                  <BaydinClock className="w-3.5 h-3.5 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Auspicious Time</span>
                 </div>
                 {/* Inauspicious (active highlighted) */}
@@ -1276,13 +1278,13 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             {/* Deep dive upsell */}
             <ShellCard className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Compass className="w-4 h-4 text-[#C5A572]" />
+                <BaydinInsights className="w-4 h-4 text-[#C5A572]" />
                 <span className="text-[11px] uppercase tracking-[0.2em] text-[#C5A572]">Deep readings</span>
               </div>
               <div className="text-[13px] text-[#E8E2D5] mb-3">Unlock your full chart with deep astrological insights.</div>
               <div className="space-y-1.5">
-                <UpsellRow icon={BookOpen} label="Life Report" cost={15} desc="7-section comprehensive" onClick={() => setView("life-report")} />
-                <UpsellRow icon={Compass} label="Insights" cost={3} desc="Yogas, transits, dasha…" onClick={() => setView("insights")} />
+                <UpsellRow icon={BaydinLifeReport} label="Life Report" cost={15} desc="7-section comprehensive" onClick={() => setView("life-report")} />
+                <UpsellRow icon={BaydinInsights} label="Insights" cost={3} desc="Yogas, transits, dasha…" onClick={() => setView("insights")} />
               </div>
             </ShellCard>
           </div>
@@ -1476,7 +1478,7 @@ function CardOfDayCard({ reading }: { reading: any }) {
             {/* Reflection */}
             <div className="mt-3">
               <div className="text-[12px] text-[#6B6358] font-medium mb-1.5 flex items-center gap-1.5">
-                <BookOpen className="w-3 h-3 text-[#C5A572]" /> Your reflection {saved && <span className="text-[#7A8B6F] serif-italic">· saved</span>}
+                <BaydinLifeReport className="w-3 h-3 text-[#C5A572]" /> Your reflection {saved && <span className="text-[#7A8B6F] serif-italic">· saved</span>}
               </div>
               <textarea
                 value={reflection}
@@ -1509,7 +1511,7 @@ function CardOfDayCard({ reading }: { reading: any }) {
               }}
               className="mt-3 inline-flex items-center gap-1.5 text-[12px] text-[#6B6358] hover:text-[#C5A572] transition focus-ring rounded-sm"
             >
-              <Share2 className="w-3.5 h-3.5" /> Share this card
+              <BaydinShare className="w-3.5 h-3.5" /> Share this card
             </button>
           </motion.div>
         )}
@@ -1538,7 +1540,7 @@ function GoalRow({ goal }: { goal: any }) {
   }
   return (
     <div className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02]">
-      <Flame className={cn("w-3.5 h-3.5 shrink-0", goal.streak > 0 ? "text-[#7A8B6F]" : "text-[#9C9489]/40")} />
+      <BaydinFlame className={cn("w-3.5 h-3.5 shrink-0", goal.streak > 0 ? "text-[#7A8B6F]" : "text-[#9C9489]/40")} />
       <div className="flex-1 min-w-0">
         <div className="text-[12px] text-[#E8E2D5] truncate">{goal.title}</div>
         {goal.streak > 0 && <div className="text-[10px] text-[#7A8B6F]">{goal.streak}-day streak</div>}
@@ -1606,10 +1608,10 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
 }) {
   // Determine what's left to do today
   const tasks: { label: string; desc: string; icon: any; view: string; done: boolean; color: string }[] = [
-    { label: "Check your mood", desc: "1 tap · +1 Luck", icon: Heart, view: "today", done: moodDone, color: "#D876A0" },
-    { label: "Confirm your intention", desc: "Daily manifest · +1 Luck", icon: Target, view: "manifest", done: manifestDone, color: "#B5CD7E" },
-    { label: "Draw a tarot card", desc: "Free daily reading", icon: Star, view: "tarot", done: tarotDone, color: "#C5A87C" },
-    { label: "Complete your ritual", desc: "4 steps · +7 Luck", icon: Flame, view: "ritual", done: ritualDone, color: "#F09A3D" },
+    { label: "Check your mood", desc: "1 tap · +1 Luck", icon: BaydinHeart, view: "today", done: moodDone, color: "#D876A0" },
+    { label: "Confirm your intention", desc: "Daily manifest · +1 Luck", icon: BaydinManifest, view: "manifest", done: manifestDone, color: "#B5CD7E" },
+    { label: "Draw a tarot card", desc: "Free daily reading", icon: BaydinStar, view: "tarot", done: tarotDone, color: "#C5A87C" },
+    { label: "Complete your ritual", desc: "4 steps · +7 Luck", icon: BaydinFlame, view: "ritual", done: ritualDone, color: "#F09A3D" },
   ];
   const next = tasks.find((t) => !t.done);
 
@@ -1618,7 +1620,7 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
       <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.2} className="p-4 mb-5 lum-reveal">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-leaf/15 border border-leaf/30 flex items-center justify-center shrink-0">
-            <Flame className="w-5 h-5 text-[#7A8B6F]" />
+            <BaydinFlame className="w-5 h-5 text-[#7A8B6F]" />
           </div>
           <div className="flex-1">
             <div className="text-[13px] text-[#E8E2D5] font-medium">Today's practice complete ✦</div>
@@ -1641,7 +1643,7 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
             <div className="text-[14px] text-[#E8E2D5] font-medium group-hover:text-[#C5A572] transition">{next.label}</div>
             <div className="text-[11px] text-[#9C9489]">{next.desc}</div>
           </div>
-          <ChevronRight className="w-4 h-4 text-[#9C9489] group-hover:text-[#C5A572] group-hover:translate-x-0.5 transition shrink-0" />
+          <BaydinChevronRight className="w-4 h-4 text-[#9C9489] group-hover:text-[#C5A572] group-hover:translate-x-0.5 transition shrink-0" />
         </div>
       </AuroraGlowCard>
     </button>

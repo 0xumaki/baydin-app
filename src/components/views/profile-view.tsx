@@ -14,19 +14,13 @@ import {
 } from "@/components/lumina/premium-ui";
 import { BrandedImageCard, brandedFilename } from "@/components/branded-image";
 import { useBrandedImageDownload } from "@/lib/use-branded-image-download";
-import { CloverIcon, CloverPNG } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { useStore } from "@/lib/store";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import {
-  BarChart3, Sparkles, MessageCircle, Moon, Target, Flame, Wallet,
-  Star, Heart, TrendingUp, Calendar, Award, Zap, Gift, Users, BookOpen, Lock,
-  Download, Trash2, X, AlertTriangle, Bookmark, Copy, Share2, UserPlus,
-  Bell, Globe, Sun, Moon as MoonIcon, Shield, Pencil, ChevronRight,
-  Crown, Activity, Clock,
-} from "lucide-react";
+import { CloverIcon, CloverPNG, BaydinTrending, BaydinStar, BaydinAstrologer, BaydinMoon, BaydinManifest, BaydinFlame, BaydinStore, BaydinHeart, BaydinCalendar, BaydinGift, BaydinUsers, BaydinLifeReport, BaydinDownload, BaydinTrash, BaydinX, BaydinAlert, BaydinBookmark, BaydinCopy, BaydinShare, BaydinBell, BaydinGlobe, BaydinSun, BaydinAdmin, BaydinEdit, BaydinChevronRight, BaydinClock } from "@/components/lumina/baydin-icons";
+import { BaydinStar as Award, BaydinAdmin as Lock, BaydinStar as Crown } from "@/components/lumina/baydin-icons";
 import { ACHIEVEMENTS, evaluateAchievements, tierColor } from "@/lib/achievements";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -96,7 +90,7 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
         </div>
         <div className="relative z-10 min-w-0 flex-1 flex items-center justify-center px-6 text-center">
           <div>
-            <BarChart3 className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+            <BaydinTrending className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
             <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to view your stats</div>
             <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
           </div>
@@ -132,7 +126,7 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
           {/* Hero */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <BarChart3 className="w-5 h-5 text-[#C5A572]" />
+              <BaydinTrending className="w-5 h-5 text-[#C5A572]" />
               <GlowPill color="#C5A572" className="!text-[10px] uppercase tracking-wide">
                 Your journey
               </GlowPill>
@@ -140,7 +134,7 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
                 {archetype.icon} {archetype.name}
               </GlowPill>
               <GlowPill color="#9C9489" className="text-[10px]">
-                <Clock className="w-3 h-3" /> {memberSinceLabel}
+                <BaydinClock className="w-3 h-3" /> {memberSinceLabel}
               </GlowPill>
             </div>
             <LiquidMetalText as="h1" className="text-[28px] sm:text-[32px] lg:text-[40px] font-light leading-tight block">
@@ -180,7 +174,7 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
                   onClick={() => setView("analytics")}
                   className="px-4 py-2 text-[12px]"
                 >
-                  <BarChart3 className="w-3.5 h-3.5" /> Full analytics
+                  <BaydinTrending className="w-3.5 h-3.5" /> Full analytics
                 </ShimmerButton>
               </div>
             </div>
@@ -198,21 +192,21 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
               showClover
             />
             <LifetimeStat
-              icon={Calendar}
+              icon={BaydinCalendar}
               label="Days Active"
               value={daysActive}
               sub={`${user.streak} day streak`}
               accent="#7A8B6F"
             />
             <LifetimeStat
-              icon={Sparkles}
+              icon={BaydinStar}
               label="Total Readings"
               value={lifetimeReadings}
               sub="Across all practices"
               accent="#9E8AC9"
             />
             <LifetimeStat
-              icon={Flame}
+              icon={BaydinFlame}
               label="Day Streak"
               value={user.streak}
               sub="Daily ritual chain"
@@ -223,12 +217,12 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
           {/* Practice breakdown — 6 AuroraGlowCards */}
           <SectionTitle eyebrow="Practice breakdown" className="mb-3" />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-            <PracticeStat icon={Sparkles} label="Tarot" value={totals?.tarot ?? 0} color="#C5A87C" />
-            <PracticeStat icon={MessageCircle} label="Chats" value={totals?.chat ?? 0} color="#5FA9C7" />
-            <PracticeStat icon={Moon} label="Frequency" value={totals?.frequency ?? 0} color="#9E8AC9" />
-            <PracticeStat icon={Target} label="Manifest" value={totals?.manifest ?? 0} color="#B5CD7E" />
-            <PracticeStat icon={Flame} label="Rituals" value={totals?.ritual ?? 0} color="#F09A3D" />
-            <PracticeStat icon={Heart} label="Mood" value={totals?.mood ?? 0} color="#D876A0" />
+            <PracticeStat icon={BaydinStar} label="Tarot" value={totals?.tarot ?? 0} color="#C5A87C" />
+            <PracticeStat icon={BaydinAstrologer} label="Chats" value={totals?.chat ?? 0} color="#5FA9C7" />
+            <PracticeStat icon={BaydinMoon} label="Frequency" value={totals?.frequency ?? 0} color="#9E8AC9" />
+            <PracticeStat icon={BaydinManifest} label="Manifest" value={totals?.manifest ?? 0} color="#B5CD7E" />
+            <PracticeStat icon={BaydinFlame} label="Rituals" value={totals?.ritual ?? 0} color="#F09A3D" />
+            <PracticeStat icon={BaydinHeart} label="Mood" value={totals?.mood ?? 0} color="#D876A0" />
           </div>
 
           {/* Birth Data ShellCard */}
@@ -241,7 +235,7 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
           <ShellCard className="p-5 mb-5">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Calendar className="w-3.5 h-3.5 text-[#C5A572]" />
+                <BaydinCalendar className="w-3.5 h-3.5 text-[#C5A572]" />
                 <span className="text-[12px] text-[#9C9489] font-medium">7-Day Activity</span>
               </div>
               <GlowPill color="#7A8B6F" className="text-[10px]">
@@ -356,14 +350,14 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
           {/* Settings */}
           <ShellCard className="p-5 mb-5">
             <div className="flex items-center gap-2 mb-3">
-              <Shield className="w-3.5 h-3.5 text-[#C5A572]" />
+              <BaydinAdmin className="w-3.5 h-3.5 text-[#C5A572]" />
               <span className="text-[12px] text-[#9C9489] font-medium">Settings</span>
             </div>
             <div className="space-y-3">
               {/* Language */}
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-[#9C9489]" />
+                  <BaydinGlobe className="w-4 h-4 text-[#9C9489]" />
                   <div>
                     <div className="text-[12px] text-[#E8E2D5]">Language</div>
                     <div className="text-[10px] text-[#9C9489]">Preferred display language</div>
@@ -385,20 +379,20 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
               {/* Theme indicator (read-only — dark is enforced) */}
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <MoonIcon className="w-4 h-4 text-[#9C9489]" />
+                  <BaydinMoon className="w-4 h-4 text-[#9C9489]" />
                   <div>
                     <div className="text-[12px] text-[#E8E2D5]">Theme</div>
                     <div className="text-[10px] text-[#9C9489]">Dark mode (locked)</div>
                   </div>
                 </div>
                 <GlowPill color="#9E8AC9" className="text-[10px]">
-                  <Sun className="w-3 h-3" /> Dark
+                  <BaydinSun className="w-3 h-3" /> Dark
                 </GlowPill>
               </div>
               {/* Notifications */}
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-[#9C9489]" />
+                  <BaydinBell className="w-4 h-4 text-[#9C9489]" />
                   <div>
                     <div className="text-[12px] text-[#E8E2D5]">Notifications</div>
                     <div className="text-[10px] text-[#9C9489]">Daily reminders and updates</div>
@@ -422,7 +416,7 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
                   onClick={() => toast.info("Privacy policy opens externally")}
                   className="inline-flex items-center gap-1 text-[11px] text-[#9C9489] hover:text-[#C5A572] transition"
                 >
-                  View <ChevronRight className="w-3 h-3" />
+                  View <BaydinChevronRight className="w-3 h-3" />
                 </button>
               </div>
             </div>
@@ -431,7 +425,7 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
           {/* Account info */}
           <ShellCard className="p-5 mb-5">
             <div className="flex items-center gap-2 mb-3">
-              <BookOpen className="w-3.5 h-3.5 text-[#C5A572]" />
+              <BaydinLifeReport className="w-3.5 h-3.5 text-[#C5A572]" />
               <span className="text-[12px] text-[#9C9489] font-medium">Account</span>
             </div>
             <div className="grid grid-cols-2 gap-3 text-[12px] mb-4">
@@ -459,13 +453,13 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
                 onClick={() => window.open("/api/export", "_blank")}
                 className="px-3 py-2 text-[12px]"
               >
-                <Download className="w-3.5 h-3.5" /> Export my data
+                <BaydinDownload className="w-3.5 h-3.5" /> Export my data
               </ShimmerButton>
               <button
                 onClick={() => setShowDelete(true)}
                 className="px-3 py-2 rounded-sm text-[12px] border border-[#C26B5C]/20 text-[#C26B5C]/70 hover:text-[#C26B5C] hover:border-[#C26B5C]/40 transition flex items-center gap-1.5"
               >
-                <Trash2 className="w-3 h-3" /> Delete account
+                <BaydinTrash className="w-3 h-3" /> Delete account
               </button>
             </div>
           </ShellCard>
@@ -600,7 +594,7 @@ function BirthDataCard({
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Star className="w-3.5 h-3.5 text-[#C5A572]" />
+            <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
             <span className="text-[12px] text-[#9C9489] font-medium">Birth Data</span>
           </div>
           {zodiac && (
@@ -628,7 +622,7 @@ function BirthDataCard({
           onClick={onEdit}
           className="px-4 py-2 text-[12px]"
         >
-          <Pencil className="w-3.5 h-3.5" /> Edit birth data
+          <BaydinEdit className="w-3.5 h-3.5" /> Edit birth data
         </ShimmerButton>
       </div>
     </ShellCard>
@@ -705,10 +699,10 @@ function DeleteAccountModal({ onClose }: { onClose: () => void }) {
         <div onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2 text-[#C26B5C]">
-              <AlertTriangle className="w-5 h-5" />
+              <BaydinAlert className="w-5 h-5" />
               <span className="text-[15px] font-medium">Delete account</span>
             </div>
-            <button onClick={onClose} className="text-[#9C9489] hover:text-[#E8E2D5]"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="text-[#9C9489] hover:text-[#E8E2D5]"><BaydinX className="w-5 h-5" /></button>
           </div>
           <div className="text-[12px] text-[#9C9489] mb-4 leading-relaxed">
             This permanently deletes your account and all data — conversations, readings, Luck balance, achievements, and history. This cannot be undone.
@@ -761,7 +755,7 @@ function SavedInsights() {
     <ShellCard className="p-5 mb-5">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Bookmark className="w-3.5 h-3.5 text-[#C5A572]" />
+          <BaydinBookmark className="w-3.5 h-3.5 text-[#C5A572]" />
           <span className="text-[12px] text-[#9C9489] font-medium">Saved Insights</span>
         </div>
         <GlowPill color="#C5A572" className="text-[10px]">{insights.length} bookmarked</GlowPill>
@@ -784,7 +778,7 @@ function SavedInsights() {
                   onClick={(e) => { e.stopPropagation(); remove(ins.id); }}
                   className="p-1 rounded text-[#9C9489]/40 hover:text-[#C26B5C] transition shrink-0"
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <BaydinTrash className="w-3 h-3" />
                 </button>
               </button>
               {isOpen && (
@@ -903,7 +897,7 @@ function ReferralEarningsCard({ user }: { user: any }) {
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <UserPlus className="w-4 h-4 text-[#C5A572]" />
+            <BaydinUsers className="w-4 h-4 text-[#C5A572]" />
             <span className="text-[13px] text-[#E8E2D5] font-medium">Referral earnings</span>
           </div>
           <GlowPill color="#C5A572">{referralCode}</GlowPill>
@@ -967,16 +961,16 @@ function ReferralEarningsCard({ user }: { user: any }) {
               onClick={copyCode}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-sm text-[12px] border border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#4A4540] transition"
             >
-              <Copy className="w-3.5 h-3.5" /> Copy code
+              <BaydinCopy className="w-3.5 h-3.5" /> Copy code
             </button>
             <button
               onClick={shareLink}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-sm text-[12px] border border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#4A4540] transition"
             >
-              <Share2 className="w-3.5 h-3.5" /> Share
+              <BaydinShare className="w-3.5 h-3.5" /> Share
             </button>
             <ShimmerButton tone="gold" onClick={downloadCard} disabled={downloading} className="px-3 py-2 text-[12px]">
-              <Download className="w-3.5 h-3.5" />
+              <BaydinDownload className="w-3.5 h-3.5" />
               {downloading ? "Preparing…" : "Download Referral Card"}
             </ShimmerButton>
           </div>

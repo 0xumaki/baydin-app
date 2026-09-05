@@ -10,14 +10,11 @@ import {
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinNumerology, BaydinStar, BaydinLoader, BaydinRefresh, BaydinChevronRight, BaydinTrash, BaydinFlame, BaydinClock } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import type { NumerologyReport, NumberMeaning, NumerologySystem } from "@/lib/numerology";
-import {
-  Hash, Sparkles, Loader2, RefreshCw, ChevronRight,
-  Trash2, Star, Flame, Droplet, Wind, Gem, Palette, Clock,
-} from "lucide-react";
+import { BaydinStar as Droplet, BaydinBreath as Wind, BaydinStar as Gem, BaydinStar as Palette } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
 
 type HistoryItem = {
@@ -41,7 +38,7 @@ const NUMBER_LABELS: { key: keyof NumerologyReport["numbers"]; label: string; su
 ];
 
 const ELEMENT_ICON: Record<string, any> = {
-  Fire: Flame, Earth: Gem, Air: Wind, Water: Droplet, Spirit: Star,
+  Fire: BaydinFlame, Earth: Gem, Air: Wind, Water: Droplet, Spirit: BaydinStar,
 };
 
 export function NumerologyView({ onAuth }: { onAuth: () => void }) {
@@ -173,7 +170,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
           <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.18} className="p-8 text-center">
             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[#9E8AC9]/15 border border-[#9E8AC9]/30 flex items-center justify-center">
-              <Hash className="w-6 h-6 text-[#9E8AC9]" />
+              <BaydinNumerology className="w-6 h-6 text-[#9E8AC9]" />
             </div>
             <LiquidMetalText as="h1" className="text-[20px] mb-1">Sign in to begin</LiquidMetalText>
             <p className="text-[12px] text-[#9C9489] mb-4 max-w-sm mx-auto">
@@ -206,11 +203,11 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
         <div className="max-w-5xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
           {/* Header */}
           <button onClick={reset} className="flex items-center gap-1.5 text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4">
-            <RefreshCw className="w-3.5 h-3.5" /> New reading
+            <BaydinRefresh className="w-3.5 h-3.5" /> New reading
           </button>
           <div className="mb-8">
             <GlowPill color="#9E8AC9" className="text-[10px] mb-3">
-              <Hash className="w-2.5 h-2.5" /> Numerology report
+              <BaydinNumerology className="w-2.5 h-2.5" /> Numerology report
             </GlowPill>
             <LiquidMetalText as="h1" className="text-[28px] lg:text-[32px] mb-1">
               {report.name}
@@ -265,7 +262,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
 
           {/* Lucky Elements — premium cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
-            <LuckyCard icon={Clock} title="Lucky days" items={report.lucky.days} accent="#C5A87C" />
+            <LuckyCard icon={BaydinClock} title="Lucky days" items={report.lucky.days} accent="#C5A87C" />
             <LuckyCard icon={Palette} title="Lucky colors" items={report.lucky.colors} accent="#D4A0B8" />
             <LuckyCard icon={Gem} title="Lucky gems" items={report.lucky.gems} accent="#7A8B6F" />
           </div>
@@ -290,7 +287,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
 
           <div className="flex justify-center pb-6">
             <ShimmerButton tone="parchment" onClick={reset} className="px-6 py-2.5 text-[13px]">
-              <RefreshCw className="w-3.5 h-3.5" /> New reading
+              <BaydinRefresh className="w-3.5 h-3.5" /> New reading
             </ShimmerButton>
           </div>
         </div>
@@ -309,7 +306,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
         {/* Hero */}
         <div className="mb-8">
           <GlowPill color="#9E8AC9" className="text-[10px] mb-3">
-            <Hash className="w-2.5 h-2.5" /> Numbers in your name and date
+            <BaydinNumerology className="w-2.5 h-2.5" /> Numbers in your name and date
           </GlowPill>
           <LiquidMetalText as="h1" className="text-[32px] lg:text-[40px] mb-3 leading-[1.05]">
             Numerology
@@ -390,11 +387,11 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
         {/* CTAs — premium */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <ShimmerButton tone="parchment" onClick={doPreview} disabled={loading} className="flex-1">
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+            {loading ? <BaydinLoader className="w-4 h-4" /> : <BaydinStar className="w-3.5 h-3.5" />}
             {loading ? "Calculating…" : "Reveal Life Path"}
           </ShimmerButton>
           <ShimmerButton onClick={doFullReport} disabled={purchasing} className="flex-1">
-            {purchasing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CloverIcon className="w-3.5 h-3.5" />}
+            {purchasing ? <BaydinLoader className="w-4 h-4" /> : <CloverIcon className="w-3.5 h-3.5" />}
             {purchasing ? "Generating…" : "Generate report"}
             <span className="inline-flex items-center gap-1 opacity-80">
               <CloverIcon className="w-3 h-3" /> <NumberTicker value={NUMEROLOGY_COST} />
@@ -408,7 +405,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <GlowPill color={preview.meaning.color} className="text-[10px] mb-2">
-                  <Sparkles className="w-2.5 h-2.5" /> Life Path Preview
+                  <BaydinStar className="w-2.5 h-2.5" /> Life Path Preview
                 </GlowPill>
                 <div className="text-[14px] text-[#9C9489]">Your most important number</div>
               </div>
@@ -442,7 +439,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
                 Your Life Path is just the beginning. The full report reveals your Destiny, Soul Urge, Personality, Maturity, Birthday and Personal Year numbers — plus a synthesis of how they interact, and your lucky days, colors and gems.
               </div>
               <ShimmerButton onClick={doFullReport} disabled={purchasing} className="w-full">
-                {purchasing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CloverIcon className="w-3.5 h-3.5" />}
+                {purchasing ? <BaydinLoader className="w-4 h-4" /> : <CloverIcon className="w-3.5 h-3.5" />}
                 {purchasing ? "Generating…" : "Reveal full report"}
                 <span className="inline-flex items-center gap-1 opacity-80">
                   <CloverIcon className="w-3 h-3" /> <NumberTicker value={NUMEROLOGY_COST} />
@@ -467,7 +464,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
                     className="w-full flex items-center gap-3 p-3 rounded-sm transition group cursor-pointer hover:bg-[#0F0D0B]/50"
                   >
                     <div className="w-9 h-9 rounded-lg bg-[#9E8AC9]/15 border border-[#9E8AC9]/30 flex items-center justify-center shrink-0">
-                      <Hash className="w-4 h-4 text-[#9E8AC9]" />
+                      <BaydinNumerology className="w-4 h-4 text-[#9E8AC9]" />
                     </div>
                     <div className="flex-1 min-w-0 text-left">
                       <div className="text-[13px] text-[#E8E2D5] truncate">{h.input.name}</div>
@@ -480,9 +477,9 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
                       className="p-2 text-[#9C9489] hover:text-red-400 transition opacity-0 group-hover:opacity-100"
                       aria-label="Delete reading"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <BaydinTrash className="w-3.5 h-3.5" />
                     </button>
-                    <ChevronRight className="w-4 h-4 text-[#9C9489]" />
+                    <BaydinChevronRight className="w-4 h-4 text-[#9C9489]" />
                   </div>
                 </AuroraGlowCard>
               ))}
@@ -501,7 +498,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
 function NumberDetail({
   num, meaning, label, sub, accent,
 }: { num: number; meaning: NumberMeaning; label: string; sub: string; accent: string }) {
-  const ElIcon = ELEMENT_ICON[meaning.element] || Star;
+  const ElIcon = ELEMENT_ICON[meaning.element] || BaydinStar;
   return (
     <AuroraGlowCard glowColor={accent} glowIntensity={0.2} className="p-5 lg:p-6 mb-6">
       <div className="flex items-start gap-5 flex-col sm:flex-row">

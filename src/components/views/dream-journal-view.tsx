@@ -10,13 +10,10 @@ import {
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinMoon, BaydinStar, BaydinLoader, BaydinPlus, BaydinChevronLeft, BaydinTrash, BaydinLifeReport, BaydinHeart, BaydinRefresh } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
-import {
-  Moon, Star, Sparkles, Loader2, Plus, ChevronLeft, Trash2, BookOpen,
-  Heart, RefreshCw, X, Sun, Zap, Droplet, Flame, Wind, Gem,
-} from "lucide-react";
+import { BaydinSun as Sun, BaydinStar as Zap, BaydinStar as Droplet, BaydinFlame as Flame, BaydinBreath as Wind, BaydinStar as Gem } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
 
 type LunarCtx = {
@@ -72,7 +69,7 @@ const POLARITY_COLOR: Record<string, string> = {
 };
 
 const CATEGORY_ICON: Record<string, any> = {
-  animal: Flame, nature: Droplet, object: Gem, person: Star, action: Zap, emotion: Heart, setting: Moon,
+  animal: Flame, nature: Droplet, object: Gem, person: BaydinStar, action: Zap, emotion: BaydinHeart, setting: BaydinMoon,
 };
 
 const DREAM_INTERPRET_COST = 2;
@@ -182,7 +179,7 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
         <div className="flex items-end justify-between mb-7 flex-wrap gap-4 lum-reveal">
           <div className="min-w-0">
             <GlowPill className="mb-3" color="#9CB4D1">
-              <Moon className="w-3 h-3" /> Dreams and their patterns
+              <BaydinMoon className="w-3 h-3" /> Dreams and their patterns
             </GlowPill>
             <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block">
               Dream Journal
@@ -202,10 +199,10 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
               )}
               aria-label="Filter favorites"
             >
-              <Heart className={cn("w-4 h-4", filterFav && "fill-current")} />
+              <BaydinHeart className={cn("w-4 h-4", filterFav && "fill-current")} />
             </button>
             <ShimmerButton onClick={() => setShowForm(true)} className="py-2 px-4 text-[12px]">
-              <Plus className="w-3.5 h-3.5" /> New dream
+              <BaydinPlus className="w-3.5 h-3.5" /> New dream
             </ShimmerButton>
           </div>
         </div>
@@ -213,17 +210,17 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
         {/* Stats */}
         {entries.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
-            <StatPill glow="#9CB4D1" icon={<BookOpen className="w-3.5 h-3.5" />} label="Dreams" value={entries.length} />
-            <StatPill glow="#C5A572" icon={<Heart className="w-3.5 h-3.5" />} label="Favorites" value={favoritesCount} />
-            <StatPill glow="#D4A0B8" icon={<RefreshCw className="w-3.5 h-3.5" />} label="Recurring" value={recurringCount} />
-            <StatPill glow="#7A8B6F" icon={<Sparkles className="w-3.5 h-3.5" />} label="Interpreted" value={interpretedCount} />
+            <StatPill glow="#9CB4D1" icon={<BaydinLifeReport className="w-3.5 h-3.5" />} label="Dreams" value={entries.length} />
+            <StatPill glow="#C5A572" icon={<BaydinHeart className="w-3.5 h-3.5" />} label="Favorites" value={favoritesCount} />
+            <StatPill glow="#D4A0B8" icon={<BaydinRefresh className="w-3.5 h-3.5" />} label="Recurring" value={recurringCount} />
+            <StatPill glow="#7A8B6F" icon={<BaydinStar className="w-3.5 h-3.5" />} label="Interpreted" value={interpretedCount} />
           </div>
         )}
 
         {/* Entries */}
         {loading ? (
           <div className="flex items-center justify-center py-16 text-[#9C9489]">
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <BaydinLoader className="w-5 h-5" />
           </div>
         ) : entries.length === 0 ? (
           <EmptyState onCreate={() => setShowForm(true)} />
@@ -306,7 +303,7 @@ function EntryCard({
             )}
             {entry.interpretation && (
               <GlowPill color="#C5A572" className="text-[9px]">
-                <Sparkles className="w-2.5 h-2.5" /> interpreted
+                <BaydinStar className="w-2.5 h-2.5" /> interpreted
               </GlowPill>
             )}
           </div>
@@ -320,7 +317,7 @@ function EntryCard({
             <GlowPill color={mood.color} className="text-[10px]">{mood.label}</GlowPill>
             {entry.lunarContext && (
               <GlowPill color="#9CB4D1" className="text-[10px]" >
-                <Moon className="w-2.5 h-2.5" />
+                <BaydinMoon className="w-2.5 h-2.5" />
                 {entry.lunarContext.emoji} {entry.lunarContext.nakshatra}
               </GlowPill>
             )}
@@ -339,14 +336,14 @@ function EntryCard({
             className="p-1.5 text-[#6B6358] hover:text-[#C5A572] transition focus-ring rounded-sm"
             aria-label={entry.isFavorite ? "Remove favorite" : "Add to favorites"}
           >
-            <Heart className={cn("w-3.5 h-3.5", entry.isFavorite && "fill-[#C5A572] text-[#C5A572]")} />
+            <BaydinHeart className={cn("w-3.5 h-3.5", entry.isFavorite && "fill-[#C5A572] text-[#C5A572]")} />
           </button>
           <button
             onClick={onDelete}
             className="p-1.5 text-[#6B6358] hover:text-[#C26B5C] transition focus-ring rounded-sm"
             aria-label="Delete dream"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            <BaydinTrash className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -361,14 +358,14 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
     <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.15} className="p-8 lg:p-12 text-center">
       <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 border border-[#9CB4D1]/30" style={{ background: "#9CB4D115" }}>
-        <Moon className="w-7 h-7 text-[#9CB4D1]" />
+        <BaydinMoon className="w-7 h-7 text-[#9CB4D1]" />
       </div>
       <LiquidMetalText as="h2" className="serif-display text-[1.5rem] block mb-3">Your dream journal is empty.</LiquidMetalText>
       <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch] mb-6 mx-auto">
         Record your dreams upon waking. Baydin detects archetypal symbols, computes the lunar context, and offers an interpretation grounded in Vedic and Jungian tradition.
       </p>
       <ShimmerButton onClick={onCreate} className="py-3 px-6">
-        <Plus className="w-4 h-4" /> Record your first dream
+        <BaydinPlus className="w-4 h-4" /> Record your first dream
       </ShimmerButton>
     </AuroraGlowCard>
   );
@@ -423,12 +420,12 @@ function EntryForm({
           onClick={onCancel}
           className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition mb-4 focus-ring rounded-sm inline-flex items-center gap-1"
         >
-          <ChevronLeft className="w-3.5 h-3.5" /> Cancel
+          <BaydinChevronLeft className="w-3.5 h-3.5" /> Cancel
         </button>
 
         <div className="mb-8 lum-reveal">
           <GlowPill className="mb-3" color="#9CB4D1">
-            <Moon className="w-3 h-3" /> A new entry
+            <BaydinMoon className="w-3 h-3" /> A new entry
           </GlowPill>
           <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block">
             Record a dream
@@ -588,7 +585,7 @@ function EntryDetail({
           onClick={onClose}
           className="text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4 focus-ring rounded-sm inline-flex items-center gap-1"
         >
-          <ChevronLeft className="w-3.5 h-3.5" /> Back to journal
+          <BaydinChevronLeft className="w-3.5 h-3.5" /> Back to journal
         </button>
 
         {/* Header */}
@@ -612,7 +609,7 @@ function EntryDetail({
                 <GlowPill color={mood.color} className="text-[11px]">{mood.label}</GlowPill>
                 {entry.isRecurring && (
                   <GlowPill color="#D4A0B8" className="text-[11px]">
-                    <RefreshCw className="w-3 h-3" /> Recurring
+                    <BaydinRefresh className="w-3 h-3" /> Recurring
                   </GlowPill>
                 )}
               </div>
@@ -624,7 +621,7 @@ function EntryDetail({
                 title={entry.isFavorite ? "Remove favorite" : "Add to favorites"}
                 aria-label={entry.isFavorite ? "Remove favorite" : "Add to favorites"}
               >
-                <Heart className={cn("w-4 h-4", entry.isFavorite && "fill-[#C5A572] text-[#C5A572]")} />
+                <BaydinHeart className={cn("w-4 h-4", entry.isFavorite && "fill-[#C5A572] text-[#C5A572]")} />
               </button>
               <button
                 onClick={onDelete}
@@ -632,7 +629,7 @@ function EntryDetail({
                 title="Delete"
                 aria-label="Delete dream"
               >
-                <Trash2 className="w-4 h-4" />
+                <BaydinTrash className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -641,7 +638,7 @@ function EntryDetail({
         {/* Dream narrative */}
         <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-5 lg:p-6 mb-4">
           <div className="flex items-center gap-2 mb-3">
-            <BookOpen className="w-4 h-4 text-[#C5A572]" />
+            <BaydinLifeReport className="w-4 h-4 text-[#C5A572]" />
             <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">The Dream</span>
           </div>
           <div className="text-[14px] text-[#E8E2D5]/90 leading-relaxed whitespace-pre-wrap">{entry.content}</div>
@@ -651,7 +648,7 @@ function EntryDetail({
         {entry.lunarContext && (
           <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.12} className="p-5 lg:p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <Moon className="w-4 h-4 text-[#9CB4D1]" />
+              <BaydinMoon className="w-4 h-4 text-[#9CB4D1]" />
               <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">Lunar Context</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -680,13 +677,13 @@ function EntryDetail({
         {entry.symbols.length > 0 && (
           <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-5 lg:p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <Star className="w-4 h-4 text-[#C5A572]" />
+              <BaydinStar className="w-4 h-4 text-[#C5A572]" />
               <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">Symbols Detected</span>
             </div>
             <div className="space-y-2.5">
               {entry.symbols.map((kw) => {
                 const sym = detectedSymbols.find((s) => s.keyword === kw);
-                const Icon = sym ? (CATEGORY_ICON[sym.category] || Star) : Star;
+                const Icon = sym ? (CATEGORY_ICON[sym.category] || BaydinStar) : BaydinStar;
                 const color = sym ? POLARITY_COLOR[sym.polarity] : "#8B7355";
                 return (
                   <div key={kw} className="p-3 rounded-sm bg-black/20 border border-[#2A2722]">
@@ -716,7 +713,7 @@ function EntryDetail({
         {interpretation ? (
           <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-5 lg:p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-4 h-4 text-[#C5A572]" />
+              <BaydinStar className="w-4 h-4 text-[#C5A572]" />
               <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">AI Interpretation</span>
             </div>
             <div className="text-[13px] text-[#E8E2D5]/90 leading-relaxed whitespace-pre-wrap">{interpretation}</div>
@@ -729,9 +726,9 @@ function EntryDetail({
                 className="text-[11px] py-1.5 px-3"
               >
                 {loadingInterp ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
+                  <BaydinLoader className="w-3 h-3" />
                 ) : (
-                  <RefreshCw className="w-3 h-3" />
+                  <BaydinRefresh className="w-3 h-3" />
                 )}
                 Re-interpret
               </ShimmerButton>
@@ -741,9 +738,9 @@ function EntryDetail({
           <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.15} className="p-6 text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-sm mb-3 border border-[#C5A572]/30" style={{ background: "#C5A57210" }}>
               {loadingInterp ? (
-                <Loader2 className="w-5 h-5 text-[#C5A572] animate-spin" />
+                <BaydinLoader className="w-5 h-5 text-[#C5A572]" />
               ) : (
-                <Sparkles className="w-5 h-5 text-[#C5A572]" />
+                <BaydinStar className="w-5 h-5 text-[#C5A572]" />
               )}
             </div>
             <div className="text-[14px] text-[#E8E2D5] font-medium mb-1">No interpretation yet</div>
@@ -759,9 +756,9 @@ function EntryDetail({
               className="py-2.5 px-5 text-[13px]"
             >
               {loadingInterp ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Interpreting…</>
+                <><BaydinLoader className="w-4 h-4" /> Interpreting…</>
               ) : (
-                <><Sparkles className="w-3.5 h-3.5" /> Interpret with AI · <span className="inline-flex items-center gap-0.5"><CloverIcon className="w-3 h-3" filled /> {DREAM_INTERPRET_COST}</span></>
+                <><BaydinStar className="w-3.5 h-3.5" /> Interpret with AI · <span className="inline-flex items-center gap-0.5"><CloverIcon className="w-3 h-3" filled /> {DREAM_INTERPRET_COST}</span></>
               )}
             </ShimmerButton>
           </AuroraGlowCard>
@@ -792,7 +789,7 @@ function Gate({ onAuth }: { onAuth: () => void }) {
         <div className="flex flex-col items-center justify-center text-center py-20">
           <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.15} className="max-w-sm w-full p-10 text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 border border-[#9CB4D1]/30" style={{ background: "#9CB4D110" }}>
-              <Moon className="w-7 h-7 text-[#9CB4D1]" />
+              <BaydinMoon className="w-7 h-7 text-[#9CB4D1]" />
             </div>
             <LiquidMetalText as="h1" className="serif-display text-[1.75rem] block mb-2">Sign in to begin</LiquidMetalText>
             <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">

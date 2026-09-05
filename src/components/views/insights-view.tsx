@@ -10,9 +10,8 @@ import {
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinInsights, BaydinStar, BaydinChevronRight, BaydinLoader, BaydinArrowLeft, BaydinBookmark } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
-import { Compass, Sparkles, Star, ChevronRight, Loader2, ArrowLeft, Bookmark } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
@@ -56,7 +55,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
           <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.18} className="p-8 text-center">
             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[#9E8AC9]/15 border border-[#9E8AC9]/30 flex items-center justify-center">
-              <Compass className="w-6 h-6 text-[#9E8AC9]" />
+              <BaydinInsights className="w-6 h-6 text-[#9E8AC9]" />
             </div>
             <LiquidMetalText as="h1" className="text-[20px] mb-1">Sign in to explore insights</LiquidMetalText>
             <p className="text-[12px] text-[#9C9489] mb-4 max-w-sm mx-auto">
@@ -87,7 +86,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
             onClick={() => { setSelected(null); setResult(null); }}
             className="flex items-center gap-1.5 text-[12px] text-[#9C9489] hover:text-[#C5A572] mb-4 transition"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> All insights
+            <BaydinArrowLeft className="w-3.5 h-3.5" /> All insights
           </button>
 
           <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.15} className="p-5 mb-5">
@@ -110,7 +109,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
 
           {loading ? (
             <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.18} className="p-8 text-center">
-              <Loader2 className="w-6 h-6 text-[#C5A572] animate-spin mx-auto mb-3" />
+              <BaydinLoader className="w-6 h-6 text-[#C5A572] mx-auto mb-3" />
               <div className="text-[13px] text-[#E8E2D5]">Reading the stars…</div>
               <div className="text-[11px] text-[#9C9489]/60 mt-1">This usually takes 10-20 seconds</div>
             </AuroraGlowCard>
@@ -157,7 +156,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
                   }}
                   className="text-[11px] px-3 py-1.5"
                 >
-                  <Bookmark className="w-3 h-3" /> Save this insight
+                  <BaydinBookmark className="w-3 h-3" /> Save this insight
                 </ShimmerButton>
               </div>
             </AuroraGlowCard>
@@ -177,7 +176,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
         {/* Hero */}
         <div className="mb-6">
           <GlowPill color="#9E8AC9" className="text-[10px] mb-3">
-            <Sparkles className="w-2.5 h-2.5" /> Deep astrology · {SKILL_COST} Luck each
+            <BaydinStar className="w-2.5 h-2.5" /> Deep astrology · {SKILL_COST} Luck each
           </GlowPill>
           <LiquidMetalText as="h1" className="text-[28px] lg:text-[32px] mb-2">Deep Insights</LiquidMetalText>
           <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch]">
@@ -198,7 +197,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
         {/* Optional query */}
         <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.1} className="p-3 mb-6">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#C5A572] shrink-0" />
+            <BaydinStar className="w-4 h-4 text-[#C5A572] shrink-0" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -230,7 +229,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
                     <CloverIcon className="w-2 h-2" /> <NumberTicker value={SKILL_COST} />
                   </GlowPill>
                   <span className="text-[10px] text-[#C5A572] opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-0.5">
-                    Explore <ChevronRight className="w-3 h-3" />
+                    Explore <BaydinChevronRight className="w-3 h-3" />
                   </span>
                 </div>
               </button>
@@ -241,7 +240,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
         {/* Empty skills state */}
         {skills.length === 0 && (
           <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.12} className="p-8 text-center">
-            <Loader2 className="w-5 h-5 text-[#9E8AC9] animate-spin mx-auto mb-3" />
+            <BaydinLoader className="w-5 h-5 text-[#9E8AC9] mx-auto mb-3" />
             <div className="text-[12px] text-[#9C9489]">Loading insight skills…</div>
           </AuroraGlowCard>
         )}
@@ -275,7 +274,7 @@ function NeedsBirthData() {
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden flex items-center justify-center">
         <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.15} className="p-8 max-w-md w-full text-center">
           <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#C5A572]/10 border border-[#C5A572]/30 flex items-center justify-center">
-            <Star className="w-6 h-6 text-[#C5A572]" />
+            <BaydinStar className="w-6 h-6 text-[#C5A572]" />
           </div>
           <LiquidMetalText as="h2" className="text-[18px] mb-2">Birth details needed</LiquidMetalText>
           <p className="text-[12px] text-[#9C9489] leading-relaxed mb-4">

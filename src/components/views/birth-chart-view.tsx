@@ -12,7 +12,7 @@ import {
 } from "@/components/lumina/premium-ui";
 import { CloverIcon } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
-import { Star, Sparkles, MapPin, Sun } from "lucide-react";
+import { BaydinStar as Star, BaydinStar as Sparkles, BaydinPin as MapPin, BaydinSun as Sun } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ZODIAC_SYMBOLS, computeNavamsa, computeDasamsa, computeSaptamsa, computeHora, computeDwadasamsa, computeDrekkana, computeChaturthamsa, computeSolarReturn, computeShodasamsa, computeVimsamsa, computeChaturvimsamsa, computeTrimsamsa, computeKhavedamsa, computeAkshavedamsa, computeShashtiamsa, computeAshtakavarga, computeShadbala } from "@/lib/astrology";

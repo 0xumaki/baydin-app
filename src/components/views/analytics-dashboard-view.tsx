@@ -11,15 +11,11 @@ import {
   NumberTicker,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon, CloverPNG } from "@/components/lumina/baydin-icons";
+import { CloverIcon, CloverPNG, BaydinTrending, BaydinMoon, BaydinStar, BaydinStore, BaydinFlame, BaydinAstrologer, BaydinLifeReport, BaydinFrequency, BaydinHeart, BaydinManifest, BaydinCalendar, BaydinLoader, BaydinNumerology } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import type { AnalyticsPayload } from "@/lib/analytics";
-import {
-  BarChart3, Moon, Star, Sparkles, Wallet, Flame, MessageCircle,
-  BookOpen, Waves, Heart, Target, Calendar, TrendingUp, Award, Loader2,
-  Zap, Hash,
-} from "lucide-react";
+import { BaydinStar as Award, BaydinStar as Zap } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
 
 const MOOD_META: Record<string, { label: string; emoji: string; color: string }> = {
@@ -88,7 +84,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
         </div>
         <div className="relative z-10 min-w-0 flex-1 flex items-center justify-center px-6 text-center">
           <div>
-            <BarChart3 className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
+            <BaydinTrending className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
             <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to view insights</div>
             <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
           </div>
@@ -106,7 +102,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
         </div>
         <div className="relative z-10 min-w-0 flex-1 flex items-center justify-center">
           <div className="flex items-center gap-2 text-[#9C9489]">
-            <Loader2 className="w-5 h-5 animate-spin text-[#C5A572]" />
+            <BaydinLoader className="w-5 h-5 text-[#C5A572]" />
             <span className="text-[12px]">Loading your insights…</span>
           </div>
         </div>
@@ -129,7 +125,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
           {/* Hero */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <BarChart3 className="w-5 h-5 text-[#C5A572]" />
+              <BaydinTrending className="w-5 h-5 text-[#C5A572]" />
               <GlowPill color="#C5A572" className="!text-[10px] uppercase tracking-wide">
                 Your practice
               </GlowPill>
@@ -155,14 +151,14 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
             <>
               {/* Top stats — 8 AuroraGlowCards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                <StatCard icon={Moon} label="Dreams" value={analytics.totals.dreams} accent="#C5A87C" />
-                <StatCard icon={Sparkles} label="Tarot" value={analytics.totals.tarotReadings} accent="#D4A0B8" />
-                <StatCard icon={MessageCircle} label="Chat turns" value={analytics.totals.chatMessages} accent="#9CB4D1" />
-                <StatCard icon={Calendar} label="Days active" value={analytics.totals.daysActive} accent="#7A8B6F" />
-                <StatCard icon={Flame} label="Rituals" value={analytics.totals.ritualsCompleted} accent="#B8553F" />
-                <StatCard icon={Waves} label="Frequencies" value={analytics.totals.frequencySessions} accent="#6F8BA0" />
-                <StatCard icon={Heart} label="Affirmations" value={analytics.totals.positivitySessions} accent="#D58FA3" />
-                <StatCard icon={Target} label="Goals" value={analytics.totals.goals} accent="#8FA37E" />
+                <StatCard icon={BaydinMoon} label="Dreams" value={analytics.totals.dreams} accent="#C5A87C" />
+                <StatCard icon={BaydinStar} label="Tarot" value={analytics.totals.tarotReadings} accent="#D4A0B8" />
+                <StatCard icon={BaydinAstrologer} label="Chat turns" value={analytics.totals.chatMessages} accent="#9CB4D1" />
+                <StatCard icon={BaydinCalendar} label="Days active" value={analytics.totals.daysActive} accent="#7A8B6F" />
+                <StatCard icon={BaydinFlame} label="Rituals" value={analytics.totals.ritualsCompleted} accent="#B8553F" />
+                <StatCard icon={BaydinFrequency} label="Frequencies" value={analytics.totals.frequencySessions} accent="#6F8BA0" />
+                <StatCard icon={BaydinHeart} label="Affirmations" value={analytics.totals.positivitySessions} accent="#D58FA3" />
+                <StatCard icon={BaydinManifest} label="Goals" value={analytics.totals.goals} accent="#8FA37E" />
               </div>
 
               {/* Luck Economy (AuroraGlowCard with CloverPNG watermark) */}
@@ -237,7 +233,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                 {/* Ritual streak */}
                 <AuroraGlowCard glowColor="#F09A3D" glowIntensity={0.1} className="p-5 lg:p-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <Flame className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinFlame className="w-4 h-4 text-[#C5A572]" />
                     <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Ritual Streak</div>
                   </div>
                   <div className="flex items-baseline gap-4 mb-4">
@@ -333,7 +329,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                     {analytics.dreamsByMood.length > 0 && (
                       <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.08} className="p-5 lg:p-6">
                         <div className="flex items-center gap-2 mb-3">
-                          <Moon className="w-4 h-4 text-[#C5A572]" />
+                          <BaydinMoon className="w-4 h-4 text-[#C5A572]" />
                           <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Dreams by Mood</div>
                         </div>
                         <div className="space-y-2">
@@ -365,7 +361,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                     {analytics.dreamsByMoonPhase.length > 0 && (
                       <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.08} className="p-5 lg:p-6">
                         <div className="flex items-center gap-2 mb-3">
-                          <Moon className="w-4 h-4 text-[#C5A572]" />
+                          <BaydinMoon className="w-4 h-4 text-[#C5A572]" />
                           <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Dreams by Moon Phase</div>
                         </div>
                         <div className="space-y-2">
@@ -394,7 +390,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
                   {analytics.topDreamSymbols.length > 0 && (
                     <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-5 lg:p-6 mb-6">
                       <div className="flex items-center gap-2 mb-3">
-                        <Hash className="w-4 h-4 text-[#C5A572]" />
+                        <BaydinNumerology className="w-4 h-4 text-[#C5A572]" />
                         <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Top Dream Symbols</div>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -421,7 +417,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
               {analytics.tarotBySpread.length > 0 && (
                 <AuroraGlowCard glowColor="#D4A0B8" glowIntensity={0.1} className="p-5 lg:p-6 mb-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                     <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Tarot Spreads Used</div>
                   </div>
                   <TarotSpreadChart data={analytics.tarotBySpread} />
@@ -432,7 +428,7 @@ export function AnalyticsDashboardView({ onAuth }: { onAuth: () => void }) {
               {analytics.moodTrend.length > 0 && (
                 <AuroraGlowCard glowColor="#D58FA3" glowIntensity={0.1} className="p-5 lg:p-6 mb-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <TrendingUp className="w-4 h-4 text-[#C5A572]" />
+                    <BaydinTrending className="w-4 h-4 text-[#C5A572]" />
                     <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Mood Trend · last 30 days</div>
                   </div>
                   <MoodTrendChart data={analytics.moodTrend} />

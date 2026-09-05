@@ -10,15 +10,12 @@ import {
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinHeart, BaydinPlay, BaydinPause, BaydinRefresh, BaydinLoader, BaydinStar, BaydinChevronLeft, BaydinClock } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import { POSITIVITY_CATEGORIES } from "@/lib/positivity";
 import ReactMarkdown from "react-markdown";
-import {
-  Heart, Play, Pause, RefreshCw, Loader2, Sparkles,
-  ChevronLeft, Volume2, Clock,
-} from "lucide-react";
+import { BaydinFrequency as Volume2 } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
 
 const DAILY_FREE = 1;
@@ -121,13 +118,13 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
             onClick={() => { pause(); setScript(""); setSelectedCat(null); setWordIndex(0); }}
             className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition mb-6 focus-ring rounded-sm inline-flex items-center gap-1"
           >
-            <ChevronLeft className="w-3.5 h-3.5" /> All categories
+            <BaydinChevronLeft className="w-3.5 h-3.5" /> All categories
           </button>
 
           {/* Category header */}
           <div className="mb-6 lum-reveal">
             <GlowPill color={cat.color} className="mb-2">
-              <Heart className="w-3 h-3" /> {cat.name}
+              <BaydinHeart className="w-3 h-3" /> {cat.name}
             </GlowPill>
             <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block">
               Affirmation
@@ -168,7 +165,7 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
               )}
               {isFinished && !playing && (
                 <div className="mt-6 text-[13px] text-[#6B6358] serif-italic flex items-center justify-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5 text-[#C5A572]" /> Complete
+                  <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" /> Complete
                 </div>
               )}
             </div>
@@ -194,14 +191,14 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
               className="w-10 h-10 rounded-full border border-[#2A2722] flex items-center justify-center text-[#6B6358] hover:text-[#E8E2D5] transition focus-ring"
               aria-label="Restart"
             >
-              <RefreshCw className="w-4 h-4" />
+              <BaydinRefresh className="w-4 h-4" />
             </button>
             <ShimmerButton
               onClick={playing ? pause : play}
               className="w-14 h-14 rounded-full p-0"
               aria-label={playing ? "Pause" : "Play"}
             >
-              {playing ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
+              {playing ? <BaydinPause className="w-6 h-6" /> : <BaydinPlay className="w-6 h-6 ml-0.5" />}
             </ShimmerButton>
             <div className="w-10" />
           </div>
@@ -231,7 +228,7 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
         </div>
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden flex items-center justify-center">
           <AuroraGlowCard glowColor={cat.color} glowIntensity={0.2} className="max-w-md w-full p-10 text-center">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: cat.color }} />
+            <BaydinLoader className="w-8 h-8 mx-auto mb-4" style={{ color: cat.color }} />
             <LiquidMetalText as="div" className="serif-display text-[1.25rem] block mb-1">
               Writing your {cat.name} affirmation…
             </LiquidMetalText>
@@ -254,7 +251,7 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
         {/* ===== Hero ===== */}
         <div className="mb-6 lum-reveal">
           <GlowPill className="mb-3" color="#D876A0">
-            <Heart className="w-3 h-3" /> Daily practice · 1 free/day
+            <BaydinHeart className="w-3 h-3" /> Daily practice · 1 free/day
           </GlowPill>
           <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-2">
             Positivity
@@ -282,7 +279,7 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
               color: remainingFree > 0 ? "#7A8B6F" : "#C5A572",
             }}
           >
-            <Clock className="w-5 h-5" />
+            <BaydinClock className="w-5 h-5" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-[14px] text-[#E8E2D5] font-medium leading-tight">
@@ -305,7 +302,7 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
 
         {/* Optional intention */}
         <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.08} className="p-3 mb-4 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-[#C5A572] shrink-0" />
+          <BaydinStar className="w-4 h-4 text-[#C5A572] shrink-0" />
           <input
             value={intention}
             onChange={(e) => setIntention(e.target.value)}
@@ -331,12 +328,12 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
                   className="w-9 h-9 rounded-sm flex items-center justify-center mb-2 transition-transform group-hover:scale-110"
                   style={{ background: `${c.color}15`, border: `1px solid ${c.color}40` }}
                 >
-                  <Heart className="w-4 h-4" style={{ color: c.color }} />
+                  <BaydinHeart className="w-4 h-4" style={{ color: c.color }} />
                 </div>
                 <div className="text-[13px] text-[#E8E2D5] font-medium leading-tight mb-0.5">{c.name}</div>
                 <div className="text-[10px] text-[#9C9489] leading-tight mb-2">{c.description}</div>
                 <ShimmerButton className="w-full py-1.5 text-[10px]">
-                  <Sparkles className="w-3 h-3" /> Generate
+                  <BaydinStar className="w-3 h-3" /> Generate
                 </ShimmerButton>
               </button>
             </AuroraGlowCard>
@@ -347,7 +344,7 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
         {history.length > 0 && (
           <div className="mt-8">
             <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-3.5 h-3.5 text-[#C5A572]" />
+              <BaydinClock className="w-3.5 h-3.5 text-[#C5A572]" />
               <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Recent scripts</span>
             </div>
             <div className="space-y-2.5">
@@ -373,13 +370,13 @@ export function PositivityView({ onAuth }: { onAuth: () => void }) {
                         className="w-7 h-7 rounded-sm flex items-center justify-center shrink-0"
                         style={{ background: `${hcat?.color || "#C5A572"}15`, color: hcat?.color || "#C5A572" }}
                       >
-                        <Heart className="w-3.5 h-3.5" />
+                        <BaydinHeart className="w-3.5 h-3.5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className="text-[12px] text-[#E8E2D5] font-medium">{hcat?.name || h.category}</span>
                           <GlowPill color={hcat?.color || "#C5A572"} className="text-[9px]">
-                            <Clock className="w-2.5 h-2.5" />
+                            <BaydinClock className="w-2.5 h-2.5" />
                             {h.createdAt ? new Date(h.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "recent"}
                           </GlowPill>
                         </div>
@@ -408,7 +405,7 @@ function Gate({ onAuth }: { onAuth: () => void }) {
         <div className="flex flex-col items-center justify-center text-center py-20">
           <AuroraGlowCard glowColor="#D876A0" glowIntensity={0.15} className="max-w-sm w-full p-10 text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 border border-[#D876A0]/30" style={{ background: "#D876A010" }}>
-              <Heart className="w-7 h-7 text-[#D876A0]" />
+              <BaydinHeart className="w-7 h-7 text-[#D876A0]" />
             </div>
             <LiquidMetalText as="h1" className="serif-display text-[1.75rem] block mb-2">Sign in to begin</LiquidMetalText>
             <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">

@@ -10,14 +10,11 @@ import {
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinFrequency, BaydinPlay, BaydinPause, BaydinBreath, BaydinLoader } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import { FREQUENCIES } from "@/lib/frequencies";
-import {
-  Waves, Play, Pause, Volume2, VolumeX, Wind, Loader2,
-  Headphones, Timer,
-} from "lucide-react";
+import { BaydinFrequency as Volume2, BaydinX as VolumeX, BaydinFrequency as Headphones, BaydinClock as Timer } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
 
 export function FrequencyView({ onAuth }: { onAuth: () => void }) {
@@ -151,7 +148,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
         {/* ===== Hero ===== */}
         <div className="mb-6 lum-reveal">
           <GlowPill className="mb-3" color={selected.color}>
-            <Waves className="w-3 h-3" /> Daily practice · Free
+            <BaydinFrequency className="w-3 h-3" /> Daily practice · Free
           </GlowPill>
           <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-2">
             Frequencies
@@ -226,9 +223,9 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                     aria-label={playing ? "Pause" : "Play"}
                   >
                     {playing ? (
-                      <Pause className="w-6 h-6" />
+                      <BaydinPause className="w-6 h-6" />
                     ) : (
-                      <Play className="w-6 h-6 ml-0.5" />
+                      <BaydinPlay className="w-6 h-6 ml-0.5" />
                     )}
                   </ShimmerButton>
                   <div className="w-9" />
@@ -301,7 +298,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
           {/* Frequency grid */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Wind className="w-3.5 h-3.5 text-[#C5A572]" />
+              <BaydinBreath className="w-3.5 h-3.5 text-[#C5A572]" />
               <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Choose your intention</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -406,7 +403,7 @@ function BreathingPacer({ active, color }: { active: boolean; color: string }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-1">
-            <Wind className="w-3.5 h-3.5 text-[#C5A572]" />
+            <BaydinBreath className="w-3.5 h-3.5 text-[#C5A572]" />
             <span className="text-[12px] text-[#E8E2D5] font-medium">Box Breathing</span>
           </div>
           {active ? (
@@ -433,7 +430,7 @@ function Gate({ onAuth }: { onAuth: () => void }) {
         <div className="flex flex-col items-center justify-center text-center py-20">
           <AuroraGlowCard glowColor="#9CA8A3" glowIntensity={0.15} className="max-w-sm w-full p-10 text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 border border-[#9CA8A3]/30" style={{ background: "#9CA8A310" }}>
-              <Waves className="w-7 h-7 text-[#9CA8A3]" />
+              <BaydinFrequency className="w-7 h-7 text-[#9CA8A3]" />
             </div>
             <LiquidMetalText as="h1" className="serif-display text-[1.75rem] block mb-2">Sign in to tune in</LiquidMetalText>
             <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">

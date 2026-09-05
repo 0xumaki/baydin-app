@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { useMe, api } from "@/lib/api-client";
 import { useT } from "@/lib/use-t";
-import { Send, Plus, ChevronDown, Star, Moon, Sun, Heart, Download, Share2, Search, Pin, Pencil, Trash2, HelpCircle, X, Loader2, Menu, MessageCircle } from "lucide-react";
+import { BaydinSend as Send, BaydinPlus as Plus, BaydinChevronDown as ChevronDown, BaydinStar as Star, BaydinMoon as Moon, BaydinSun as Sun, BaydinHeart as Heart, BaydinDownload as Download, BaydinShare as Share2, BaydinSearch as Search, BaydinPin as Pin, BaydinEdit as Pencil, BaydinTrash as Trash2, BaydinHelp as HelpCircle, BaydinX as X, BaydinLoader as Loader2, BaydinMenu as Menu, BaydinAstrologer as MessageCircle } from "@/components/lumina/baydin-icons";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";

@@ -12,7 +12,7 @@ import {
 import { useMe, api } from "@/lib/api-client";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { BookOpen, Bookmark, BookmarkCheck, ChevronDown, ChevronRight, Share2, Sparkles, Loader2 } from "lucide-react";
+import { BaydinLifeReport, BaydinBookmark, BaydinChevronDown, BaydinChevronRight, BaydinShare, BaydinStar, BaydinLoader } from "@/components/lumina/baydin-icons";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { TAROT_DECK } from "@/lib/tarot-data";
@@ -64,7 +64,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
         <div className="max-w-3xl mx-auto px-6 py-12 relative z-10 min-w-0 overflow-hidden flex flex-col items-center justify-center text-center">
           <div className="flex justify-center mb-4">
             <div className="w-14 h-14 rounded-full border border-[#C5A572]/30 bg-[#C5A572]/5 flex items-center justify-center">
-              <BookOpen className="w-7 h-7 text-[#C5A572]" />
+              <BaydinLifeReport className="w-7 h-7 text-[#C5A572]" />
             </div>
           </div>
           <LiquidMetalText as="h1" className="serif-display text-[1.75rem] text-[#E8E2D5] tracking-tight block mb-2">
@@ -89,7 +89,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
         {/* Hero */}
         <div className="mb-6 lum-reveal">
           <GlowPill className="mb-3">
-            <BookOpen className="w-3 h-3" /> Your past readings
+            <BaydinLifeReport className="w-3 h-3" /> Your past readings
           </GlowPill>
           <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.25rem] leading-[1.1] tracking-tight block mb-2">
             Tarot History
@@ -105,23 +105,23 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
             onClick={() => setSavedOnly(!savedOnly)}
             className={cn("px-3 py-1.5 rounded-full text-[11px] border transition flex items-center gap-1.5 shrink-0", savedOnly ? "border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572]" : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5]")}
           >
-            {savedOnly ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
+            {savedOnly ? <BaydinBookmark className="w-3.5 h-3.5" /> : <BaydinBookmark className="w-3.5 h-3.5" />}
             {savedOnly ? "Saved only" : "All"}
           </button>
         </div>
 
         {loading ? (
           <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-8 text-center">
-            <Loader2 className="w-6 h-6 text-[#C5A572] animate-spin mx-auto mb-2" />
+            <BaydinLoader className="w-6 h-6 text-[#C5A572] mx-auto mb-2" />
             <div className="text-[13px] text-[#9C9489]">Loading readings…</div>
           </AuroraGlowCard>
         ) : readings.length === 0 ? (
           <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.12} className="p-8 text-center">
-            <Sparkles className="w-8 h-8 text-[#9C9489] mx-auto mb-3" />
+            <BaydinStar className="w-8 h-8 text-[#9C9489] mx-auto mb-3" />
             <div className="text-[14px] text-[#E8E2D5] mb-1">{savedOnly ? "No saved readings yet" : "No readings yet"}</div>
             <div className="text-[12px] text-[#9C9489] mb-4">{savedOnly ? "Bookmark readings you want to keep." : "Draw your first cards from the Tarot tab."}</div>
             <ShimmerButton onClick={() => setView("tarot")}>
-              <Sparkles className="w-3.5 h-3.5" /> Draw your first card
+              <BaydinStar className="w-3.5 h-3.5" /> Draw your first card
             </ShimmerButton>
           </AuroraGlowCard>
         ) : (
@@ -173,9 +173,9 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                         className={cn("p-1.5 rounded-full transition", r.saved ? "text-[#C5A572]" : "text-[#9C9489]/40 hover:text-[#9C9489]")}
                         aria-label={r.saved ? "Remove bookmark" : "Save reading"}
                       >
-                        {r.saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                        {r.saved ? <BaydinBookmark className="w-4 h-4" /> : <BaydinBookmark className="w-4 h-4" />}
                       </button>
-                      {isExpanded ? <ChevronDown className="w-4 h-4 text-[#9C9489]" /> : <ChevronRight className="w-4 h-4 text-[#9C9489]" />}
+                      {isExpanded ? <BaydinChevronDown className="w-4 h-4 text-[#9C9489]" /> : <BaydinChevronRight className="w-4 h-4 text-[#9C9489]" />}
                     </div>
                   </div>
 
@@ -205,18 +205,18 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                       <div className="mt-3 flex items-center gap-2">
                         {r.saved ? (
                           <GlowPill color="#7A8B6F" className="text-[9px]">
-                            <BookmarkCheck className="w-3 h-3" /> Saved
+                            <BaydinBookmark className="w-3 h-3" /> Saved
                           </GlowPill>
                         ) : (
                           <GlowPill color="#9C9489" className="text-[9px]">
-                            <Bookmark className="w-3 h-3" /> Unsaved
+                            <BaydinBookmark className="w-3 h-3" /> Unsaved
                           </GlowPill>
                         )}
                         <ShimmerButton
                           onClick={() => shareReading(r)}
                           className="py-1.5 px-3 text-[11px]"
                         >
-                          <Share2 className="w-3 h-3" /> Share this reading
+                          <BaydinShare className="w-3 h-3" /> Share this reading
                         </ShimmerButton>
                       </div>
                     </div>
@@ -252,7 +252,7 @@ function ReflectionsHistory() {
   return (
     <div className="mt-6">
       <div className="flex items-center gap-2 mb-3">
-        <BookOpen className="w-4 h-4 text-[#C5A572]" />
+        <BaydinLifeReport className="w-4 h-4 text-[#C5A572]" />
         <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Reflection Journal</span>
         <span className="text-[10px] text-[#9C9489]/50">· {reflections.length} entries</span>
       </div>

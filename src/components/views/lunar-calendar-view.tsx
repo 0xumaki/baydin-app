@@ -10,14 +10,11 @@ import {
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinCalendar, BaydinChevronLeft, BaydinChevronRight, BaydinMoon, BaydinStar, BaydinSun, BaydinLoader } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import type { LunarDay, LunarMonth } from "@/lib/lunar-calendar";
-import {
-  Calendar, ChevronLeft, ChevronRight, Moon, Star, Sun, Sparkles,
-  Loader2, Zap,
-} from "lucide-react";
+import { BaydinStar as Zap } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
 
 const DOW_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -96,7 +93,7 @@ export function LunarCalendarView({ onAuth }: { onAuth: () => void }) {
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
           <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.18} className="p-8 text-center">
             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[#9CB4D1]/15 border border-[#9CB4D1]/30 flex items-center justify-center">
-              <Moon className="w-6 h-6 text-[#9CB4D1]" />
+              <BaydinMoon className="w-6 h-6 text-[#9CB4D1]" />
             </div>
             <LiquidMetalText as="h1" className="text-[20px] mb-1">Sign in to begin</LiquidMetalText>
             <p className="text-[12px] text-[#9C9489] mb-4 max-w-sm mx-auto">
@@ -152,7 +149,7 @@ export function LunarCalendarView({ onAuth }: { onAuth: () => void }) {
         <div className="flex items-end justify-between mb-6 flex-wrap gap-4">
           <div>
             <GlowPill color="#9CB4D1" className="text-[10px] mb-3">
-              <Moon className="w-2.5 h-2.5" /> Vedic panchanga
+              <BaydinMoon className="w-2.5 h-2.5" /> Vedic panchanga
             </GlowPill>
             <LiquidMetalText as="h1" className="text-[28px] lg:text-[32px] leading-[1.1]">
               Lunar Calendar
@@ -160,16 +157,16 @@ export function LunarCalendarView({ onAuth }: { onAuth: () => void }) {
           </div>
           <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.12} className="p-2 flex items-center gap-2">
             <ShimmerButton tone="parchment" onClick={goToday} className="text-[11px] px-3 py-1.5">
-              <Calendar className="w-3 h-3" /> Today
+              <BaydinCalendar className="w-3 h-3" /> Today
             </ShimmerButton>
             <button onClick={prevMonth} aria-label="Previous month" className="p-2 text-[#9C9489] hover:text-[#C5A572] transition focus-ring rounded-sm">
-              <ChevronLeft className="w-4 h-4" />
+              <BaydinChevronLeft className="w-4 h-4" />
             </button>
             <div className="serif-display text-[1.25rem] text-[#E8E2D5] min-w-[160px] text-center tabular-nums">
               {lunarMonth?.monthName ?? "…"} {year}
             </div>
             <button onClick={nextMonth} aria-label="Next month" className="p-2 text-[#9C9489] hover:text-[#C5A572] transition focus-ring rounded-sm">
-              <ChevronRight className="w-4 h-4" />
+              <BaydinChevronRight className="w-4 h-4" />
             </button>
           </AuroraGlowCard>
         </div>
@@ -179,7 +176,7 @@ export function LunarCalendarView({ onAuth }: { onAuth: () => void }) {
           <div className="flex flex-wrap gap-2 mb-6">
             {summary.purnima.length > 0 && (
               <GlowPill color="#C5A87C" className="text-[10px]">
-                <Moon className="w-2.5 h-2.5" /> Purnima: {summary.purnima.map(d => d.date.slice(8)).join(", ")}
+                <BaydinMoon className="w-2.5 h-2.5" /> Purnima: {summary.purnima.map(d => d.date.slice(8)).join(", ")}
               </GlowPill>
             )}
             {summary.amavasya.length > 0 && (
@@ -194,7 +191,7 @@ export function LunarCalendarView({ onAuth }: { onAuth: () => void }) {
             )}
             {summary.festivals.length > 0 && (
               <GlowPill color="#D4A0B8" className="text-[10px]">
-                <Star className="w-2.5 h-2.5" /> <NumberTicker value={summary.festivals.length} /> festival{summary.festivals.length > 1 ? "s" : ""}
+                <BaydinStar className="w-2.5 h-2.5" /> <NumberTicker value={summary.festivals.length} /> festival{summary.festivals.length > 1 ? "s" : ""}
               </GlowPill>
             )}
           </div>
@@ -341,7 +338,7 @@ function TodayMoonCard({ lunarMonth, onOpenDay }: { lunarMonth: LunarMonth; onOp
   return (
     <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.18} className="p-5 lg:p-6 mb-6">
       <div className="flex items-center gap-2 mb-3">
-        <Moon className="w-4 h-4 text-[#C5A572]" />
+        <BaydinMoon className="w-4 h-4 text-[#C5A572]" />
         <GlowPill color="#C5A572" className="text-[10px]">Today's Moon</GlowPill>
       </div>
       <div className="flex items-start gap-5 flex-col sm:flex-row">
@@ -366,7 +363,7 @@ function TodayMoonCard({ lunarMonth, onOpenDay }: { lunarMonth: LunarMonth; onOp
       </div>
       <div className="mt-4">
         <ShimmerButton onClick={() => onOpenDay(today)} className="py-2 px-4 text-[12px]">
-          View full day detail <ChevronRight className="w-3.5 h-3.5" />
+          View full day detail <BaydinChevronRight className="w-3.5 h-3.5" />
         </ShimmerButton>
       </div>
     </AuroraGlowCard>
@@ -405,7 +402,7 @@ function DayDetail({
       </div>
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
         <button onClick={onBack} className="flex items-center gap-1.5 text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4">
-          <ChevronLeft className="w-3.5 h-3.5" /> Back to calendar
+          <BaydinChevronLeft className="w-3.5 h-3.5" /> Back to calendar
         </button>
 
         {/* Hero card */}
@@ -416,7 +413,7 @@ function DayDetail({
             </div>
             <div className="flex-1 min-w-0">
               <GlowPill color="#C5A572" className="text-[10px] mb-2">
-                <Moon className="w-2.5 h-2.5" /> {day.dayOfWeekName}, {dateObj.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                <BaydinMoon className="w-2.5 h-2.5" /> {day.dayOfWeekName}, {dateObj.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
               </GlowPill>
               <LiquidMetalText as="h1" className="text-[26px] lg:text-[32px]">{day.moonPhase.name}</LiquidMetalText>
               <div className="flex items-center gap-2 mt-3 flex-wrap">
@@ -432,7 +429,7 @@ function DayDetail({
               </div>
               {day.isToday && (
                 <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-leaf/10 border border-leaf/30 text-[#7A8B6F] text-[10px] font-medium tracking-wide">
-                  <Star className="w-3 h-3" /> TODAY
+                  <BaydinStar className="w-3 h-3" /> TODAY
                 </div>
               )}
             </div>
@@ -443,21 +440,21 @@ function DayDetail({
         <GlowPill color="#9CB4D1" className="text-[10px] mb-3">Panchanga · The Five Limbs</GlowPill>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
           <PanchangaCard
-            icon={Moon}
+            icon={BaydinMoon}
             label="Tithi"
             value={day.panchanga.tithi}
             sub={`Lunar day ${(day.panchanga.tithi_number % 30) + 1} of 30 · ${day.panchanga.tithi_paksha} paksha`}
             accent="#C5A87C"
           />
           <PanchangaCard
-            icon={Star}
+            icon={BaydinStar}
             label="Nakshatra"
             value={`${day.panchanga.nakshatra} ${day.panchanga.nakshatra_pada}`}
             sub={`Pada ${day.panchanga.nakshatra_pada} of 4 · Constellation ${day.panchanga.nakshatra_index + 1} of 27`}
             accent="#D4A0B8"
           />
           <PanchangaCard
-            icon={Sparkles}
+            icon={BaydinStar}
             label="Yoga"
             value={day.panchanga.yoga}
             sub={`Yoga ${day.panchanga.yoga_index} of 27`}
@@ -471,7 +468,7 @@ function DayDetail({
             accent="#8FA37E"
           />
           <PanchangaCard
-            icon={Sun}
+            icon={BaydinSun}
             label="Vaara"
             value={day.dayOfWeekName}
             sub={`Planetary ruler: ${dayRuler(day.dayOfWeek)}`}
@@ -483,7 +480,7 @@ function DayDetail({
         {nakshatraDetail && (
           <AuroraGlowCard glowColor="#D4A0B8" glowIntensity={0.16} className="p-5 lg:p-6 mb-6">
             <div className="flex items-center gap-2 mb-3">
-              <Star className="w-4 h-4 text-[#C5A572]" />
+              <BaydinStar className="w-4 h-4 text-[#C5A572]" />
               <GlowPill color="#D4A0B8" className="text-[10px]">Nakshatra · {nakshatraDetail.nakshatra}</GlowPill>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
@@ -505,7 +502,7 @@ function DayDetail({
             <div className="space-y-2">
               {day.isPurnima && (
                 <SignificanceRow
-                  icon={Moon}
+                  icon={BaydinMoon}
                   title="Purnima (Full Moon)"
                   desc="A day of completion, fullness, and bright spiritual energy. Auspicious for new beginnings, meditation, and acts of generosity."
                   accent="#C5A87C"
@@ -513,7 +510,7 @@ function DayDetail({
               )}
               {day.isAmavasya && (
                 <SignificanceRow
-                  icon={Sun}
+                  icon={BaydinSun}
                   title="Amavasya (New Moon)"
                   desc="The dark moon — a time for ancestor rituals (tarpanam), introspection, and seeding new intentions. Avoid major new ventures today."
                   accent="#8B7355"
@@ -521,7 +518,7 @@ function DayDetail({
               )}
               {day.isEkadashi && (
                 <SignificanceRow
-                  icon={Sparkles}
+                  icon={BaydinStar}
                   title="Ekadashi (11th Tithi)"
                   desc="Sacred to Vishnu — a day of fasting (upavasa) and spiritual practice. Fasting on Ekadashi is said to purify the body and mind."
                   accent="#7A8B6F"
@@ -529,7 +526,7 @@ function DayDetail({
               )}
               {day.isFestival && day.festivalName && (
                 <SignificanceRow
-                  icon={Star}
+                  icon={BaydinStar}
                   title={day.festivalName}
                   desc="A Vedic festival observed on this tithi. Special rituals, mantras, and offerings are traditionally performed."
                   accent="#D4A0B8"
@@ -541,7 +538,7 @@ function DayDetail({
 
         {loading && (
           <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.12} className="p-6 flex items-center justify-center gap-2 text-[#9C9489]">
-            <Loader2 className="w-4 h-4 animate-spin" /> Loading nakshatra detail…
+            <BaydinLoader className="w-4 h-4" /> Loading nakshatra detail…
           </AuroraGlowCard>
         )}
       </div>
