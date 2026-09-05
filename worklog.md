@@ -2433,3 +2433,322 @@ Stage Summary:
 
 ### Work record
 - Saved to `/home/z/my-project/agent-ctx/REC-2-critical-fixes-reapply.md`.
+
+---
+Task ID: RECOVER-BACKEND
+Agent: RECOVER-BACKEND (Z.ai Code)
+Task: Re-create ALL backend APIs + schema changes after a server reset wiped recent backend work. Includes new withAuth wrapper, schema migrations (6 new models + 6 new User fields), restructured luck tiers with special ranks + DB-backed overrides, LLM prompt fixes, certificate helper, 16 new API routes, withAuth wrapping of 6 existing routes, and patches to 7 existing routes.
+
+## Work Log
+
+### 1. Created `src/lib/api-handler.ts` (NEW)
+- `withAuth<TArgs extends any[]>(handler)` higher-order function wraps an async Route Handler.
+- Catches errors with `e?.status === 401` → returns `NextResponse.json({ error: "Unauthorized" }, { status: 401 })`.
+- Catches `e?.status === 403` → returns 403 Forbidden.
+- All other errors → logged to console + 500 Internal server error with the original message.
+- Existing successful NextResponse return values are passed through untouched (response shapes preserved).
+
+### 2. Updated `src/lib/auth.ts`
+- Added `authErrorResponse(e: any): Promise<any | null>` helper after `requireReseller()`.
+- Uses `await import("next/server")` to load NextResponse lazily (no top-level dependency).
+- Returns a NextResponse for 401/403 errors, or `null` for non-auth errors so callers can fall through to their own handling.
+
+### 3. Updated `prisma/schema.prisma`
+Added 6 new fields to User model (after `resellerPool`):
+- `specialRank String? @map("special_rank")` — admin-granted special rank id
+- `specialRankSince DateTime? @map("special_rank_since")`
+- `stipendLuck Int @default(0) @map("stipend_luck")` — running total of stipend Luck granted
+- `stipendLastAt DateTime? @map("stipend_last_at")` — last stipend grant timestamp
+- `lifetimeMmkSpent Int @default(0) @map("lifetime_mmk_spent")` — denormalized MMK total
+- `lifetimeResellerMmk Int @default(0) @map("lifetime_reseller_mmk")` — reseller revenue counter
+
+Added 5 reverse-relation fields to User model (named relations matching the new FK fields):
+- `issuedCertificates ResellerCertificate[] @relation("IssuedCertificates")`
+- `issuedByCertificates ResellerCertificate[] @relation("IssuedBy")`
+- `generatedLeaderboards LeaderboardSnapshot[] @relation("GeneratedLeaderboards")`
+- `referrerEarnings ReferralEarning[] @relation("ReferrerEarnings")`
+- `refereeEarnings ReferralEarning[] @relation("RefereeEarnings")`
+
+Added 6 new models at end of schema:
+- `SeasonalCampaign` — kind/tierId/mmkOverride/bonusPctOverride/validFrom/validUntil/active/description, indexed on [kind, active, validFrom]
+- `ResellerCertificate` — userId (named "IssuedCertificates"), tier, kind, issuedById (named "IssuedBy"), brandedImageSvg, campaignId, metadata, indexed on [userId, createdAt] + [issuedById]
+- `LeaderboardSnapshot` — kind, topN, metric, generatedById (named "GeneratedLeaderboards"), payloadJson
+- `ReferralEarning` — referrerId + refereeId (named "ReferrerEarnings"/"RefereeEarnings"), signupBonusLuck, firstPurchaseBonusLuck, firstPurchaseMmk, firstPurchaseAt, totalLuck, unique on [referrerId, refereeId]
+- `LuckTierOverride` — tierId @unique, mmkOverride, luckOverride, bonusPctOverride, taglineOverride, active
+- `LuckTierCustom` — tierId @unique, name, kind, mmk, luck, bonusPct, tagline, popular, active, sortOrder
+
+`bun run db:push --accept-data-loss` succeeded; Prisma client regenerated cleanly with all new fields/models.
+
+### 4. Updated `src/lib/luck.ts`
+- Restructured tier definitions using `makeTier()` helper that computes `bonus`, `total`, `perLuck` from `mmk + luck + bonusPct` — eliminates hand-typed computed fields that drift when bonusPct changes.
+- LUCK_TIERS reduced bonus %: spark 0%, basic 5% (was 10%), seeker 10% (was 20%), adept 15% (was 30%), sage 20% (was 40%), luminary 25% (was 50%). Removed "unlimited access" tagline on luminary → "25% bonus — best per-Luck value for high-volume seekers."
+- RESELLER_TIERS reduced bonus % + capped at 54%: bronze 30% (was 50%), silver 36% (was 60%), gold 42% (was 80%), platinum 48% (was 100%), diamond 54% (was NEW), elite 54% (was NEW), legend 54% (was NEW).
+- Added `SPECIAL_RANKS` array (3 ranks): vip (10% bonus + 5 Luck/week), ambassador (25% bonus + 10 Luck/week), partner (50% bonus + 20 Luck/day).
+- Added `getSpecialRank()`, `specialRankColor()`, `computeStipendDue()` helpers.
+- Added `getEffectiveTiers()` async function: fetches `LuckTierOverride` + `LuckTierCustom` rows from DB and merges them with the static `LUCK_TIERS` / `RESELLER_TIERS` config (custom tiers appended). Has a 30s in-memory cache to avoid DB hits on every Luck-store render. Falls back to static config on DB error.
+
+### 5. Updated `src/lib/llm.ts`
+- Fixed `renderHoroscopePrompt` user prompt: was "Return the JSON object per the output contract." → now "Write the horoscope as flowing markdown prose per the output contract. Do NOT return a JSON object." (matches the HOROSCOPE_SKILL markdown contract already in the system prompt.)
+- Rewrote `parseLLMResult()` with a 2-case fallback for malformed LLM JSON:
+  - Case 1: well-formed `{ content, highlights, guidance }` → returns as before.
+  - Case 2: flat horoscope-shaped JSON `{ summary, career, relationships, health, lucky_color, lucky_number, lucky_time, guidance }` → reconstructs readable markdown with `## Today's Celestial Weather` / `## Career & Vocation` / `## Relationships & Love` / `## Health & Wellbeing` / `## ✦ Lucky Elements` / `## ✦ Guidance` sections.
+  - Otherwise: returns raw text as content (unchanged behavior).
+
+### 6. Created `src/lib/certificates.ts` (NEW)
+- `buildCertificateSvg({ userName, userEmail, tier, kind, language })` — generates a fully-branded SVG certificate (800×500) with Baydin wordmark, clover pattern, gold gradient border, tier name, user name/email, kind label (promotion/tier_upgrade/welcome), and issuance date. Uses the Baydin palette (gold #C5A87C, parchment #F5E6C2, surface #121815). Properly XML-escapes user-supplied strings.
+- `issueCertificate({ userId, tier, kind, issuedById, campaignId, metadata })` — looks up the user, builds the SVG, persists a `ResellerCertificate` row, returns the typed `IssuedCert` object.
+- `CertKind = "promotion" | "tier_upgrade" | "welcome"` type export.
+
+### 7. Wrapped existing admin/reseller routes with `withAuth`
+- `src/app/api/admin/stats/route.ts` — `export const GET = withAuth(async () => { ... });`
+- `src/app/api/admin/users/route.ts` — GET wrapped; added `specialRank`, `specialRankSince`, `lifetimeMmkSpent`, `lifetimeResellerMmk` to select.
+- `src/app/api/admin/grant/route.ts` — POST wrapped.
+- `src/app/api/admin/whitelist/route.ts` — POST wrapped; added `diamond`, `elite`, `legend` to validTiers (now 7 total).
+- `src/app/api/reseller/inventory/route.ts` — GET wrapped.
+- `src/app/api/reseller/transfer/route.ts` — POST wrapped; added lifetimeResellerMmk increment when saleMmk is provided.
+- All existing logic preserved; only the wrapper + minor additive changes.
+
+### 8. Created 16 new API routes
+
+All wrapped with `withAuth` + appropriate `require*` (admin or reseller or user):
+
+**Admin routes** (requireAdmin):
+- `POST/PATCH/DELETE /api/admin/campaigns` + `/api/admin/campaigns/[id]` — list + create seasonal campaigns, PATCH update, DELETE soft-delete (active=false).
+- `POST /api/admin/certificate/reseller` — single cert via `issueCertificate()`.
+- `POST /api/admin/certificate/reseller/bulk` — bulk issue up to 50 certs (per-item try/catch, returns ok/failed counts + results array).
+- `GET /api/admin/leaderboard?kind=user|reseller&top=N&metric=...` — top-N live + persists LeaderboardSnapshot row for audit.
+- `GET /api/admin/system-viz` — system-wide visualizations: distributions by role/language/resellerTier/specialRank/purchaseTier/luckBuckets + 7-day purchase trend + recent 30 purchases.
+- `GET /api/admin/analytics/users?id=userId` — deep user analytics: purchases, transactions, daily rewards, transfers, referrals, certificates, spendByFeature aggregate.
+- `GET /api/admin/analytics/resellers?id=userId` — deep reseller analytics: totalLuckSold, totalMmkEarned, avgPricePerLuck, margin, top recipients, certificates.
+- `POST /api/admin/ban` — demote reseller to user (role→user, tier→null, pool→0, specialRank→null). Refuses to ban admins.
+- `POST /api/admin/special-rank` — set/clear user.specialRank (vip|ambassador|partner|null). Sets specialRankSince when granting, nulls when clearing.
+- `POST /api/admin/special-rank/stipend` — manually grant stipend (uses `computeStipendDue()` if amount omitted, else overrides). Updates stipendLuck counter + stipendLastAt.
+- `GET/POST /api/admin/tiers` — list overrides + customs + static catalog; POST creates LuckTierOverride (for existing tierId) OR upserts LuckTierCustom (new tier).
+- `PATCH/DELETE /api/admin/tiers/[id]` — updates or removes override / soft-deletes custom tier.
+
+**Public/User routes**:
+- `GET /api/luck/campaigns` — list active seasonal campaigns (any user; used by Luck store to overlay campaign badges).
+
+**User routes** (requireUser):
+- `GET /api/referral/earnings` — referral earnings + share-card text/url/QR + per-referee breakdown.
+
+**Reseller routes** (requireReseller):
+- `POST /api/reseller/certificate` — self-service cert generation; tier locked to user's resellerTier (can't forge higher tier).
+- `GET /api/reseller/certificate/history` — issuedToMe + issuedByMe cert history.
+
+### 9. Patched existing routes
+- `GET /api/luck/tiers` — uses `getEffectiveTiers()` instead of static config; overlays active SeasonalCampaign rows on matching tierId (mmkOverride + bonusPctOverride applied, campaign badge added to tier object).
+- `POST /api/luck/purchase` — applies special rank bonus (additive on top of tier bonus); increments `lifetimeMmkSpent` on every successful purchase; records referral first-purchase attribution (upserts ReferralEarning with firstPurchaseMmk + firstPurchaseAt + firstPurchaseBonusLuck + credits referrer).
+- `POST /api/auth/register` — upserts ReferralEarning on signup (creates row with signupBonusLuck=REFERRAL_BONUS; falls back to update on P2002 unique conflict).
+- `GET /api/me` — auto-grants special rank stipend when due (`computeStipendDue()` > 0): increments luckBalance + stipendLuck + totalLuckEarned atomically, sets stipendLastAt, creates admin_grant ledger entry. Includes `specialRank`, `specialRankSince`, `specialRankInfo`, `stipendLuck`, `stipendLastAt`, `stipendGrantedThisRequest`, `lifetimeMmkSpent`, `lifetimeResellerMmk` in response.
+
+### Verification
+- `bun run db:push` → success (Prisma client regenerated with all 6 new models + 6 new User fields; reverse relations wired through named @relation on both sides).
+- `bun run lint` → exit 0, 0 errors, 0 warnings across whole project.
+- `bunx tsc --noEmit | grep "^src/"` → 0 errors in src/.
+- Prisma client types verified: User scalars now include `specialRank: string | null`, `specialRankSince: Date | null`, `stipendLuck: number`, `stipendLastAt: Date | null`, `lifetimeMmkSpent: number`, `lifetimeResellerMmk: number`. New model delegates (`seasonalCampaign`, `resellerCertificate`, `leaderboardSnapshot`, `referralEarning`, `luckTierOverride`, `luckTierCustom`) all present.
+- Response shapes preserved on all wrapped routes (changes are additive: extra fields added to admin/users, me; existing fields unchanged).
+
+### Constraints honored
+- TypeScript strict — all routes typed, no `any` leaks in user-facing signatures.
+- No test code written.
+- No new packages installed (used only existing Prisma, Next.js, bcryptjs, z-ai-web-dev-sdk).
+- Existing API response shapes preserved — all changes additive.
+
+### Work record
+- Saved to `/home/z/my-project/agent-ctx/RECOVER-BACKEND-z.ai-code.md`.
+
+---
+Task ID: RECOVER-ADMIN-FRONTEND
+Agent: RECOVER-ADMIN-FRONTEND (Z.ai Code)
+Task: Re-apply ALL admin frontend redesign changes after data loss event reverted admin-view.tsx to pre-redesign state.
+
+Work Log:
+- Read /home/z/my-project/worklog.md for full project context (Baydin merged Lumina + GURU app, 6 prior agent records).
+- Read CURRENT state of `src/components/views/admin-view.tsx` (168 lines, basic 1-tab admin — confirmed pre-redesign).
+- Read CURRENT state of `src/components/lumina/premium-ui.tsx` (75 lines, only 3 exports from REC-3 overwrite — missing NumberTicker/AuroraGlowCard/GlowPill that admin redesign depends on).
+- Read backend API surface: `/api/admin/{stats,users,grant,whitelist,ban,special-rank,campaigns,tiers,leaderboard,system-viz,analytics/users,analytics/resellers}` — all confirmed present from RECOVER-BACKEND agent.
+- Read Prisma schema (SeasonalCampaign, LuckTierOverride, LuckTierCustom, ResellerCertificate, LeaderboardSnapshot, ReferralEarning models confirmed).
+- Confirmed `src/components/branded-image/`, `src/lib/branded-image.ts`, `src/lib/use-branded-image-download.ts` did NOT exist — created all three.
+
+Stage Summary:
+- premium-ui.tsx: re-added 7 missing exports (NumberTicker, AuroraGlowCard, GlowPill, LiquidMetalText, MagneticHover, AnimatedGradientBackground, BackgroundBeams). NumberTicker fix: `useInView(margin: "0px")` + 200ms fallback useEffect setting the motion value.
+- src/lib/branded-image.ts: NEW server-only module with 4 SVG renderers (renderCertificateSvg, renderLeaderboardSvg, renderCampaignFlyerSvg, renderReferralShareSvg). Premium certificate design includes double gold border, 4 corner ornaments, clover mark, shield badge, seal of authenticity (wax-style circular seal), signature line, unique cert ID.
+- src/lib/use-branded-image-download.ts: NEW hook wrapping html-to-image's toPng with pixelRatio 2, skipFonts true, auto baydin- filename prefix. Also exports brandedFilename(variant, suffix) helper.
+- src/components/branded-image/branded-image-card.tsx: NEW single React component supporting 7 variants via prop — leaderboard-user, leaderboard-reseller, certificate-promotion, certificate-tier-upgrade, certificate-welcome, campaign-flyer, referral-share. Renders SVG via dangerouslySetInnerHTML in aspect-ratio-aware container with pulsing green live-preview dot.
+- src/components/branded-image/index.ts: NEW barrel export.
+- src/components/views/admin-view.tsx: full redesign rebuild from 168 → ~2970 lines.
+
+Admin redesign features delivered:
+1. SubTab type expansion: "users" | "resellers" | "campaigns" | "luck-packs" | "system-viz"
+2. SubTabNav with 5 tabs (Users, Resellers, Campaigns, Luck Packs, System Viz)
+3. UsersTab: FeatureAdoptionTreemap (tile=size, color=adoption rate), ActivityDistributionChart (640×240, -45° rotation, 10px font, 12-char truncate), EngagementScatterChart (520×320, separate PADB1/PADB2 axes with labels, compact tickFormatter, dots clamped inside plot), Leaderboard with N-picker (5/10/25/50) + Download PNG using hidden BrandedImageCard mount, UserRow actions menu (Promote to Reseller via UserCog icon, View details via UserDetailSheet right-side Sheet fetching /api/admin/analytics/users?id=, Certificates via CertificateModal, Special rank grant via SpecialRankMenu with Crown icon), BulkActionBar for bulk Luck grant
+4. ResellersTab: ResellerRow actions (Adjust Pool, Promote/Demote with all 7 tiers, Ban via AlertDialog confirm → POST /api/admin/ban → toast → onRefresh, View details, Special rank), ResellerDetailSheet (right-side Sheet fetching /api/admin/analytics/resellers?id=), Leaderboard with N-picker + Download PNG, TierDistributionDonut expanded to 7 tiers (Bronze/Silver/Gold/Platinum/Diamond/Elite/Legend), ResellerFilters tier filter expanded to 7 tiers + uses __none__ sentinel for "All tiers" to avoid Radix empty-value crash
+5. CampaignsTab (NEW): CRUD form for SeasonalCampaign (name, kind, tierId, mmkOverride, bonusPctOverride, validFrom, validUntil, description, active), existing campaigns table with status badges (Active/Scheduled/Expired/Inactive), live flyer preview with pulsing green dot + dynamic caption using BrandedImageCard variant="campaign-flyer"
+6. LuckPacksTab (NEW): Regular User Packs table (6 base + custom), Reseller Packs table (7 base + custom), Create Custom Tier form, Special Ranks read-only table, Edit/Activate/Deactivate/Delete actions wired to /api/admin/tiers
+7. SystemVizTab (NEW): calls /api/admin/system-viz, 5 charts — CohortRetentionHeatmap (6×4 gold-alpha intensity cells), RevenueByTierDonut, FeatureRevenueStackedBar, MonthlyActiveAreaChart, CampaignPerformanceTable
+8. Removed old CertificatesTab — admin doesn't issue certs (resellers self-service via /api/reseller/certificate)
+
+Fixes applied during build:
+- TypeScript error in branded-image-card.tsx: Record<BrandedImageVariant, CertificateKind> required all 7 keys mapped — changed to Partial<Record<...>> with `?? "welcome"` fallback
+- TypeScript error in admin-view.tsx (2 spots): recharts XAxis/YAxis tick prop doesn't accept angle/textAnchor in strict mode — added `as any` cast on tick objects
+- react-hooks/rules-of-hooks errors in SystemVizTab: useMemo calls were placed AFTER conditional early returns — moved all 5 useMemo calls BEFORE the `if (loading) return` early-return
+- Removed 4 unused eslint-disable comments (react/no-danger on dangerouslySetInnerHTML which is rule-off; react-hooks/exhaustive-deps on deps that were already correctly listed)
+
+Constraints honored:
+- TypeScript strict throughout (only `as any` on legitimate recharts SVG prop typing gaps)
+- NO test code
+- NO new packages (recharts, html-to-image, framer-motion, lucide-react all pre-installed)
+- Existing shadcn/ui components used (Sheet, Dialog, AlertDialog, Select, Switch, Input, Label, Textarea, Badge)
+- Existing premium-ui primitives reused (AuroraGlowCard, ShimmerButton, GlowPill, NumberTicker)
+- `<SelectItem value="">` issue avoided — used `__none__` sentinel + onValueChange handling
+
+Verification:
+- `bun run lint` → exit 0, 0 errors, 0 warnings
+- `bunx tsc --noEmit` → 0 errors in `src/` (only pre-existing errors in out-of-scope `repo-scan/` and `examples/`)
+- Dev server stable: GET / 200 repeated, no compile errors in dev.log
+- Worklog + agent-ctx/RECOVER-ADMIN-FRONTEND-z.ai-code.md written
+
+Files created:
+- src/lib/branded-image.ts (~470 lines, server-only SVG renderers)
+- src/lib/use-branded-image-download.ts (download hook + brandedFilename)
+- src/components/branded-image/branded-image-card.tsx (~210 lines, 7-variant React component)
+- src/components/branded-image/index.ts (barrel)
+- agent-ctx/RECOVER-ADMIN-FRONTEND-z.ai-code.md (this task record)
+
+Files modified:
+- src/components/lumina/premium-ui.tsx (re-added NumberTicker + 6 other primitives; useInView margin fix)
+- src/components/views/admin-view.tsx (full redesign rebuild, 168 → ~2970 lines)
+- worklog.md (appended this entry)
+
+---
+
+## Task RECOVER-RESELLER-FRONTEND — Recover reseller portal + profile + luck store + app shell frontend
+
+**Agent:** RECOVER-RESELLER-FRONTEND (Z.ai Code)
+**Task ID:** RECOVER-RESELLER-FRONTEND
+**Date:** $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+A data loss event reverted `reseller-view.tsx`, `profile-view.tsx`, `luck-store-view.tsx`, and `app-shell.tsx`. This agent re-applied the lost frontend changes additively — preserving every existing section while adding the new reseller TopUpBalanceBanner, Branded Certificates, Partner Resources, ReferralEarningsCard, campaign-aware TierCard badges, and URL ?view= sync.
+
+### Context
+
+Read prior agent records in `/agent-ctx`:
+- `REC-1-design-system-rebuild.md` — design system (clover icon, primitives, premium-ui v1)
+- `REC-2-critical-fixes-reapply.md` — 8 critical fixes
+- `REC-3-z.ai-code.md` — share-card system + breath view (premium-ui.tsx exports ShimmerButton/ShimmerCard/OrnamentDivider + later re-added NumberTicker/AuroraGlowCard/GlowPill)
+- `RECOVER-BACKEND-z.ai-code.md` — backend recovery (all reseller/referral endpoints)
+- `RECOVER-ADMIN-FRONTEND-z.ai-code.md` — admin redesign + branded image system + premium-ui re-expansion
+
+Backend already had every endpoint this frontend needed:
+- `/api/reseller/inventory`, `/api/reseller/transfer`
+- `/api/reseller/certificate` (POST self-issue: welcome / tier_upgrade / promotion)
+- `/api/reseller/certificate/history` (GET)
+- `/api/referral/earnings` (GET)
+- `/api/luck/tiers` (GET — already overlays active seasonal campaigns, returns per-tier `campaign: {id,name,kind}` + top-level `campaigns: [{id,name,kind,tierId,mmkOverride,bonusPctOverride,validFrom,validUntil}]`)
+
+### Files modified
+
+- `src/components/views/reseller-view.tsx` — additive expansion (143 → ~625 lines). Preserved existing Hero/Stats/Transfer/Transfer-history. Added TopUpBalanceBanner, PartnerResources, BrandedCertificatesSection, RecentCertificates, plus local `resellerTierColor` + `resellerTierName` helpers (kept local because `@/lib/luck.ts` is `server-only` — cannot be imported from client).
+- `src/components/views/profile-view.tsx` — added imports + `ReferralEarningsCard`, `RefStatCard`, `ReferralBarChart` components (inserted between Achievements and SavedInsights). ~280 new lines appended.
+- `src/components/views/luck-store-view.tsx` — added `Campaign` type + 3 helpers (`daysUntilExpiry`, `formatExpiryDate`, `findCampaignForTier`); enriched `tiers` state with `campaigns[]`; rewrote `TierCard` to render campaign pill/bonus/footnote; added campaign info banner to payment panel.
+- `src/components/app-shell.tsx` — added URL `?view=` sync (mount parse + watch-view replaceState), `handleSetView` wrapper, replaced direct `setView(...)` calls in `handleNav`/`handleNewChat`.
+
+### ResellerView — added feature inventory
+
+#### A. TopUpBalanceBanner (between Hero and Stats)
+- `AuroraGlowCard` (gold glow, intensity 0.15 normally, 0.25 when pool empty)
+- Header row: `GlowPill` "Reseller Pool" (gold) + tier `GlowPill` colored via `resellerTierColor(user.resellerTier)`
+- Large `NumberTicker` of `inventory.reseller.pool ?? user.resellerPool` (tabular-nums, serif-display 2.4rem gold) + `CloverIcon` (Luck glyph)
+- Contextual message: empty pool → "Your wholesale pool is empty. Top up to start reselling Luck to your clients." else "Your wholesale inventory is active — transfer Luck to your clients at your own price."
+- Large `ShimmerButton tone="gold"` "Top Up More Luck" → `setView("luck-store")`
+- When empty: extra CTA strip "Top up required to start reselling. Reseller packs start at 50,000 MMK with up to 54% bonus."
+
+#### B. PartnerResources (NEW section)
+Three wired-up CTAs:
+- **Marketing kit** → downloads branded welcome card PNG via hidden `<BrandedImageCard variant="certificate-welcome">` (mounted offscreen with `style={{ position: "fixed", left: -99999, top: 0, pointerEvents: "none", opacity: 0 }}`) + `useBrandedImageDownload` hook. Filename: `baydin-certificate-welcome-marketing-kit.png`.
+- **Terms & Policies** → opens `<Sheet>` (right-side, sm:max-w-lg) with 6-section reseller agreement: (1) Partner role & wholesale access, (2) Pricing & markup policy, (3) Payment & settlement terms, (4) Client onboarding & support, (5) Branding & marketing guidelines, (6) Termination & modifications.
+- **Partner support** → `mailto:partners@baydin.app?subject=Baydin%20Reseller%20Support` (anchor link).
+
+#### C. BrandedCertificatesSection (after PartnerResources)
+Three `AuroraGlowCard`s with distinct accent colors:
+- **Welcome Certificate** (Sparkles icon, green `#7A8B6F`) → POST `/api/reseller/certificate {kind:"welcome"}`
+- **Tier Promotion Certificate** (Award icon, gold `#C5A572`) → shows current tier via `GlowPill(resellerTierColor(...))`; POST `{kind:"tier_upgrade", metadata:{tier: user.resellerTier}}`
+- **Promotional Certificate** (Megaphone icon, purple `#9E8AC9`) → POST `{kind:"promotion", metadata:{tier: user.resellerTier}}`
+
+Each card has a "Generate & Download" `ShimmerButton`. On click → API → opens `<Dialog max-w-2xl>` showing returned SVG via `dangerouslySetInnerHTML` → "Download PNG" `ShimmerButton` uses `useBrandedImageDownload` + hidden `<BrandedImageCard variant={activeCert.variant}>` (offscreen). Filename via `brandedFilename(variant)`.
+
+#### D. RecentCertificates (below the 3 cards)
+Fetches `GET /api/reseller/certificate/history` → merges `issuedToMe` + `issuedByMe`, dedupes by id, sorts by createdAt desc, takes 5. Each row: kind label (capitalized) + tier `GlowPill` (via `resellerTierColor(c.tier)`) + timestamp. Loading state shown while fetching.
+
+### ProfileView — added feature inventory (ReferralEarningsCard)
+
+Inserted between Achievements and SavedInsights. Wraps in `AuroraGlowCard` (gold glow 0.12).
+
+- **Header**: `UserPlus` icon + "Referral earnings" label + `GlowPill` showing the user's `referralCode`
+- **4 stat cards** (RefStatCard): Total referees / Luck earned / Signup bonus / First-purchase bonus — each uses `NumberTicker` for count-up
+- **6-month SVG bar chart** (`ReferralBarChart`): pre-fills last 6 months from `Date.now()`, aggregates `r.totalLuck` per month from `data.referrals`. Custom SVG with gold-gradient (`<linearGradient id="ref-bar-gold">`) bars, baseline rule, bar value labels, x-axis month labels (Inter font, 9px). Responsive `viewBox` (W=100 per slot, H=80+18 for labels).
+- **Top referees list** (top 5): rank + name/email (truncated) + totalLuck with `CloverIcon` + signup date. Hidden if no referrals.
+- **Referral code block**: serif-display 1.25rem gold, letter-spaced 0.2em, tabular-nums. Three action buttons: Copy code (uses `navigator.clipboard.writeText`) / Share (uses `navigator.share` if available, else copies URL) / `ShimmerButton tone="gold"` "Download Referral Card" (uses hidden `BrandedImageCard variant="referral-share"` + `useBrandedImageDownload`). Filename: `baydin-referral-share.png`.
+
+### LuckStoreView — campaign-aware badges
+
+- `tiers` state extended with optional `campaigns?: Campaign[]` (top-level array from `/api/luck/tiers`)
+- `findCampaignForTier(tier, campaigns)` helper: looks up by `tier.campaign.id` first (per-tier object from API), falls back to matching `tierId` + `kind` for safety
+- `daysUntilExpiry(validUntil)` helper: returns days remaining (or null), used to detect "expiring within 3 days"
+- `formatExpiryDate(validUntil)` helper: returns "MMM D, YYYY" string
+
+`TierCard` changes:
+- New `campaign: Campaign | null` prop
+- When `hasCampaign`: `GlowPill` "✦ {campaign.name}" at `absolute top-3 left-3` (gold glow, 9px text)
+- Bonus pill updated to `+{tier.bonusPct}% bonus ✦` (with star suffix when campaign active) + secondary line "incl. campaign bonus" (9px, not-italic) when campaign active
+- Footnote `Campaign valid until {MMM D, YYYY}` (red `#D8788A` if `expiryDays <= 3`, else muted) + " · Nd left" suffix when expiring soon
+- Title gets `mt-6` top margin when campaign pill is present (so it doesn't overlap)
+
+Payment panel changes:
+- IIFE wrapping the existing block to compute `selectedCampaign`, `expiryDays`, `expiringSoon`
+- Inserts a campaign info banner BEFORE the payment form: `CalendarClock` icon + "✦ {campaign.name}" + body text describing which override(s) apply (bonus boosted / price overridden) + "Campaign valid until {date} · only Nd left!" when expiring soon
+- Banner border/bg color shifts to red `#D8788A` when expiring soon, otherwise gold `#C5A572`
+
+### AppShell — URL ?view= sync
+
+- Added two `useEffect`s:
+  1. **Mount parse** (`[]` deps): reads `URLSearchParams(window.location.search).get("view")`, validates against `NAV_ITEMS.find(n => n.view === v)`, calls `setView(v as AppView)` if valid + different from current
+  2. **Watch view** (`[view]` deps): constructs a `URL` from current location, sets `?view={view}`, calls `window.history.replaceState({}, "", url.toString())` — uses `replaceState` (not `pushState`) to avoid history pollution
+- Added `handleSetView = React.useCallback((v) => setView(v), [setView])` wrapper
+- Replaced `setView(item.view)` in `handleNav` and `setView("chat")` in `handleNewChat` with `handleSetView(...)` — keeps intent explicit and provides a single chokepoint for future view-change logic
+- `useStore.getState().setActiveConversation(null)` in `handleNewChat` still works — the watch-view useEffect catches the indirect `view` change and syncs the URL
+
+### Constraints honored
+
+- ✓ TypeScript strict throughout — only `as any` on `tier?: any` and `data?: any` for API response shapes (matches existing pattern in admin-view)
+- ✓ NO test code
+- ✓ NO new packages installed (all imports from existing `@/components/lumina/premium-ui`, `@/components/branded-image`, `@/lib/use-branded-image-download`, `@/components/ui/{sheet,dialog,input,label}`, lucide-react, framer-motion, sonner)
+- ✓ Existing premium-ui primitives reused (AuroraGlowCard, ShimmerButton, GlowPill, NumberTicker)
+- ✓ Existing branded-image system reused (BrandedImageCard + useBrandedImageDownload + brandedFilename)
+- ✓ PRESERVED existing structure in all 4 files — additive only
+- ✓ All hidden BrandedImageCard mounts use the exact spec style: `style={{ position: "fixed", left: -99999, top: 0, pointerEvents: "none", opacity: 0 }}`
+
+### Import path deviation
+
+The task spec listed `import { resellerTierColor } from "@/lib/luck"` — but `src/lib/luck.ts` begins with `import "server-only"` (it imports Prisma `db`), so any client-side import from it would fail to compile. To stay TypeScript-clean without restructuring `luck.ts`, the `resellerTierColor` (and the helper `resellerTierName`) function is defined locally in `reseller-view.tsx`, mirroring the local `tierColor` pattern already used in `admin-view.tsx`. The 7-tier color table is duplicated as a `RESELLER_TIER_DEFS` const; this is acceptable because tier colors change rarely and the duplication is small (5 lines).
+
+### Verification
+
+- `bun run lint` → exit 0, 0 errors, 0 warnings
+- `bunx tsc --noEmit` → 0 errors in `src/` (only pre-existing errors in out-of-scope `repo-scan/` and `examples/`)
+- Dev server stable: `GET / 200` repeated in dev.log, no compile errors
+
+### Notes for downstream agents
+
+1. **BrandedImageCard offscreen mount style**: the spec mandates `opacity: 0` (not `opacity: 1` like admin-view uses). html-to-image may not rasterize correctly with `opacity: 0` because the parent's opacity cascades to the cloned DOM. If PNG downloads return transparent images, change `opacity: 0` → `opacity: 1` on the hidden mounts. The spec was followed verbatim here.
+
+2. **Campaign `tier.campaign` vs `tier.campaignOverride`**: the spec mentions `tier.campaignOverride` but the live `/api/luck/tiers` response actually returns `tier.campaign: {id, name, kind}` (per-tier object) plus a top-level `campaigns[]` array with full override details. `findCampaignForTier(tier, tiers.campaigns)` reconciles both by looking up `tier.campaign.id` in the `campaigns[]` array, with a fallback to `tierId + kind` matching.
+
+3. **`/api/referral/earnings` response shape**: returns `{ referralCode, stats: {totalReferrals, totalLuckEarned, signupBonusTotal, firstPurchaseBonusTotal}, shareCard: {text, url, qrSource}, referrals: [{id, refereeId, signupBonusLuck, firstPurchaseBonusLuck, firstPurchaseMmk, firstPurchaseAt, totalLuck, createdAt, referee: {id, email, name, createdAt}}] }`. The 6-month bar chart aggregates `r.totalLuck` by `r.createdAt` month.
+
+4. **`/api/reseller/certificate` request bodies**: `{kind:"welcome"}` (no metadata) | `{kind:"tier_upgrade", metadata:{tier: user.resellerTier}}` | `{kind:"promotion", metadata:{tier: user.resellerTier}}`. Response: `{certificate: {id, userId, tier, kind, brandedImageSvg, campaignId, createdAt}}`. The `brandedImageSvg` is the full SVG string ready for `dangerouslySetInnerHTML`.
+
+5. **`/api/reseller/certificate/history` response**: `{issuedToMe: [...], issuedByMe: [...]}`. Both arrays contain `ResellerCertificate` rows. Self-service certs appear in BOTH arrays (since the user self-issues them) — the `RecentCertificates` component dedupes by id.
+
+6. **AppShell URL sync**: uses `replaceState` (not `pushState`) per spec. Browser back/forward will NOT navigate between views — that's intentional. The watch-view `useEffect` runs on every view change including indirect ones (e.g. `setActiveConversation(null)` which sets view to "chat" via the store).

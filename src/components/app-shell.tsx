@@ -77,6 +77,36 @@ export function AppShell() {
   const [authOpen, setAuthOpen] = React.useState(false);
   const [profileOpen, setProfileOpen] = React.useState(false);
 
+  // --- URL ?view= sync ---
+  // On mount: parse ?view= from URL, validate against NAV_ITEMS, set if valid.
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const v = params.get("view");
+    if (!v) return;
+    const valid = NAV_ITEMS.find((n) => n.view === v);
+    if (valid && v !== view) {
+      setView(v as AppView);
+    }
+    // Empty deps — only run on mount.
+  }, []);
+
+  // Whenever view changes, update URL via replaceState (no history pollution).
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", view);
+    window.history.replaceState({}, "", url.toString());
+  }, [view]);
+
+  // Wrapper that any code in this component should use for view changes.
+  const handleSetView = React.useCallback(
+    (v: AppView) => {
+      setView(v);
+    },
+    [setView],
+  );
+
   const visibleNav = NAV_ITEMS.filter((item) => {
     if (item.resellerOnly && user?.role !== "reseller" && user?.role !== "admin") return false;
     if (item.adminOnly && user?.role !== "admin") return false;
@@ -88,13 +118,13 @@ export function AppShell() {
       setAuthOpen(true);
       return;
     }
-    setView(item.view);
+    handleSetView(item.view);
     if (window.innerWidth < 1024) setSidebarOpen(false);
   }
 
   function handleNewChat() {
     if (!user) { setAuthOpen(true); return; }
-    setView("chat");
+    handleSetView("chat");
     // The ChatView watches activeConversationId; setting null triggers a new conversation
     useStore.getState().setActiveConversation(null);
     if (window.innerWidth < 1024) setSidebarOpen(false);

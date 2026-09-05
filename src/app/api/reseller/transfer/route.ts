@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireReseller } from "@/lib/auth";
+import { withAuth } from "@/lib/api-handler";
 import { db } from "@/lib/db";
 import { resellerTransfer } from "@/lib/luck";
 
@@ -7,7 +8,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /** Reseller transfers Luck from their pool to a recipient user's balance. */
-export async function POST(req: NextRequest) {
+export const POST = withAuth(async (req: NextRequest) => {
   const reseller = await requireReseller();
   const { toEmail, amount, saleMmk, note } = await req.json();
   if (!toEmail || !amount || amount <= 0) {
@@ -31,5 +32,18 @@ export async function POST(req: NextRequest) {
     };
     return NextResponse.json({ error: msgs[result.reason ?? ""] ?? "Transfer failed." }, { status: 400 });
   }
+
+  // Increment lifetime reseller MMK counter for revenue tracking (additive only)
+  if (typeof saleMmk === "number" && saleMmk > 0) {
+    try {
+      await db.user.update({
+        where: { id: reseller.id },
+        data: { lifetimeResellerMmk: { increment: saleMmk } },
+      });
+    } catch (e) {
+      console.error("[reseller/transfer] failed to update lifetimeResellerMmk:", e);
+    }
+  }
+
   return NextResponse.json({ ok: true, transferred: amount, to: recipient.email });
-}
+});

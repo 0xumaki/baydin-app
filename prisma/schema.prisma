@@ -47,6 +47,14 @@ model User {
   resellerTier   String?   @map("reseller_tier") // bronze|silver|gold|platinum
   resellerSince  DateTime? @map("reseller_since")
   resellerPool   Int       @default(0) @map("reseller_pool") // sellable inventory (wholesale Luck)
+  // Admin-granted special rank
+  specialRank        String?    @map("special_rank")
+  specialRankSince   DateTime?  @map("special_rank_since")
+  stipendLuck        Int        @default(0) @map("stipend_luck")
+  stipendLastAt      DateTime?  @map("stipend_last_at")
+  // Denormalized lifetime counters
+  lifetimeMmkSpent    Int      @default(0) @map("lifetime_mmk_spent")
+  lifetimeResellerMmk Int      @default(0) @map("lifetime_reseller_mmk")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
@@ -65,6 +73,13 @@ model User {
   compatibilityReadings CompatibilityReading[]
   numerologyReadings NumerologyReading[]
   dreamJournals   DreamJournal[]
+
+  // Reverse relations for certificates, leaderboards, referral earnings
+  issuedCertificates    ResellerCertificate[] @relation("IssuedCertificates")
+  issuedByCertificates  ResellerCertificate[] @relation("IssuedBy")
+  generatedLeaderboards LeaderboardSnapshot[] @relation("GeneratedLeaderboards")
+  referrerEarnings      ReferralEarning[]     @relation("ReferrerEarnings")
+  refereeEarnings       ReferralEarning[]     @relation("RefereeEarnings")
 
   @@index([referredById])
   @@index([role])
@@ -412,4 +427,102 @@ model HoroscopeCache {
   createdAt   DateTime @default(now()) @map("created_at")
   @@unique([sign, type, dateStr, language, personalized])
   @@map("horoscope_cache")
+}
+
+// ============================================================
+// SEASONAL CAMPAIGNS — admin-defined temporary tier overrides
+// ============================================================
+
+model SeasonalCampaign {
+  id                  String   @id @default(cuid())
+  name                String
+  kind                String   // "user" | "reseller"
+  tierId              String  @map("tier_id")
+  mmkOverride         Int?    @map("mmk_override")
+  bonusPctOverride    Int?    @map("bonus_pct_override")
+  validFrom           DateTime @map("valid_from")
+  validUntil          DateTime @map("valid_until")
+  active              Boolean  @default(true)
+  description         String?
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  @@index([kind, active, validFrom])
+  @@map("seasonal_campaigns")
+}
+
+model ResellerCertificate {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  user              User     @relation("IssuedCertificates", fields: [userId], references: [id], onDelete: Cascade)
+  tier              String
+  kind              String   // "promotion" | "tier_upgrade" | "welcome"
+  issuedById        String   @map("issued_by_id")
+  issuedBy          User     @relation("IssuedBy", fields: [issuedById], references: [id])
+  brandedImageSvg   String   @map("branded_image_svg")
+  campaignId        String?  @map("campaign_id")
+  metadata          String?
+  createdAt         DateTime @default(now()) @map("created_at")
+  @@index([userId, createdAt])
+  @@index([issuedById])
+  @@map("reseller_certificates")
+}
+
+model LeaderboardSnapshot {
+  id              String   @id @default(cuid())
+  kind            String
+  topN            Int      @map("top_n")
+  metric          String
+  generatedById   String   @map("generated_by_id")
+  generatedBy     User     @relation("GeneratedLeaderboards", fields: [generatedById], references: [id])
+  payloadJson     String   @map("payload_json")
+  createdAt       DateTime @default(now()) @map("created_at")
+  @@index([kind, createdAt])
+  @@map("leaderboard_snapshots")
+}
+
+model ReferralEarning {
+  id                      String   @id @default(cuid())
+  referrerId              String   @map("referrer_id")
+  referrer                User     @relation("ReferrerEarnings", fields: [referrerId], references: [id], onDelete: Cascade)
+  refereeId               String   @map("referee_id")
+  referee                 User     @relation("RefereeEarnings", fields: [refereeId], references: [id], onDelete: Cascade)
+  signupBonusLuck         Int      @default(0) @map("signup_bonus_luck")
+  firstPurchaseBonusLuck  Int      @default(0) @map("first_purchase_bonus_luck")
+  firstPurchaseMmk        Int?     @map("first_purchase_mmk")
+  firstPurchaseAt         DateTime? @map("first_purchase_at")
+  totalLuck               Int      @default(0) @map("total_luck")
+  createdAt               DateTime @default(now()) @map("created_at")
+  @@unique([referrerId, refereeId])
+  @@index([referrerId, createdAt])
+  @@map("referral_earnings")
+}
+
+model LuckTierOverride {
+  id          String   @id @default(cuid())
+  tierId      String   @unique @map("tier_id")
+  mmkOverride Int?     @map("mmk_override")
+  luckOverride Int?    @map("luck_override")
+  bonusPctOverride Int? @map("bonus_pct_override")
+  taglineOverride String? @map("tagline_override")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  @@map("luck_tier_overrides")
+}
+
+model LuckTierCustom {
+  id          String   @id @default(cuid())
+  tierId      String   @unique @map("tier_id")
+  name        String
+  kind        String   // "regular" | "reseller"
+  mmk         Int
+  luck        Int
+  bonusPct    Int      @map("bonus_pct")
+  tagline     String?
+  popular     Boolean  @default(false)
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(100) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  @@map("luck_tier_custom")
 }

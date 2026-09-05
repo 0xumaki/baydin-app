@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
+import { withAuth } from "@/lib/api-handler";
 import { db } from "@/lib/db";
 import { creditLuck } from "@/lib/luck";
 
@@ -7,7 +8,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /** Admin grants Luck to any user. */
-export async function POST(req: NextRequest) {
+export const POST = withAuth(async (req: NextRequest) => {
   const admin = await requireAdmin();
   const { userEmail, amount, description } = await req.json();
   if (!userEmail || !amount) {
@@ -22,4 +23,4 @@ export async function POST(req: NextRequest) {
     description: description ?? `Admin grant by ${admin.email}`,
   });
   return NextResponse.json({ ok: true, user: target.email, newBalance: balance });
-}
+});

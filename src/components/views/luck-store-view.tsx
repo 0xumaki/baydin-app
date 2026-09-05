@@ -5,10 +5,69 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useMe, api } from "@/lib/api-client";
 import { useT } from "@/lib/use-t";
-import { Wallet, Check, Gift, Moon, Star, Sparkles, Heart, Hash } from "lucide-react";
+import { GlowPill } from "@/components/lumina/premium-ui";
+import { Wallet, Check, Gift, Moon, Star, Sparkles, Heart, Hash, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+// ============================================================
+// Campaign helpers (client-side)
+// ============================================================
+
+type Campaign = {
+  id: string;
+  name: string;
+  kind: "user" | "reseller";
+  tierId: string;
+  mmkOverride?: number | null;
+  bonusPctOverride?: number | null;
+  validFrom?: string | null;
+  validUntil?: string | null;
+};
+
+/** Returns the days remaining until a campaign's validUntil date
+ *  (negative if already expired, 0 if same-day). */
+function daysUntilExpiry(validUntil: string | null | undefined): number | null {
+  if (!validUntil) return null;
+  const end = new Date(validUntil).getTime();
+  if (Number.isNaN(end)) return null;
+  const now = Date.now();
+  return Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+}
+
+function formatExpiryDate(validUntil: string | null | undefined): string {
+  if (!validUntil) return "";
+  try {
+    return new Date(validUntil).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return String(validUntil);
+  }
+}
+
+/** Find the active campaign for a tier (looking it up in the top-level
+ *  campaigns list, since the per-tier `campaign` object only has id/name/kind). */
+function findCampaignForTier(
+  tier: any,
+  campaigns: Campaign[] | undefined,
+): Campaign | null {
+  if (!campaigns || campaigns.length === 0) return null;
+  // Per-tier campaign object from /api/luck/tiers has { id, name, kind }.
+  const campaignId = tier?.campaign?.id;
+  if (campaignId) {
+    const c = campaigns.find((cc) => cc.id === campaignId);
+    if (c) return c;
+  }
+  // Fallback: match by tierId + kind.
+  const kind = tier?.kind === "reseller" ? "reseller" : "user";
+  return campaigns.find(
+    (c) => c.tierId === tier.id && c.kind === kind,
+  ) ?? null;
+}
 
 const PAYMENT_METHODS = [
   { id: "kbz", name: "KBZ Pay" },
@@ -40,7 +99,7 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
   const user = data?.user;
   const qc = useQueryClient();
   const t = useT();
-  const [tiers, setTiers] = React.useState<{ regular: any[]; reseller: any[] | null }>({ regular: [], reseller: null });
+  const [tiers, setTiers] = React.useState<{ regular: any[]; reseller: any[] | null; campaigns?: Campaign[] }>({ regular: [], reseller: null });
   const [selected, setSelected] = React.useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = React.useState("kbz");
   const [paymentRef, setPaymentRef] = React.useState("");
@@ -170,7 +229,13 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
           <div className="text-[12px] text-[#6B6358] font-medium mb-5">{t("luck_packs")}</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#2A2722] border border-[#2A2722]">
             {tiers.regular.map((tier) => (
-              <TierCard key={tier.id} tier={tier} selected={selected === tier.id} onSelect={() => setSelected(selected === tier.id ? null : tier.id)} />
+              <TierCard
+                key={tier.id}
+                tier={tier}
+                campaign={findCampaignForTier(tier, tiers.campaigns)}
+                selected={selected === tier.id}
+                onSelect={() => setSelected(selected === tier.id ? null : tier.id)}
+              />
             ))}
           </div>
         </div>
@@ -181,14 +246,25 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
             <div className="text-[12px] text-[#6B6358] font-medium mb-4">Reseller packs (whitelisted)</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[#2A2722] border border-[#2A2722]">
               {tiers.reseller.map((tier) => (
-                <TierCard key={tier.id} tier={tier} selected={selected === tier.id} onSelect={() => setSelected(selected === tier.id ? null : tier.id)} reseller />
+                <TierCard
+                  key={tier.id}
+                  tier={tier}
+                  campaign={findCampaignForTier(tier, tiers.campaigns)}
+                  selected={selected === tier.id}
+                  onSelect={() => setSelected(selected === tier.id ? null : tier.id)}
+                  reseller
+                />
               ))}
             </div>
           </div>
         )}
 
         {/* Payment panel */}
-        {selectedTier && (
+        {selectedTier && (() => {
+          const selectedCampaign = findCampaignForTier(selectedTier, tiers.campaigns);
+          const expiryDays = daysUntilExpiry(selectedCampaign?.validUntil);
+          const expiringSoon = expiryDays !== null && expiryDays >= 0 && expiryDays <= 3;
+          return (
           <div className="p-6 border border-[#2A2722] mb-10">
             <div className="text-[12px] text-[#6B6358] mb-2">Complete your purchase</div>
             <div className="serif-display text-[1.5rem] text-[#E8E2D5] mb-1">{selectedTier.name}</div>
@@ -198,6 +274,46 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
               <span className="text-[13px] text-[#6B6358]">·</span>
               <span className="text-[13px] text-[#9C9489] tabular-nums">{selectedTier.mmk.toLocaleString()} MMK</span>
             </div>
+
+            {/* Campaign info banner */}
+            {selectedCampaign && (
+              <div
+                className={cn(
+                  "mb-5 p-3 rounded-sm border flex items-start gap-2.5",
+                  expiringSoon
+                    ? "border-[#D8788A]/40 bg-[#D8788A]/5"
+                    : "border-[#C5A572]/30 bg-[#C5A572]/5",
+                )}
+              >
+                <CalendarClock
+                  className={cn(
+                    "w-4 h-4 shrink-0 mt-0.5",
+                    expiringSoon ? "text-[#D8788A]" : "text-[#C5A572]",
+                  )}
+                />
+                <div className="min-w-0">
+                  <div className={cn("text-[12px] font-medium", expiringSoon ? "text-[#D8788A]" : "text-[#C5A572]")}>
+                    ✦ {selectedCampaign.name}
+                  </div>
+                  <div className="text-[11px] text-[#9C9489] mt-0.5 leading-relaxed">
+                    {selectedCampaign.bonusPctOverride != null && (
+                      <>Bonus boosted to {selectedTier.bonusPct}%. {""}</>
+                    )}
+                    {selectedCampaign.mmkOverride != null && (
+                      <>Price overridden to {selectedTier.mmk.toLocaleString()} MMK. {""}</>
+                    )}
+                    {selectedCampaign.validUntil && (
+                      <span className={expiringSoon ? "text-[#D8788A]" : ""}>
+                        Campaign valid until {formatExpiryDate(selectedCampaign.validUntil)}
+                        {expiryDays !== null && expiryDays >= 0 && expiryDays <= 3
+                          ? ` · only ${expiryDays} day${expiryDays === 1 ? "" : "s"} left!`
+                          : ""}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-4">
               <div>
@@ -240,7 +356,8 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
               </button>
             </div>
           </div>
-        )}
+          );
+        })}
       </div>
     </div>
   );
@@ -257,7 +374,22 @@ function EarnMethod({ icon: Icon, title, body, cta }: { icon: any; title: string
   );
 }
 
-function TierCard({ tier, selected, onSelect, reseller }: { tier: any; selected: boolean; onSelect: () => void; reseller?: boolean }) {
+function TierCard({
+  tier,
+  campaign,
+  selected,
+  onSelect,
+  reseller,
+}: {
+  tier: any;
+  campaign: Campaign | null;
+  selected: boolean;
+  onSelect: () => void;
+  reseller?: boolean;
+}) {
+  const hasCampaign = !!campaign;
+  const expiryDays = daysUntilExpiry(campaign?.validUntil);
+  const expiringSoon = expiryDays !== null && expiryDays >= 0 && expiryDays <= 3;
   return (
     <button
       onClick={onSelect}
@@ -266,22 +398,47 @@ function TierCard({ tier, selected, onSelect, reseller }: { tier: any; selected:
         selected ? "bg-[#1A1714]" : "hover:bg-[#0F0D0B]"
       )}
     >
+      {/* Campaign pill — top-left */}
+      {hasCampaign && (
+        <div className="absolute top-3 left-3 z-10">
+          <GlowPill color="#C5A572" className="text-[9px]">✦ {campaign!.name}</GlowPill>
+        </div>
+      )}
       {tier.popular && (
         <div className="absolute top-3 right-3 text-[10px] text-[#C5A572] serif-italic">popular</div>
       )}
       {reseller && (
         <div className="absolute top-3 right-3 text-[10px] text-[#6B6358] serif-italic">wholesale</div>
       )}
-      <div className="text-[14px] text-[#E8E2D5] font-medium mb-3">{tier.name}</div>
+      <div className={cn("text-[14px] text-[#E8E2D5] font-medium mb-3", hasCampaign && "mt-6")}>{tier.name}</div>
       <div className="flex items-baseline gap-1.5 mb-1">
         <span className="serif-display text-[2rem] text-[#C5A572] tabular-nums leading-none">{tier.total}</span>
         <span className="text-[12px] text-[#6B6358]">Luck</span>
       </div>
       {tier.bonus > 0 && (
-        <div className="text-[11px] text-[#9C9489] mb-2 serif-italic">+{tier.bonusPct}% bonus</div>
+        <div className="text-[11px] text-[#9C9489] mb-2 serif-italic">
+          +{tier.bonusPct}% bonus {hasCampaign ? "✦" : ""}
+          {hasCampaign && (
+            <span className="block text-[9px] text-[#6B6358] not-italic">incl. campaign bonus</span>
+          )}
+        </div>
       )}
       <div className="text-[13px] text-[#9C9489] tabular-nums mb-1">{tier.mmk.toLocaleString()} MMK</div>
       <div className="text-[11px] text-[#6B6358] leading-[1.5] mt-2">{tier.tagline}</div>
+      {/* Campaign valid-until footnote */}
+      {hasCampaign && campaign!.validUntil && (
+        <div
+          className={cn(
+            "text-[10px] mt-2 leading-tight",
+            expiringSoon ? "text-[#D8788A]" : "text-[#9C9489]"
+          )}
+        >
+          Campaign valid until {formatExpiryDate(campaign!.validUntil)}
+          {expiryDays !== null && expiryDays >= 0 && expiryDays <= 3
+            ? ` · ${expiryDays}d left`
+            : ""}
+        </div>
+      )}
       {selected && (
         <div className="absolute bottom-3 right-3 w-5 h-5 rounded-full bg-[#C5A572] flex items-center justify-center">
           <Check className="w-3 h-3 text-[#0A0908]" />

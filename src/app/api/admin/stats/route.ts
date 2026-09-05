@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
+import { withAuth } from "@/lib/api-handler";
 import { db } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export const GET = withAuth(async () => {
   await requireAdmin();
   const [totalUsers, totalPurchases, totalMmk, totalLuckSold, totalLuckSpent] = await Promise.all([
     db.user.count(),
@@ -25,4 +26,4 @@ export async function GET() {
       totalLuckSpent: Math.abs(totalLuckSpent._sum.amount ?? 0),
     },
   });
-}
+});

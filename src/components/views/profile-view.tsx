@@ -2,6 +2,10 @@
 
 import * as React from "react";
 import { GlassCard, GoldButton, Pill, SectionTitle, ShellCard } from "@/components/lumina/primitives";
+import { ShimmerButton, AuroraGlowCard, GlowPill, NumberTicker } from "@/components/lumina/premium-ui";
+import { BrandedImageCard, brandedFilename } from "@/components/branded-image";
+import { useBrandedImageDownload } from "@/lib/use-branded-image-download";
+import { CloverIcon } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -9,7 +13,7 @@ import { toast } from "sonner";
 import {
   BarChart3, Sparkles, MessageCircle, Moon, Target, Flame, Wallet,
   Star, Heart, TrendingUp, Calendar, Award, Zap, Gift, Users, BookOpen, Lock,
-  Download, Trash2, X, AlertTriangle, Bookmark,
+  Download, Trash2, X, AlertTriangle, Bookmark, Copy, Share2, UserPlus,
 } from "lucide-react";
 import { ACHIEVEMENTS, evaluateAchievements, tierColor } from "@/lib/achievements";
 import { Input } from "@/components/ui/input";
@@ -189,6 +193,9 @@ export function ProfileView({ onAuth }: { onAuth: () => void }) {
             })}
           </div>
         </GlassCard>
+
+        {/* Referral earnings card */}
+        <ReferralEarningsCard user={user} />
 
         {/* Saved insights (bookmarked deep readings) */}
         <SavedInsights />
@@ -392,5 +399,279 @@ function SavedInsights() {
         })}
       </div>
     </GlassCard>
+  );
+}
+
+// ============================================================
+// ReferralEarningsCard — fetches GET /api/referral/earnings and
+// shows 4 stat cards, a 6-month SVG bar chart (gold gradient),
+// top-5 referees list, referral code with Copy + Share buttons,
+// and a "Download Referral Card" ShimmerButton.
+// ============================================================
+
+function ReferralEarningsCard({ user }: { user: any }) {
+  const [data, setData] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+  const { download, downloading } = useBrandedImageDownload();
+  const hiddenCardRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    api<any>("/api/referral/earnings")
+      .then((d) => { if (!cancelled) setData(d); })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const monthly = React.useMemo(() => {
+    const map = new Map<string, { luck: number; referrals: number }>();
+    const now = new Date();
+    // Pre-fill the last 6 months (including current month)
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      map.set(k, { luck: 0, referrals: 0 });
+    }
+    for (const r of data?.referrals ?? []) {
+      const d = new Date(r.createdAt);
+      const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const cur = map.get(k);
+      if (cur) {
+        cur.luck += (r.totalLuck ?? 0);
+        cur.referrals += 1;
+      }
+    }
+    return Array.from(map.entries()).map(([k, v]) => {
+      const [y, m] = k.split("-");
+      const label = new Date(Number(y), Number(m) - 1, 1).toLocaleString("en-US", { month: "short" });
+      return { key: k, label, ...v };
+    });
+  }, [data]);
+
+  if (loading) return null;
+
+  const stats = data?.stats ?? {
+    totalReferrals: 0,
+    totalLuckEarned: 0,
+    signupBonusTotal: 0,
+    firstPurchaseBonusTotal: 0,
+  };
+  const referrals = (data?.referrals ?? []).slice(0, 5);
+  const referralCode = data?.referralCode ?? user?.referralCode ?? "";
+  const shareUrl = data?.shareCard?.url ?? `${window.location.origin}/?ref=${referralCode}`;
+  const shareText = data?.shareCard?.text ?? `Join me on Baydin — get free Luck on signup with my code: ${referralCode}`;
+  const signupBonusLuck = 5; // SIGNUP_BONUS constant for the share card
+
+  async function copyCode() {
+    try {
+      await navigator.clipboard.writeText(referralCode);
+      toast.success("Referral code copied");
+    } catch { toast.error("Could not copy code"); }
+  }
+
+  async function shareLink() {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Baydin", text: shareText, url: shareUrl });
+      } catch { /* user dismissed */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Referral link copied");
+      } catch { toast.error("Could not copy link"); }
+    }
+  }
+
+  async function downloadCard() {
+    if (!hiddenCardRef.current) return;
+    await download(hiddenCardRef.current, brandedFilename("referral-share"));
+  }
+
+  return (
+    <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-5 mb-5">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <UserPlus className="w-4 h-4 text-[#C5A572]" />
+          <span className="text-[13px] text-[#E8E2D5] font-medium">Referral earnings</span>
+        </div>
+        <GlowPill color="#C5A572">{referralCode}</GlowPill>
+      </div>
+
+      {/* 4 stat cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
+        <RefStatCard label="Total referees" value={stats.totalReferrals ?? 0} />
+        <RefStatCard label="Luck earned" value={stats.totalLuckEarned ?? 0} icon={<CloverIcon className="w-3 h-3" aria-label="Luck" />} />
+        <RefStatCard label="Signup bonus" value={stats.signupBonusTotal ?? 0} icon={<CloverIcon className="w-3 h-3" aria-label="Luck" />} />
+        <RefStatCard label="First-purchase bonus" value={stats.firstPurchaseBonusTotal ?? 0} icon={<CloverIcon className="w-3 h-3" aria-label="Luck" />} />
+      </div>
+
+      {/* 6-month monthly bar chart */}
+      <div className="mb-5">
+        <div className="text-[11px] text-[#9C9489] mb-2">Luck earned — last 6 months</div>
+        <ReferralBarChart data={monthly} />
+      </div>
+
+      {/* Top referees */}
+      {referrals.length > 0 && (
+        <div className="mb-5">
+          <div className="text-[11px] text-[#9C9489] mb-2">Top referees</div>
+          <div className="space-y-1.5">
+            {referrals.map((r: any, i: number) => (
+              <div
+                key={r.id}
+                className="flex items-center justify-between py-1.5 border-b border-[#2A2722] last:border-0 text-[12px]"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[10px] text-[#6B6358] w-4">{i + 1}</span>
+                  <span className="text-[#E8E2D5] truncate">
+                    {r.referee?.name || r.referee?.email || "—"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[#C5A572] tabular-nums flex items-center gap-1">
+                    <CloverIcon className="w-3 h-3" aria-label="Luck" />
+                    {r.totalLuck ?? 0}
+                  </span>
+                  <span className="text-[10px] text-[#9C9489]">
+                    {new Date(r.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Referral code + actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-sm border border-[#2A2722] bg-[#0F0D0B]">
+        <div className="flex-1 min-w-0">
+          <div className="text-[10px] text-[#9C9489] mb-1 uppercase tracking-wide">Your referral code</div>
+          <div className="serif-display text-[1.25rem] text-[#C5A572] tabular-nums tracking-[0.2em]">
+            {referralCode}
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={copyCode}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-sm text-[12px] border border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#4A4540] transition"
+          >
+            <Copy className="w-3.5 h-3.5" /> Copy code
+          </button>
+          <button
+            onClick={shareLink}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-sm text-[12px] border border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#4A4540] transition"
+          >
+            <Share2 className="w-3.5 h-3.5" /> Share
+          </button>
+          <ShimmerButton tone="gold" onClick={downloadCard} disabled={downloading} className="px-3 py-2 text-[12px]">
+            <Download className="w-3.5 h-3.5" />
+            {downloading ? "Preparing…" : "Download Referral Card"}
+          </ShimmerButton>
+        </div>
+      </div>
+
+      {/* Hidden BrandedImageCard mount for PNG download */}
+      <div
+        ref={hiddenCardRef}
+        aria-hidden
+        style={{
+          position: "fixed",
+          left: -99999,
+          top: 0,
+          pointerEvents: "none",
+          opacity: 0,
+        }}
+      >
+        <BrandedImageCard
+          variant="referral-share"
+          referral={{
+            userName: user?.name ?? null,
+            userEmail: user?.email ?? "",
+            referralCode,
+            signupBonusLuck,
+            referralUrl: shareUrl,
+          }}
+        />
+      </div>
+    </AuroraGlowCard>
+  );
+}
+
+function RefStatCard({ label, value, icon }: { label: string; value: number; icon?: React.ReactNode }) {
+  return (
+    <div className="p-3 rounded-sm border border-[#2A2722] bg-[#0F0D0B] text-center">
+      <div className="text-[18px] font-light text-[#E8E2D5] leading-none flex items-center justify-center gap-1">
+        {icon}
+        <NumberTicker value={value} className="tabular-nums" />
+      </div>
+      <div className="text-[9px] text-[#9C9489] mt-1 leading-tight">{label}</div>
+    </div>
+  );
+}
+
+function ReferralBarChart({ data }: { data: { key: string; label: string; luck: number; referrals: number }[] }) {
+  const max = Math.max(1, ...data.map((d) => d.luck));
+  const W = 100; // viewBox width per bar slot
+  const H = 80;  // viewBox height
+  const barW = 36;
+  const gap = (W * data.length - barW * data.length) / (data.length + 1);
+  return (
+    <svg
+      viewBox={`0 0 ${W * data.length} ${H + 18}`}
+      className="w-full h-24"
+      role="img"
+      aria-label="Luck earned per month over the last 6 months"
+    >
+      <defs>
+        <linearGradient id="ref-bar-gold" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#E7D2A8" />
+          <stop offset="60%" stopColor="#C5A87C" />
+          <stop offset="100%" stopColor="#9C7F54" />
+        </linearGradient>
+      </defs>
+      {/* baseline */}
+      <line x1="0" y1={H} x2={W * data.length} y2={H} stroke="#2A2722" strokeWidth="0.5" />
+      {data.map((d, i) => {
+        const h = (d.luck / max) * (H - 8);
+        const x = gap + i * (barW + gap);
+        const y = H - h;
+        return (
+          <g key={d.key}>
+            <rect
+              x={x}
+              y={y}
+              width={barW}
+              height={Math.max(0.5, h)}
+              rx="1.5"
+              fill="url(#ref-bar-gold)"
+              opacity={d.luck > 0 ? 1 : 0.18}
+            />
+            {d.luck > 0 && (
+              <text
+                x={x + barW / 2}
+                y={y - 3}
+                textAnchor="middle"
+                fontSize="9"
+                fill="#E8E2D5"
+                fontFamily="Inter, Arial, sans-serif"
+              >
+                {d.luck}
+              </text>
+            )}
+            <text
+              x={x + barW / 2}
+              y={H + 12}
+              textAnchor="middle"
+              fontSize="9"
+              fill="#9C9489"
+              fontFamily="Inter, Arial, sans-serif"
+            >
+              {d.label}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
   );
 }

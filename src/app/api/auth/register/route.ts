@@ -90,6 +90,27 @@ export async function POST(req: NextRequest) {
         type: "referral_bonus",
         description: `Referral bonus — ${user.email} joined with your code`,
       });
+      // Upsert ReferralEarning so future first-purchase attribution has a row
+      try {
+        await db.referralEarning.create({
+          data: {
+            referrerId,
+            refereeId: user.id,
+            signupBonusLuck: REFERRAL_BONUS,
+            totalLuck: REFERRAL_BONUS,
+          },
+        });
+      } catch (e: any) {
+        // If the row already exists (shouldn't for a brand-new user), fall back to update
+        if (e?.code === "P2002") {
+          await db.referralEarning.update({
+            where: { referrerId_refereeId: { referrerId, refereeId: user.id } },
+            data: { signupBonusLuck: { increment: REFERRAL_BONUS }, totalLuck: { increment: REFERRAL_BONUS } },
+          });
+        } else {
+          console.error("[register] ReferralEarning upsert failed:", e);
+        }
+      }
     }
 
     await createSession(user.id);

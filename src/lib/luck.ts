@@ -30,145 +30,296 @@ export type LuckTier = {
   tagline: string;
 };
 
+/** Build a tier with computed bonus/total/perLuck from mmk + luck + bonusPct. */
+function makeTier(t: Omit<LuckTier, "bonus" | "total" | "perLuck">): LuckTier {
+  const bonus = Math.round((t.luck * t.bonusPct) / 100);
+  const total = t.luck + bonus;
+  const perLuck = total > 0 ? Math.round((t.mmk / total) * 100) / 100 : 0;
+  return { ...t, bonus, total, perLuck };
+}
+
 export const LUCK_TIERS: LuckTier[] = [
-  {
+  makeTier({
     id: "spark",
     name: "Spark",
     mmk: 5000,
     luck: 50,
     bonusPct: 0,
-    bonus: 0,
-    total: 50,
-    perLuck: 100,
     kind: "regular",
     tagline: "Try the stars — a single reading or a week of daily guidance.",
-  },
-  {
+  }),
+  makeTier({
     id: "basic",
     name: "Basic",
     mmk: 10000,
     luck: 100,
-    bonusPct: 10,
-    bonus: 10,
-    total: 110,
-    perLuck: 91,
+    bonusPct: 5,
     kind: "regular",
-    tagline: "10% bonus — a few deep consultations with the astrologer.",
-  },
-  {
+    tagline: "5% bonus — a few deep consultations with the astrologer.",
+  }),
+  makeTier({
     id: "popular",
     name: "Seeker",
     mmk: 25000,
     luck: 250,
-    bonusPct: 20,
-    bonus: 50,
-    total: 300,
-    perLuck: 83,
+    bonusPct: 10,
     kind: "regular",
     popular: true,
-    tagline: "20% bonus — the sweet spot for regular spiritual practice.",
-  },
-  {
+    tagline: "10% bonus — the sweet spot for regular spiritual practice.",
+  }),
+  makeTier({
     id: "value",
     name: "Adept",
     mmk: 50000,
     luck: 500,
-    bonusPct: 30,
-    bonus: 150,
-    total: 650,
-    perLuck: 77,
+    bonusPct: 15,
     kind: "regular",
-    tagline: "30% bonus — daily horoscopes + monthly life reports.",
-  },
-  {
+    tagline: "15% bonus — daily horoscopes + monthly life reports.",
+  }),
+  makeTier({
     id: "premium",
     name: "Sage",
     mmk: 100000,
     luck: 1000,
-    bonusPct: 40,
-    bonus: 400,
-    total: 1400,
-    perLuck: 71,
+    bonusPct: 20,
     kind: "regular",
-    tagline: "40% bonus — for the devoted seeker. Deep weekly consultations.",
-  },
-  {
+    tagline: "20% bonus — for the devoted seeker. Deep weekly consultations.",
+  }),
+  makeTier({
     id: "luminary",
     name: "Luminary",
     mmk: 150000,
     luck: 1500,
-    bonusPct: 50,
-    bonus: 750,
-    total: 2250,
-    perLuck: 67,
+    bonusPct: 25,
     kind: "regular",
-    tagline: "50% bonus — unlimited access. Best per-Luck value.",
-  },
+    tagline: "25% bonus — best per-Luck value for high-volume seekers.",
+  }),
 ];
 
 export const RESELLER_TIERS: LuckTier[] = [
-  {
+  makeTier({
     id: "reseller_bronze",
     name: "Reseller · Bronze",
     mmk: 50000,
     luck: 500,
-    bonusPct: 50,
-    bonus: 250,
-    total: 750,
-    perLuck: 67,
+    bonusPct: 30,
     kind: "reseller",
     allocationTarget: "pool",
     minMmk: 50000,
-    tagline: "Wholesale entry — 50% bonus. Resell at your own price.",
-  },
-  {
+    tagline: "Wholesale entry — 30% bonus. Resell at your own price.",
+  }),
+  makeTier({
     id: "reseller_silver",
     name: "Reseller · Silver",
     mmk: 100000,
     luck: 1000,
-    bonusPct: 60,
-    bonus: 600,
-    total: 1600,
-    perLuck: 63,
+    bonusPct: 36,
     kind: "reseller",
     allocationTarget: "pool",
     minMmk: 50000,
-    tagline: "60% bonus — better margin for active resellers.",
-  },
-  {
+    tagline: "36% bonus — better margin for active resellers.",
+  }),
+  makeTier({
     id: "reseller_gold",
     name: "Reseller · Gold",
     mmk: 250000,
     luck: 2500,
-    bonusPct: 80,
-    bonus: 2000,
-    total: 4500,
-    perLuck: 56,
+    bonusPct: 42,
     kind: "reseller",
     allocationTarget: "pool",
     minMmk: 50000,
-    tagline: "80% bonus — high-volume wholesale tier.",
-  },
-  {
+    tagline: "42% bonus — high-volume wholesale tier.",
+  }),
+  makeTier({
     id: "reseller_platinum",
     name: "Reseller · Platinum",
     mmk: 500000,
     luck: 5000,
-    bonusPct: 100,
-    bonus: 5000,
-    total: 10000,
-    perLuck: 50,
+    bonusPct: 48,
     kind: "reseller",
     allocationTarget: "pool",
     minMmk: 50000,
-    tagline: "100% bonus — the best wholesale rate. Double your inventory.",
-  },
+    tagline: "48% bonus — strong wholesale rate.",
+  }),
+  makeTier({
+    id: "reseller_diamond",
+    name: "Reseller · Diamond",
+    mmk: 1000000,
+    luck: 10000,
+    bonusPct: 54,
+    kind: "reseller",
+    allocationTarget: "pool",
+    minMmk: 50000,
+    tagline: "54% bonus — premium wholesale tier.",
+  }),
+  makeTier({
+    id: "reseller_elite",
+    name: "Reseller · Elite",
+    mmk: 2000000,
+    luck: 20000,
+    bonusPct: 54,
+    kind: "reseller",
+    allocationTarget: "pool",
+    minMmk: 50000,
+    tagline: "54% bonus — elite wholesale tier for proven partners.",
+  }),
+  makeTier({
+    id: "reseller_legend",
+    name: "Reseller · Legend",
+    mmk: 5000000,
+    luck: 50000,
+    bonusPct: 54,
+    kind: "reseller",
+    allocationTarget: "pool",
+    minMmk: 50000,
+    tagline: "54% bonus — legend tier, the highest wholesale volume.",
+  }),
 ];
 
 export const ALL_TIERS = [...LUCK_TIERS, ...RESELLER_TIERS];
 
 export function getTier(id: string): LuckTier | undefined {
   return ALL_TIERS.find((t) => t.id === id);
+}
+
+// ============================================================
+// SPECIAL RANKS — admin-granted per-user bonus + Luck stipend
+// ============================================================
+
+export type SpecialRank = "vip" | "ambassador" | "partner";
+
+export const SPECIAL_RANKS = [
+  {
+    id: "vip" as SpecialRank,
+    name: "VIP",
+    color: "#C5A572",
+    bonusPct: 10,
+    stipendLuck: 5,
+    stipendPeriodDays: 7,
+    description: "VIP buyer — 10% extra bonus + 5 free Luck/week",
+  },
+  {
+    id: "ambassador" as SpecialRank,
+    name: "Ambassador",
+    color: "#9E8AC9",
+    bonusPct: 25,
+    stipendLuck: 10,
+    stipendPeriodDays: 7,
+    description: "Ambassador — 25% extra bonus + 10 free Luck/week",
+  },
+  {
+    id: "partner" as SpecialRank,
+    name: "Partner",
+    color: "#B9F2FF",
+    bonusPct: 50,
+    stipendLuck: 20,
+    stipendPeriodDays: 1,
+    description: "Partner — 50% extra bonus + 20 free Luck/day",
+  },
+];
+
+export function getSpecialRank(rank: string | null | undefined) {
+  if (!rank) return null;
+  return SPECIAL_RANKS.find((r) => r.id === rank) ?? null;
+}
+
+export function specialRankColor(rank: string | null | undefined): string {
+  const r = getSpecialRank(rank);
+  return r?.color ?? "#9CA8A3";
+}
+
+/** Compute how many Luck points are due for a stipend, given the user's
+ *  rank, last stipend timestamp, and current time. Returns 0 if not due. */
+export function computeStipendDue(
+  rank: string | null | undefined,
+  stipendLastAt: Date | string | null,
+  now: Date = new Date(),
+): number {
+  const r = getSpecialRank(rank);
+  if (!r || r.stipendPeriodDays <= 0) return 0;
+  const periodMs = r.stipendPeriodDays * 24 * 60 * 60 * 1000;
+  const last = stipendLastAt ? new Date(stipendLastAt).getTime() : 0;
+  if (now.getTime() - last >= periodMs) {
+    return r.stipendLuck;
+  }
+  return 0;
+}
+
+// ============================================================
+// EFFECTIVE TIERS — merges static config + DB overrides + custom tiers
+// ============================================================
+
+type CachedEffective = {
+  regular: LuckTier[];
+  reseller: LuckTier[];
+  all: LuckTier[];
+  fetchedAt: number;
+};
+
+const EFFECTIVE_CACHE_TTL_MS = 30_000; // 30s in-memory cache
+let effectiveCache: CachedEffective | null = null;
+
+/** Merge static config with DB overrides and custom tiers from the
+ *  LuckTierOverride + LuckTierCustom tables. Returns a fresh array every
+ *  time (no mutation of static LUCK_TIERS / RESELLER_TIERS). */
+export async function getEffectiveTiers(): Promise<{
+  regular: LuckTier[];
+  reseller: LuckTier[];
+  all: LuckTier[];
+}> {
+  if (effectiveCache && Date.now() - effectiveCache.fetchedAt < EFFECTIVE_CACHE_TTL_MS) {
+    return effectiveCache;
+  }
+  try {
+    const [overrides, customs] = await Promise.all([
+      db.luckTierOverride.findMany({ where: { active: true } }),
+      db.luckTierCustom.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } }),
+    ]);
+    const overrideMap = new Map(overrides.map((o) => [o.tierId, o]));
+
+    const applyOverride = (t: LuckTier): LuckTier => {
+      const o = overrideMap.get(t.id);
+      if (!o) return t;
+      const mmk = o.mmkOverride ?? t.mmk;
+      const luck = o.luckOverride ?? t.luck;
+      const bonusPct = o.bonusPctOverride ?? t.bonusPct;
+      const tagline = o.taglineOverride ?? t.tagline;
+      return makeTier({ ...t, mmk, luck, bonusPct, tagline });
+    };
+
+    const regularStatic = LUCK_TIERS.map(applyOverride);
+    const resellerStatic = RESELLER_TIERS.map(applyOverride);
+
+    // Custom tiers (additional to the static list)
+    const customRegular: LuckTier[] = [];
+    const customReseller: LuckTier[] = [];
+    for (const c of customs) {
+      const t = makeTier({
+        id: c.tierId,
+        name: c.name,
+        mmk: c.mmk,
+        luck: c.luck,
+        bonusPct: c.bonusPct,
+        kind: c.kind === "reseller" ? "reseller" : "regular",
+        tagline: c.tagline ?? "",
+        popular: c.popular,
+        allocationTarget: c.kind === "reseller" ? "pool" : undefined,
+        minMmk: c.kind === "reseller" ? 50000 : undefined,
+      });
+      if (c.kind === "reseller") customReseller.push(t);
+      else customRegular.push(t);
+    }
+
+    const regular = [...regularStatic, ...customRegular];
+    const reseller = [...resellerStatic, ...customReseller];
+    const all = [...regular, ...reseller];
+
+    effectiveCache = { regular, reseller, all, fetchedAt: Date.now() };
+    return effectiveCache;
+  } catch (err) {
+    console.error("[getEffectiveTiers] failed, returning static config:", err);
+    return { regular: LUCK_TIERS, reseller: RESELLER_TIERS, all: ALL_TIERS };
+  }
 }
 
 // ============================================================

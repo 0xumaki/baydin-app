@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { requireReseller } from "@/lib/auth";
+import { withAuth } from "@/lib/api-handler";
 import { db } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /** Reseller dashboard: pool balance, recent transfers, allocation history. */
-export async function GET() {
+export const GET = withAuth(async () => {
   const reseller = await requireReseller();
   const [transfersOut, purchases, recipients] = await Promise.all([
     db.luckTransfer.findMany({
@@ -44,4 +45,4 @@ export async function GET() {
       user: recipientUsers.find((u) => u.id === r.toUserId),
     })),
   });
-}
+});

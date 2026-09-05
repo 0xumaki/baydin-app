@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseBirthData, sanitizeString } from "@/lib/validate";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { computeStipendDue, getSpecialRank } from "@/lib/luck";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,10 +10,46 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ user: null }, { status: 200 });
+
+  // Auto-grant special rank stipend if due (idempotent — only fires once per period)
+  let stipendGranted = 0;
+  let newBalance = user.luckBalance;
+  let stipendLastAt = user.stipendLastAt;
+  const due = computeStipendDue(user.specialRank, user.stipendLastAt);
+  if (due > 0) {
+    try {
+      const updated = await db.user.update({
+        where: { id: user.id },
+        data: {
+          stipendLuck: { increment: due },
+          stipendLastAt: new Date(),
+          luckBalance: { increment: due },
+          totalLuckEarned: { increment: due },
+        },
+        select: { luckBalance: true, stipendLuck: true, stipendLastAt: true },
+      });
+      stipendGranted = due;
+      newBalance = updated.luckBalance;
+      stipendLastAt = updated.stipendLastAt;
+      await db.luckTransaction.create({
+        data: {
+          userId: user.id,
+          amount: due,
+          balanceAfter: newBalance,
+          type: "admin_grant",
+          description: `Special rank stipend (${user.specialRank})`,
+        },
+      });
+    } catch (e) {
+      console.error("[me] stipend grant failed:", e);
+    }
+  }
+
+  const rank = getSpecialRank(user.specialRank);
   return NextResponse.json({
     user: {
       id: user.id, email: user.email, name: user.name,
-      luckBalance: user.luckBalance, referralCode: user.referralCode,
+      luckBalance: newBalance, referralCode: user.referralCode,
       role: user.role, language: user.language,
       birthData: parseBirthData(user.birthData),
       resellerTier: user.resellerTier,
@@ -21,6 +58,18 @@ export async function GET() {
       totalLuckEarned: user.totalLuckEarned,
       totalLuckSpent: user.totalLuckSpent,
       createdAt: user.createdAt,
+      specialRank: user.specialRank,
+      specialRankSince: user.specialRankSince,
+      specialRankInfo: rank ? {
+        name: rank.name, color: rank.color, bonusPct: rank.bonusPct,
+        stipendLuck: rank.stipendLuck, stipendPeriodDays: rank.stipendPeriodDays,
+        description: rank.description,
+      } : null,
+      stipendLuck: user.stipendLuck,
+      stipendLastAt,
+      stipendGrantedThisRequest: stipendGranted,
+      lifetimeMmkSpent: user.lifetimeMmkSpent,
+      lifetimeResellerMmk: user.lifetimeResellerMmk,
     },
   });
 }

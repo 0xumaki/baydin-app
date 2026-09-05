@@ -125,6 +125,20 @@ export async function requireReseller() {
   return user;
 }
 
+/** Convert a thrown auth error (with `.status` of 401/403) into a JSON
+ *  response, or return null if the error is not an auth error. Useful for
+ *  routes that catch errors manually instead of using `withAuth`. */
+export async function authErrorResponse(e: any): Promise<any | null> {
+  const { NextResponse } = await import("next/server");
+  if (e?.status === 401) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (e?.status === 403) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  return null;
+}
+
 /** Generate a unique human-friendly referral code like "BAYDIN-7F3K2". */
 export function generateReferralCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

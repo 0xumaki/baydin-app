@@ -218,7 +218,7 @@ export function renderHoroscopePrompt(params: {
   const { language, sign, date, period, transits } = params;
   const langInstructions = buildLanguageInstructions((language as Language) || "en", null);
   const system = `${SHARED_PERSONA}${langInstructions}\n\n${HOROSCOPE_SKILL}`;
-  const user = `Period: ${period}. Sign: ${sign}. Date: ${date}.\n\nCALCULATION DATA:\n\`\`\`json\n${JSON.stringify(transits, null, 2)}\n\`\`\`\n\nReturn the JSON object per the output contract.`;
+  const user = `Period: ${period}. Sign: ${sign}. Date: ${date}.\n\nCALCULATION DATA:\n\`\`\`json\n${JSON.stringify(transits, null, 2)}\n\`\`\`\n\nWrite the horoscope as flowing markdown prose per the output contract. Do NOT return a JSON object.`;
   return { system, user };
 }
 
@@ -380,15 +380,59 @@ function parseLLMResult(raw: string): LLMResult {
     const jsonStr = candidate.slice(jsonStart, jsonEnd + 1);
     try {
       const parsed = JSON.parse(jsonStr);
-      return {
-        content: parsed.content ?? raw,
-        raw,
-        parsed: {
-          content: parsed.content ?? raw,
-          highlights: Array.isArray(parsed.highlights) ? parsed.highlights : [],
-          guidance: parsed.guidance ?? null,
-        },
-      };
+      // Case 1: well-formed chat contract — { content, highlights, guidance }
+      if (typeof parsed.content === "string") {
+        return {
+          content: parsed.content,
+          raw,
+          parsed: {
+            content: parsed.content,
+            highlights: Array.isArray(parsed.highlights) ? parsed.highlights : [],
+            guidance: parsed.guidance ?? null,
+          },
+        };
+      }
+      // Case 2: flat horoscope-shaped JSON — { summary, career, relationships,
+      // health, lucky_color, lucky_number, lucky_time, guidance }
+      // Reconstruct flowing markdown prose so the client can render it.
+      const flat = parsed as Record<string, any>;
+      const sections: { heading: string; key: string }[] = [
+        { heading: "Today's Celestial Weather", key: "summary" },
+        { heading: "Career & Vocation", key: "career" },
+        { heading: "Relationships & Love", key: "relationships" },
+        { heading: "Health & Wellbeing", key: "health" },
+      ];
+      let md = "";
+      for (const s of sections) {
+        const v = flat[s.key];
+        if (typeof v === "string" && v.trim()) {
+          md += `## ${s.heading}\n\n${v.trim()}\n\n`;
+        }
+      }
+      const lucky: string[] = [];
+      if (flat.lucky_color) lucky.push(`**Lucky color:** ${flat.lucky_color}`);
+      if (flat.lucky_number !== undefined) lucky.push(`**Lucky number:** ${flat.lucky_number}`);
+      if (flat.lucky_time) lucky.push(`**Lucky time:** ${flat.lucky_time}`);
+      if (lucky.length) {
+        md += `## \u2726 Lucky Elements\n\n- ${lucky.join("\n- ")}\n\n`;
+      }
+      const guidance = flat.guidance;
+      if (Array.isArray(guidance) && guidance.length) {
+        md += `## \u2726 Guidance\n\n- ${guidance.map((g) => String(g)).join("\n- ")}\n\n`;
+      } else if (typeof guidance === "string" && guidance.trim()) {
+        md += `## \u2726 Guidance\n\n${guidance.trim()}\n\n`;
+      }
+      if (md.trim()) {
+        return {
+          content: md.trim(),
+          raw,
+          parsed: {
+            content: md.trim(),
+            highlights: Array.isArray(flat.highlights) ? flat.highlights : [],
+            guidance: flat.guidance ?? null,
+          },
+        };
+      }
     } catch {
       // fall through
     }
