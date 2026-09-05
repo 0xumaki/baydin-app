@@ -5,8 +5,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useMe, api } from "@/lib/api-client";
 import { useT } from "@/lib/use-t";
-import { GlowPill } from "@/components/lumina/premium-ui";
-import { Wallet, Check, Gift, Moon, Star, Sparkles, Heart, Hash, CalendarClock } from "lucide-react";
+import { StarField } from "@/components/lumina/primitives";
+import {
+  GlowPill,
+  ShimmerButton,
+  AuroraGlowCard,
+  LiquidMetalText,
+  NumberTicker,
+  AnimatedGradientBackground,
+} from "@/components/lumina/premium-ui";
+import { CloverIcon, CloverPNG } from "@/components/lumina/baydin-icons";
+import { Wallet, Check, Gift, Moon, Star, Sparkles, Heart, Hash, CalendarClock, Copy, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,8 +88,8 @@ const PAYMENT_METHODS = [
 
 // Feature cost reference shown to the user
 const FEATURE_COSTS = [
-  { feature: "Astrologer chat (per turn)", cost: 2, icon: MessageCircleIcon },
-  { feature: "Tarot reading (after 2 free/day)", cost: 1, icon: Sparkles },
+  { feature: "Astrologer chat (per turn)", cost: 2, icon: Sparkles },
+  { feature: "Tarot reading (after 2 free/day)", cost: 1, icon: Star },
   { feature: "Birth chart", cost: 3, icon: Star },
   { feature: "Numerology report", cost: 3, icon: Hash },
   { feature: "Personal horoscope", cost: 2, icon: Moon },
@@ -127,18 +136,44 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
     finally { setBuying(false); }
   }
 
+  async function copyReferralLink() {
+    if (!user) return;
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/?ref=${user.referralCode}`);
+      toast.success("Referral link copied");
+    } catch { toast.error("Could not copy link"); }
+  }
+
+  async function shareReferral() {
+    if (!user) return;
+    const url = `${window.location.origin}/?ref=${user.referralCode}`;
+    const shareText = `Join me on Baydin — get free Luck on signup with my code: ${user.referralCode}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Baydin", text: shareText, url });
+      } catch { /* user dismissed */ }
+    } else {
+      await copyReferralLink();
+    }
+  }
+
   if (!user) {
     return (
-      <div className="h-full flex items-center justify-center px-6 text-center">
-        <div>
-          <Wallet className="w-10 h-10 text-[#6B6358] mx-auto mb-3" />
-          <div className="text-[16px] text-[#E8E2D5] mb-1">{t("luck_earn")}</div>
-          <button
-            onClick={onAuth}
-            className="mt-3 inline-flex items-center gap-2 py-2.5 px-5 bg-[#E8E2D5] text-[#0A0908] text-[13px] font-medium hover:bg-white transition rounded-sm focus-ring"
-          >
-            {t("sign_in")}
-          </button>
+      <div className="relative min-h-screen flex flex-col">
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <AnimatedGradientBackground variant="cosmic" />
+          <StarField count={24} />
+        </div>
+        <div className="relative z-10 min-w-0 flex-1 flex items-center justify-center px-6 text-center">
+          <div>
+            <div className="w-14 h-14 rounded-full bg-[#C5A572]/10 border border-[#C5A572]/20 flex items-center justify-center mx-auto mb-4">
+              <Wallet className="w-7 h-7 text-[#C5A572]" />
+            </div>
+            <div className="text-[16px] text-[#E8E2D5] mb-1">{t("luck_earn")}</div>
+            <ShimmerButton tone="gold" onClick={onAuth} className="mt-4">
+              {t("sign_in")}
+            </ShimmerButton>
+          </div>
         </div>
       </div>
     );
@@ -147,232 +182,329 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
   const selectedTier = [...tiers.regular, ...(tiers.reseller || [])].find((t) => t.id === selected);
 
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
-      <div className="max-w-4xl mx-auto px-6 py-10 lg:py-14">
-        {/* Hero */}
-        <div className="mb-10 lum-reveal">
-          <div className="text-[13px] text-[#6B6358] mb-2">In-app credit</div>
-          <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.1] tracking-tight mb-3">
-            {t("luck_earn")}
-          </h1>
-          <p className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch]">
-            Luck is the credit you spend on readings, rituals, and reports. Earn it through daily rewards, referrals, or by topping up below.
-          </p>
-          <div className="mt-4 flex items-baseline gap-3">
-            <span className="serif-display text-[2rem] text-[#C5A572] tabular-nums">{user.luckBalance}</span>
-            <span className="text-[13px] text-[#6B6358]">Luck in your account</span>
-          </div>
-        </div>
+    <div className="relative min-h-screen flex flex-col">
+      {/* Backdrop: AnimatedGradientBackground (cosmic) + StarField */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <AnimatedGradientBackground variant="cosmic" />
+        <StarField count={30} />
+      </div>
 
-        {/* What Luck buys — neutral list of per-feature costs */}
-        <div className="pt-8 border-t border-[#2A2722] mb-10">
-          <div className="text-[12px] text-[#6B6358] font-medium mb-4">{t("luck_what_buys")}</div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
-            {FEATURE_COSTS.map(({ feature, cost, icon: Icon }) => (
-              <div key={feature} className="flex items-baseline justify-between py-2 border-b border-[#1A1714]">
-                <div className="flex items-center gap-2.5">
-                  <Icon className="w-3.5 h-3.5 text-[#6B6358]" />
-                  <span className="text-[13px] text-[#9C9489]">{feature}</span>
-                </div>
-                <span className="serif-display text-[1rem] text-[#E8E2D5] tabular-nums">{cost}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Ways to earn */}
-        <div className="pt-8 border-t border-[#2A2722] mb-10">
-          <div className="text-[12px] text-[#6B6358] font-medium mb-5">{t("luck_ways_to_earn")}</div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[#2A2722] border border-[#2A2722]">
-            <EarnMethod
-              icon={Gift}
-              title="Daily reward"
-              body="Claim 1–5 Luck each day. Streaks grow the reward."
-              cta="Claim in sidebar"
-            />
-            <EarnMethod
-              icon={Sparkles}
-              title="Referrals"
-              body="Earn 10 Luck for each friend who signs up with your code."
-              cta={user.referralCode}
-            />
-            <EarnMethod
-              icon={Wallet}
-              title="Top up"
-              body="Purchase a Luck pack below. Bonus Luck on larger packs."
-              cta="See tiers below"
-            />
-          </div>
-        </div>
-
-        {/* Referral share */}
-        <div className="mb-10 p-5 border border-[#2A2722] flex items-center gap-4">
-          <Gift className="w-5 h-5 text-[#C5A572] shrink-0" />
-          <div className="flex-1 min-w-0">
-            <div className="text-[13px] text-[#E8E2D5]">Share your referral code</div>
-            <div className="text-[11px] text-[#6B6358] mt-0.5">10 Luck for each friend who joins</div>
-          </div>
-          <div className="serif-display text-[1rem] text-[#C5A572] tabular-nums mr-2">{user.referralCode}</div>
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(`${window.location.origin}/?ref=${user.referralCode}`);
-              toast.success("Link copied");
-            }}
-            className="text-[12px] text-[#9C9489] hover:text-[#E8E2D5] transition focus-ring rounded-sm px-3 py-2 border border-[#2A2722]"
-          >
-            Copy link
-          </button>
-        </div>
-
-        {/* Tiers */}
-        <div className="pt-8 border-t border-[#2A2722] mb-10">
-          <div className="text-[12px] text-[#6B6358] font-medium mb-5">{t("luck_packs")}</div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#2A2722] border border-[#2A2722]">
-            {tiers.regular.map((tier) => (
-              <TierCard
-                key={tier.id}
-                tier={tier}
-                campaign={findCampaignForTier(tier, tiers.campaigns)}
-                selected={selected === tier.id}
-                onSelect={() => setSelected(selected === tier.id ? null : tier.id)}
+      <div className="relative z-10 min-w-0 overflow-hidden flex-1">
+        <div className="max-w-4xl mx-auto px-4 py-6 lg:py-10 pb-20">
+          {/* Hero */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <Wallet className="w-5 h-5 text-[#C5A572]" />
+              <GlowPill color="#C5A572" className="!text-[10px] uppercase tracking-wide">
+                In-app credit
+              </GlowPill>
+            </div>
+            <LiquidMetalText as="h1" className="text-[28px] sm:text-[32px] lg:text-[40px] font-light leading-tight block">
+              {t("luck_earn")}
+            </LiquidMetalText>
+            <p className="text-[13px] text-[#9C9489] mt-2 max-w-2xl leading-relaxed">
+              Luck is the credit you spend on readings, rituals, and reports. Earn it through daily rewards, referrals, or by topping up below.
+            </p>
+            {/* Luck balance display */}
+            <AuroraGlowCard
+              glowColor="#C5A572"
+              glowIntensity={0.15}
+              className="mt-4 p-4 inline-flex items-center gap-3 relative overflow-hidden"
+            >
+              <CloverPNG
+                aria-hidden
+                className="absolute -right-2 -bottom-2 w-16 h-16 opacity-[0.08] pointer-events-none"
               />
-            ))}
+              <div className="flex items-center gap-2 relative z-10">
+                <CloverIcon className="w-6 h-6 text-[#C5A87C]" strokeWidth={1.6} aria-label="Luck" />
+                <div className="flex items-baseline gap-2">
+                  <NumberTicker
+                    value={user.luckBalance}
+                    className="serif-display text-[1.75rem] text-[#C5A572] tabular-nums leading-none"
+                  />
+                  <span className="text-[12px] text-[#9C9489]">Luck in your account</span>
+                </div>
+              </div>
+            </AuroraGlowCard>
           </div>
-        </div>
 
-        {/* Reseller tiers */}
-        {tiers.reseller && tiers.reseller.length > 0 && (
-          <div className="mb-10">
-            <div className="text-[12px] text-[#6B6358] font-medium mb-4">Reseller packs (whitelisted)</div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[#2A2722] border border-[#2A2722]">
-              {tiers.reseller.map((tier) => (
+          {/* Ways to Earn — 3 AuroraGlowCards */}
+          <div className="mb-6">
+            <div className="text-[12px] text-[#9C9489] font-medium mb-3 uppercase tracking-wide">{t("luck_ways_to_earn")}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <EarnMethodCard
+                icon={Gift}
+                title="Daily reward"
+                body="Claim 1–5 Luck each day. Streaks grow the reward."
+                cta="Claim in sidebar"
+                color="#C5A572"
+              />
+              <EarnMethodCard
+                icon={MessageCircleIcon}
+                title="Refer friends"
+                body="Earn 10 Luck for each friend who signs up with your code."
+                cta={user.referralCode}
+                color="#7A8B6F"
+              />
+              <EarnMethodCard
+                icon={Sparkles}
+                title="Practice daily"
+                body="Complete rituals, mood checks, and frequency sessions for streak Luck."
+                cta="See practices"
+                color="#9E8AC9"
+              />
+            </div>
+          </div>
+
+          {/* What Luck buys — premium list with AuroraGlowCard per feature */}
+          <div className="mb-6">
+            <div className="text-[12px] text-[#9C9489] font-medium mb-3 uppercase tracking-wide">{t("luck_what_buys")}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {FEATURE_COSTS.map(({ feature, cost, icon: Icon }) => (
+                <AuroraGlowCard key={feature} glowColor="#C5A572" glowIntensity={0.06} className="p-3">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Icon className="w-3.5 h-3.5 text-[#6B6358] shrink-0" />
+                      <span className="text-[12px] text-[#9C9489] truncate">{feature}</span>
+                    </div>
+                    <span className="flex items-center gap-1 serif-display text-[1.1rem] text-[#E8E2D5] tabular-nums shrink-0">
+                      <CloverIcon className="w-3 h-3 text-[#C5A572]" aria-label="Luck" />
+                      {cost}
+                    </span>
+                  </div>
+                </AuroraGlowCard>
+              ))}
+            </div>
+          </div>
+
+          {/* Referral Program — AuroraGlowCard with CloverPNG watermark */}
+          <AuroraGlowCard
+            glowColor="#7A8B6F"
+            glowIntensity={0.12}
+            className="p-5 mb-6 relative overflow-hidden"
+          >
+            <CloverPNG
+              aria-hidden
+              className="absolute -right-4 -bottom-4 w-28 h-28 opacity-[0.06] pointer-events-none"
+            />
+            <div className="relative z-10 flex items-center gap-4">
+              <Gift className="w-5 h-5 text-[#C5A572] shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="text-[13px] text-[#E8E2D5] font-medium">Share your referral code</div>
+                <div className="text-[11px] text-[#9C9489] mt-0.5">10 Luck for each friend who joins</div>
+              </div>
+              <div className="serif-display text-[1rem] text-[#C5A572] tabular-nums mr-2 tracking-[0.2em]">
+                {user.referralCode}
+              </div>
+              <button
+                onClick={copyReferralLink}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-sm text-[12px] border border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#4A4540] transition"
+              >
+                <Copy className="w-3.5 h-3.5" /> Copy link
+              </button>
+              <button
+                onClick={shareReferral}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-sm text-[12px] border border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#4A4540] transition"
+              >
+                <Share2 className="w-3.5 h-3.5" /> Share
+              </button>
+            </div>
+          </AuroraGlowCard>
+
+          {/* Luck Packs — regular tiers */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-[12px] text-[#9C9489] font-medium uppercase tracking-wide">{t("luck_packs")}</div>
+              <GlowPill color="#C5A572" className="text-[10px]">{tiers.regular.length} tiers</GlowPill>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {tiers.regular.map((tier) => (
                 <TierCard
                   key={tier.id}
                   tier={tier}
                   campaign={findCampaignForTier(tier, tiers.campaigns)}
                   selected={selected === tier.id}
                   onSelect={() => setSelected(selected === tier.id ? null : tier.id)}
-                  reseller
                 />
               ))}
             </div>
           </div>
-        )}
 
-        {/* Payment panel */}
-        {selectedTier && (() => {
-          const selectedCampaign = findCampaignForTier(selectedTier, tiers.campaigns);
-          const expiryDays = daysUntilExpiry(selectedCampaign?.validUntil);
-          const expiringSoon = expiryDays !== null && expiryDays >= 0 && expiryDays <= 3;
-          return (
-          <div className="p-6 border border-[#2A2722] mb-10">
-            <div className="text-[12px] text-[#6B6358] mb-2">Complete your purchase</div>
-            <div className="serif-display text-[1.5rem] text-[#E8E2D5] mb-1">{selectedTier.name}</div>
-            <div className="flex items-baseline gap-3 mb-5">
-              <span className="serif-display text-[1.5rem] text-[#C5A572] tabular-nums">{selectedTier.total}</span>
-              <span className="text-[13px] text-[#6B6358]">Luck</span>
-              <span className="text-[13px] text-[#6B6358]">·</span>
-              <span className="text-[13px] text-[#9C9489] tabular-nums">{selectedTier.mmk.toLocaleString()} MMK</span>
+          {/* Reseller packs (only if user is reseller/admin) */}
+          {tiers.reseller && tiers.reseller.length > 0 && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-[12px] text-[#9C9489] font-medium uppercase tracking-wide">Reseller packs (whitelisted)</div>
+                <GlowPill color="#9E8AC9" className="text-[10px]">Wholesale</GlowPill>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {tiers.reseller.map((tier) => (
+                  <TierCard
+                    key={tier.id}
+                    tier={tier}
+                    campaign={findCampaignForTier(tier, tiers.campaigns)}
+                    selected={selected === tier.id}
+                    onSelect={() => setSelected(selected === tier.id ? null : tier.id)}
+                    reseller
+                  />
+                ))}
+              </div>
             </div>
+          )}
 
-            {/* Campaign info banner */}
-            {selectedCampaign && (
-              <div
-                className={cn(
-                  "mb-5 p-3 rounded-sm border flex items-start gap-2.5",
-                  expiringSoon
-                    ? "border-[#D8788A]/40 bg-[#D8788A]/5"
-                    : "border-[#C5A572]/30 bg-[#C5A572]/5",
-                )}
-              >
-                <CalendarClock
+          {/* Payment panel — AuroraGlowCard */}
+          {selectedTier && (() => {
+            const selectedCampaign = findCampaignForTier(selectedTier, tiers.campaigns);
+            const expiryDays = daysUntilExpiry(selectedCampaign?.validUntil);
+            const expiringSoon = expiryDays !== null && expiryDays >= 0 && expiryDays <= 3;
+            return (
+            <AuroraGlowCard
+              glowColor={expiringSoon ? "#D8788A" : "#C5A572"}
+              glowIntensity={0.14}
+              className="p-5 mb-6"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-[12px] text-[#9C9489] font-medium uppercase tracking-wide">Complete your purchase</div>
+                <GlowPill color="#C5A572" className="text-[10px]">Selected</GlowPill>
+              </div>
+              <div className="serif-display text-[1.5rem] text-[#E8E2D5] mb-1">{selectedTier.name}</div>
+              <div className="flex items-baseline gap-3 mb-5">
+                <span className="flex items-center gap-1 serif-display text-[1.5rem] text-[#C5A572] tabular-nums">
+                  <CloverIcon className="w-4 h-4" aria-label="Luck" />
+                  <NumberTicker value={selectedTier.total} />
+                </span>
+                <span className="text-[13px] text-[#9C9489]">Luck</span>
+                <span className="text-[13px] text-[#9C9489]">·</span>
+                <span className="text-[13px] text-[#9C9489] tabular-nums">{selectedTier.mmk.toLocaleString()} MMK</span>
+              </div>
+
+              {/* Campaign info banner */}
+              {selectedCampaign && (
+                <div
                   className={cn(
-                    "w-4 h-4 shrink-0 mt-0.5",
-                    expiringSoon ? "text-[#D8788A]" : "text-[#C5A572]",
+                    "mb-5 p-3 rounded-sm border flex items-start gap-2.5",
+                    expiringSoon
+                      ? "border-[#D8788A]/40 bg-[#D8788A]/5"
+                      : "border-[#C5A572]/30 bg-[#C5A572]/5",
                   )}
-                />
-                <div className="min-w-0">
-                  <div className={cn("text-[12px] font-medium", expiringSoon ? "text-[#D8788A]" : "text-[#C5A572]")}>
-                    ✦ {selectedCampaign.name}
-                  </div>
-                  <div className="text-[11px] text-[#9C9489] mt-0.5 leading-relaxed">
-                    {selectedCampaign.bonusPctOverride != null && (
-                      <>Bonus boosted to {selectedTier.bonusPct}%. {""}</>
+                >
+                  <CalendarClock
+                    className={cn(
+                      "w-4 h-4 shrink-0 mt-0.5",
+                      expiringSoon ? "text-[#D8788A]" : "text-[#C5A572]",
                     )}
-                    {selectedCampaign.mmkOverride != null && (
-                      <>Price overridden to {selectedTier.mmk.toLocaleString()} MMK. {""}</>
-                    )}
-                    {selectedCampaign.validUntil && (
-                      <span className={expiringSoon ? "text-[#D8788A]" : ""}>
-                        Campaign valid until {formatExpiryDate(selectedCampaign.validUntil)}
-                        {expiryDays !== null && expiryDays >= 0 && expiryDays <= 3
-                          ? ` · only ${expiryDays} day${expiryDays === 1 ? "" : "s"} left!`
-                          : ""}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div>
-                <Label className="block text-[12px] text-[#6B6358] font-medium mb-2">Payment method</Label>
-                <div className="grid grid-cols-5 gap-1.5">
-                  {PAYMENT_METHODS.map((m) => (
-                    <button
-                      key={m.id}
-                      onClick={() => setPaymentMethod(m.id)}
-                      className={cn(
-                        "px-2 py-2.5 text-[11px] border transition focus-ring rounded-sm",
-                        paymentMethod === m.id
-                          ? "border-[#C5A572] bg-[#1A1714] text-[#E8E2D5]"
-                          : "border-[#2A2722] text-[#6B6358] hover:border-[#4A4540] hover:text-[#9C9489]"
+                  />
+                  <div className="min-w-0">
+                    <div className={cn("text-[12px] font-medium", expiringSoon ? "text-[#D8788A]" : "text-[#C5A572]")}>
+                      ✦ {selectedCampaign.name}
+                    </div>
+                    <div className="text-[11px] text-[#9C9489] mt-0.5 leading-relaxed">
+                      {selectedCampaign.bonusPctOverride != null && (
+                        <>Bonus boosted to {selectedTier.bonusPct}%. {""}</>
                       )}
-                    >
-                      {m.name}
-                    </button>
-                  ))}
+                      {selectedCampaign.mmkOverride != null && (
+                        <>Price overridden to {selectedTier.mmk.toLocaleString()} MMK. {""}</>
+                      )}
+                      {selectedCampaign.validUntil && (
+                        <span className={expiringSoon ? "text-[#D8788A]" : ""}>
+                          Campaign valid until {formatExpiryDate(selectedCampaign.validUntil)}
+                          {expiryDays !== null && expiryDays >= 0 && expiryDays <= 3
+                            ? ` · only ${expiryDays} day${expiryDays === 1 ? "" : "s"} left!`
+                            : ""}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
+              )}
+
+              <div className="space-y-4">
+                <div>
+                  <Label className="block text-[12px] text-[#9C9489] font-medium mb-2 uppercase tracking-wide">Payment method</Label>
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {PAYMENT_METHODS.map((m) => (
+                      <button
+                        key={m.id}
+                        onClick={() => setPaymentMethod(m.id)}
+                        className={cn(
+                          "px-2 py-2.5 text-[11px] border transition focus-ring rounded-sm",
+                          paymentMethod === m.id
+                            ? "border-[#C5A572] bg-[#1A1714] text-[#E8E2D5]"
+                            : "border-[#2A2722] text-[#6B6358] hover:border-[#4A4540] hover:text-[#9C9489]"
+                        )}
+                      >
+                        {m.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Label className="block text-[12px] text-[#9C9489] font-medium mb-2 uppercase tracking-wide">Transaction reference</Label>
+                  <Input
+                    value={paymentRef}
+                    onChange={(e) => setPaymentRef(e.target.value)}
+                    className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] text-[13px] py-2.5 focus-ring"
+                    placeholder="e.g. TXN123456789"
+                  />
+                </div>
+                <div className="text-[12px] text-[#9C9489] leading-relaxed">
+                  Transfer {selectedTier.mmk.toLocaleString()} MMK to our {PAYMENT_METHODS.find((m) => m.id === paymentMethod)?.name} account, then enter the reference above. Luck is credited to your account.
+                </div>
+                <ShimmerButton
+                  tone="gold"
+                  onClick={() => buy(selectedTier.id)}
+                  disabled={buying}
+                  className="w-full py-3 text-[14px]"
+                >
+                  {buying ? "Processing…" : "Confirm purchase"}
+                </ShimmerButton>
               </div>
-              <div>
-                <Label className="block text-[12px] text-[#6B6358] font-medium mb-2">Transaction reference</Label>
-                <Input
-                  value={paymentRef}
-                  onChange={(e) => setPaymentRef(e.target.value)}
-                  className="bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] placeholder:text-[#4A4540] focus-visible:border-[#C5A572] focus-visible:ring-0"
-                  placeholder="e.g. TXN123456789"
-                />
-              </div>
-              <div className="text-[12px] text-[#6B6358] leading-relaxed">
-                Transfer {selectedTier.mmk.toLocaleString()} MMK to our {PAYMENT_METHODS.find((m) => m.id === paymentMethod)?.name} account, then enter the reference above. Luck is credited to your account.
-              </div>
-              <button
-                onClick={() => buy(selectedTier.id)}
-                disabled={buying}
-                className="w-full py-3 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition rounded-sm disabled:opacity-50 focus-ring"
-              >
-                {buying ? "Processing…" : "Confirm purchase"}
-              </button>
-            </div>
-          </div>
-          );
-        })}
+            </AuroraGlowCard>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 }
 
-function EarnMethod({ icon: Icon, title, body, cta }: { icon: any; title: string; body: string; cta: string }) {
+// ============================================================
+// EarnMethodCard — premium AuroraGlowCard
+// ============================================================
+
+function EarnMethodCard({
+  icon: Icon,
+  title,
+  body,
+  cta,
+  color,
+}: {
+  icon: any;
+  title: string;
+  body: string;
+  cta: string;
+  color: string;
+}) {
   return (
-    <div className="p-5 bg-[#0A0908]">
-      <Icon className="w-4 h-4 text-[#C5A572] mb-3" />
-      <div className="text-[14px] text-[#E8E2D5] font-medium mb-1.5">{title}</div>
-      <div className="text-[12px] text-[#9C9489] leading-[1.6] mb-2">{body}</div>
-      <div className="text-[11px] text-[#C5A572] serif-italic">{cta}</div>
-    </div>
+    <AuroraGlowCard glowColor={color} glowIntensity={0.1} className="p-5 flex flex-col gap-3">
+      <div
+        className="w-9 h-9 rounded-sm flex items-center justify-center"
+        style={{ background: `${color}1A`, border: `1px solid ${color}40` }}
+      >
+        <Icon className="w-4 h-4" style={{ color }} />
+      </div>
+      <div>
+        <div className="text-[14px] text-[#E8E2D5] font-medium mb-1.5">{title}</div>
+        <div className="text-[12px] text-[#9C9489] leading-[1.6]">{body}</div>
+      </div>
+      <div className="text-[11px] text-[#C5A572] serif-italic mt-auto">{cta}</div>
+    </AuroraGlowCard>
   );
 }
+
+// ============================================================
+// TierCard — AuroraGlowCard wrapper with all campaign features
+// ============================================================
 
 function TierCard({
   tier,
@@ -391,59 +523,98 @@ function TierCard({
   const expiryDays = daysUntilExpiry(campaign?.validUntil);
   const expiringSoon = expiryDays !== null && expiryDays >= 0 && expiryDays <= 3;
   return (
-    <button
-      onClick={onSelect}
+    <AuroraGlowCard
+      glowColor={selected ? "#C5A572" : "#9C9489"}
+      glowIntensity={selected ? 0.18 : 0.06}
       className={cn(
-        "relative text-left p-5 transition-colors border-0 bg-[#0A0908]",
-        selected ? "bg-[#1A1714]" : "hover:bg-[#0F0D0B]"
+        "p-5 relative overflow-hidden cursor-pointer transition",
+        selected ? "border-[#C5A572]/60" : "",
       )}
     >
+      <button
+        onClick={onSelect}
+        className="absolute inset-0 z-10 w-full h-full cursor-pointer"
+        aria-label={`Select ${tier.name} tier`}
+      />
+      {/* CloverPNG watermark */}
+      <CloverPNG
+        aria-hidden
+        className="absolute -right-3 -bottom-3 w-20 h-20 opacity-[0.05] pointer-events-none"
+      />
       {/* Campaign pill — top-left */}
       {hasCampaign && (
-        <div className="absolute top-3 left-3 z-10">
+        <div className="absolute top-3 left-3 z-20">
           <GlowPill color="#C5A572" className="text-[9px]">✦ {campaign!.name}</GlowPill>
         </div>
       )}
-      {tier.popular && (
-        <div className="absolute top-3 right-3 text-[10px] text-[#C5A572] serif-italic">popular</div>
+      {/* Popular / Wholesale badge — top-right */}
+      {tier.popular && !reseller && (
+        <div className="absolute top-3 right-3 z-20">
+          <GlowPill color="#E7A264" className="text-[9px]">Popular</GlowPill>
+        </div>
       )}
       {reseller && (
-        <div className="absolute top-3 right-3 text-[10px] text-[#6B6358] serif-italic">wholesale</div>
-      )}
-      <div className={cn("text-[14px] text-[#E8E2D5] font-medium mb-3", hasCampaign && "mt-6")}>{tier.name}</div>
-      <div className="flex items-baseline gap-1.5 mb-1">
-        <span className="serif-display text-[2rem] text-[#C5A572] tabular-nums leading-none">{tier.total}</span>
-        <span className="text-[12px] text-[#6B6358]">Luck</span>
-      </div>
-      {tier.bonus > 0 && (
-        <div className="text-[11px] text-[#9C9489] mb-2 serif-italic">
-          +{tier.bonusPct}% bonus {hasCampaign ? "✦" : ""}
-          {hasCampaign && (
-            <span className="block text-[9px] text-[#6B6358] not-italic">incl. campaign bonus</span>
-          )}
+        <div className="absolute top-3 right-3 z-20">
+          <GlowPill color="#9E8AC9" className="text-[9px]">Wholesale</GlowPill>
         </div>
       )}
-      <div className="text-[13px] text-[#9C9489] tabular-nums mb-1">{tier.mmk.toLocaleString()} MMK</div>
-      <div className="text-[11px] text-[#6B6358] leading-[1.5] mt-2">{tier.tagline}</div>
-      {/* Campaign valid-until footnote */}
-      {hasCampaign && campaign!.validUntil && (
-        <div
-          className={cn(
-            "text-[10px] mt-2 leading-tight",
-            expiringSoon ? "text-[#D8788A]" : "text-[#9C9489]"
-          )}
+
+      <div className={cn("relative z-30 pointer-events-none", hasCampaign && "mt-7")}>
+        <div className="text-[14px] text-[#E8E2D5] font-medium mb-3">{tier.name}</div>
+        <div className="flex items-baseline gap-1.5 mb-1">
+          <CloverIcon className="w-4 h-4 text-[#C5A572]" aria-label="Luck" />
+          <NumberTicker
+            value={tier.total}
+            className="serif-display text-[2rem] text-[#C5A572] tabular-nums leading-none"
+          />
+          <span className="text-[12px] text-[#9C9489]">Luck</span>
+        </div>
+        {tier.bonus > 0 && (
+          <div className="text-[11px] text-[#9C9489] mb-2 serif-italic">
+            +{tier.bonusPct}% bonus {hasCampaign ? "✦" : ""}
+            {hasCampaign && (
+              <span className="block text-[9px] text-[#6B6358] not-italic">incl. campaign bonus</span>
+            )}
+          </div>
+        )}
+        <div className="text-[13px] text-[#9C9489] tabular-nums mb-1">{tier.mmk.toLocaleString()} MMK</div>
+        <div className="text-[11px] text-[#6B6358] leading-[1.5] mt-2">{tier.tagline}</div>
+        {/* Campaign valid-until footnote */}
+        {hasCampaign && campaign!.validUntil && (
+          <div
+            className={cn(
+              "text-[10px] mt-2 leading-tight",
+              expiringSoon ? "text-[#D8788A]" : "text-[#9C9489]"
+            )}
+          >
+            Campaign valid until {formatExpiryDate(campaign!.validUntil)}
+            {expiryDays !== null && expiryDays >= 0 && expiryDays <= 3
+              ? ` · ${expiryDays}d left`
+              : ""}
+          </div>
+        )}
+        <ShimmerButton
+          tone={selected ? "gold" : "parchment"}
+          className="w-full mt-4 py-2 text-[12px] pointer-events-auto relative z-40"
+          onClick={(e: any) => {
+            e?.stopPropagation?.();
+            onSelect();
+          }}
         >
-          Campaign valid until {formatExpiryDate(campaign!.validUntil)}
-          {expiryDays !== null && expiryDays >= 0 && expiryDays <= 3
-            ? ` · ${expiryDays}d left`
-            : ""}
-        </div>
-      )}
+          {selected ? (
+            <>
+              <Check className="w-3.5 h-3.5" /> Selected
+            </>
+          ) : (
+            "Purchase"
+          )}
+        </ShimmerButton>
+      </div>
       {selected && (
-        <div className="absolute bottom-3 right-3 w-5 h-5 rounded-full bg-[#C5A572] flex items-center justify-center">
+        <div className="absolute bottom-3 right-3 z-40 w-5 h-5 rounded-full bg-[#C5A572] flex items-center justify-center pointer-events-none">
           <Check className="w-3 h-3 text-[#0A0908]" />
         </div>
       )}
-    </button>
+    </AuroraGlowCard>
   );
 }

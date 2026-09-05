@@ -2,11 +2,23 @@
 
 import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { GlassCard, GoldButton, GradientButton, Pill, SectionTitle, ShellCard } from "@/components/lumina/primitives";
+import { StarField } from "@/components/lumina/primitives";
+import {
+  AuroraGlowCard,
+  GlowPill,
+  LiquidMetalText,
+  NumberTicker,
+  ShimmerButton,
+  AnimatedGradientBackground,
+} from "@/components/lumina/premium-ui";
+import { CloverIcon } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { Flame, Waves, Target, Sparkles, Check, Loader2, ChevronRight, Calendar } from "lucide-react";
+import {
+  Flame, Waves, Target, Sparkles, Check, Loader2, ChevronRight,
+  Calendar, Crown, Clock,
+} from "lucide-react";
 import { toast } from "sonner";
 
 const STEPS = [
@@ -25,15 +37,12 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
   const [streak, setStreak] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [marking, setMarking] = React.useState<string | null>(null);
-  const [history, setHistory] = React.useState<any[]>([]);
 
   async function load() {
     try {
       const res = await api<{ ritual: any; streak: number; today: string }>("/api/ritual");
       setRitual(res.ritual);
       setStreak(res.streak);
-      // Load last 30 days of ritual logs for the heatmap
-      // (simplified — just use streak for now)
     } catch {}
     finally { setLoading(false); }
   }
@@ -41,7 +50,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
 
   async function markStep(stepId: string) {
     if (!user) { onAuth(); return; }
-    if (ritual?.[stepId]) return; // already done
+    if (ritual?.[stepId]) return;
     setMarking(stepId);
     try {
       const res = await api<{ ritual: any; bonusLuck: number; justCompleted?: boolean }>("/api/ritual", {
@@ -59,17 +68,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
     finally { setMarking(null); }
   }
 
-  if (!user) {
-    return (
-      <div className="h-full flex items-center justify-center px-6 text-center">
-        <div>
-          <Flame className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
-          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to begin your ritual</div>
-          <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
-        </div>
-      </div>
-    );
-  }
+  if (!user) return <Gate onAuth={onAuth} />;
 
   const completedSteps = STEPS.filter((s) => ritual?.[s.id]).length;
   const totalSteps = STEPS.length;
@@ -77,40 +76,101 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
   const progress = (completedSteps / totalSteps) * 100;
 
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
-      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
-        <SectionTitle eyebrow="Daily practice · Free" title="Daily Ritual" subtitle="A 4-step morning practice. Complete it for a Luck bonus." className="mb-6" />
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="warm" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+
+        {/* ===== Hero ===== */}
+        <div className="mb-6 lum-reveal">
+          <GlowPill className="mb-3" color="#F09A3D">
+            <Flame className="w-3 h-3" /> Daily practice · Free
+          </GlowPill>
+          <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-2">
+            Daily Ritual
+          </LiquidMetalText>
+          <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch]">
+            A 4-step morning practice. Each step earns{" "}
+            <span className="inline-flex items-center gap-1 text-[#C5A572]">
+              <CloverIcon className="w-3 h-3" filled /> +1 Luck
+            </span>
+            ; completing the full ritual awards a{" "}
+            <span className="inline-flex items-center gap-1 text-[#C5A572]">
+              <CloverIcon className="w-3 h-3" filled /> +3 bonus
+            </span>.
+          </p>
+        </div>
 
         {/* Progress + streak hero */}
-        <ShellCard className="p-5 mb-5 relative overflow-hidden">
-          <div className="" />
+        <AuroraGlowCard
+          glowColor={isComplete ? "#B5CD7E" : "#C5A572"}
+          glowIntensity={0.18}
+          className="p-5 mb-5"
+        >
           <div className="relative flex items-center gap-5">
             {/* Progress ring */}
             <div className="relative w-20 h-20 shrink-0">
               <svg className="w-20 h-20 -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4" />
-                <circle cx="50" cy="50" r="42" fill="none" stroke={isComplete ? "#B5CD7E" : "#C5A87C"} strokeWidth="4" strokeLinecap="round"
-                  strokeDasharray={`${(progress / 100) * 264} 264`} style={{ transition: "stroke-dasharray 0.6s ease" }} />
+                <circle
+                  cx="50" cy="50" r="42" fill="none"
+                  stroke={isComplete ? "#B5CD7E" : "#C5A87C"}
+                  strokeWidth="4" strokeLinecap="round"
+                  strokeDasharray={`${(progress / 100) * 264} 264`}
+                  style={{ transition: "stroke-dasharray 0.6s ease" }}
+                />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                {isComplete ? <Check className="w-7 h-7 text-[#7A8B6F]" /> : <span className="text-[18px] font-light text-[#C5A572]">{completedSteps}/{totalSteps}</span>}
+                {isComplete ? (
+                  <Check className="w-7 h-7 text-[#7A8B6F]" />
+                ) : (
+                  <div className="flex items-baseline">
+                    <NumberTicker value={completedSteps} className="text-[20px] font-light text-[#C5A572] leading-none" />
+                    <span className="text-[12px] text-[#6B6358]">/{totalSteps}</span>
+                  </div>
+                )}
               </div>
             </div>
-            <div className="flex-1">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-1">{new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</div>
-              <div className="text-[20px] font-light text-[#E8E2D5] mb-1">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-1">
+                <Calendar className="w-3 h-3" />
+                {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+              </div>
+              <div className="text-[20px] font-light text-[#E8E2D5] mb-1.5">
                 {isComplete ? "Ritual complete ✦" : completedSteps === 0 ? "Begin your ritual" : "Continue your ritual"}
               </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="flex items-center gap-1 text-[#7A8B6F]">
-                  <Flame className="w-3.5 h-3.5" /> {streak}-day streak
+              <div className="flex items-center gap-3 text-[12px] flex-wrap">
+                <span className="flex items-center gap-1 text-[#F09A3D]">
+                  <Flame className="w-3.5 h-3.5" />
+                  <NumberTicker value={streak} suffix="-day streak" className="tabular-nums" />
                 </span>
                 <span className="text-[#9C9489]">·</span>
-                <span className="text-[#C5A572]">+1 Luck per step · +3 completion bonus</span>
+                <span className="text-[#C5A572] flex items-center gap-1">
+                  <CloverIcon className="w-3 h-3" filled /> +1 Luck per step · +3 bonus
+                </span>
               </div>
             </div>
           </div>
-        </ShellCard>
+        </AuroraGlowCard>
+
+        {/* Complete ritual CTA */}
+        {completedSteps === totalSteps - 1 && !isComplete && (
+          <div className="mb-5">
+            <ShimmerButton
+              onClick={() => markStep(STEPS.find((s) => !ritual?.[s.id])!.id)}
+              disabled={marking !== null}
+              className="w-full py-3"
+            >
+              {marking ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Marking…</>
+              ) : (
+                <><Crown className="w-4 h-4" /> Complete ritual · claim +3 Luck bonus</>
+              )}
+            </ShimmerButton>
+          </div>
+        )}
 
         {/* Steps */}
         <div className="space-y-3">
@@ -118,12 +178,17 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
             const done = ritual?.[step.id];
             const isMarking = marking === step.id;
             return (
-              <GlassCard key={step.id} className={cn("p-4 transition-all", done && "opacity-70")}>
+              <AuroraGlowCard
+                key={step.id}
+                glowColor={done ? step.color : "#2A2722"}
+                glowIntensity={done ? 0.15 : 0.05}
+                className={cn("p-4 transition-all", done && "opacity-85")}
+              >
                 <div className="flex items-start gap-4">
                   {/* Step number / check */}
                   <div className="relative shrink-0">
                     <div
-                      className={cn("w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all")}
+                      className="w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all"
                       style={{
                         borderColor: done ? step.color : "rgba(255,255,255,0.1)",
                         background: done ? `${step.color}20` : "rgba(255,255,255,0.02)",
@@ -137,56 +202,99 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
                         <step.icon className="w-5 h-5" style={{ color: step.color }} />
                       )}
                     </div>
-                    {/* Connector line to next step */}
                     {i < STEPS.length - 1 && (
-                      <div className="absolute left-1/2 top-full w-px h-3 -translate-x-1/2" style={{ background: done ? `${step.color}40` : "rgba(255,255,255,0.06)" }} />
+                      <div
+                        className="absolute left-1/2 top-full w-px h-3 -translate-x-1/2"
+                        style={{ background: done ? `${step.color}40` : "rgba(255,255,255,0.06)" }}
+                      />
                     )}
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
+                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                       <span className="text-[14px] text-[#E8E2D5] font-medium">{step.name}</span>
-                      {step.optional && <Pill className="text-[9px]">optional</Pill>}
-                      {done && <Pill variant="leaf" className="text-[9px]">done</Pill>}
+                      {step.optional && (
+                        <GlowPill color="#8B7355" className="text-[10px]">optional</GlowPill>
+                      )}
+                      {done && (
+                        <GlowPill color={step.color} className="text-[10px]">
+                          <Check className="w-3 h-3" /> done
+                        </GlowPill>
+                      )}
                     </div>
                     <div className="text-[12px] text-[#9C9489] leading-relaxed mb-2">{step.desc}</div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       {!done && (
-                        <button
+                        <ShimmerButton
                           onClick={() => markStep(step.id)}
                           disabled={isMarking}
-                          className="px-3 py-1.5 rounded-full text-[11px] border border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572] hover:bg-[#C5A572]/20 active:scale-95 transition disabled:opacity-50"
+                          className="px-3 py-1.5 text-[11px]"
                         >
-                          {isMarking ? "Marking…" : "Mark complete"}
-                        </button>
+                          {isMarking ? (
+                            "Marking…"
+                          ) : (
+                            <>
+                              Mark complete
+                              <span className="inline-flex items-center gap-0.5 text-[#C5A572]">
+                                · <CloverIcon className="w-3 h-3" filled /> +1
+                              </span>
+                            </>
+                          )}
+                        </ShimmerButton>
                       )}
                       <button
                         onClick={() => setView(step.action as any)}
-                        className="px-3 py-1.5 rounded-full text-[11px] text-[#9C9489] hover:text-[#C5A572] transition flex items-center gap-0.5"
+                        className="px-3 py-1.5 rounded-full text-[11px] text-[#9C9489] hover:text-[#C5A572] transition flex items-center gap-0.5 focus-ring"
                       >
                         {step.cta} <ChevronRight className="w-3 h-3" />
                       </button>
                     </div>
                   </div>
                 </div>
-              </GlassCard>
+              </AuroraGlowCard>
             );
           })}
         </div>
 
         {/* Streak info */}
-        <GlassCard className="p-4 mt-5">
+        <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-4 mt-5">
           <div className="flex items-center gap-2 mb-2">
-            <Calendar className="w-4 h-4 text-[#C5A572]" />
-            <span className="text-[12px] text-[#9C9489]">How streaks work</span>
+            <Clock className="w-4 h-4 text-[#C5A572]" />
+            <span className="text-[12px] text-[#9C9489] font-medium">How streaks work</span>
           </div>
           <div className="text-[12px] text-[#9C9489] leading-relaxed">
             Complete all 4 steps (step 3 — Tarot — is optional) to mark today's ritual done.
             Keep your streak alive by completing the ritual each day. One gap per week is allowed (streak freeze).
-            Each step awards +1 Luck; completing the full ritual awards a +3 Luck bonus.
+            Each step awards <span className="inline-flex items-center gap-0.5 text-[#C5A572]"><CloverIcon className="w-3 h-3" filled /> +1 Luck</span>;
+            completing the full ritual awards a <span className="inline-flex items-center gap-0.5 text-[#C5A572]"><CloverIcon className="w-3 h-3" filled /> +3 Luck bonus</span>.
           </div>
-        </GlassCard>
+        </AuroraGlowCard>
+      </div>
+    </div>
+  );
+}
+
+function Gate({ onAuth }: { onAuth: () => void }) {
+  return (
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="warm" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+        <div className="flex flex-col items-center justify-center text-center py-20">
+          <AuroraGlowCard glowColor="#F09A3D" glowIntensity={0.15} className="max-w-sm w-full p-10 text-center">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 border border-[#F09A3D]/30" style={{ background: "#F09A3D10" }}>
+              <Flame className="w-7 h-7 text-[#F09A3D]" />
+            </div>
+            <LiquidMetalText as="h1" className="serif-display text-[1.75rem] block mb-2">Sign in to begin</LiquidMetalText>
+            <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">
+              A 4-step morning ritual to align your day with cosmic rhythm.
+            </p>
+            <ShimmerButton onClick={onAuth} className="w-full">Sign in</ShimmerButton>
+          </AuroraGlowCard>
+        </div>
       </div>
     </div>
   );

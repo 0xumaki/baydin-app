@@ -2,10 +2,19 @@
 
 import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { GlassCard, GoldButton, GhostButton, GradientButton, Pill, SectionTitle, ShellCard } from "@/components/lumina/primitives";
+import { StarField } from "@/components/lumina/primitives";
+import {
+  AuroraGlowCard,
+  GlowPill,
+  LiquidMetalText,
+  NumberTicker,
+  ShimmerButton,
+  AnimatedGradientBackground,
+} from "@/components/lumina/premium-ui";
+import { CloverIcon } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
-import { Target, Plus, Flame, Check, X, Sparkles, TrendingUp } from "lucide-react";
+import { Target, Plus, Flame, Check, X, Sparkles, TrendingUp, Music2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,52 +71,115 @@ export function ManifestView({ onAuth }: { onAuth: () => void }) {
     finally { setCreating(false); }
   }
 
+  const bestStreak = Math.max(0, ...goals.map((g) => g.streak || 0));
+  const doneToday = goals.filter((g) => g.confirmedToday).length;
+
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
-      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
-        <div className="flex items-center justify-between mb-6">
-          <SectionTitle eyebrow="Daily practice · Free" title="Manifest" subtitle="Set intentions. Confirm daily. Watch them grow." />
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="warm" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+
+        {/* ===== Hero ===== */}
+        <div className="flex items-start justify-between gap-4 mb-7 lum-reveal">
+          <div className="min-w-0">
+            <GlowPill className="mb-3" color="#B5CD7E">
+              <Target className="w-3 h-3" /> Daily practice · Free
+            </GlowPill>
+            <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-2">
+              Manifest
+            </LiquidMetalText>
+            <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch]">
+              Set intentions. Confirm daily. Watch them grow. Each confirmation earns{" "}
+              <span className="inline-flex items-center gap-1 text-[#C5A572]">
+                <CloverIcon className="w-3 h-3" filled /> +1 Luck
+              </span>.
+            </p>
+          </div>
           {!showForm && (
-            <GoldButton onClick={() => setShowForm(true)} className="py-2 px-4 text-[12px]">
+            <ShimmerButton onClick={() => setShowForm(true)} className="shrink-0 py-2 px-4 text-[12px]">
               <Plus className="w-4 h-4" /> New intention
-            </GoldButton>
+            </ShimmerButton>
           )}
         </div>
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-2.5 mb-5">
-          <StatCard icon={Target} label="Active" value={String(goals.length)} />
-          <StatCard icon={Flame} label="Best streak" value={String(Math.max(0, ...goals.map((g) => g.streak || 0)))} sub="days" />
-          <StatCard icon={Check} label="Done today" value={String(goals.filter((g) => g.confirmedToday).length)} />
+          <StatCard
+            icon={<Target className="w-4 h-4" />}
+            glow="#C5A572"
+            label="Active"
+            value={<NumberTicker value={goals.length} className="text-[18px] font-light text-[#E8E2D5] leading-none" />}
+          />
+          <StatCard
+            icon={<Flame className="w-4 h-4" />}
+            glow="#F09A3D"
+            label="Best streak"
+            value={<NumberTicker value={bestStreak} suffix="-day" className="text-[18px] font-light text-[#E8E2D5] leading-none" />}
+          />
+          <StatCard
+            icon={<Check className="w-4 h-4" />}
+            glow="#7A8B6F"
+            label="Done today"
+            value={<NumberTicker value={doneToday} className="text-[18px] font-light text-[#E8E2D5] leading-none" />}
+          />
         </div>
 
         {showForm && (
-          <ShellCard className="p-5 mb-4 lum-reveal">
+          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-5 mb-4 lum-reveal">
             <div className="flex items-center justify-between mb-3">
-              <div className="text-[13px] text-[#E8E2D5] flex items-center gap-2"><Sparkles className="w-4 h-4 text-[#C5A572]" /> New intention</div>
-              <button onClick={() => setShowForm(false)} className="text-[#9C9489] hover:text-[#E8E2D5]"><X className="w-4 h-4" /></button>
+              <div className="text-[13px] text-[#E8E2D5] flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#C5A572]" /> New intention
+              </div>
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-[#9C9489] hover:text-[#E8E2D5] transition focus-ring rounded-sm p-1"
+                aria-label="Close form"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
             <div className="space-y-3">
               <div>
                 <Label className="text-[12px] text-[#9C9489]">What do you want to manifest?</Label>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" placeholder="e.g. A loving, supportive relationship" />
+                <Input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5 focus-visible:border-[#C5A572]/60"
+                  placeholder="e.g. A loving, supportive relationship"
+                />
               </div>
               <div>
                 <Label className="text-[12px] text-[#9C9489]">Your affirmation (optional)</Label>
-                <Textarea value={statement} onChange={(e) => setStatement(e.target.value)} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5 min-h-[60px]" placeholder="I am worthy of love and it flows to me effortlessly." />
+                <Textarea
+                  value={statement}
+                  onChange={(e) => setStatement(e.target.value)}
+                  className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5 min-h-[60px] focus-visible:border-[#C5A572]/60"
+                  placeholder="I am worthy of love and it flows to me effortlessly."
+                />
               </div>
               <div>
                 <Label className="text-[12px] text-[#9C9489]">Daily reminder time (optional)</Label>
-                <Input type="time" value={reminderTime} onChange={(e) => setReminderTime(e.target.value)} className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5" />
+                <Input
+                  type="time"
+                  value={reminderTime}
+                  onChange={(e) => setReminderTime(e.target.value)}
+                  className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5 focus-visible:border-[#C5A572]/60"
+                />
               </div>
-              <div className="text-[11px] text-[#9C9489] leading-relaxed">
-                Baydin auto-detects the intention and suggests a Solfeggio frequency ({user.language === "my" ? "မြန်မာ" : "Vedic"} wisdom).
+              <div className="flex items-start gap-1.5 text-[11px] text-[#9C9489] leading-relaxed">
+                <Sparkles className="w-3 h-3 text-[#C5A572] mt-0.5 shrink-0" />
+                <span>
+                  Baydin auto-detects the intention and suggests a Solfeggio frequency ({user.language === "my" ? "မြန်မာ" : "Vedic"} wisdom).
+                </span>
               </div>
-              <GradientButton onClick={create} disabled={creating} className="w-full">
+              <ShimmerButton onClick={create} disabled={creating} className="w-full">
                 {creating ? "Setting intention…" : "Set intention"}
-              </GradientButton>
+              </ShimmerButton>
             </div>
-          </ShellCard>
+          </AuroraGlowCard>
         )}
 
         {/* Goals list */}
@@ -148,7 +220,7 @@ function GoalCard({ goal, onChange }: { goal: any; onChange: () => void }) {
   }
 
   return (
-    <GlassCard className="p-4">
+    <AuroraGlowCard glowColor={intention.color} glowIntensity={0.12} className="p-4">
       <div className="flex items-start gap-3">
         <div
           className="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0 border"
@@ -157,60 +229,95 @@ function GoalCard({ goal, onChange }: { goal: any; onChange: () => void }) {
           {intention.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
+          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
             <div className="text-[14px] text-[#E8E2D5] font-medium truncate">{goal.title}</div>
-            <Pill className="text-[9px]" style={{ borderColor: `${intention.color}30`, color: intention.color }}>{intention.label}</Pill>
+            <GlowPill color={intention.color} className="text-[10px]">{intention.label}</GlowPill>
           </div>
           {goal.statement && goal.statement !== goal.title && (
             <div className="text-[12px] text-[#9C9489] italic mb-2">"{goal.statement}"</div>
           )}
-          <div className="flex items-center gap-3 text-[11px] text-[#9C9489]">
+          <div className="flex items-center gap-3 text-[11px] text-[#9C9489] flex-wrap">
             {goal.streak > 0 && (
-              <span className="flex items-center gap-1 text-[#7A8B6F]">
-                <Flame className="w-3 h-3" /> {goal.streak}-day streak
+              <span className="flex items-center gap-1 text-[#F09A3D]">
+                <Flame className="w-3 h-3" />
+                <NumberTicker value={goal.streak} suffix="-day streak" className="tabular-nums" />
               </span>
             )}
-            <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> {goal.totalConfirmations} total</span>
-            {freq && <span className="flex items-center gap-1 text-[#C5A572]">♪ {freq}Hz</span>}
+            <span className="flex items-center gap-1">
+              <TrendingUp className="w-3 h-3" />
+              <NumberTicker value={goal.totalConfirmations || 0} suffix=" total" className="tabular-nums" />
+            </span>
+            {freq > 0 && (
+              <span className="flex items-center gap-1 text-[#C5A572]">
+                <Music2 className="w-3 h-3" /> {freq}Hz
+              </span>
+            )}
           </div>
         </div>
         <div className="flex flex-col items-end gap-1.5">
-          <button
+          <ShimmerButton
             onClick={confirm}
             disabled={confirming || goal.confirmedToday}
-            className={cn(
-              "px-3 py-1.5 rounded-full text-[11px] transition border whitespace-nowrap",
-              goal.confirmedToday
-                ? "border-leaf/20 bg-leaf/10 text-[#7A8B6F]"
-                : "border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572] hover:bg-[#C5A572]/20 active:scale-95"
-            )}
+            tone={goal.confirmedToday ? "parchment" : "gold"}
+            className="px-3 py-1.5 text-[11px] whitespace-nowrap"
           >
-            {goal.confirmedToday ? <span className="flex items-center gap-1"><Check className="w-3 h-3" /> Done</span> : confirming ? "…" : "Confirm"}
+            {goal.confirmedToday ? (
+              <span className="flex items-center gap-1"><Check className="w-3 h-3" /> Done</span>
+            ) : confirming ? (
+              "…"
+            ) : (
+              <>Confirm <span className="inline-flex items-center gap-0.5">· <CloverIcon className="w-3 h-3" filled /> +1</span></>
+            )}
+          </ShimmerButton>
+          <button
+            onClick={archive}
+            className="text-[10px] text-[#9C9489] hover:text-[#C26B5C] transition focus-ring rounded-sm px-1 py-0.5"
+          >
+            Archive
           </button>
-          <button onClick={archive} className="text-[10px] text-[#9C9489] hover:text-[#C26B5C] transition">Archive</button>
         </div>
       </div>
-    </GlassCard>
+    </AuroraGlowCard>
   );
 }
 
-function StatCard({ icon: Icon, label, value, sub }: { icon: any; label: string; value: string; sub?: string }) {
+function StatCard({
+  icon, label, value, glow,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  glow: string;
+}) {
   return (
-    <GlassCard className="p-3 text-center">
-      <Icon className="w-4 h-4 text-[#C5A572] mx-auto mb-1" />
-      <div className="text-[18px] font-light text-[#E8E2D5] leading-none">{value}</div>
-      <div className="text-[10px] text-[#9C9489] mt-0.5">{label}{sub ? ` ${sub}` : ""}</div>
-    </GlassCard>
+    <AuroraGlowCard glowColor={glow} glowIntensity={0.1} className="p-3 text-center">
+      <div className="flex justify-center mb-1" style={{ color: glow }}>{icon}</div>
+      <div className="flex items-center justify-center">{value}</div>
+      <div className="text-[10px] text-[#9C9489] mt-0.5">{label}</div>
+    </AuroraGlowCard>
   );
 }
 
 function Gate({ onAuth }: { onAuth: () => void }) {
   return (
-    <div className="h-full flex items-center justify-center px-6 text-center">
-      <div>
-        <Target className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
-        <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to manifest</div>
-        <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="warm" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+        <div className="flex flex-col items-center justify-center text-center py-20">
+          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.15} className="max-w-sm w-full p-10 text-center">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 border border-[#C5A572]/30" style={{ background: "#C5A57210" }}>
+              <Target className="w-7 h-7 text-[#C5A572]" />
+            </div>
+            <LiquidMetalText as="h1" className="serif-display text-[1.75rem] block mb-2">Sign in to manifest</LiquidMetalText>
+            <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">
+              Set daily intentions, confirm them, and watch the universe conspire with you.
+            </p>
+            <ShimmerButton onClick={onAuth} className="w-full">Sign in</ShimmerButton>
+          </AuroraGlowCard>
+        </div>
       </div>
     </div>
   );
@@ -218,18 +325,30 @@ function Gate({ onAuth }: { onAuth: () => void }) {
 
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
-    <div className="h-full flex items-center justify-center px-6">
-      <ShellCard className="max-w-md w-full p-8 text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-leaf/20 to-gold/10 border border-leaf/20 mb-4">
-          <Target className="w-7 h-7 text-[#7A8B6F]" />
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="warm" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+        <div className="flex items-center justify-center py-10">
+          <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.15} className="max-w-md w-full p-8 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 border border-[#7A8B6F]/30" style={{ background: "#7A8B6F15" }}>
+              <Target className="w-7 h-7 text-[#7A8B6F]" />
+            </div>
+            <LiquidMetalText as="h2" className="serif-display text-[1.5rem] block mb-2">What do you want to call in?</LiquidMetalText>
+            <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">
+              Manifestation works through daily repetition. Set an intention, confirm it each day, and watch the universe conspire with you.
+            </p>
+            <ShimmerButton onClick={onCreate} className="w-full">
+              <Plus className="w-4 h-4" /> Set your first intention
+            </ShimmerButton>
+            <div className="mt-3 text-[11px] text-[#7A8B6F] flex items-center justify-center gap-1">
+              <CloverIcon className="w-3 h-3" filled /> +1 Luck for every daily confirmation
+            </div>
+          </AuroraGlowCard>
         </div>
-        <h2 className="text-[20px] font-light text-[#E8E2D5] mb-2">What do you want to call in?</h2>
-        <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">
-          Manifestation works through daily repetition. Set an intention, confirm it each day, and watch the universe conspire with you.
-        </p>
-        <GoldButton onClick={onCreate} className="w-full"><Plus className="w-4 h-4" /> Set your first intention</GoldButton>
-        <div className="mt-3 text-[11px] text-[#7A8B6F]">+1 Luck for every daily confirmation</div>
-      </ShellCard>
+      </div>
     </div>
   );
 }

@@ -1,8 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { GlassCard, GoldButton, Pill, SectionTitle, ShellCard } from "@/components/lumina/primitives";
+import { GoldButton, StarField } from "@/components/lumina/primitives";
+import {
+  AuroraGlowCard,
+  GlowPill,
+  LiquidMetalText,
+  ShimmerButton,
+  AnimatedGradientBackground,
+} from "@/components/lumina/premium-ui";
 import { useMe, api } from "@/lib/api-client";
+import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { BookOpen, Bookmark, BookmarkCheck, ChevronDown, ChevronRight, Share2, Sparkles, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -12,6 +20,7 @@ import { TAROT_DECK } from "@/lib/tarot-data";
 export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
   const { data } = useMe();
   const user = data?.user;
+  const { setView } = useStore();
   const [readings, setReadings] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [savedOnly, setSavedOnly] = React.useState(false);
@@ -47,21 +56,51 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
 
   if (!user) {
     return (
-      <div className="h-full flex items-center justify-center px-6 text-center">
-        <div>
-          <BookOpen className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
-          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to view your history</div>
-          <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
+      <div className="h-full overflow-y-auto lumina-scroll relative">
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <AnimatedGradientBackground variant="cosmic" />
+          <StarField count={30} />
+        </div>
+        <div className="max-w-3xl mx-auto px-6 py-12 relative z-10 min-w-0 overflow-hidden flex flex-col items-center justify-center text-center">
+          <div className="flex justify-center mb-4">
+            <div className="w-14 h-14 rounded-full border border-[#C5A572]/30 bg-[#C5A572]/5 flex items-center justify-center">
+              <BookOpen className="w-7 h-7 text-[#C5A572]" />
+            </div>
+          </div>
+          <LiquidMetalText as="h1" className="serif-display text-[1.75rem] text-[#E8E2D5] tracking-tight block mb-2">
+            Sign in to view your history
+          </LiquidMetalText>
+          <p className="text-[13px] text-[#9C9489] mb-6 max-w-xs">
+            Your tarot readings and reflections will appear here.
+          </p>
+          <GoldButton onClick={onAuth} className="mt-1">Sign in</GoldButton>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
-      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
-        <div className="flex items-center justify-between mb-6">
-          <SectionTitle eyebrow="Your past readings" title="Tarot History" subtitle="Browse, bookmark & share your past tarot readings." />
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="cosmic" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+        {/* Hero */}
+        <div className="mb-6 lum-reveal">
+          <GlowPill className="mb-3">
+            <BookOpen className="w-3 h-3" /> Your past readings
+          </GlowPill>
+          <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.25rem] leading-[1.1] tracking-tight block mb-2">
+            Tarot History
+          </LiquidMetalText>
+          <p className="t-body text-[#9C9489] leading-[1.6]">
+            Browse, bookmark & share your past tarot readings.
+          </p>
+        </div>
+
+        {/* Filter control */}
+        <div className="flex items-center justify-end mb-5">
           <button
             onClick={() => setSavedOnly(!savedOnly)}
             className={cn("px-3 py-1.5 rounded-full text-[11px] border transition flex items-center gap-1.5 shrink-0", savedOnly ? "border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572]" : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5]")}
@@ -72,24 +111,27 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
         </div>
 
         {loading ? (
-          <div className="text-center py-12">
+          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-8 text-center">
             <Loader2 className="w-6 h-6 text-[#C5A572] animate-spin mx-auto mb-2" />
             <div className="text-[13px] text-[#9C9489]">Loading readings…</div>
-          </div>
+          </AuroraGlowCard>
         ) : readings.length === 0 ? (
-          <ShellCard className="p-8 text-center">
+          <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.12} className="p-8 text-center">
             <Sparkles className="w-8 h-8 text-[#9C9489] mx-auto mb-3" />
             <div className="text-[14px] text-[#E8E2D5] mb-1">{savedOnly ? "No saved readings yet" : "No readings yet"}</div>
-            <div className="text-[12px] text-[#9C9489]">{savedOnly ? "Bookmark readings you want to keep." : "Draw your first cards from the Tarot tab."}</div>
-          </ShellCard>
+            <div className="text-[12px] text-[#9C9489] mb-4">{savedOnly ? "Bookmark readings you want to keep." : "Draw your first cards from the Tarot tab."}</div>
+            <ShimmerButton onClick={() => setView("tarot")}>
+              <Sparkles className="w-3.5 h-3.5" /> Draw your first card
+            </ShimmerButton>
+          </AuroraGlowCard>
         ) : (
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             {readings.map((r) => {
               const isExpanded = expanded === r.id;
               let cards: any[] = [];
               try { cards = JSON.parse(r.cardsJson); } catch {}
               return (
-                <GlassCard key={r.id} className="overflow-hidden">
+                <AuroraGlowCard key={r.id} glowColor={isExpanded ? "#C5A572" : "#9E8AC9"} glowIntensity={isExpanded ? 0.2 : 0.1} className="overflow-hidden">
                   {/* Header row */}
                   <div
                     onClick={() => setExpanded(isExpanded ? null : r.id)}
@@ -102,7 +144,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                         return (
                           <div
                             key={i}
-                            className={cn("w-8 h-12 rounded border border-[#2A2722] bg-gradient-to-br from-[#121815] to-[#0C100E]-2 flex items-center justify-center text-sm", c.reversed && "rotate-180")}
+                            className={cn("w-8 h-12 rounded border border-[#2A2722] bg-gradient-to-br from-[#121815] to-[#0C100E] flex items-center justify-center text-sm", c.reversed && "rotate-180")}
                             style={{ zIndex: 3 - i }}
                           >
                             {card?.symbol || "✦"}
@@ -119,7 +161,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                     <div className="flex-1 min-w-0">
                       <div className="text-[13px] text-[#E8E2D5] truncate">{r.question}</div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <Pill className="text-[9px]">{r.spreadType}</Pill>
+                        <GlowPill color="#9E8AC9" className="text-[9px]">{r.spreadType}</GlowPill>
                         <span className="text-[10px] text-[#9C9489]">{new Date(r.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
@@ -129,6 +171,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleSave(r.id); }}
                         className={cn("p-1.5 rounded-full transition", r.saved ? "text-[#C5A572]" : "text-[#9C9489]/40 hover:text-[#9C9489]")}
+                        aria-label={r.saved ? "Remove bookmark" : "Save reading"}
                       >
                         {r.saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                       </button>
@@ -145,7 +188,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                           const card = TAROT_DECK.find((t) => t.id === c.id);
                           return (
                             <div key={i} className="flex flex-col items-center">
-                              <div className={cn("w-12 h-18 rounded border border-[#C5A572]/20 bg-gradient-to-br from-[#121815] to-[#0C100E]-2 flex items-center justify-center text-lg p-1", c.reversed && "rotate-180")} style={{ height: "72px" }}>
+                              <div className={cn("w-12 rounded border border-[#C5A572]/20 bg-gradient-to-br from-[#121815] to-[#0C100E] flex items-center justify-center text-lg p-1", c.reversed && "rotate-180")} style={{ height: "72px" }}>
                                 {card?.symbol || "✦"}
                               </div>
                               <div className="text-[9px] text-[#E8E2D5] mt-1 text-center max-w-[60px] truncate">{card?.nameShort}</div>
@@ -158,16 +201,27 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                       <div className="serif prose-editorial text-[13px] text-[#E8E2D5]/85 leading-relaxed">
                         <ReactMarkdown>{r.interpretation}</ReactMarkdown>
                       </div>
-                      {/* Share */}
-                      <button
-                        onClick={() => shareReading(r)}
-                        className="mt-3 px-3 py-1.5 rounded-full text-[11px] text-[#9C9489] hover:text-[#C5A572] border border-[#2A2722] hover:border-[#C5A572]/30 transition flex items-center gap-1"
-                      >
-                        <Share2 className="w-3 h-3" /> Share this reading
-                      </button>
+                      {/* Share + reflection status */}
+                      <div className="mt-3 flex items-center gap-2">
+                        {r.saved ? (
+                          <GlowPill color="#7A8B6F" className="text-[9px]">
+                            <BookmarkCheck className="w-3 h-3" /> Saved
+                          </GlowPill>
+                        ) : (
+                          <GlowPill color="#9C9489" className="text-[9px]">
+                            <Bookmark className="w-3 h-3" /> Unsaved
+                          </GlowPill>
+                        )}
+                        <ShimmerButton
+                          onClick={() => shareReading(r)}
+                          className="py-1.5 px-3 text-[11px]"
+                        >
+                          <Share2 className="w-3 h-3" /> Share this reading
+                        </ShimmerButton>
+                      </div>
                     </div>
                   )}
-                </GlassCard>
+                </AuroraGlowCard>
               );
             })}
           </div>
@@ -206,7 +260,7 @@ function ReflectionsHistory() {
         {reflections.map((r) => {
           const card = r.card ? TAROT_DECK.find((t) => t.id === r.card.id) : null;
           return (
-            <GlassCard key={r.id} className="p-3 flex items-start gap-3">
+            <AuroraGlowCard key={r.id} glowColor="#9E8AC9" glowIntensity={0.1} className="p-3 flex items-start gap-3">
               <div className={cn("w-8 h-12 rounded border border-[#C5A572]/20 bg-gradient-to-br from-[#121815] to-[#0C100E]-2 flex items-center justify-center text-sm shrink-0", r.card?.reversed && "rotate-180")}>
                 {card?.symbol || "✦"}
               </div>
@@ -217,7 +271,7 @@ function ReflectionsHistory() {
                 </div>
                 <div className="text-[11px] text-[#9C9489] leading-relaxed line-clamp-2 italic">"{r.reflection}"</div>
               </div>
-            </GlassCard>
+            </AuroraGlowCard>
           );
         })}
       </div>

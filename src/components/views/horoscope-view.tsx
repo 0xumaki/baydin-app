@@ -1,22 +1,64 @@
 "use client";
 
 import * as React from "react";
-import { GlassCard, GoldButton, Pill, SectionTitle } from "@/components/lumina/primitives";
+import {
+  StarField,
+} from "@/components/lumina/primitives";
+import {
+  AuroraGlowCard,
+  GlowPill,
+  LiquidMetalText,
+  NumberTicker,
+  ShimmerButton,
+  AnimatedGradientBackground,
+} from "@/components/lumina/premium-ui";
+import { CloverIcon } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
-import { Moon, Star, Sun, Sparkles, Wallet } from "lucide-react";
+import { Moon, Sparkles, Star, Loader2, Check, X, CalendarDays, Clock, Palette, Hash, Sun, Wind } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
-import { ZODIAC_SYMBOLS } from "@/lib/astrology";
+import { ZODIAC_SYMBOLS, ZODIAC_MY } from "@/lib/astrology";
 
-const SIGNS = ["aries","taurus","gemini","cancer","leo","virgo","libra","scorpio","sagittarius","capricorn","aquarius","pisces"];
+const SIGNS = [
+  "aries", "taurus", "gemini", "cancer", "leo", "virgo",
+  "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces",
+] as const;
+
+const SIGN_LABELS: Record<string, string> = {
+  aries: "Aries", taurus: "Taurus", gemini: "Gemini", cancer: "Cancer",
+  leo: "Leo", virgo: "Virgo", libra: "Libra", scorpio: "Scorpio",
+  sagittarius: "Sagittarius", capricorn: "Capricorn", aquarius: "Aquarius", pisces: "Pisces",
+};
+
+const PERIODS = [
+  { id: "daily", label: "Daily" },
+  { id: "weekly", label: "Weekly" },
+  { id: "monthly", label: "Monthly" },
+] as const;
+
+const LUCK_COST_PERSONALIZED = 2;
 
 export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
   const { data } = useMe();
   const user = data?.user;
-  const [sign, setSign] = React.useState("aries");
+  const [sign, setSign] = React.useState<string>("aries");
   const [type, setType] = React.useState<"daily" | "weekly" | "monthly">("daily");
   const [horoscope, setHoroscope] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(false);
+
+  // Sync sign from birth data once user loads
+  React.useEffect(() => {
+    if (!user) return;
+    if (user.birthData) {
+      try {
+        const bd = JSON.parse(user.birthData);
+        if (bd?.dob) {
+          const inferred = inferSunSign(bd.dob);
+          if (inferred) setSign(inferred);
+        }
+      } catch {}
+    }
+  }, [user]);
 
   async function fetchH(s?: string, t?: typeof type) {
     if (!user) { onAuth(); return; }
@@ -33,77 +75,396 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
   function changeType(t: typeof type) { setType(t); setHoroscope(null); }
 
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
-      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
-        <SectionTitle eyebrow="Daily guidance" title="Horoscope" subtitle="Written by Gemini from live transit data." className="mb-6" />
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="cosmic" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
 
-        <div className="flex items-center gap-2 mb-4">
-          {(["daily", "weekly", "monthly"] as const).map((t) => (
-            <button key={t} onClick={() => changeType(t)} className={`px-3 py-1.5 rounded-full text-[12px] border transition ${type === t ? "bg-[#C5A572]/15 text-[#C5A572] border-[#C5A572]/30" : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5]"}`}>
-              {t[0].toUpperCase() + t.slice(1)}
-            </button>
-          ))}
+        {/* ===== Hero ===== */}
+        <div className="mb-7 lum-reveal">
+          <GlowPill className="mb-3">
+            <Sparkles className="w-3 h-3" /> Daily guidance
+          </GlowPill>
+          <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-2">
+            Your Horoscope
+          </LiquidMetalText>
+          <p className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch]">
+            Written by Gemini from live transit data. Personalized readings draw from your natal chart — costs {LUCK_COST_PERSONALIZED} Luck each. Generic sun-sign guidance is free.
+          </p>
         </div>
 
-        <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5 mb-5">
-          {SIGNS.map((s, i) => (
-            <button key={s} onClick={() => changeSign(s)} className={`aspect-square rounded-lg flex items-center justify-center text-lg transition ${sign === s ? "bg-[#C5A572]/15 text-[#C5A572] border border-[#C5A572]/30" : "bg-white/[0.02] text-[#9C9489] hover:text-[#E8E2D5] hover:bg-white/[0.04]"}`} title={s}>
-              {ZODIAC_SYMBOLS[i]}
-            </button>
-          ))}
+        {/* ===== Sign selector ===== */}
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-2.5">
+            <Star className="w-3.5 h-3.5 text-[#C5A572]" />
+            <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Choose your sign</span>
+          </div>
+          <div className="flex gap-1.5 overflow-x-auto lum-no-scrollbar pb-2 -mx-1 px-1">
+            {SIGNS.map((s, i) => (
+              <button
+                key={s}
+                onClick={() => changeSign(s)}
+                aria-pressed={sign === s}
+                title={SIGN_LABELS[s]}
+                className={`shrink-0 w-11 h-11 rounded-sm border flex flex-col items-center justify-center transition focus-ring ${
+                  sign === s
+                    ? "border-[#C5A572]/60 bg-[#C5A572]/10 text-[#C5A572]"
+                    : "border-[#2A2722] bg-white/[0.02] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#4A4540]"
+                }`}
+              >
+                <span className="text-[16px] leading-none">{ZODIAC_SYMBOLS[i]}</span>
+              </button>
+            ))}
+          </div>
+          <div className="mt-1.5 text-[11px] text-[#9C9489]">
+            Selected · <span className="text-[#C5A572]">{SIGN_LABELS[sign]}</span>
+            <span className="text-[#9C9489]/60"> · {ZODIAC_MY[SIGNS.indexOf(sign as typeof SIGNS[number])]}</span>
+          </div>
         </div>
 
-        <GoldButton onClick={() => fetchH()} disabled={loading} className="w-full mb-5">
-          {loading ? "Reading the stars…" : <><Moon className="w-4 h-4" /> {user?.birthData ? "Personalized · 2 Luck" : "Read horoscope"}</>}
-        </GoldButton>
+        {/* ===== Period tabs ===== */}
+        <div className="mb-5">
+          <div className="flex gap-2 border-b border-[#2A2722]">
+            {PERIODS.map((p) => {
+              const active = type === p.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => changeType(p.id)}
+                  className={`relative px-4 py-2 text-[12px] font-medium transition focus-ring ${
+                    active ? "text-[#C5A572]" : "text-[#9C9489] hover:text-[#E8E2D5]"
+                  }`}
+                >
+                  {p.label}
+                  {active && (
+                    <span
+                      aria-hidden
+                      className="absolute left-0 right-0 -bottom-px h-[2px] bg-gradient-to-r from-transparent via-[#C5A572] to-transparent"
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
+        {/* ===== Read horoscope button (the only fetch trigger) ===== */}
+        <ShimmerButton
+          onClick={() => fetchH()}
+          disabled={loading}
+          className="w-full mb-5 py-3"
+        >
+          {loading ? (
+            <><Loader2 className="w-4 h-4 animate-spin" /> Reading the stars…</>
+          ) : (
+            <>
+              <Moon className="w-4 h-4" />
+              {user?.birthData ? (
+                <>Personalized · {LUCK_COST_PERSONALIZED} <CloverIcon className="w-3.5 h-3.5" filled /></>
+              ) : (
+                <>Read horoscope</>
+              )}
+            </>
+          )}
+        </ShimmerButton>
+
+        {/* ===== Loading state ===== */}
         {loading && (
-          <GlassCard className="p-5">
+          <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.12} className="p-5 mb-5">
             <div className="animate-pulse space-y-3">
-              <div className="h-4 w-3/4 bg-white/5 rounded" />
-              <div className="h-3 w-full bg-white/5 rounded" />
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-24 bg-white/5 rounded" />
+                <div className="h-3 w-12 bg-white/5 rounded" />
+              </div>
+              <div className="h-4 w-full bg-white/5 rounded" />
               <div className="h-3 w-full bg-white/5 rounded" />
               <div className="h-3 w-5/6 bg-white/5 rounded" />
               <div className="h-3 w-full bg-white/5 rounded" />
               <div className="h-3 w-2/3 bg-white/5 rounded" />
+              <div className="grid grid-cols-2 gap-3 pt-3">
+                <div className="h-14 bg-white/[0.03] rounded" />
+                <div className="h-14 bg-white/[0.03] rounded" />
+              </div>
             </div>
-          </GlassCard>
+          </AuroraGlowCard>
         )}
 
+        {/* ===== Main reading ===== */}
         {horoscope && !loading && (
-          <GlassCard className="p-5">
-            {horoscope.personalized && <Pill variant="gold" className="mb-3">Personalized for your chart</Pill>}
-            <div className="serif prose-editorial text-[14px] text-[#E8E2D5]/90">
-              <ReactMarkdown>{horoscope.content}</ReactMarkdown>
-            </div>
-            {horoscope.guidance && (
-              <div className="mt-4 pt-4 border-t border-[#2A2722] grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {horoscope.guidance.lucky_color && <Stat label="Lucky color" value={horoscope.guidance.lucky_color} />}
-                {horoscope.guidance.lucky_number !== undefined && <Stat label="Lucky number" value={String(horoscope.guidance.lucky_number)} />}
-                {horoscope.guidance.lucky_time && <Stat label="Lucky time" value={horoscope.guidance.lucky_time} />}
+          <div className="space-y-5">
+            <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.18} className="p-5">
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <GlowPill color="#9E8AC9"><Moon className="w-3 h-3" /> {SIGN_LABELS[horoscope.sign] || SIGN_LABELS[sign]} · {horoscope.type}</GlowPill>
+                {horoscope.personalized && (
+                  <GlowPill color="#C5A572">
+                    <Sparkles className="w-3 h-3" /> Personalized for your chart
+                  </GlowPill>
+                )}
+                {horoscope.luckCost > 0 && (
+                  <GlowPill color="#7A8B6F">
+                    <CloverIcon className="w-3 h-3" filled /> {horoscope.luckCost} spent
+                  </GlowPill>
+                )}
               </div>
-            )}
-            {horoscope.highlights?.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {horoscope.highlights.map((h: string, i: number) => <Pill key={i} variant="gold" className="text-[10px]">{h}</Pill>)}
+              <div className="serif prose-editorial text-[14px] text-[#E8E2D5]/90 leading-[1.75]">
+                <ReactMarkdown>{horoscope.content}</ReactMarkdown>
               </div>
+            </AuroraGlowCard>
+
+            {/* ===== Lucky elements grid ===== */}
+            <LuckyElementsGrid horoscope={horoscope} />
+
+            {/* ===== DO / DON'T lists ===== */}
+            <DoDontLists horoscope={horoscope} />
+
+            {/* ===== Highlights ===== */}
+            {Array.isArray(horoscope.highlights) && horoscope.highlights.length > 0 && (
+              <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.15} className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-4 h-4 text-[#C5A572]" />
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Highlights</span>
+                </div>
+                <ul className="space-y-2">
+                  {horoscope.highlights.map((h: string, i: number) => (
+                    <li key={i} className="flex items-start gap-2.5">
+                      <span className="text-[#C5A572] mt-0.5 shrink-0">✦</span>
+                      <span className="text-[13px] text-[#E8E2D5]/90 leading-[1.6]">{h}</span>
+                    </li>
+                  ))}
+                </ul>
+              </AuroraGlowCard>
             )}
-          </GlassCard>
+
+            {/* ===== Transit summary ===== */}
+            <TransitSummary horoscope={horoscope} />
+          </div>
         )}
 
+        {/* ===== Empty state ===== */}
         {!horoscope && !loading && (
-          <div className="text-center py-12 text-[#9C9489] text-[13px]">Select your sign and read your stars.</div>
+          <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.1} className="p-8 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-12 h-12 rounded-full border border-[#C5A572]/30 bg-[#C5A572]/5 flex items-center justify-center">
+                <Moon className="w-6 h-6 text-[#C5A572]" />
+              </div>
+            </div>
+            <div className="serif-display text-[16px] text-[#E8E2D5] mb-1">The stars are quiet — for now.</div>
+            <p className="text-[12px] text-[#9C9489] leading-[1.6] max-w-xs mx-auto mb-5">
+              Select your sign above and tap <span className="text-[#C5A572]">Read horoscope</span> to receive today's guidance.
+            </p>
+            <ShimmerButton onClick={() => fetchH()} disabled={loading}>
+              <Moon className="w-4 h-4" /> Reveal today's reading
+            </ShimmerButton>
+          </AuroraGlowCard>
         )}
       </div>
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+// ============================================================
+// LuckyElementsGrid — 4 AuroraGlowCards for lucky_color, lucky_number,
+// lucky_time, lucky_day.
+// ============================================================
+function LuckyElementsGrid({ horoscope }: { horoscope: any }) {
+  const g = horoscope?.guidance;
+  const color = g?.lucky_color ?? g?.luckyColor;
+  const number = g?.lucky_number ?? g?.luckyNumber;
+  const time = g?.lucky_time ?? g?.luckyTime;
+  const day = g?.lucky_day ?? g?.luckyDay ?? new Date().toLocaleDateString("en-US", { weekday: "long" });
+
+  const items = [
+    { label: "Lucky color", value: color, icon: Palette, accent: "#C5A572" },
+    { label: "Lucky number", value: number !== undefined && number !== null ? String(number) : null, icon: Hash, accent: "#9E8AC9" },
+    { label: "Lucky time", value: time, icon: Clock, accent: "#B5CD7E" },
+    { label: "Lucky day", value: day, icon: CalendarDays, accent: "#D876A0" },
+  ];
+  const present = items.filter((it) => it.value);
+  if (present.length === 0) return null;
+
   return (
     <div>
-      <div className="text-[10px] text-[#9C9489] uppercase tracking-wide mb-0.5">{label}</div>
-      <div className="text-[13px] text-[#C5A572]">{value}</div>
+      <div className="flex items-center gap-2 mb-3">
+        <Sparkles className="w-3.5 h-3.5 text-[#C5A572]" />
+        <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Lucky Elements</span>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {items.map((it) => {
+          const Icon = it.icon;
+          return (
+            <AuroraGlowCard key={it.label} glowColor={it.accent} glowIntensity={0.18} className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <Icon className="w-4 h-4" style={{ color: it.accent }} />
+              </div>
+              <div className="text-[10px] uppercase tracking-wide text-[#9C9489] mb-1">{it.label}</div>
+              <div className="text-[14px] text-[#E8E2D5] font-medium truncate">
+                {it.value ? (
+                  typeof it.value === "string" && /^\d+$/.test(it.value) ? (
+                    <NumberTicker value={parseInt(it.value, 10)} />
+                  ) : (
+                    it.value
+                  )
+                ) : (
+                  <span className="text-[#6B6358] text-[12px]">—</span>
+                )}
+              </div>
+            </AuroraGlowCard>
+          );
+        })}
+      </div>
     </div>
   );
+}
+
+// ============================================================
+// DoDontLists — 2-column grid of AuroraGlowCards with doList and dontList.
+// Falls back to guidance.remedies (DO) and guidance.warnings (DON'T) if
+// the API doesn't return explicit doList/dontList fields.
+// ============================================================
+function DoDontLists({ horoscope }: { horoscope: any }) {
+  const g = horoscope?.guidance;
+  const doList: string[] = Array.isArray(horoscope?.doList)
+    ? horoscope.doList
+    : Array.isArray(g?.remedies) ? g.remedies : [];
+  const dontList: string[] = Array.isArray(horoscope?.dontList)
+    ? horoscope.dontList
+    : Array.isArray(g?.warnings) ? g.warnings : [];
+
+  if (doList.length === 0 && dontList.length === 0) return null;
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <Sparkles className="w-3.5 h-3.5 text-[#C5A572]" />
+        <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Guidance</span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.18} className="p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-6 h-6 rounded-full bg-[#7A8B6F]/15 border border-[#7A8B6F]/30 flex items-center justify-center shrink-0">
+              <Check className="w-3.5 h-3.5 text-[#7A8B6F]" />
+            </span>
+            <span className="text-[12px] uppercase tracking-[0.2em] text-[#7A8B6F]">Do</span>
+          </div>
+          {doList.length > 0 ? (
+            <ul className="space-y-2">
+              {doList.slice(0, 5).map((d: string, i: number) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-[#7A8B6F] mt-1 shrink-0">✓</span>
+                  <span className="text-[12px] text-[#E8E2D5]/90 leading-[1.6]">{d}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="text-[12px] text-[#6B6358] serif-italic">Lean into what feels alive today.</div>
+          )}
+        </AuroraGlowCard>
+
+        <AuroraGlowCard glowColor="#C26B5C" glowIntensity={0.18} className="p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-6 h-6 rounded-full bg-[#C26B5C]/15 border border-[#C26B5C]/30 flex items-center justify-center shrink-0">
+              <X className="w-3.5 h-3.5 text-[#C26B5C]" />
+            </span>
+            <span className="text-[12px] uppercase tracking-[0.2em] text-[#C26B5C]">Don't</span>
+          </div>
+          {dontList.length > 0 ? (
+            <ul className="space-y-2">
+              {dontList.slice(0, 5).map((d: string, i: number) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-[#C26B5C] mt-1 shrink-0">✕</span>
+                  <span className="text-[12px] text-[#E8E2D5]/90 leading-[1.6]">{d}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="text-[12px] text-[#6B6358] serif-italic">No sharp edges to avoid — proceed gently.</div>
+          )}
+        </AuroraGlowCard>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// TransitSummary — "Moon in {sign}" + first natal aspect (best-effort).
+// ============================================================
+function TransitSummary({ horoscope }: { horoscope: any }) {
+  const g = horoscope?.guidance;
+  const moonSign = g?.moon_sign ?? g?.moonSign ?? null;
+  const natalAspect = Array.isArray(g?.natal_aspects) && g.natal_aspects[0]
+    ? g.natal_aspects[0]
+    : (typeof g?.natal_aspects === "string" ? g.natal_aspects : null);
+
+  if (!moonSign && !natalAspect) return null;
+
+  return (
+    <AuroraGlowCard glowColor="#5FA9C7" glowIntensity={0.16} className="p-5">
+      <div className="flex items-center gap-2 mb-3">
+        <Wind className="w-4 h-4 text-[#5FA9C7]" />
+        <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Transit Summary</span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {moonSign && (
+          <div className="p-3 rounded-sm border border-[#2A2722] bg-white/[0.02]">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Moon className="w-3.5 h-3.5 text-[#5FA9C7]" />
+              <span className="text-[10px] uppercase tracking-wide text-[#9C9489]">Moon</span>
+            </div>
+            <div className="text-[13px] text-[#E8E2D5]">in {moonSign}</div>
+          </div>
+        )}
+        {natalAspect && (
+          <div className="p-3 rounded-sm border border-[#2A2722] bg-white/[0.02]">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Sun className="w-3.5 h-3.5 text-[#C5A572]" />
+              <span className="text-[10px] uppercase tracking-wide text-[#9C9489]">Natal Aspect</span>
+            </div>
+            <div className="text-[12px] text-[#E8E2D5] leading-[1.5]">
+              {typeof natalAspect === "string" ? natalAspect : (natalAspect?.description || JSON.stringify(natalAspect))}
+            </div>
+          </div>
+        )}
+      </div>
+    </AuroraGlowCard>
+  );
+}
+
+// ============================================================
+// Helpers
+// ============================================================
+
+/** Infer Western sun sign from "YYYY-MM-DD". */
+function inferSunSign(dob: string): string | null {
+  if (!dob) return null;
+  const m = dob.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return null;
+  const month = parseInt(m[2], 10);
+  const day = parseInt(m[3], 10);
+  const ranges: { sign: string; from: [number, number]; to: [number, number] }[] = [
+    { sign: "capricorn", from: [12, 22], to: [1, 19] },
+    { sign: "aquarius", from: [1, 20], to: [2, 18] },
+    { sign: "pisces", from: [2, 19], to: [3, 20] },
+    { sign: "aries", from: [3, 21], to: [4, 19] },
+    { sign: "taurus", from: [4, 20], to: [5, 20] },
+    { sign: "gemini", from: [5, 21], to: [6, 20] },
+    { sign: "cancer", from: [6, 21], to: [7, 22] },
+    { sign: "leo", from: [7, 23], to: [8, 22] },
+    { sign: "virgo", from: [8, 23], to: [9, 22] },
+    { sign: "libra", from: [9, 23], to: [10, 22] },
+    { sign: "scorpio", from: [10, 23], to: [11, 21] },
+    { sign: "sagittarius", from: [11, 22], to: [12, 21] },
+  ];
+  for (const r of ranges) {
+    const [fm, fd] = r.from;
+    const [tm, td] = r.to;
+    if (fm > tm) {
+      // Capricorn wrap
+      if ((month === fm && day >= fd) || (month === tm && day <= td)) return r.sign;
+    } else {
+      if ((month === fm && day >= fd) || (month === tm && day <= td)) return r.sign;
+    }
+  }
+  return null;
 }

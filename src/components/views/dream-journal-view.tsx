@@ -1,9 +1,16 @@
 "use client";
 
 import * as React from "react";
+import { StarField } from "@/components/lumina/primitives";
 import {
-  GlassCard, GoldButton, GhostButton, Pill, SectionTitle, ShellCard,
-} from "@/components/lumina/primitives";
+  AuroraGlowCard,
+  GlowPill,
+  LiquidMetalText,
+  NumberTicker,
+  ShimmerButton,
+  AnimatedGradientBackground,
+} from "@/components/lumina/premium-ui";
+import { CloverIcon } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import {
@@ -68,6 +75,8 @@ const CATEGORY_ICON: Record<string, any> = {
   animal: Flame, nature: Droplet, object: Gem, person: Star, action: Zap, emotion: Heart, setting: Moon,
 };
 
+const DREAM_INTERPRET_COST = 2;
+
 export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
   const { data, refetch } = useMe();
   const user = data?.user;
@@ -129,17 +138,7 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
     }
   }
 
-  if (!user) {
-    return (
-      <div className="h-full flex items-center justify-center px-6 text-center">
-        <div>
-          <Moon className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
-          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to begin</div>
-          <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
-        </div>
-      </div>
-    );
-  }
+  if (!user) return <Gate onAuth={onAuth} />;
 
   // Active entry detail
   if (activeEntry) {
@@ -167,18 +166,32 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
     );
   }
 
+  const favoritesCount = entries.filter((e) => e.isFavorite).length;
+  const recurringCount = entries.filter((e) => e.isRecurring).length;
+  const interpretedCount = entries.filter((e) => e.interpretation).length;
+
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
-      <div className="max-w-5xl mx-auto px-6 py-10 lg:py-14">
-        {/* Header — serif headline */}
-        <div className="flex items-end justify-between mb-8 flex-wrap gap-4 lum-reveal">
-          <div>
-            <div className="text-[13px] text-[#6B6358] mb-2">Dreams and their patterns</div>
-            <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.1] tracking-tight">
-              Dream journal
-            </h1>
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="warm" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-5xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+
+        {/* ===== Hero ===== */}
+        <div className="flex items-end justify-between mb-7 flex-wrap gap-4 lum-reveal">
+          <div className="min-w-0">
+            <GlowPill className="mb-3" color="#9CB4D1">
+              <Moon className="w-3 h-3" /> Dreams and their patterns
+            </GlowPill>
+            <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block">
+              Dream Journal
+            </LiquidMetalText>
+            <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch] mt-2">
+              Record dreams upon waking. Baydin detects archetypal symbols, computes the lunar context, and offers interpretations grounded in Vedic and Jungian tradition.
+            </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setFilterFav((v) => !v)}
               className={cn(
@@ -191,28 +204,19 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
             >
               <Heart className={cn("w-4 h-4", filterFav && "fill-current")} />
             </button>
-            <button
-              onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-2 py-2 px-4 bg-[#E8E2D5] text-[#0A0908] text-[13px] font-medium hover:bg-white transition rounded-sm focus-ring"
-            >
-              <Plus className="w-3.5 h-3.5" /> Record dream
-            </button>
+            <ShimmerButton onClick={() => setShowForm(true)} className="py-2 px-4 text-[12px]">
+              <Plus className="w-3.5 h-3.5" /> New dream
+            </ShimmerButton>
           </div>
         </div>
 
-        {/* Stats — text, not pills */}
+        {/* Stats */}
         {entries.length > 0 && (
-          <div className="flex flex-wrap gap-x-6 gap-y-2 mb-8 text-[12px] text-[#6B6358]">
-            <span>{entries.length} dream{entries.length > 1 ? "s" : ""}</span>
-            {entries.filter((e) => e.isFavorite).length > 0 && (
-              <span>{entries.filter((e) => e.isFavorite).length} favorite{entries.filter((e) => e.isFavorite).length > 1 ? "s" : ""}</span>
-            )}
-            {entries.filter((e) => e.isRecurring).length > 0 && (
-              <span>{entries.filter((e) => e.isRecurring).length} recurring</span>
-            )}
-            {entries.filter((e) => e.interpretation).length > 0 && (
-              <span>{entries.filter((e) => e.interpretation).length} interpreted</span>
-            )}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
+            <StatPill glow="#9CB4D1" icon={<BookOpen className="w-3.5 h-3.5" />} label="Dreams" value={entries.length} />
+            <StatPill glow="#C5A572" icon={<Heart className="w-3.5 h-3.5" />} label="Favorites" value={favoritesCount} />
+            <StatPill glow="#D4A0B8" icon={<RefreshCw className="w-3.5 h-3.5" />} label="Recurring" value={recurringCount} />
+            <StatPill glow="#7A8B6F" icon={<Sparkles className="w-3.5 h-3.5" />} label="Interpreted" value={interpretedCount} />
           </div>
         )}
 
@@ -241,6 +245,29 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
   );
 }
 
+function StatPill({
+  glow, icon, label, value,
+}: {
+  glow: string;
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+}) {
+  return (
+    <AuroraGlowCard glowColor={glow} glowIntensity={0.1} className="p-3">
+      <div className="flex items-center gap-2.5">
+        <span style={{ color: glow }}>{icon}</span>
+        <div>
+          <div className="text-[18px] font-light text-[#E8E2D5] leading-none tabular-nums">
+            <NumberTicker value={value} />
+          </div>
+          <div className="text-[10px] text-[#9C9489] mt-0.5">{label}</div>
+        </div>
+      </div>
+    </AuroraGlowCard>
+  );
+}
+
 // ============================================================
 // ENTRY CARD
 // ============================================================
@@ -254,40 +281,48 @@ function EntryCard({
 }) {
   const mood = MOODS.find((m) => m.id === entry.mood) || MOODS[5];
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onClick}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }}
-      className="w-full p-5 border-b border-[#2A2722] hover:bg-[#0F0D0B] transition group cursor-pointer text-left focus-ring"
-    >
-      <div className="flex items-start gap-4">
-        {/* Mood — just the emoji, no badge chrome */}
-        <div className="text-[1.5rem] leading-none mt-1 shrink-0" title={mood.label}>
+    <AuroraGlowCard glowColor={mood.color} glowIntensity={0.1} className="p-5">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onClick}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }}
+        className="flex items-start gap-4 cursor-pointer text-left focus-ring rounded-sm"
+      >
+        {/* Mood emoji */}
+        <div
+          className="w-11 h-11 rounded-sm flex items-center justify-center shrink-0 text-xl border"
+          style={{ background: `${mood.color}15`, borderColor: `${mood.color}40` }}
+          title={mood.label}
+        >
           {mood.emoji}
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-baseline gap-2 mb-1">
+          <div className="flex items-baseline gap-2 mb-1 flex-wrap">
             <div className="serif text-[1.125rem] text-[#E8E2D5] truncate">{entry.title}</div>
             {entry.isRecurring && (
-              <span className="text-[10px] text-[#6B6358] serif-italic">recurring</span>
+              <GlowPill color="#D4A0B8" className="text-[9px]">recurring</GlowPill>
             )}
             {entry.interpretation && (
-              <span className="text-[10px] text-[#C5A572] serif-italic">interpreted</span>
+              <GlowPill color="#C5A572" className="text-[9px]">
+                <Sparkles className="w-2.5 h-2.5" /> interpreted
+              </GlowPill>
             )}
           </div>
           <div className="text-[13px] text-[#9C9489] line-clamp-2 mb-2 leading-[1.6]">{entry.content}</div>
 
-          {/* Symbols + lunar — text, not pills */}
-          <div className="flex items-center gap-3 flex-wrap text-[11px] text-[#6B6358]">
-            <span>
+          {/* Date + mood GlowPill + symbols */}
+          <div className="flex items-center gap-2 flex-wrap text-[11px] text-[#6B6358]">
+            <GlowPill color={mood.color} className="text-[10px]">
               {new Date(entry.dreamDate + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-            </span>
+            </GlowPill>
+            <GlowPill color={mood.color} className="text-[10px]">{mood.label}</GlowPill>
             {entry.lunarContext && (
-              <span title={`${entry.lunarContext.moonPhase} · ${entry.lunarContext.nakshatra}`}>
+              <GlowPill color="#9CB4D1" className="text-[10px]" >
+                <Moon className="w-2.5 h-2.5" />
                 {entry.lunarContext.emoji} {entry.lunarContext.nakshatra}
-              </span>
+              </GlowPill>
             )}
             {entry.symbols.slice(0, 4).map((s) => (
               <span key={s} className="text-[#9C9489]">#{s}</span>
@@ -315,7 +350,7 @@ function EntryCard({
           </button>
         </div>
       </div>
-    </div>
+    </AuroraGlowCard>
   );
 }
 
@@ -324,18 +359,18 @@ function EntryCard({
 // ============================================================
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
-    <div className="pt-12 border-t border-[#2A2722]">
-      <div className="serif text-[1.5rem] text-[#E8E2D5] mb-3">Your dream journal is empty.</div>
-      <p className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch] mb-6">
+    <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.15} className="p-8 lg:p-12 text-center">
+      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 border border-[#9CB4D1]/30" style={{ background: "#9CB4D115" }}>
+        <Moon className="w-7 h-7 text-[#9CB4D1]" />
+      </div>
+      <LiquidMetalText as="h2" className="serif-display text-[1.5rem] block mb-3">Your dream journal is empty.</LiquidMetalText>
+      <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch] mb-6 mx-auto">
         Record your dreams upon waking. Baydin detects archetypal symbols, computes the lunar context, and offers an interpretation grounded in Vedic and Jungian tradition.
       </p>
-      <button
-        onClick={onCreate}
-        className="inline-flex items-center gap-2 py-3 px-6 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition rounded-sm focus-ring"
-      >
+      <ShimmerButton onClick={onCreate} className="py-3 px-6">
         <Plus className="w-4 h-4" /> Record your first dream
-      </button>
-    </div>
+      </ShimmerButton>
+    </AuroraGlowCard>
   );
 }
 
@@ -377,20 +412,30 @@ function EntryForm({
   }
 
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
-      <form onSubmit={submit} className="max-w-2xl mx-auto px-6 py-12 lg:py-16">
-        <button type="button" onClick={onCancel} className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition mb-4 focus-ring rounded-sm">
-          ← Cancel
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="warm" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition mb-4 focus-ring rounded-sm inline-flex items-center gap-1"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" /> Cancel
         </button>
 
-        <div className="mb-10 lum-reveal">
-          <div className="text-[13px] text-[#6B6358] mb-2">A new entry</div>
-          <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.1] tracking-tight">
+        <div className="mb-8 lum-reveal">
+          <GlowPill className="mb-3" color="#9CB4D1">
+            <Moon className="w-3 h-3" /> A new entry
+          </GlowPill>
+          <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block">
             Record a dream
-          </h1>
+          </LiquidMetalText>
         </div>
 
-        <div className="space-y-6 pb-8 border-b border-[#2A2722] mb-8">
+        <form onSubmit={submit} className="space-y-6 pb-8">
           {/* Dream date */}
           <div>
             <label className="block text-[12px] text-[#6B6358] font-medium mb-2">Dream date</label>
@@ -433,6 +478,7 @@ function EntryForm({
                       ? "border-[#C5A572] bg-[#1A1714]"
                       : "border-[#2A2722] bg-transparent hover:border-[#4A4540]"
                   )}
+                  style={mood === m.id ? { borderColor: `${m.color}66`, background: `${m.color}10` } : {}}
                 >
                   <div className="text-lg leading-none">{m.emoji}</div>
                   <div className="text-[10px] text-[#6B6358] mt-1">{m.label}</div>
@@ -451,7 +497,9 @@ function EntryForm({
               rows={8}
               className="w-full bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] placeholder:text-[#4A4540] focus:outline-none focus:border-[#C5A572] transition resize-y min-h-[160px] leading-[1.7]"
             />
-            <div className="text-[11px] text-[#6B6358] mt-1.5">{content.length} characters · symbols auto-detected</div>
+            <div className="text-[11px] text-[#6B6358] mt-1.5">
+              <NumberTicker value={content.length} /> characters · symbols auto-detected
+            </div>
           </div>
 
           {/* Recurring */}
@@ -464,25 +512,26 @@ function EntryForm({
             />
             <span className="text-[13px] text-[#9C9489]">This is a recurring dream theme</span>
           </label>
-        </div>
 
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex-1 py-3 text-[14px] text-[#9C9489] hover:text-[#E8E2D5] border border-[#2A2722] hover:border-[#4A4540] transition rounded-sm focus-ring"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={saving}
-            className="flex-1 py-3 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition rounded-sm disabled:opacity-50 focus-ring"
-          >
-            {saving ? "Saving…" : "Save dream"}
-          </button>
-        </div>
-      </form>
+          <div className="flex gap-3 pt-2">
+            <ShimmerButton
+              type="button"
+              onClick={onCancel}
+              tone="parchment"
+              className="flex-1 py-3"
+            >
+              Cancel
+            </ShimmerButton>
+            <ShimmerButton
+              type="submit"
+              disabled={saving}
+              className="flex-1 py-3"
+            >
+              {saving ? "Saving…" : "Save dream"}
+            </ShimmerButton>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
@@ -529,59 +578,81 @@ function EntryDetail({
   }
 
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
-      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-8">
-        <button onClick={onClose} className="text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4">
-          ← Back to journal
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="warm" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+        <button
+          onClick={onClose}
+          className="text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4 focus-ring rounded-sm inline-flex items-center gap-1"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" /> Back to journal
         </button>
 
         {/* Header */}
-        <div className="flex items-start gap-4 mb-6">
-          <div
-            className="w-14 h-14 rounded-sm flex items-center justify-center shrink-0 text-2xl border"
-            style={{ background: `${mood.color}15`, borderColor: `${mood.color}40` }}
-            title={mood.label}
-          >
-            {mood.emoji}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-[12px] text-[#6B6358] font-medium">
-              {dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+        <AuroraGlowCard glowColor={mood.color} glowIntensity={0.15} className="p-5 mb-4">
+          <div className="flex items-start gap-4">
+            <div
+              className="w-14 h-14 rounded-sm flex items-center justify-center shrink-0 text-2xl border"
+              style={{ background: `${mood.color}15`, borderColor: `${mood.color}40` }}
+              title={mood.label}
+            >
+              {mood.emoji}
             </div>
-            <h1 className="text-[22px] lg:text-[26px] font-light text-[#E8E2D5] mt-1 leading-tight">{entry.title}</h1>
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ background: `${mood.color}15`, borderColor: `${mood.color}40`, color: mood.color }}>
-                {mood.label}
-              </span>
-              {entry.isRecurring && (
-                <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/5 text-[#9C9489] border border-[#2A2722]">
-                  <RefreshCw className="w-3 h-3 inline mr-1" /> Recurring
-                </span>
-              )}
+            <div className="flex-1 min-w-0">
+              <div className="text-[12px] text-[#6B6358] font-medium">
+                {dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+              </div>
+              <LiquidMetalText as="h1" className="serif-display text-[1.5rem] lg:text-[1.75rem] block mt-1 leading-tight">
+                {entry.title}
+              </LiquidMetalText>
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                <GlowPill color={mood.color} className="text-[11px]">{mood.label}</GlowPill>
+                {entry.isRecurring && (
+                  <GlowPill color="#D4A0B8" className="text-[11px]">
+                    <RefreshCw className="w-3 h-3" /> Recurring
+                  </GlowPill>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                onClick={onToggleFavorite}
+                className="p-2 rounded-sm text-[#9C9489] hover:text-[#C5A572] transition focus-ring"
+                title={entry.isFavorite ? "Remove favorite" : "Add to favorites"}
+                aria-label={entry.isFavorite ? "Remove favorite" : "Add to favorites"}
+              >
+                <Heart className={cn("w-4 h-4", entry.isFavorite && "fill-[#C5A572] text-[#C5A572]")} />
+              </button>
+              <button
+                onClick={onDelete}
+                className="p-2 rounded-sm text-[#9C9489] hover:text-[#C26B5C] transition focus-ring"
+                title="Delete"
+                aria-label="Delete dream"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            <button onClick={onToggleFavorite} className="p-2 rounded-lg text-[#9C9489] hover:text-[#C5A572] transition" title={entry.isFavorite ? "Remove favorite" : "Add to favorites"}>
-              <Heart className={cn("w-4 h-4", entry.isFavorite && "fill-gold text-[#C5A572]")} />
-            </button>
-            <button onClick={onDelete} className="p-2 rounded-lg text-[#9C9489] hover:text-red-400 transition" title="Delete">
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        </AuroraGlowCard>
 
         {/* Dream narrative */}
-        <GlassCard className="p-5 lg:p-6 mb-4">
-          <div className="text-[12px] text-[#6B6358] font-medium mb-3">The Dream</div>
+        <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-5 lg:p-6 mb-4">
+          <div className="flex items-center gap-2 mb-3">
+            <BookOpen className="w-4 h-4 text-[#C5A572]" />
+            <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">The Dream</span>
+          </div>
           <div className="text-[14px] text-[#E8E2D5]/90 leading-relaxed whitespace-pre-wrap">{entry.content}</div>
-        </GlassCard>
+        </AuroraGlowCard>
 
         {/* Lunar context */}
         {entry.lunarContext && (
-          <GlassCard className="p-5 lg:p-6 mb-4">
+          <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.12} className="p-5 lg:p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <Moon className="w-4 h-4 text-[#C5A572]" />
-              <div className="text-[12px] text-[#6B6358] font-medium">Lunar Context</div>
+              <Moon className="w-4 h-4 text-[#9CB4D1]" />
+              <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">Lunar Context</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <LunarMini label="Moon phase" value={`${entry.lunarContext.emoji} ${entry.lunarContext.moonPhase}`} sub={`${(entry.lunarContext.illumination * 100).toFixed(0)}% lit`} />
@@ -591,20 +662,26 @@ function EntryDetail({
             </div>
             {(entry.lunarContext.isPurnima || entry.lunarContext.isAmavasya || entry.lunarContext.isEkadashi) && (
               <div className="mt-3 flex items-center gap-2 flex-wrap">
-                {entry.lunarContext.isPurnima && <Pill variant="gold" className="text-[10px]">Purnima — vivid dreams</Pill>}
-                {entry.lunarContext.isAmavasya && <Pill className="text-[10px] bg-white/5 text-[#9C9489] border border-[#2A2722]">Amavasya — ancestral messages</Pill>}
-                {entry.lunarContext.isEkadashi && <Pill variant="leaf" className="text-[10px]">Ekadashi — spiritual charge</Pill>}
+                {entry.lunarContext.isPurnima && (
+                  <GlowPill color="#C5A572" className="text-[10px]">Purnima — vivid dreams</GlowPill>
+                )}
+                {entry.lunarContext.isAmavasya && (
+                  <GlowPill color="#9CB4D1" className="text-[10px]">Amavasya — ancestral messages</GlowPill>
+                )}
+                {entry.lunarContext.isEkadashi && (
+                  <GlowPill color="#7A8B6F" className="text-[10px]">Ekadashi — spiritual charge</GlowPill>
+                )}
               </div>
             )}
-          </GlassCard>
+          </AuroraGlowCard>
         )}
 
         {/* Detected symbols */}
         {entry.symbols.length > 0 && (
-          <GlassCard className="p-5 lg:p-6 mb-4">
+          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-5 lg:p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
               <Star className="w-4 h-4 text-[#C5A572]" />
-              <div className="text-[12px] text-[#6B6358] font-medium">Symbols Detected</div>
+              <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">Symbols Detected</span>
             </div>
             <div className="space-y-2.5">
               {entry.symbols.map((kw) => {
@@ -613,13 +690,11 @@ function EntryDetail({
                 const color = sym ? POLARITY_COLOR[sym.polarity] : "#8B7355";
                 return (
                   <div key={kw} className="p-3 rounded-sm bg-black/20 border border-[#2A2722]">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <Icon className="w-3.5 h-3.5" style={{ color }} />
                       <span className="text-[13px] text-[#E8E2D5] font-medium">#{kw}</span>
                       {sym && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-full border" style={{ background: `${color}15`, borderColor: `${color}40`, color }}>
-                          {sym.polarity}
-                        </span>
+                        <GlowPill color={color} className="text-[9px]">{sym.polarity}</GlowPill>
                       )}
                     </div>
                     {sym ? (
@@ -634,42 +709,62 @@ function EntryDetail({
                 );
               })}
             </div>
-          </GlassCard>
+          </AuroraGlowCard>
         )}
 
         {/* Interpretation */}
         {interpretation ? (
-          <ShellCard>
-            <div className="p-5 lg:p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-4 h-4 text-[#C5A572]" />
-                <div className="text-[12px] text-[#6B6358] font-medium">AI Interpretation</div>
-              </div>
-              <div className="text-[13px] text-[#E8E2D5]/90 leading-relaxed whitespace-pre-wrap">{interpretation}</div>
-              <div className="mt-4 pt-3 border-t border-[#2A2722] flex items-center justify-between">
-                <div className="text-[10px] text-[#9C9489]">Drawn from Vedic symbolism, Jungian psychology, and the lunar context above.</div>
-                <GhostButton onClick={interpret} disabled={loadingInterp} className="text-[11px] py-1.5 px-3">
-                  <RefreshCw className="w-3 h-3" /> Re-interpret
-                </GhostButton>
-              </div>
+          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-5 lg:p-6 mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-4 h-4 text-[#C5A572]" />
+              <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">AI Interpretation</span>
             </div>
-          </ShellCard>
+            <div className="text-[13px] text-[#E8E2D5]/90 leading-relaxed whitespace-pre-wrap">{interpretation}</div>
+            <div className="mt-4 pt-3 border-t border-[#2A2722] flex items-center justify-between gap-2 flex-wrap">
+              <div className="text-[10px] text-[#9C9489]">Drawn from Vedic symbolism, Jungian psychology, and the lunar context above.</div>
+              <ShimmerButton
+                onClick={interpret}
+                disabled={loadingInterp}
+                tone="parchment"
+                className="text-[11px] py-1.5 px-3"
+              >
+                {loadingInterp ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-3 h-3" />
+                )}
+                Re-interpret
+              </ShimmerButton>
+            </div>
+          </AuroraGlowCard>
         ) : (
-          <ShellCard>
-            <div className="p-6 text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-sm bg-[#C5A572]-soft/30 border border-[#C5A572]/15 mb-3">
+          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.15} className="p-6 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-sm mb-3 border border-[#C5A572]/30" style={{ background: "#C5A57210" }}>
+              {loadingInterp ? (
+                <Loader2 className="w-5 h-5 text-[#C5A572] animate-spin" />
+              ) : (
                 <Sparkles className="w-5 h-5 text-[#C5A572]" />
-              </div>
-              <div className="text-[14px] text-[#E8E2D5] font-medium mb-1">No interpretation yet</div>
-              <div className="text-[12px] text-[#9C9489] mb-4 max-w-md mx-auto">
-                Get an AI interpretation that draws on the symbols, the lunar context, and your natal chart. Costs 2 Luck.
-              </div>
-              <GoldButton onClick={interpret} disabled={loadingInterp} className="py-2.5 px-5 text-[13px]">
-                {loadingInterp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                Interpret with AI · 2 Luck
-              </GoldButton>
+              )}
             </div>
-          </ShellCard>
+            <div className="text-[14px] text-[#E8E2D5] font-medium mb-1">No interpretation yet</div>
+            <div className="text-[12px] text-[#9C9489] mb-4 max-w-md mx-auto">
+              Get an AI interpretation that draws on the symbols, the lunar context, and your natal chart. Costs{" "}
+              <span className="inline-flex items-center gap-1 text-[#C5A572]">
+                <CloverIcon className="w-3 h-3" filled /> {DREAM_INTERPRET_COST} Luck
+              </span>.
+            </div>
+            <ShimmerButton
+              onClick={interpret}
+              disabled={loadingInterp}
+              className="py-2.5 px-5 text-[13px]"
+            >
+              {loadingInterp ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Interpreting…</>
+              ) : (
+                <><Sparkles className="w-3.5 h-3.5" /> Interpret with AI · <span className="inline-flex items-center gap-0.5"><CloverIcon className="w-3 h-3" filled /> {DREAM_INTERPRET_COST}</span></>
+              )}
+            </ShimmerButton>
+          </AuroraGlowCard>
         )}
       </div>
     </div>
@@ -682,6 +777,31 @@ function LunarMini({ label, value, sub }: { label: string; value: string; sub?: 
       <div className="text-[11px] text-[#6B6358]">{label}</div>
       <div className="text-[12px] text-[#E8E2D5] mt-0.5 font-medium truncate" title={value}>{value}</div>
       {sub && <div className="text-[10px] text-[#9C9489]">{sub}</div>}
+    </div>
+  );
+}
+
+function Gate({ onAuth }: { onAuth: () => void }) {
+  return (
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="warm" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+        <div className="flex flex-col items-center justify-center text-center py-20">
+          <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.15} className="max-w-sm w-full p-10 text-center">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 border border-[#9CB4D1]/30" style={{ background: "#9CB4D110" }}>
+              <Moon className="w-7 h-7 text-[#9CB4D1]" />
+            </div>
+            <LiquidMetalText as="h1" className="serif-display text-[1.75rem] block mb-2">Sign in to begin</LiquidMetalText>
+            <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">
+              Record your dreams and reveal their archetypal meaning.
+            </p>
+            <ShimmerButton onClick={onAuth} className="w-full">Sign in</ShimmerButton>
+          </AuroraGlowCard>
+        </div>
+      </div>
     </div>
   );
 }

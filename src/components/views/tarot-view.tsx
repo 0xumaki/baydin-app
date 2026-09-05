@@ -6,12 +6,20 @@ import { cn } from "@/lib/utils";
 import { useMe, api } from "@/lib/api-client";
 import { TarotCardFace, TarotCardBack } from "@/components/tarot-card-face";
 import { CardDetailModal } from "@/components/card-detail-modal";
-import { Sparkles, Shuffle, Star, Share2, Save, BookOpen, Loader2, RotateCw } from "lucide-react";
+import { StarField } from "@/components/lumina/primitives";
+import {
+  AuroraGlowCard,
+  GlowPill,
+  LiquidMetalText,
+  ShimmerButton,
+  AnimatedGradientBackground,
+} from "@/components/lumina/premium-ui";
+import { CloverIcon } from "@/components/lumina/baydin-icons";
+import { Sparkles, Shuffle, Star, Share2, Save, BookOpen, Loader2, RotateCw, Moon } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/lib/store";
-import { useT } from "@/lib/use-t";
 
 const SPREADS = [
   { id: "yes-no", name: "Yes / No", count: 1, desc: "A single card for a clear answer" },
@@ -28,7 +36,6 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
   const { data } = useMe();
   const user = data?.user;
   const qc = useQueryClient();
-  const t = useT();
   const { setView } = useStore();
   const [phase, setPhase] = React.useState<Phase>("ask");
   const [spread, setSpread] = React.useState("three-card");
@@ -114,19 +121,38 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
 
   if (!user) {
     return (
-      <div className="h-full flex items-center justify-center px-6 text-center">
-        <div>
-          <Sparkles className="w-10 h-10 text-[#6B6358] mx-auto mb-3" />
-          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to begin</div>
-          <button onClick={onAuth} className="mt-3 py-2.5 px-5 bg-[#E8E2D5] text-[#0A0908] text-[13px] font-medium hover:bg-white transition rounded-sm focus-ring">Sign in</button>
+      <div className="h-full overflow-y-auto lumina-scroll relative">
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <AnimatedGradientBackground variant="cosmic" />
+          <StarField count={30} />
+        </div>
+        <div className="max-w-3xl mx-auto px-4 py-10 lg:py-14 relative z-10 min-w-0 overflow-hidden flex flex-col items-center justify-center text-center">
+          <div className="flex justify-center mb-4">
+            <div className="w-14 h-14 rounded-full border border-[#C5A572]/30 bg-[#C5A572]/5 flex items-center justify-center">
+              <Sparkles className="w-7 h-7 text-[#C5A572]" />
+            </div>
+          </div>
+          <LiquidMetalText as="h1" className="serif-display text-[1.75rem] text-[#E8E2D5] tracking-tight block mb-2">
+            Sign in to begin
+          </LiquidMetalText>
+          <p className="text-[13px] text-[#9C9489] mb-6 max-w-xs">
+            The deck speaks in symbols. Sign in to draw your first cards.
+          </p>
+          <ShimmerButton onClick={onAuth} className="px-6 py-2.5">
+            Sign in
+          </ShimmerButton>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
-      <div className="max-w-3xl mx-auto px-6 py-10 lg:py-14">
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="cosmic" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
 
         {/* ===== PHASE: ASK ===== */}
         {phase === "ask" && (
@@ -137,12 +163,14 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
           >
             {/* Hero */}
             <div className="mb-8">
-              <div className="text-[13px] text-[#6B6358] mb-2">Rider-Waite-Smith deck</div>
-              <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.1] tracking-tight mb-3">
-                Tarot
-              </h1>
+              <GlowPill className="mb-3">
+                <Moon className="w-3 h-3" /> Rider-Waite-Smith deck
+              </GlowPill>
+              <LiquidMetalText as="h1" className="serif-display text-[2rem] lg:text-[2.5rem] leading-[1.1] tracking-tight block mb-3">
+                Tarot Reading
+              </LiquidMetalText>
               <p className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch]">
-                The deck speaks in symbols. Ask, and the cards answer. 2 free readings daily, then 1 Luck each.
+                The deck speaks in symbols. Ask, and the cards answer. 2 free readings daily, then 1 <CloverIcon className="w-3 h-3" /> Luck each.
               </p>
             </div>
 
@@ -160,32 +188,52 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
             </div>
 
             {/* Spread selector */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
-              {SPREADS.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => setSpread(s.id)}
-                  className={cn(
-                    "p-3 border text-left transition focus-ring rounded-sm",
-                    spread === s.id
-                      ? "border-[#C5A572] bg-[#1A1714]"
-                      : "border-[#2A2722] bg-transparent hover:border-[#4A4540]"
-                  )}
-                >
-                  <div className={cn("text-[13px] font-medium mb-0.5", spread === s.id ? "text-[#E8E2D5]" : "text-[#9C9489]")}>{s.name}</div>
-                  <div className="text-[11px] text-[#6B6358]">{s.desc}</div>
-                </button>
-              ))}
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-3.5 h-3.5 text-[#C5A572]" />
+                <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Choose a spread</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                {SPREADS.map((s) => {
+                  const active = spread === s.id;
+                  return (
+                    <AuroraGlowCard
+                      key={s.id}
+                      glowColor={active ? "#C5A572" : "#9E8AC9"}
+                      glowIntensity={active ? 0.22 : 0.1}
+                      className={cn(
+                        "p-3 text-left transition cursor-pointer",
+                        active ? "border-[#C5A572]/60" : "border-[#2A2722] hover:border-[#4A4540]"
+                      )}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSpread(s.id)}
+                        className="w-full text-left"
+                        aria-pressed={active}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <div className={cn("text-[13px] font-medium", active ? "text-[#E8E2D5]" : "text-[#9C9489]")}>{s.name}</div>
+                          {active && (
+                            <GlowPill color="#C5A572" className="text-[9px]">{s.count} card{s.count > 1 ? "s" : ""}</GlowPill>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-[#6B6358]">{s.desc}</div>
+                      </button>
+                    </AuroraGlowCard>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Shuffle & Draw button */}
-            <button
+            <ShimmerButton
               onClick={performReading}
               disabled={!question.trim()}
-              className="w-full py-3.5 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition rounded-sm disabled:opacity-50 focus-ring mb-8 flex items-center justify-center gap-2"
+              className="w-full py-3.5 mb-8"
             >
               <Shuffle className="w-4 h-4" /> Shuffle & Draw {SPREADS.find(s => s.id === spread)?.count} card{SPREADS.find(s => s.id === spread)!.count > 1 ? "s" : ""}
-            </button>
+            </ShimmerButton>
 
             {/* Past readings */}
             <div className="pt-8 border-t border-[#2A2722]">
@@ -241,10 +289,10 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
             className="space-y-6"
           >
             {/* Question display */}
-            <div className="pb-4 border-b border-[#2A2722]">
-              <div className="text-[12px] text-[#6B6358] font-medium mb-1">Your question</div>
-              <p className="serif-italic text-[15px] text-[#9C9489] leading-[1.6]">"{reading.question}"</p>
-            </div>
+            <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.15} className="p-4">
+              <div className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-1">Your question</div>
+              <p className="serif-italic text-[15px] text-[#E8E2D5] leading-[1.6]">"{reading.question}"</p>
+            </AuroraGlowCard>
 
             {/* Cards */}
             <div className="flex flex-wrap items-end justify-center gap-4 lg:gap-6">
@@ -306,9 +354,12 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                 transition={{ delay: 0.2 }}
                 className="space-y-4"
               >
-                <div className="pt-6 border-t border-[#2A2722]">
+                <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-5">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="text-[12px] text-[#6B6358] font-medium">The reading</div>
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#C5A572]" />
+                      <span className="text-[12px] uppercase tracking-[0.2em] text-[#9C9489]">The reading</span>
+                    </div>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={shareReading}
@@ -336,19 +387,20 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
 
                   {/* Luck info */}
                   {reading.luckSpent > 0 && (
-                    <div className="mt-6 text-[11px] text-[#6B6358]">
-                      {reading.luckSpent} Luck spent · {reading.freeRemaining} free readings remaining today
+                    <div className="mt-6 text-[11px] text-[#6B6358] flex items-center gap-1.5">
+                      <CloverIcon className="w-3 h-3" /> {reading.luckSpent} Luck spent · {reading.freeRemaining} free readings remaining today
                     </div>
                   )}
-                </div>
+                </AuroraGlowCard>
 
                 {/* New reading button */}
-                <button
+                <ShimmerButton
                   onClick={reset}
-                  className="inline-flex items-center gap-2 py-3 px-6 text-[14px] text-[#9C9489] hover:text-[#E8E2D5] border border-[#2A2722] hover:border-[#4A4540] transition rounded-sm focus-ring"
+                  tone="parchment"
+                  className="py-3 px-6"
                 >
                   <RotateCw className="w-3.5 h-3.5" /> Ask another question
-                </button>
+                </ShimmerButton>
               </motion.div>
             )}
           </motion.div>

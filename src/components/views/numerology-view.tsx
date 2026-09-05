@@ -1,15 +1,22 @@
 "use client";
 
 import * as React from "react";
+import { StarField } from "@/components/lumina/primitives";
 import {
-  GlassCard, GoldButton, GhostButton, Pill, SectionTitle, ShellCard,
-} from "@/components/lumina/primitives";
+  AuroraGlowCard,
+  GlowPill,
+  LiquidMetalText,
+  NumberTicker,
+  ShimmerButton,
+  AnimatedGradientBackground,
+} from "@/components/lumina/premium-ui";
+import { CloverIcon } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import type { NumerologyReport, NumberMeaning, NumerologySystem } from "@/lib/numerology";
 import {
-  Hash, Sparkles, Wallet, Loader2, Calendar, User, RefreshCw, ChevronRight,
-  Trash2, Sun, Moon, Star, Flame, Droplet, Wind, Gem, Palette, Clock,
+  Hash, Sparkles, Loader2, RefreshCw, ChevronRight,
+  Trash2, Star, Flame, Droplet, Wind, Gem, Palette, Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,15 +27,17 @@ type HistoryItem = {
   createdAt: string;
 };
 
-const NUMBER_LABELS: { key: keyof NumerologyReport["numbers"]; label: string; sub: string }[] = [
-  { key: "lifePath", label: "Life Path", sub: "The road you walk" },
-  { key: "destiny", label: "Destiny", sub: "What you must accomplish" },
-  { key: "soulUrge", label: "Soul Urge", sub: "Your heart's longing" },
-  { key: "personality", label: "Personality", sub: "How others see you" },
-  { key: "birthday", label: "Birthday", sub: "Your special talent" },
-  { key: "maturity", label: "Maturity", sub: "Who you become" },
-  { key: "personalYear", label: "Personal Year", sub: "This year's theme" },
-  { key: "personalMonth", label: "Personal Month", sub: "This month's energy" },
+const NUMEROLOGY_COST = 3;
+
+const NUMBER_LABELS: { key: keyof NumerologyReport["numbers"]; label: string; sub: string; accent: string }[] = [
+  { key: "lifePath", label: "Life Path", sub: "The road you walk", accent: "#C5A572" },
+  { key: "destiny", label: "Destiny", sub: "What you must accomplish", accent: "#9E8AC9" },
+  { key: "soulUrge", label: "Soul Urge", sub: "Your heart's longing", accent: "#D876A0" },
+  { key: "personality", label: "Personality", sub: "How others see you", accent: "#5FA9C7" },
+  { key: "birthday", label: "Birthday", sub: "Your special talent", accent: "#F09A3D" },
+  { key: "maturity", label: "Maturity", sub: "Who you become", accent: "#7A8B6F" },
+  { key: "personalYear", label: "Personal Year", sub: "This year's theme", accent: "#B5CD7E" },
+  { key: "personalMonth", label: "Personal Month", sub: "This month's energy", accent: "#C5A87C" },
 ];
 
 const ELEMENT_ICON: Record<string, any> = {
@@ -112,7 +121,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
       setHistory(h.readings || []);
     } catch (e: any) {
       if (e.status === 402) {
-        toast.error("Not enough Luck — you need 3 Luck for a full numerology report.");
+        toast.error(`Not enough Luck — you need ${NUMEROLOGY_COST} Luck for a full numerology report.`);
       } else {
         toast.error(e.message);
       }
@@ -156,11 +165,22 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
 
   if (!user) {
     return (
-      <div className="h-full flex items-center justify-center px-6 text-center">
-        <div>
-          <Hash className="w-10 h-10 text-[#9C9489] mx-auto mb-3" />
-          <div className="text-[16px] text-[#E8E2D5] mb-1">Sign in to begin</div>
-          <GoldButton onClick={onAuth} className="mt-3">Sign in</GoldButton>
+      <div className="h-full overflow-y-auto lumina-scroll relative">
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <AnimatedGradientBackground variant="cosmic" />
+          <StarField count={30} />
+        </div>
+        <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+          <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.18} className="p-8 text-center">
+            <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[#9E8AC9]/15 border border-[#9E8AC9]/30 flex items-center justify-center">
+              <Hash className="w-6 h-6 text-[#9E8AC9]" />
+            </div>
+            <LiquidMetalText as="h1" className="text-[20px] mb-1">Sign in to begin</LiquidMetalText>
+            <p className="text-[12px] text-[#9C9489] mb-4 max-w-sm mx-auto">
+              Decode the geometry of your name and birth date.
+            </p>
+            <ShimmerButton onClick={onAuth}>Sign in</ShimmerButton>
+          </AuroraGlowCard>
         </div>
       </div>
     );
@@ -168,95 +188,110 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
 
   // ---- Showing full report ----
   if (report) {
-    const numberCards = NUMBER_LABELS.map(({ key, label, sub }) => {
+    const numberCards = NUMBER_LABELS.map(({ key, label, sub, accent }) => {
       const num = report.numbers[key];
       const meaning = report.meanings[key];
-      return { key, label, sub, num, meaning };
+      return { key, label, sub, num, meaning, accent };
     });
     const active = activeNumber
       ? numberCards.find((c) => c.key === activeNumber)
       : numberCards[0];
 
     return (
-      <div className="h-full overflow-y-auto lumina-scroll">
-        <div className="max-w-5xl mx-auto px-6 py-8 lg:py-12">
-          {/* Header — serif headline, sentence-case */}
-          <div className="mb-10 lum-reveal">
-            <button onClick={reset} className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition mb-4">← New reading</button>
-            <div className="text-[13px] text-[#6B6358] mb-2">
-              {report.name} · born {new Date(report.birthDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-            </div>
-            <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.15] tracking-tight mb-1">
-              Numerology report
-            </h1>
+      <div className="h-full overflow-y-auto lumina-scroll relative">
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <AnimatedGradientBackground variant="cosmic" />
+          <StarField count={30} />
+        </div>
+        <div className="max-w-5xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+          {/* Header */}
+          <button onClick={reset} className="flex items-center gap-1.5 text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4">
+            <RefreshCw className="w-3.5 h-3.5" /> New reading
+          </button>
+          <div className="mb-8">
+            <GlowPill color="#9E8AC9" className="text-[10px] mb-3">
+              <Hash className="w-2.5 h-2.5" /> Numerology report
+            </GlowPill>
+            <LiquidMetalText as="h1" className="text-[28px] lg:text-[32px] mb-1">
+              {report.name}
+            </LiquidMetalText>
             <div className="text-[12px] text-[#9C9489]">
-              {report.system === "chaldean" ? "Chaldean" : "Pythagorean"} system
+              Born {new Date(report.birthDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} · {report.system === "chaldean" ? "Chaldean" : "Pythagorean"} system
             </div>
           </div>
 
-          {/* 8 Number Cards — hairline grid, no glass */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#2A2722] border border-[#2A2722] mb-10">
-            {numberCards.map(({ key, label, num, meaning }) => {
+          {/* 8 Number Cards — premium AuroraGlowCard grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            {numberCards.map(({ key, label, num, meaning, accent }) => {
               const isActive = active?.key === key;
               return (
-                <button
+                <AuroraGlowCard
                   key={key}
-                  onClick={() => setActiveNumber(key)}
-                  className={cn(
-                    "relative p-5 text-left transition-colors bg-[#0A0908]",
-                    isActive
-                      ? "bg-[#1A1714]"
-                      : "hover:bg-[#0F0D0B]"
-                  )}
+                  glowColor={isActive ? accent : "#2A2722"}
+                  glowIntensity={isActive ? 0.22 : 0.06}
+                  className="p-0"
                 >
-                  <div className="text-[11px] text-[#6B6358] mb-2 font-medium">{label}</div>
-                  <div className="flex items-baseline gap-2">
-                    <span
-                      className="serif-display text-[2.5rem] leading-none tabular-nums"
-                      style={{ color: isActive ? "#C5A572" : "#E8E2D5" }}
-                    >
-                      {num}
-                    </span>
-                    {num > 9 && (
-                      <span className="text-[10px] text-[#6B6358] serif-italic">master</span>
-                    )}
-                  </div>
-                  <div className="text-[11px] text-[#9C9489] mt-2 truncate">{meaning?.title}</div>
-                </button>
+                  <button
+                    onClick={() => setActiveNumber(key)}
+                    className="w-full text-left p-5 transition-colors rounded-sm"
+                  >
+                    <div className="text-[11px] text-[#9C9489] mb-2 font-medium">{label}</div>
+                    <div className="flex items-baseline gap-2">
+                      <NumberTicker
+                        value={num}
+                        className="text-[2.5rem] leading-none tabular-nums font-light"
+                      />
+                      {num > 9 && (
+                        <GlowPill color="#C5A572" className="text-[8px]">master</GlowPill>
+                      )}
+                    </div>
+                    <div className="text-[11px] text-[#9C9489] mt-2 truncate">{meaning?.title}</div>
+                  </button>
+                </AuroraGlowCard>
               );
             })}
           </div>
 
           {/* Active Number Detail */}
           {active && active.meaning && (
-            <NumberDetail num={active.num} meaning={active.meaning} label={active.label} sub={active.sub} />
+            <NumberDetail num={active.num} meaning={active.meaning} label={active.label} sub={active.sub} accent={active.accent} />
           )}
 
-          {/* Synthesis — editorial prose, no card chrome */}
-          <div className="mt-12 pt-8 border-t border-[#2A2722] mb-10">
-            <div className="text-[12px] text-[#6B6358] mb-4 font-medium">Synthesis</div>
+          {/* Synthesis */}
+          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.14} className="p-6 lg:p-8 mt-8 mb-8">
+            <GlowPill color="#C5A572" className="text-[10px] mb-4">Synthesis</GlowPill>
             <div className="serif text-[15px] leading-[1.8] text-[#E8E2D5] whitespace-pre-line max-w-[65ch] prose-editorial">{report.synthesis}</div>
-          </div>
+          </AuroraGlowCard>
 
-          {/* Lucky Elements — quiet, not colorful cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#2A2722] border border-[#2A2722] mb-10">
+          {/* Lucky Elements — premium cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
             <LuckyCard icon={Clock} title="Lucky days" items={report.lucky.days} accent="#C5A87C" />
             <LuckyCard icon={Palette} title="Lucky colors" items={report.lucky.colors} accent="#D4A0B8" />
             <LuckyCard icon={Gem} title="Lucky gems" items={report.lucky.gems} accent="#7A8B6F" />
           </div>
-          <div className="flex items-center justify-center gap-3 mb-10">
-            <span className="text-[12px] text-[#6B6358]">Lucky numbers:</span>
-            {report.lucky.numbers.map((n) => (
-              <span key={n} className="serif-display text-[1.25rem] text-[#C5A572] tabular-nums">
-                {n}
+
+          {/* Lucky numbers */}
+          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-6 mb-8">
+            <div className="flex items-center justify-center gap-4 flex-wrap">
+              <span className="text-[12px] text-[#9C9489] flex items-center gap-1.5">
+                <CloverIcon className="w-3.5 h-3.5" /> Lucky numbers:
               </span>
-            ))}
-          </div>
+              <div className="flex items-center gap-3">
+                {report.lucky.numbers.map((n) => (
+                  <NumberTicker
+                    key={n}
+                    value={n}
+                    className="text-[1.5rem] text-[#C5A572] tabular-nums font-light"
+                  />
+                ))}
+              </div>
+            </div>
+          </AuroraGlowCard>
 
           <div className="flex justify-center pb-6">
-            <GhostButton onClick={reset} className="px-6 py-2.5 text-[13px]">
+            <ShimmerButton tone="parchment" onClick={reset} className="px-6 py-2.5 text-[13px]">
               <RefreshCw className="w-3.5 h-3.5" /> New reading
-            </GhostButton>
+            </ShimmerButton>
           </div>
         </div>
       </div>
@@ -265,184 +300,191 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
 
   // ---- Form / Preview ----
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
-      <div className="max-w-2xl mx-auto px-6 py-12 lg:py-16">
-        {/* Hero — serif, no icon-in-circle */}
-        <div className="mb-10 lum-reveal">
-          <div className="text-[13px] text-[#6B6358] mb-3">Numbers in your name and date</div>
-          <h1 className="serif-display text-[2.5rem] lg:text-[3rem] text-[#E8E2D5] leading-[1.05] tracking-tight mb-4">
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="cosmic" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-2xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
+        {/* Hero */}
+        <div className="mb-8">
+          <GlowPill color="#9E8AC9" className="text-[10px] mb-3">
+            <Hash className="w-2.5 h-2.5" /> Numbers in your name and date
+          </GlowPill>
+          <LiquidMetalText as="h1" className="text-[32px] lg:text-[40px] mb-3 leading-[1.05]">
             Numerology
-          </h1>
-          <p className="t-body-lg text-[#9C9489] leading-[1.7] max-w-[55ch]">
+          </LiquidMetalText>
+          <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch]">
             Decode the geometry of your name and birth date. Life Path, Destiny, Soul Urge, Personality — eight numbers, each a facet of the same life.
           </p>
         </div>
 
-        {/* Form — editorial, inputs with hairline underlines */}
-        <div className="space-y-6 pb-8 border-b border-[#2A2722] mb-8">
-          {/* Name */}
-          <div>
-            <label className="block text-[12px] text-[#6B6358] font-medium mb-2">
-              Full birth name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Aung San"
-              className="w-full bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] placeholder:text-[#4A4540] focus:outline-none focus:border-[#C5A572] transition"
-            />
-            <div className="text-[11px] text-[#6B6358] mt-1.5">First, middle, and last — for the most accurate reading.</div>
-          </div>
+        {/* Form — AuroraGlowCard wrapper */}
+        <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-6 mb-6">
+          <div className="space-y-6">
+            {/* Name */}
+            <div>
+              <label className="block text-[12px] text-[#9C9489] font-medium mb-2">
+                Full birth name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Aung San"
+                className="w-full bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] placeholder:text-[#4A4540] focus:outline-none focus:border-[#C5A572] transition"
+              />
+              <div className="text-[11px] text-[#9C9489] mt-1.5">First, middle, and last — for the most accurate reading.</div>
+            </div>
 
-          {/* Birth date */}
-          <div>
-            <label className="block text-[12px] text-[#6B6358] font-medium mb-2">
-              Birth date
-            </label>
-            <input
-              type="date"
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-              max={new Date().toISOString().slice(0, 10)}
-              min="1800-01-01"
-              className="w-full bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] focus:outline-none focus:border-[#C5A572] transition [color-scheme:dark]"
-            />
-          </div>
+            {/* Birth date */}
+            <div>
+              <label className="block text-[12px] text-[#9C9489] font-medium mb-2">
+                Birth date
+              </label>
+              <input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                max={new Date().toISOString().slice(0, 10)}
+                min="1800-01-01"
+                className="w-full bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] focus:outline-none focus:border-[#C5A572] transition [color-scheme:dark]"
+              />
+            </div>
 
-          {/* System toggle */}
-          <div>
-            <label className="block text-[12px] text-[#6B6358] font-medium mb-2.5">
-              Calculation system
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setSystem("pythagorean")}
-                className={cn(
-                  "p-3 border text-left transition",
-                  system === "pythagorean"
-                    ? "border-[#C5A572] bg-[#1A1714]"
-                    : "border-[#2A2722] bg-transparent hover:border-[#4A4540]"
-                )}
-              >
-                <div className="text-[13px] text-[#E8E2D5] font-medium">Pythagorean</div>
-                <div className="text-[11px] text-[#6B6358] mt-0.5">Western · A=1, B=2…</div>
-              </button>
-              <button
-                onClick={() => setSystem("chaldean")}
-                className={cn(
-                  "p-3 border text-left transition",
-                  system === "chaldean"
-                    ? "border-[#C5A572] bg-[#1A1714]"
-                    : "border-[#2A2722] bg-transparent hover:border-[#4A4540]"
-                )}
-              >
-                <div className="text-[13px] text-[#E8E2D5] font-medium">Chaldean</div>
-                <div className="text-[11px] text-[#6B6358] mt-0.5">Vedic · values 1–8</div>
-              </button>
+            {/* System toggle */}
+            <div>
+              <label className="block text-[12px] text-[#9C9489] font-medium mb-2.5">
+                Calculation system
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setSystem("pythagorean")}
+                  className={cn(
+                    "p-3 border text-left transition rounded-sm",
+                    system === "pythagorean"
+                      ? "border-[#C5A572] bg-[#1A1714]"
+                      : "border-[#2A2722] bg-transparent hover:border-[#4A4540]"
+                  )}
+                >
+                  <div className="text-[13px] text-[#E8E2D5] font-medium">Pythagorean</div>
+                  <div className="text-[11px] text-[#9C9489] mt-0.5">Western · A=1, B=2…</div>
+                </button>
+                <button
+                  onClick={() => setSystem("chaldean")}
+                  className={cn(
+                    "p-3 border text-left transition rounded-sm",
+                    system === "chaldean"
+                      ? "border-[#C5A572] bg-[#1A1714]"
+                      : "border-[#2A2722] bg-transparent hover:border-[#4A4540]"
+                  )}
+                >
+                  <div className="text-[13px] text-[#E8E2D5] font-medium">Chaldean</div>
+                  <div className="text-[11px] text-[#9C9489] mt-0.5">Vedic · values 1–8</div>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </AuroraGlowCard>
 
-        {/* CTAs — quiet, not gold-wash */}
+        {/* CTAs — premium */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <button
-            onClick={doPreview}
-            disabled={loading}
-            className="flex-1 py-3 text-[14px] text-[#9C9489] hover:text-[#E8E2D5] border border-[#2A2722] hover:border-[#4A4540] transition rounded-sm disabled:opacity-50 focus-ring"
-          >
-            {loading ? "…" : "Reveal Life Path"}
-          </button>
-          <button
-            onClick={doFullReport}
-            disabled={purchasing}
-            className="flex-1 py-3 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition rounded-sm disabled:opacity-50 focus-ring"
-          >
-            {purchasing ? "…" : "Full report · 3 Luck"}
-          </button>
+          <ShimmerButton tone="parchment" onClick={doPreview} disabled={loading} className="flex-1">
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+            {loading ? "Calculating…" : "Reveal Life Path"}
+          </ShimmerButton>
+          <ShimmerButton onClick={doFullReport} disabled={purchasing} className="flex-1">
+            {purchasing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CloverIcon className="w-3.5 h-3.5" />}
+            {purchasing ? "Generating…" : "Generate report"}
+            <span className="inline-flex items-center gap-1 opacity-80">
+              <CloverIcon className="w-3 h-3" /> <NumberTicker value={NUMEROLOGY_COST} />
+            </span>
+          </ShimmerButton>
         </div>
 
         {/* Free Preview Result */}
         {preview && (
-          <ShellCard className="mb-6">
-            <div className="p-5 lg:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#C5A572]">Life Path Preview</div>
-                  <div className="text-[14px] text-[#9C9489] mt-0.5">Your most important number</div>
-                </div>
-                <span className="text-[9px] uppercase tracking-wider px-2 py-1 rounded-full bg-leaf/10 text-[#7A8B6F] border border-leaf/20">Free</span>
+          <AuroraGlowCard glowColor={preview.meaning.color} glowIntensity={0.18} className="p-5 lg:p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <GlowPill color={preview.meaning.color} className="text-[10px] mb-2">
+                  <Sparkles className="w-2.5 h-2.5" /> Life Path Preview
+                </GlowPill>
+                <div className="text-[14px] text-[#9C9489]">Your most important number</div>
               </div>
-              <div className="flex items-center gap-5 mb-4">
-                <div
-                  className="w-24 h-24 rounded-sm flex items-center justify-center shrink-0"
-                  style={{ background: `${preview.meaning.color}18`, border: `1px solid ${preview.meaning.color}40` }}
-                >
-                  <span
-                    className="text-[52px] font-light leading-none"
-                    style={{ color: preview.meaning.color }}
-                  >
-                    {preview.lifePath}
-                  </span>
-                </div>
-                <div className="min-w-0">
-                  <div className="text-[18px] text-[#E8E2D5] font-light">{preview.meaning.title}</div>
-                  <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                    {preview.meaning.keywords.slice(0, 3).map((k) => (
-                      <span key={k} className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-[#9C9489] border border-[#2A2722]">{k}</span>
-                    ))}
-                  </div>
-                  <div className="text-[11px] text-[#9C9489] mt-1.5">{preview.meaning.element} · {preview.meaning.rulingPlanet}</div>
-                </div>
+              <GlowPill color="#7A8B6F" className="text-[9px]">Free</GlowPill>
+            </div>
+            <div className="flex items-center gap-5 mb-4">
+              <div
+                className="w-24 h-24 rounded-sm flex items-center justify-center shrink-0"
+                style={{ background: `${preview.meaning.color}18`, border: `1px solid ${preview.meaning.color}40` }}
+              >
+                <NumberTicker
+                  value={preview.lifePath}
+                  className="text-[52px] font-light leading-none tabular-nums"
+                />
               </div>
-              <p className="text-[13px] leading-relaxed text-[#E8E2D5]/85">{preview.meaning.summary}</p>
-
-              <div className="mt-4 p-3 rounded-sm bg-[#C5A572]-soft/30 border border-[#C5A572]/15">
-                <div className="text-[12px] text-[#C5A572] font-medium mb-1">Unlock the full picture</div>
-                <div className="text-[11px] text-[#9C9489] leading-relaxed">
-                  Your Life Path is just the beginning. The full report reveals your Destiny, Soul Urge, Personality, Maturity, Birthday and Personal Year numbers — plus a synthesis of how they interact, and your lucky days, colors and gems.
+              <div className="min-w-0">
+                <div className="text-[18px] text-[#E8E2D5] font-light">{preview.meaning.title}</div>
+                <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                  {preview.meaning.keywords.slice(0, 3).map((k) => (
+                    <GlowPill key={k} color={preview.meaning.color} className="text-[10px]">{k}</GlowPill>
+                  ))}
                 </div>
-                <GoldButton onClick={doFullReport} disabled={purchasing} className="w-full mt-3 py-2.5 text-[13px]">
-                  {purchasing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wallet className="w-3.5 h-3.5" />}
-                  Reveal full report · 3 Luck
-                </GoldButton>
+                <div className="text-[11px] text-[#9C9489] mt-1.5">{preview.meaning.element} · {preview.meaning.rulingPlanet}</div>
               </div>
             </div>
-          </ShellCard>
+            <p className="text-[13px] leading-relaxed text-[#E8E2D5]/85">{preview.meaning.summary}</p>
+
+            <div className="mt-4 p-4 rounded-sm border border-[#C5A572]/15 bg-[#C5A572]/[0.04]">
+              <div className="text-[12px] text-[#C5A572] font-medium mb-1">Unlock the full picture</div>
+              <div className="text-[11px] text-[#9C9489] leading-relaxed mb-3">
+                Your Life Path is just the beginning. The full report reveals your Destiny, Soul Urge, Personality, Maturity, Birthday and Personal Year numbers — plus a synthesis of how they interact, and your lucky days, colors and gems.
+              </div>
+              <ShimmerButton onClick={doFullReport} disabled={purchasing} className="w-full">
+                {purchasing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CloverIcon className="w-3.5 h-3.5" />}
+                {purchasing ? "Generating…" : "Reveal full report"}
+                <span className="inline-flex items-center gap-1 opacity-80">
+                  <CloverIcon className="w-3 h-3" /> <NumberTicker value={NUMEROLOGY_COST} />
+                </span>
+              </ShimmerButton>
+            </div>
+          </AuroraGlowCard>
         )}
 
         {/* History */}
         {history.length > 0 && (
           <div>
-            <SectionTitle className="mb-3">Past Readings</SectionTitle>
+            <GlowPill color="#9E8AC9" className="text-[10px] mb-3">Past Readings</GlowPill>
             <div className="space-y-2">
               {history.map((h) => (
-                <div
-                  key={h.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => loadHistory(h.id)}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); loadHistory(h.id); } }}
-                  className="w-full flex items-center gap-3 p-3 rounded-sm bg-[#0A0908] border border-[#2A2722] hover:border-[#4A4540] transition group cursor-pointer"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-[#C5A572]-soft/40 border border-[#C5A572]/15 flex items-center justify-center shrink-0">
-                    <Hash className="w-4 h-4 text-[#C5A572]" />
-                  </div>
-                  <div className="flex-1 min-w-0 text-left">
-                    <div className="text-[13px] text-[#E8E2D5] truncate">{h.input.name}</div>
-                    <div className="text-[10px] text-[#9C9489]">
-                      {new Date(h.input.birthDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })} · {h.system === "chaldean" ? "Chaldean" : "Pythagorean"} · {new Date(h.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                  <button
-                    onClick={(e) => deleteHistory(h.id, e)}
-                    className="p-2 text-[#9C9489] hover:text-red-400 transition opacity-0 group-hover:opacity-100"
-                    aria-label="Delete reading"
+                <AuroraGlowCard key={h.id} glowColor="#9E8AC9" glowIntensity={0.08} className="p-0">
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => loadHistory(h.id)}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); loadHistory(h.id); } }}
+                    className="w-full flex items-center gap-3 p-3 rounded-sm transition group cursor-pointer hover:bg-[#0F0D0B]/50"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                  <ChevronRight className="w-4 h-4 text-[#9C9489]" />
-                </div>
+                    <div className="w-9 h-9 rounded-lg bg-[#9E8AC9]/15 border border-[#9E8AC9]/30 flex items-center justify-center shrink-0">
+                      <Hash className="w-4 h-4 text-[#9E8AC9]" />
+                    </div>
+                    <div className="flex-1 min-w-0 text-left">
+                      <div className="text-[13px] text-[#E8E2D5] truncate">{h.input.name}</div>
+                      <div className="text-[10px] text-[#9C9489]">
+                        {new Date(h.input.birthDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })} · {h.system === "chaldean" ? "Chaldean" : "Pythagorean"} · {new Date(h.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <button
+                      onClick={(e) => deleteHistory(h.id, e)}
+                      className="p-2 text-[#9C9489] hover:text-red-400 transition opacity-0 group-hover:opacity-100"
+                      aria-label="Delete reading"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                    <ChevronRight className="w-4 h-4 text-[#9C9489]" />
+                  </div>
+                </AuroraGlowCard>
               ))}
             </div>
           </div>
@@ -457,20 +499,21 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
 // ============================================================
 
 function NumberDetail({
-  num, meaning, label, sub,
-}: { num: number; meaning: NumberMeaning; label: string; sub: string }) {
+  num, meaning, label, sub, accent,
+}: { num: number; meaning: NumberMeaning; label: string; sub: string; accent: string }) {
   const ElIcon = ELEMENT_ICON[meaning.element] || Star;
   return (
-    <GlassCard className="p-5 lg:p-6 mb-6">
+    <AuroraGlowCard glowColor={accent} glowIntensity={0.2} className="p-5 lg:p-6 mb-6">
       <div className="flex items-start gap-5 flex-col sm:flex-row">
         {/* Big Number */}
         <div
           className="w-28 h-28 rounded-sm flex flex-col items-center justify-center shrink-0"
           style={{ background: `${meaning.color}15`, border: `1px solid ${meaning.color}40` }}
         >
-          <span className="text-[56px] font-light leading-none" style={{ color: meaning.color }}>
-            {num}
-          </span>
+          <NumberTicker
+            value={num}
+            className="text-[56px] font-light leading-none tabular-nums"
+          />
           {num > 9 && (
             <span className="text-[8px] uppercase tracking-[0.2em] text-[#C5A572] mt-1">Master</span>
           )}
@@ -478,20 +521,15 @@ function NumberDetail({
 
         {/* Title + meta */}
         <div className="flex-1 min-w-0">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-[#9C9489]">{label} · {sub}</div>
+          <GlowPill color={accent} className="text-[10px] mb-2">{label} · {sub}</GlowPill>
           <h2 className="text-[22px] lg:text-[26px] font-light text-[#E8E2D5] mt-1">{meaning.title}</h2>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <span
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] border"
-              style={{ background: `${meaning.color}15`, borderColor: `${meaning.color}40`, color: meaning.color }}
-            >
+            <GlowPill color={meaning.color} className="text-[10px]">
               <ElIcon className="w-2.5 h-2.5" /> {meaning.element}
-            </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-[#9C9489] border border-[#2A2722]">
-              {meaning.rulingPlanet}
-            </span>
+            </GlowPill>
+            <GlowPill color="#9E8AC9" className="text-[10px]">{meaning.rulingPlanet}</GlowPill>
             {meaning.keywords.map((k) => (
-              <span key={k} className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-[#9C9489] border border-[#2A2722]">{k}</span>
+              <GlowPill key={k} color="#C5A572" className="text-[10px]">{k}</GlowPill>
             ))}
           </div>
           <p className="text-[13px] leading-relaxed text-[#E8E2D5]/85 mt-3">{meaning.summary}</p>
@@ -501,8 +539,8 @@ function NumberDetail({
       {/* Traits + Challenges */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.2em] text-[#7A8B6F] mb-2">Gifts</div>
-          <ul className="space-y-1.5">
+          <GlowPill color="#7A8B6F" className="text-[10px] mb-2">Gifts</GlowPill>
+          <ul className="space-y-1.5 mt-2">
             {meaning.traits.map((t) => (
               <li key={t} className="text-[12px] text-[#E8E2D5]/80 flex items-start gap-2">
                 <span className="text-[#7A8B6F] mt-0.5">·</span>
@@ -512,8 +550,8 @@ function NumberDetail({
           </ul>
         </div>
         <div>
-          <div className="text-[10px] uppercase tracking-[0.2em] text-[#D4A0B8]/80 mb-2">Challenges</div>
-          <ul className="space-y-1.5">
+          <GlowPill color="#D4A0B8" className="text-[10px] mb-2">Challenges</GlowPill>
+          <ul className="space-y-1.5 mt-2">
             {meaning.challenges.map((c) => (
               <li key={c} className="text-[12px] text-[#E8E2D5]/80 flex items-start gap-2">
                 <span className="text-[#D4A0B8]/80 mt-0.5">·</span>
@@ -523,7 +561,7 @@ function NumberDetail({
           </ul>
         </div>
       </div>
-    </GlassCard>
+    </AuroraGlowCard>
   );
 }
 
@@ -531,10 +569,10 @@ function LuckyCard({
   icon: Icon, title, items, accent,
 }: { icon: any; title: string; items: string[]; accent: string }) {
   return (
-    <div className="p-5 bg-[#0A0908]">
+    <AuroraGlowCard glowColor={accent} glowIntensity={0.1} className="p-5">
       <div className="flex items-center gap-2 mb-3">
         <Icon className="w-3.5 h-3.5" style={{ color: accent }} />
-        <div className="text-[12px] text-[#6B6358] font-medium">{title}</div>
+        <GlowPill color={accent} className="text-[10px]">{title}</GlowPill>
       </div>
       <div className="flex flex-wrap gap-x-3 gap-y-1.5">
         {items.map((it) => (
@@ -543,6 +581,6 @@ function LuckyCard({
           </span>
         ))}
       </div>
-    </div>
+    </AuroraGlowCard>
   );
 }

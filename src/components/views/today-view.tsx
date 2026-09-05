@@ -1,8 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { GlassCard, GoldButton, GradientButton, Pill, SectionTitle, ShellCard } from "@/components/lumina/primitives";
+import { useQueryClient } from "@tanstack/react-query";
+import { GlassCard, Pill, ShellCard, StarField } from "@/components/lumina/primitives";
+import {
+  AuroraGlowCard,
+  GlowPill,
+  LiquidMetalText,
+  NumberTicker,
+  ShimmerButton,
+  AnimatedGradientBackground,
+} from "@/components/lumina/premium-ui";
+import { CloverIcon } from "@/components/lumina/baydin-icons";
 import { TarotCardFace } from "@/components/tarot-card-face";
 import { CardDetailModal } from "@/components/card-detail-modal";
 import { useMe, api } from "@/lib/api-client";
@@ -11,12 +20,10 @@ import { useT } from "@/lib/use-t";
 import { cn } from "@/lib/utils";
 import {
   Sparkles, Moon, Star, Sun, Flame, Gift, ChevronRight, Heart, Calendar,
-  TrendingUp, Wallet, Target, Compass, BookOpen, Share2, Snowflake, Clock,
+  TrendingUp, Target, Compass, BookOpen, Share2, Snowflake, Clock,
 } from "lucide-react";
-import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { ZODIAC_SYMBOLS, ZODIAC_MY } from "@/lib/astrology";
 
 export function TodayView({ onAuth }: { onAuth: () => void }) {
   const { data } = useMe();
@@ -66,6 +73,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const [argala, setArgala] = React.useState<any>(null);
   const [drishti, setDrishti] = React.useState<any>(null);
   const [aspectsToday, setAspectsToday] = React.useState<any>(null);
+  const [claimingDaily, setClaimingDaily] = React.useState(false);
 
   // Load card of day
   React.useEffect(() => {
@@ -154,27 +162,30 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
 
   if (!user) {
     return (
-      <div className="h-full overflow-y-auto lumina-scroll">
-        <div className="max-w-2xl mx-auto px-6 py-12 lg:py-20">
+      <div className="h-full overflow-y-auto lumina-scroll relative">
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <AnimatedGradientBackground variant="cosmic" />
+          <StarField count={30} />
+        </div>
+        <div className="max-w-2xl mx-auto px-6 py-12 lg:py-20 relative z-10 min-w-0 overflow-hidden">
           {/* The one distinctive moment — serif headline, no card chrome */}
           <div className="lum-reveal">
-            <div className="text-[13px] text-[#6B6358] mb-3">
-              {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-            </div>
-            <h1 className="serif-display text-[2.75rem] sm:text-[3.5rem] leading-[1.05] text-[#E8E2D5] mb-5 tracking-tight">
+            <GlowPill className="mb-4">
+              <Sparkles className="w-3 h-3" /> Welcome
+            </GlowPill>
+            <LiquidMetalText as="h1" className="serif-display text-[2.75rem] sm:text-[3.5rem] leading-[1.05] tracking-tight block mb-5">
               {t("hero_read_sky")}
-            </h1>
+            </LiquidMetalText>
             <p className="t-body-lg text-[#9C9489] max-w-md leading-[1.7] mb-10">
               Baydin is a daily astrologer, tarot reader, and ritual companion. Vedic, Western, and Myanmar Mahabote traditions, drawn from your birth chart and the moon overhead.
             </p>
-            <button
-              onClick={onAuth}
-              className="inline-flex items-center gap-2 py-3 px-6 bg-[#E8E2D5] text-[#0A0908] text-[14px] font-medium hover:bg-white transition focus-ring rounded-sm"
-            >
+            <ShimmerButton onClick={onAuth} className="px-6 py-3">
               Begin
               <ChevronRight className="w-4 h-4" />
-            </button>
-            <div className="mt-3 text-[12px] text-[#6B6358]">5 Luck to start. No card required.</div>
+            </ShimmerButton>
+            <div className="mt-3 text-[12px] text-[#6B6358] flex items-center gap-1.5">
+              <CloverIcon className="w-3.5 h-3.5" /> 5 Luck to start. No card required.
+            </div>
           </div>
 
           {/* Hairline divider */}
@@ -206,21 +217,93 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
   const today = new Date();
   const dateStr = today.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
+  // Daily reward already claimed today? (user.lastDailyAt is set when claimed)
+  const lastDaily = user.lastDailyAt ? new Date(user.lastDailyAt) : null;
+  const alreadyClaimedToday = !!lastDaily && lastDaily.toDateString() === today.toDateString();
+
+  async function claimDailyReward() {
+    if (claimingDaily || alreadyClaimedToday) return;
+    setClaimingDaily(true);
+    try {
+      const res = await api<{ ok: boolean; amount?: number; streak?: number; dayNumber?: number; reason?: string; message?: string }>("/api/luck/daily-reward", { method: "POST" });
+      if (res.ok && res.amount) {
+        toast.success(`Daily Luck claimed · +${res.amount}`);
+        qc.invalidateQueries({ queryKey: ["me"] });
+      } else if (res.reason === "already_claimed") {
+        toast.info(res.message || "Already claimed today");
+        qc.invalidateQueries({ queryKey: ["me"] });
+      } else {
+        toast.error("Could not claim daily Luck right now");
+      }
+    } catch (e: any) { toast.error(e.message); }
+    finally { setClaimingDaily(false); }
+  }
+
   return (
-    <div className="h-full overflow-y-auto lumina-scroll">
-      <div className="max-w-4xl mx-auto px-4 py-6 lg:py-8">
+    <div className="h-full overflow-y-auto lumina-scroll relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <AnimatedGradientBackground variant="cosmic" />
+        <StarField count={30} />
+      </div>
+      <div className="max-w-4xl mx-auto px-4 py-6 lg:py-8 relative z-10 min-w-0 overflow-hidden">
         {/* Hero — serif greeting, sentence-case date, no ALL-CAPS eyebrow */}
         <div className="mb-8 lum-reveal">
           <div className="text-[13px] text-[#6B6358] mb-2">
             {dateStr}
           </div>
-          <h1 className="serif-display text-[1.75rem] sm:text-[2.25rem] leading-[1.15] text-[#E8E2D5] mb-1.5 tracking-tight">
+          <LiquidMetalText as="h1" className="serif-display text-[1.75rem] sm:text-[2.25rem] leading-[1.15] tracking-tight block mb-1.5">
             {greeting()}, {user.name?.split(" ")[0] || user.email.split("@")[0]}.
-          </h1>
+          </LiquidMetalText>
           <p className="t-body text-[#9C9489]">
-            {user.streak > 0 ? `${user.streak}-day streak. Keep it alive.` : "Begin your daily practice — claim your free Luck below."}
+            {user.streak > 0 ? (
+              <><NumberTicker value={user.streak} className="text-[#C5A572]" />-day streak. Keep it alive.</>
+            ) : (
+              "Begin your daily practice — claim your free Luck below."
+            )}
           </p>
         </div>
+
+        {/* Daily reward claim */}
+        <AuroraGlowCard glowColor="#C5A572" glowIntensity={alreadyClaimedToday ? 0.1 : 0.25} className="p-4 mb-5 lum-reveal">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-[#C5A572]/15 border border-[#C5A572]/30 flex items-center justify-center shrink-0">
+              <Gift className="w-5 h-5 text-[#C5A572]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-[10px] uppercase tracking-[0.2em] text-[#9C9489]">Daily reward</span>
+                {alreadyClaimedToday && (
+                  <GlowPill color="#7A8B6F" className="text-[9px]">
+                    <Flame className="w-3 h-3" /> Claimed
+                  </GlowPill>
+                )}
+              </div>
+              <div className="text-[14px] text-[#E8E2D5] font-medium leading-tight">
+                {alreadyClaimedToday
+                  ? `Come back tomorrow — streak at ${user.streak}.`
+                  : "Claim your daily Luck to grow the streak."}
+              </div>
+              <div className="text-[11px] text-[#9C9489] flex items-center gap-1">
+                <CloverIcon className="w-3 h-3" /> {alreadyClaimedToday ? "Reward already in your balance" : "Free Luck, every day"}
+              </div>
+            </div>
+            <ShimmerButton
+              onClick={claimDailyReward}
+              disabled={claimingDaily || alreadyClaimedToday}
+              className="shrink-0"
+            >
+              {claimingDaily ? (
+                "Claiming…"
+              ) : alreadyClaimedToday ? (
+                "✓ Claimed"
+              ) : (
+                <>
+                  <CloverIcon className="w-3.5 h-3.5" filled /> Claim
+                </>
+              )}
+            </ShimmerButton>
+          </div>
+        </AuroraGlowCard>
 
         {/* Recommended practice (personalized) */}
         <RecommendedPractice
@@ -245,7 +328,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
           <div className="lg:col-span-2 space-y-4">
             {/* Weekly practice summary */}
             {activity.length > 0 && (
-              <GlassCard className="p-4 flex items-center gap-4">
+              <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.15} className="p-4 flex items-center gap-4">
                 <div className="flex items-center gap-2 shrink-0">
                   <TrendingUp className="w-4 h-4 text-[#7A8B6F]" />
                   <span className="text-[11px] uppercase tracking-[0.15em] text-[#9C9489] hidden sm:inline">This Week</span>
@@ -256,11 +339,11 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                   <WeeklyStat label="Tarot" value={activity.reduce((s: number, d: any) => s + (d?.activities?.tarot ?? 0), 0)} color="#9E8AC9" />
                   <WeeklyStat label="Chat" value={activity.reduce((s: number, d: any) => s + (d?.activities?.chat ?? 0), 0)} color="#5FA9C7" />
                 </div>
-              </GlassCard>
+              </AuroraGlowCard>
             )}
 
             {/* Card of the day */}
-            <GlassCard className="p-6 relative overflow-hidden">
+            <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-6 relative overflow-hidden">
               <div className="relative">
                 {loadingCard ? (
                   <div className="animate-pulse space-y-3">
@@ -280,7 +363,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                   <div className="text-[13px] text-[#9C9489] py-4 text-center">Could not load card of the day.</div>
                 )}
               </div>
-            </GlassCard>
+            </AuroraGlowCard>
 
             {/* Today's planetary transits */}
             {transits?.positions?.length > 0 && (
@@ -929,14 +1012,17 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             </GlassCard>
 
             {/* Luck balance + streak */}
-            <GlassCard className="p-5">
+            <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.2} className="p-5">
               <div className="flex items-center gap-2 mb-3">
-                <Wallet className="w-4 h-4 text-[#C5A572]" />
+                <CloverIcon className="w-4 h-4 text-[#C5A572]" filled />
                 <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Your Luck</span>
               </div>
-              <div className="text-[32px] font-light text-[#C5A572] leading-none mb-1">{user.luckBalance}</div>
+              <div className="text-[32px] font-light text-[#C5A572] leading-none mb-1 flex items-center gap-1.5">
+                <NumberTicker value={user.luckBalance} />
+                <CloverIcon className="w-5 h-5" />
+              </div>
               <div className="text-[11px] text-[#9C9489] mb-2">
-                {user.streak}-day streak · {user.totalLuckEarned} earned lifetime
+                <NumberTicker value={user.streak} />-day streak · <NumberTicker value={user.totalLuckEarned} /> earned lifetime
               </div>
               {/* Streak freeze indicator */}
               {user.streak > 0 && (
@@ -948,13 +1034,13 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               {user.streak === 0 && (
                 <div className="mb-3" />
               )}
-              <GradientButton onClick={() => setView("luck-store")} className="w-full py-2 text-[12px]">
+              <ShimmerButton onClick={() => setView("luck-store")} className="w-full py-2 text-[12px]">
                 Top up Luck
-              </GradientButton>
-            </GlassCard>
+              </ShimmerButton>
+            </AuroraGlowCard>
 
             {/* 7-day activity heatmap */}
-            <GlassCard className="p-4">
+            <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.15} className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">7-day practice</span>
                 <Flame className="w-3.5 h-3.5 text-[#7A8B6F]" />
@@ -977,9 +1063,9 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 })}
               </div>
               <div className="text-[10px] text-[#9C9489] mt-2 text-center">
-                {activity.reduce((sum: number, d: any) => sum + (d?.total ?? 0), 0)} actions this week
+                <NumberTicker value={activity.reduce((sum: number, d: any) => sum + (d?.total ?? 0), 0)} /> actions this week
               </div>
-            </GlassCard>
+            </AuroraGlowCard>
 
             {/* Moon phase + Nakshatra */}
             {moon && (
@@ -1112,10 +1198,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
 
             {/* Today's lucky numbers */}
             {lucky && (
-              <GlassCard className="p-4">
+              <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-[#C5A572]" />
+                    <CloverIcon className="w-3.5 h-3.5 text-[#C5A572]" filled />
                     <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Luck</span>
                   </div>
                   <button
@@ -1137,7 +1223,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                 <div className="flex items-center gap-2 mb-3">
                   {lucky.numbers.map((n: number, i: number) => (
                     <div key={i} className="w-9 h-9 rounded-full bg-gradient-to-br from-gold/20 to-leaf/10 border border-[#C5A572]/30 flex items-center justify-center text-[15px] font-light text-[#C5A572]">
-                      {n}
+                      <NumberTicker value={n} />
                     </div>
                   ))}
                 </div>
@@ -1151,7 +1237,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                     <div className="text-[#E8E2D5]">{lucky.time}</div>
                   </div>
                 </div>
-              </GlassCard>
+              </AuroraGlowCard>
             )}
 
             {/* Muhurta (auspicious time) */}
@@ -1529,23 +1615,23 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
 
   if (!next) {
     return (
-      <ShellCard className="p-4 mb-5 lum-reveal">
+      <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.2} className="p-4 mb-5 lum-reveal">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-leaf/15 border border-leaf/30 flex items-center justify-center shrink-0">
             <Flame className="w-5 h-5 text-[#7A8B6F]" />
           </div>
           <div className="flex-1">
             <div className="text-[13px] text-[#E8E2D5] font-medium">Today's practice complete ✦</div>
-            <div className="text-[11px] text-[#9C9489]">You've done everything. Come back tomorrow to keep your {streak}-day streak alive.</div>
+            <div className="text-[11px] text-[#9C9489]">You've done everything. Come back tomorrow to keep your <NumberTicker value={streak} />-day streak alive.</div>
           </div>
         </div>
-      </ShellCard>
+      </AuroraGlowCard>
     );
   }
 
   return (
     <button onClick={() => onNavigate(next.view)} className="block w-full text-left mb-5 lum-reveal group">
-      <ShellCard className="p-4 hover:border-[#C5A572]/30 transition">
+      <AuroraGlowCard glowColor={next.color} glowIntensity={0.18} className="p-4 hover:border-[#C5A572]/30 transition">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border" style={{ background: `${next.color}15`, borderColor: `${next.color}40` }}>
             <next.icon className="w-5 h-5" style={{ color: next.color }} />
@@ -1557,7 +1643,7 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
           </div>
           <ChevronRight className="w-4 h-4 text-[#9C9489] group-hover:text-[#C5A572] group-hover:translate-x-0.5 transition shrink-0" />
         </div>
-      </ShellCard>
+      </AuroraGlowCard>
     </button>
   );
 }
