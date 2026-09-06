@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { GlassCard, GoldButton, Pill, SectionTitle, GradientButton, ShellCard, StarField } from "@/components/lumina/primitives";
 import {
   ShimmerButton,
-  AuroraGlowCard,
+  IconBgCard,
   GlowPill,
   NumberTicker,
   LiquidMetalText,
@@ -261,9 +261,9 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
           </div>
 
           {/* Sales analytics — 2-col grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
             {/* 6-month sales chart (2 cols) */}
-            <AuroraGlowCard className="p-5 lg:col-span-2" glowColor="#C5A572" glowIntensity={0.1}>
+            <IconBgCard icon={BaydinTrending} className="p-5 lg:col-span-2" glowColor="#C5A572" glowIntensity={0.16} iconSize={180} iconOpacity={0.06} iconPosition="top-right">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <BaydinTrending className="w-4 h-4 text-[#C5A572]" />
@@ -274,10 +274,10 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
                 </GlowPill>
               </div>
               <SalesTrendChart data={monthlySales} />
-            </AuroraGlowCard>
+            </IconBgCard>
 
             {/* Revenue + average */}
-            <AuroraGlowCard className="p-5" glowColor="#7A8B6F" glowIntensity={0.12}>
+            <IconBgCard icon={BaydinWallet} className="p-5" glowColor="#7A8B6F" glowIntensity={0.18} iconSize={140} iconOpacity={0.06} iconPosition="top-right">
               <div className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-3">Revenue</div>
               <div className="flex items-baseline gap-2 mb-3">
                 <NumberTicker
@@ -308,13 +308,13 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
                   </span>
                 </div>
               </div>
-            </AuroraGlowCard>
+            </IconBgCard>
           </div>
 
           {/* Buy more + Transfer (2-col grid) */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
             {/* Buy more (wholesale) */}
-            <AuroraGlowCard className="p-5" glowColor="#C5A572" glowIntensity={0.12}>
+            <IconBgCard icon={BaydinStore} className="p-5" glowColor="#C5A572" glowIntensity={0.18} iconSize={150} iconOpacity={0.06} iconPosition="top-right">
               <div className="flex items-center gap-2 mb-2">
                 <Package className="w-4 h-4 text-[#C5A572]" />
                 <span className="text-[13px] text-[#E8E2D5] font-medium">Need more inventory?</span>
@@ -334,10 +334,10 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
                 <BaydinWallet className="w-4 h-4" /> Browse Wholesale Packs
                 <BaydinChevronRight className="w-3 h-3" />
               </ShimmerButton>
-            </AuroraGlowCard>
+            </IconBgCard>
 
             {/* Sell Luck to a client */}
-            <AuroraGlowCard className="p-5" glowColor="#9E8AC9" glowIntensity={0.12}>
+            <IconBgCard icon={BaydinSend} className="p-5" glowColor="#9E8AC9" glowIntensity={0.18} iconSize={150} iconOpacity={0.06} iconPosition="top-right">
               <div className="flex items-center gap-2 mb-3">
                 <BaydinSend className="w-4 h-4 text-[#C5A572]" />
                 <span className="text-[13px] text-[#E8E2D5] font-medium">Sell Luck to a client</span>
@@ -382,12 +382,12 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
                 <BaydinSend className="w-4 h-4" />
                 {transferring ? "Transferring…" : `Transfer ${amount || ""} Luck`}
               </ShimmerButton>
-            </AuroraGlowCard>
+            </IconBgCard>
           </div>
 
           {/* Transfer history (premium) */}
           {(inventory?.transfersOut?.length ?? 0) > 0 && (
-            <AuroraGlowCard className="p-5 mb-6" glowColor="#7A8B6F" glowIntensity={0.08}>
+            <IconBgCard icon={Activity} className="p-5 mb-6" glowColor="#7A8B6F" glowIntensity={0.14} iconSize={150} iconOpacity={0.06} iconPosition="top-right">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Activity className="w-3.5 h-3.5 text-[#C5A572]" />
@@ -431,7 +431,7 @@ export function ResellerView({ onAuth }: { onAuth: () => void }) {
                   );
                 })}
               </div>
-            </AuroraGlowCard>
+            </IconBgCard>
           )}
 
           {/* Branded Certificates */}
@@ -468,7 +468,7 @@ function StatCard({
   showClover?: boolean;
 }) {
   return (
-    <AuroraGlowCard className="p-4" glowColor={accent} glowIntensity={0.1}>
+    <IconBgCard icon={Icon} glowColor={accent} glowIntensity={0.16} iconSize={130} iconOpacity={0.07} iconPosition="top-right" className="p-5">
       <div className="flex items-center gap-1.5 mb-2 text-[10px] uppercase tracking-wide text-[#9C9489]">
         <Icon className="w-3 h-3" style={{ color: accent }} /> {label}
       </div>
@@ -476,11 +476,11 @@ function StatCard({
         {showClover && <CloverIcon className="w-4 h-4 text-[#C5A572] shrink-0" strokeWidth={1.6} aria-label="Luck" />}
         <NumberTicker
           value={value}
-          className="serif-display text-[1.6rem] text-[#E8E2D5] tabular-nums leading-none"
+          className="serif-display text-[2rem] text-[#E8E2D5] tabular-nums leading-none"
         />
       </div>
       <div className="text-[10px] text-[#9C9489] mt-1">{sub}</div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -587,9 +587,13 @@ function TopUpBalanceBanner({
 }) {
   const isEmpty = poolBalance <= 0;
   return (
-    <AuroraGlowCard
+    <IconBgCard
+      icon={BaydinWallet}
       glowColor="#C5A572"
-      glowIntensity={isEmpty ? 0.25 : 0.15}
+      glowIntensity={isEmpty ? 0.3 : 0.2}
+      iconSize={220}
+      iconOpacity={0.07}
+      iconPosition="top-right"
       className="mb-6 p-5 lg:p-6 relative overflow-hidden"
     >
       {/* CloverPNG watermark */}
@@ -639,7 +643,7 @@ function TopUpBalanceBanner({
           </ShimmerButton>
         </div>
       </div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -664,7 +668,7 @@ function PartnerResources({ user }: { user: any }) {
   }
 
   return (
-    <AuroraGlowCard className="p-5 mb-6" glowColor="#7A8B6F" glowIntensity={0.1}>
+    <IconBgCard icon={BaydinGift} className="p-5 mb-6" glowColor="#7A8B6F" glowIntensity={0.16} iconSize={150} iconOpacity={0.06} iconPosition="top-right">
       <div className="flex items-center justify-between mb-1">
         <div className="text-[12px] text-[#9C9489] uppercase tracking-wide">Partner resources</div>
         <GlowPill color="#7A8B6F" className="text-[10px]">Baydin Partner</GlowPill>
@@ -732,7 +736,7 @@ function PartnerResources({ user }: { user: any }) {
       </div>
 
       <TermsSheet open={termsOpen} onOpenChange={setTermsOpen} />
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -904,10 +908,14 @@ function BrandedCertificatesSection({ user }: { user: any }) {
           const Icon = c.icon;
           const isTierCard = c.kind === "tier_upgrade";
           return (
-            <AuroraGlowCard
+            <IconBgCard
               key={c.kind}
+              icon={Icon}
               glowColor={c.color}
-              glowIntensity={0.18}
+              glowIntensity={0.22}
+              iconSize={130}
+              iconOpacity={0.07}
+              iconPosition="top-right"
               className="p-4 flex flex-col gap-3"
             >
               <div className="flex items-center gap-2">
@@ -943,7 +951,7 @@ function BrandedCertificatesSection({ user }: { user: any }) {
                   </>
                 )}
               </ShimmerButton>
-            </AuroraGlowCard>
+            </IconBgCard>
           );
         })}
       </div>
@@ -1039,19 +1047,19 @@ function RecentCertificates() {
 
   if (loading) {
     return (
-      <AuroraGlowCard className="p-5" glowColor="#C5A572" glowIntensity={0.06}>
+      <IconBgCard icon={Award} className="p-5" glowColor="#C5A572" glowIntensity={0.12} iconSize={130} iconOpacity={0.06} iconPosition="top-right">
         <div className="text-[12px] text-[#9C9489] flex items-center gap-2">
           <Award className="w-3.5 h-3.5 text-[#C5A572] animate-pulse" />
           Loading recent certificates…
         </div>
-      </AuroraGlowCard>
+      </IconBgCard>
     );
   }
 
   if (history.length === 0) return null;
 
   return (
-    <AuroraGlowCard className="p-5" glowColor="#C5A572" glowIntensity={0.08}>
+    <IconBgCard icon={Award} className="p-5" glowColor="#C5A572" glowIntensity={0.14} iconSize={150} iconOpacity={0.06} iconPosition="top-right">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Award className="w-3.5 h-3.5 text-[#C5A572]" />
@@ -1087,7 +1095,7 @@ function RecentCertificates() {
           </div>
         ))}
       </div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 

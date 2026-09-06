@@ -3,8 +3,8 @@
 import * as React from "react";
 import { StarField } from "@/components/lumina/primitives";
 import {
-  AuroraGlowCard,
   GlowPill,
+  IconBgCard,
   LiquidMetalText,
   NumberTicker,
   ShimmerButton,
@@ -163,7 +163,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
           {/* Player */}
           <div className="space-y-4">
             {/* Now playing card */}
-            <AuroraGlowCard glowColor={selected.color} glowIntensity={0.18} className="p-6 relative overflow-hidden">
+            <IconBgCard icon={BaydinFrequency} glowColor={selected.color} glowIntensity={0.22} iconSize={260} iconOpacity={0.08} iconPosition="top-right" className="p-6 relative overflow-hidden">
               {/* Radial glow halo */}
               <div
                 className="absolute inset-0 pointer-events-none"
@@ -183,7 +183,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <div className="text-[10px] uppercase tracking-[0.2em] text-[#9C9489]">{selected.name}</div>
-                    <div className="text-[32px] font-light leading-none mt-1" style={{ color: selected.color }}>
+                    <div className="text-[36px] font-light leading-none mt-1" style={{ color: selected.color }}>
                       <NumberTicker value={selected.hz} className="tabular-nums" />
                       <span className="text-[14px] text-[#9C9489] ml-0.5">Hz</span>
                     </div>
@@ -289,7 +289,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                   ))}
                 </div>
               </div>
-            </AuroraGlowCard>
+            </IconBgCard>
 
             {/* Breathing pacer */}
             <BreathingPacer active={playing} color={selected.color} />
@@ -301,15 +301,19 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
               <BaydinBreath className="w-3.5 h-3.5 text-[#C5A572]" />
               <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Choose your intention</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {FREQUENCIES.map((f) => {
                 const isSelected = selected.id === f.id;
                 return (
-                  <AuroraGlowCard
+                  <IconBgCard
                     key={f.id}
+                    icon={BaydinFrequency}
                     glowColor={isSelected ? f.color : "#2A2722"}
-                    glowIntensity={isSelected ? 0.18 : 0.05}
-                    className="p-3"
+                    glowIntensity={isSelected ? 0.22 : 0.06}
+                    iconSize={120}
+                    iconOpacity={isSelected ? 0.1 : 0.05}
+                    iconPosition="top-right"
+                    className="p-4"
                   >
                     <button
                       onClick={() => { if (playing) stopTone(false); setSelected(f); }}
@@ -317,7 +321,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                     >
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="w-2 h-2 rounded-full" style={{ background: f.color }} />
-                        <span className="text-[10px] text-[#9C9489] tabular-nums">
+                        <span className="text-[14px] font-light text-[#E8E2D5] tabular-nums">
                           <NumberTicker value={f.hz} suffix="Hz" />
                         </span>
                       </div>
@@ -327,7 +331,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                         <GlowPill color={f.color} className="text-[9px]">{f.intention}</GlowPill>
                       </div>
                     </button>
-                  </AuroraGlowCard>
+                  </IconBgCard>
                 );
               })}
             </div>
@@ -389,7 +393,7 @@ function BreathingPacer({ active, color }: { active: boolean; color: string }) {
   }, [active]);
   const scale = phase === "inhale" ? 1.3 : phase === "exhale" ? 0.7 : phase === "hold" ? 1.3 : 0.7;
   return (
-    <AuroraGlowCard glowColor={color} glowIntensity={0.12} className="p-5">
+    <IconBgCard icon={BaydinBreath} glowColor={color} glowIntensity={0.18} iconSize={130} iconOpacity={0.06} iconPosition="top-right" className="p-5">
       <div className="flex items-center gap-4">
         <div className="relative w-16 h-16 flex items-center justify-center shrink-0">
           <div
@@ -415,7 +419,7 @@ function BreathingPacer({ active, color }: { active: boolean; color: string }) {
           )}
         </div>
       </div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -428,7 +432,7 @@ function Gate({ onAuth }: { onAuth: () => void }) {
       </div>
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
         <div className="flex flex-col items-center justify-center text-center py-20">
-          <AuroraGlowCard glowColor="#9CA8A3" glowIntensity={0.15} className="max-w-sm w-full p-10 text-center">
+          <IconBgCard icon={BaydinFrequency} glowColor="#9CA8A3" glowIntensity={0.18} iconSize={180} iconOpacity={0.07} iconPosition="center" className="max-w-sm w-full p-10 text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 border border-[#9CA8A3]/30" style={{ background: "#9CA8A310" }}>
               <BaydinFrequency className="w-7 h-7 text-[#9CA8A3]" />
             </div>
@@ -437,7 +441,7 @@ function Gate({ onAuth }: { onAuth: () => void }) {
               Solfeggio frequencies, binaural beats, and ambient pads via Web Audio.
             </p>
             <ShimmerButton onClick={onAuth} className="w-full">Sign in</ShimmerButton>
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
       </div>
     </div>

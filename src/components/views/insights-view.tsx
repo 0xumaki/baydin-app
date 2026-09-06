@@ -3,8 +3,8 @@
 import * as React from "react";
 import { StarField } from "@/components/lumina/primitives";
 import {
-  AuroraGlowCard,
   GlowPill,
+  IconBgCard,
   LiquidMetalText,
   NumberTicker,
   ShimmerButton,
@@ -53,7 +53,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
           <StarField count={30} />
         </div>
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
-          <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.18} className="p-8 text-center">
+          <IconBgCard icon={BaydinInsights} glowColor="#9E8AC9" glowIntensity={0.22} iconSize={220} iconOpacity={0.08} iconPosition="center" className="p-8 text-center">
             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[#9E8AC9]/15 border border-[#9E8AC9]/30 flex items-center justify-center">
               <BaydinInsights className="w-6 h-6 text-[#9E8AC9]" />
             </div>
@@ -62,7 +62,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
               Skill-based readings grounded in your natal chart — Yogas, Transits, Dasha, Career, Gemstones and more.
             </p>
             <ShimmerButton onClick={onAuth}>Sign in</ShimmerButton>
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
       </div>
     );
@@ -89,7 +89,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
             <BaydinArrowLeft className="w-3.5 h-3.5" /> All insights
           </button>
 
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.15} className="p-5 mb-5">
+          <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.2} iconSize={140} iconOpacity={0.07} iconPosition="top-right" className="p-5 mb-5">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-sm bg-[#C5A572]/10 border border-[#C5A572]/20 flex items-center justify-center text-2xl text-[#C5A572]">
                 {skill?.icon || "✦"}
@@ -105,16 +105,16 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
                 </GlowPill>
               )}
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
 
           {loading ? (
-            <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.18} className="p-8 text-center">
+            <IconBgCard icon={BaydinLoader} glowColor="#9E8AC9" glowIntensity={0.22} iconSize={180} iconOpacity={0.07} iconPosition="center" className="p-8 text-center">
               <BaydinLoader className="w-6 h-6 text-[#C5A572] mx-auto mb-3" />
               <div className="text-[13px] text-[#E8E2D5]">Reading the stars…</div>
               <div className="text-[11px] text-[#9C9489]/60 mt-1">This usually takes 10-20 seconds</div>
-            </AuroraGlowCard>
+            </IconBgCard>
           ) : result ? (
-            <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-6">
+            <IconBgCard icon={BaydinInsights} glowColor="#C5A572" glowIntensity={0.22} iconSize={220} iconOpacity={0.07} iconPosition="top-right" className="p-6">
               <div className="serif prose-editorial text-[14px] text-[#E8E2D5]/90 leading-relaxed">
                 <ReactMarkdown>{result.content}</ReactMarkdown>
               </div>
@@ -159,7 +159,7 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
                   <BaydinBookmark className="w-3 h-3" /> Save this insight
                 </ShimmerButton>
               </div>
-            </AuroraGlowCard>
+            </IconBgCard>
           ) : null}
         </div>
       </div>
@@ -186,16 +186,16 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
 
         {/* Luck balance row */}
         <div className="flex items-center gap-2 mb-5">
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-3 px-4 inline-flex items-center gap-2">
+          <IconBgCard icon={CloverIcon} glowColor="#C5A572" glowIntensity={0.16} iconSize={100} iconOpacity={0.07} iconPosition="top-right" className="p-3 px-4 inline-flex items-center gap-2">
             <CloverIcon className="w-3.5 h-3.5" />
             <span className="text-[12px] text-[#9C9489]">Balance:</span>
             <NumberTicker value={user.luckBalance} className="text-[14px] text-[#C5A572] font-medium" />
             <span className="text-[12px] text-[#9C9489]">Luck</span>
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
 
         {/* Optional query */}
-        <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.1} className="p-3 mb-6">
+        <IconBgCard icon={BaydinStar} glowColor="#9E8AC9" glowIntensity={0.16} iconSize={140} iconOpacity={0.06} iconPosition="top-right" className="p-3 mb-6">
           <div className="flex items-center gap-2">
             <BaydinStar className="w-4 h-4 text-[#C5A572] shrink-0" />
             <input
@@ -206,20 +206,24 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
               className="flex-1 bg-transparent outline-none text-[13px] text-[#E8E2D5] placeholder:text-[#9C9489]/60"
             />
           </div>
-        </AuroraGlowCard>
+        </IconBgCard>
 
         {/* Skills grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {skills.map((s) => (
-            <AuroraGlowCard
+            <IconBgCard
               key={s.id}
+              icon={BaydinInsights}
               glowColor="#9E8AC9"
-              glowIntensity={0.08}
-              className="p-0"
+              glowIntensity={0.1}
+              iconSize={130}
+              iconOpacity={0.07}
+              iconPosition="top-right"
+              className="p-5"
             >
               <button
                 onClick={() => run(s.id)}
-                className="group w-full text-left p-4 rounded-sm transition-all"
+                className="group w-full text-left transition-all"
               >
                 <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{s.icon}</div>
                 <div className="text-[13px] text-[#E8E2D5] font-medium mb-0.5">{s.name}</div>
@@ -233,16 +237,16 @@ export function InsightsView({ onAuth }: { onAuth: () => void }) {
                   </span>
                 </div>
               </button>
-            </AuroraGlowCard>
+            </IconBgCard>
           ))}
         </div>
 
         {/* Empty skills state */}
         {skills.length === 0 && (
-          <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.12} className="p-8 text-center">
+          <IconBgCard icon={BaydinLoader} glowColor="#9E8AC9" glowIntensity={0.16} iconSize={140} iconOpacity={0.07} iconPosition="center" className="p-8 text-center">
             <BaydinLoader className="w-5 h-5 text-[#9E8AC9] mx-auto mb-3" />
             <div className="text-[12px] text-[#9C9489]">Loading insight skills…</div>
-          </AuroraGlowCard>
+          </IconBgCard>
         )}
       </div>
     </div>
@@ -272,7 +276,7 @@ function NeedsBirthData() {
         <StarField count={30} />
       </div>
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden flex items-center justify-center">
-        <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.15} className="p-8 max-w-md w-full text-center">
+        <IconBgCard icon={BaydinStar} glowColor="#9E8AC9" glowIntensity={0.2} iconSize={200} iconOpacity={0.08} iconPosition="center" className="p-8 max-w-md w-full text-center">
           <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#C5A572]/10 border border-[#C5A572]/30 flex items-center justify-center">
             <BaydinStar className="w-6 h-6 text-[#C5A572]" />
           </div>
@@ -281,7 +285,7 @@ function NeedsBirthData() {
             Insights read your natal chart. Open your profile (top-right settings icon) and add your birth date, time, and place.
           </p>
           <GlowPill color="#9E8AC9" className="text-[10px]">Profile → Birth data</GlowPill>
-        </AuroraGlowCard>
+        </IconBgCard>
       </div>
     </div>
   );

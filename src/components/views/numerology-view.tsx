@@ -3,8 +3,8 @@
 import * as React from "react";
 import { StarField } from "@/components/lumina/primitives";
 import {
-  AuroraGlowCard,
   GlowPill,
+  IconBgCard,
   LiquidMetalText,
   NumberTicker,
   ShimmerButton,
@@ -168,7 +168,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
           <StarField count={30} />
         </div>
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
-          <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.18} className="p-8 text-center">
+          <IconBgCard icon={BaydinNumerology} glowColor="#9E8AC9" glowIntensity={0.22} iconSize={220} iconOpacity={0.08} iconPosition="center" className="p-8 text-center">
             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[#9E8AC9]/15 border border-[#9E8AC9]/30 flex items-center justify-center">
               <BaydinNumerology className="w-6 h-6 text-[#9E8AC9]" />
             </div>
@@ -177,7 +177,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
               Decode the geometry of your name and birth date.
             </p>
             <ShimmerButton onClick={onAuth}>Sign in</ShimmerButton>
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
       </div>
     );
@@ -217,26 +217,30 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
             </div>
           </div>
 
-          {/* 8 Number Cards — premium AuroraGlowCard grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          {/* 8 Number Cards — premium IconBgCard grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {numberCards.map(({ key, label, num, meaning, accent }) => {
               const isActive = active?.key === key;
               return (
-                <AuroraGlowCard
+                <IconBgCard
                   key={key}
+                  icon={BaydinNumerology}
                   glowColor={isActive ? accent : "#2A2722"}
-                  glowIntensity={isActive ? 0.22 : 0.06}
-                  className="p-0"
+                  glowIntensity={isActive ? 0.28 : 0.06}
+                  iconSize={150}
+                  iconOpacity={isActive ? 0.1 : 0.05}
+                  iconPosition="center"
+                  className="p-5"
                 >
                   <button
                     onClick={() => setActiveNumber(key)}
-                    className="w-full text-left p-5 transition-colors rounded-sm"
+                    className="w-full text-left transition-colors"
                   >
                     <div className="text-[11px] text-[#9C9489] mb-2 font-medium">{label}</div>
                     <div className="flex items-baseline gap-2">
                       <NumberTicker
                         value={num}
-                        className="text-[2.5rem] leading-none tabular-nums font-light"
+                        className="text-[3rem] leading-none tabular-nums font-light"
                       />
                       {num > 9 && (
                         <GlowPill color="#C5A572" className="text-[8px]">master</GlowPill>
@@ -244,7 +248,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
                     </div>
                     <div className="text-[11px] text-[#9C9489] mt-2 truncate">{meaning?.title}</div>
                   </button>
-                </AuroraGlowCard>
+                </IconBgCard>
               );
             })}
           </div>
@@ -255,20 +259,20 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
           )}
 
           {/* Synthesis */}
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.14} className="p-6 lg:p-8 mt-8 mb-8">
+          <IconBgCard icon={BaydinNumerology} glowColor="#C5A572" glowIntensity={0.2} iconSize={200} iconOpacity={0.06} iconPosition="top-right" className="p-6 lg:p-8 mt-8 mb-8">
             <GlowPill color="#C5A572" className="text-[10px] mb-4">Synthesis</GlowPill>
             <div className="serif text-[15px] leading-[1.8] text-[#E8E2D5] whitespace-pre-line max-w-[65ch] prose-editorial">{report.synthesis}</div>
-          </AuroraGlowCard>
+          </IconBgCard>
 
           {/* Lucky Elements — premium cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <LuckyCard icon={BaydinClock} title="Lucky days" items={report.lucky.days} accent="#C5A87C" />
             <LuckyCard icon={Palette} title="Lucky colors" items={report.lucky.colors} accent="#D4A0B8" />
             <LuckyCard icon={Gem} title="Lucky gems" items={report.lucky.gems} accent="#7A8B6F" />
           </div>
 
           {/* Lucky numbers */}
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-6 mb-8">
+          <IconBgCard icon={CloverIcon} glowColor="#C5A572" glowIntensity={0.22} iconSize={180} iconOpacity={0.07} iconPosition="center" className="p-6 mb-8">
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <span className="text-[12px] text-[#9C9489] flex items-center gap-1.5">
                 <CloverIcon className="w-3.5 h-3.5" /> Lucky numbers:
@@ -278,12 +282,12 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
                   <NumberTicker
                     key={n}
                     value={n}
-                    className="text-[1.5rem] text-[#C5A572] tabular-nums font-light"
+                    className="text-[2rem] text-[#C5A572] tabular-nums font-light"
                   />
                 ))}
               </div>
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
 
           <div className="flex justify-center pb-6">
             <ShimmerButton tone="parchment" onClick={reset} className="px-6 py-2.5 text-[13px]">
@@ -316,8 +320,8 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
           </p>
         </div>
 
-        {/* Form — AuroraGlowCard wrapper */}
-        <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-6 mb-6">
+        {/* Form — IconBgCard wrapper */}
+        <IconBgCard icon={BaydinNumerology} glowColor="#C5A572" glowIntensity={0.18} iconSize={180} iconOpacity={0.06} iconPosition="top-right" className="p-6 mb-6">
           <div className="space-y-6">
             {/* Name */}
             <div>
@@ -382,7 +386,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
               </div>
             </div>
           </div>
-        </AuroraGlowCard>
+        </IconBgCard>
 
         {/* CTAs — premium */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -401,7 +405,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
 
         {/* Free Preview Result */}
         {preview && (
-          <AuroraGlowCard glowColor={preview.meaning.color} glowIntensity={0.18} className="p-5 lg:p-6 mb-6">
+          <IconBgCard icon={BaydinNumerology} glowColor={preview.meaning.color} glowIntensity={0.22} iconSize={200} iconOpacity={0.08} iconPosition="top-right" className="p-5 lg:p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <GlowPill color={preview.meaning.color} className="text-[10px] mb-2">
@@ -418,7 +422,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
               >
                 <NumberTicker
                   value={preview.lifePath}
-                  className="text-[52px] font-light leading-none tabular-nums"
+                  className="text-[56px] font-light leading-none tabular-nums"
                 />
               </div>
               <div className="min-w-0">
@@ -446,7 +450,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
                 </span>
               </ShimmerButton>
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
         )}
 
         {/* History */}
@@ -455,13 +459,13 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
             <GlowPill color="#9E8AC9" className="text-[10px] mb-3">Past Readings</GlowPill>
             <div className="space-y-2">
               {history.map((h) => (
-                <AuroraGlowCard key={h.id} glowColor="#9E8AC9" glowIntensity={0.08} className="p-0">
+                <IconBgCard key={h.id} icon={BaydinNumerology} glowColor="#9E8AC9" glowIntensity={0.1} iconSize={100} iconOpacity={0.06} iconPosition="top-right" className="p-0">
                   <div
                     role="button"
                     tabIndex={0}
                     onClick={() => loadHistory(h.id)}
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); loadHistory(h.id); } }}
-                    className="w-full flex items-center gap-3 p-3 rounded-sm transition group cursor-pointer hover:bg-[#0F0D0B]/50"
+                    className="w-full flex items-center gap-3 p-3 transition group cursor-pointer hover:bg-[#0F0D0B]/50"
                   >
                     <div className="w-9 h-9 rounded-lg bg-[#9E8AC9]/15 border border-[#9E8AC9]/30 flex items-center justify-center shrink-0">
                       <BaydinNumerology className="w-4 h-4 text-[#9E8AC9]" />
@@ -481,7 +485,7 @@ export function NumerologyView({ onAuth }: { onAuth: () => void }) {
                     </button>
                     <BaydinChevronRight className="w-4 h-4 text-[#9C9489]" />
                   </div>
-                </AuroraGlowCard>
+                </IconBgCard>
               ))}
             </div>
           </div>
@@ -500,7 +504,7 @@ function NumberDetail({
 }: { num: number; meaning: NumberMeaning; label: string; sub: string; accent: string }) {
   const ElIcon = ELEMENT_ICON[meaning.element] || BaydinStar;
   return (
-    <AuroraGlowCard glowColor={accent} glowIntensity={0.2} className="p-5 lg:p-6 mb-6">
+    <IconBgCard icon={BaydinNumerology} glowColor={accent} glowIntensity={0.24} iconSize={220} iconOpacity={0.07} iconPosition="top-right" className="p-5 lg:p-6 mb-6">
       <div className="flex items-start gap-5 flex-col sm:flex-row">
         {/* Big Number */}
         <div
@@ -509,7 +513,7 @@ function NumberDetail({
         >
           <NumberTicker
             value={num}
-            className="text-[56px] font-light leading-none tabular-nums"
+            className="text-[64px] font-light leading-none tabular-nums"
           />
           {num > 9 && (
             <span className="text-[8px] uppercase tracking-[0.2em] text-[#C5A572] mt-1">Master</span>
@@ -519,7 +523,7 @@ function NumberDetail({
         {/* Title + meta */}
         <div className="flex-1 min-w-0">
           <GlowPill color={accent} className="text-[10px] mb-2">{label} · {sub}</GlowPill>
-          <h2 className="text-[22px] lg:text-[26px] font-light text-[#E8E2D5] mt-1">{meaning.title}</h2>
+          <h2 className="text-[24px] lg:text-[28px] font-light text-[#E8E2D5] mt-1">{meaning.title}</h2>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             <GlowPill color={meaning.color} className="text-[10px]">
               <ElIcon className="w-2.5 h-2.5" /> {meaning.element}
@@ -558,7 +562,7 @@ function NumberDetail({
           </ul>
         </div>
       </div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -566,7 +570,7 @@ function LuckyCard({
   icon: Icon, title, items, accent,
 }: { icon: any; title: string; items: string[]; accent: string }) {
   return (
-    <AuroraGlowCard glowColor={accent} glowIntensity={0.1} className="p-5">
+    <IconBgCard icon={Icon} glowColor={accent} glowIntensity={0.16} iconSize={130} iconOpacity={0.07} iconPosition="top-right" className="p-5">
       <div className="flex items-center gap-2 mb-3">
         <Icon className="w-3.5 h-3.5" style={{ color: accent }} />
         <GlowPill color={accent} className="text-[10px]">{title}</GlowPill>
@@ -578,6 +582,6 @@ function LuckyCard({
           </span>
         ))}
       </div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }

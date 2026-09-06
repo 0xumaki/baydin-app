@@ -9,7 +9,7 @@ import { StarField } from "@/components/lumina/primitives";
 import {
   GlowPill,
   ShimmerButton,
-  AuroraGlowCard,
+  IconBgCard,
   LiquidMetalText,
   NumberTicker,
   AnimatedGradientBackground,
@@ -205,9 +205,13 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
               Luck is the credit you spend on readings, rituals, and reports. Earn it through daily rewards, referrals, or by topping up below.
             </p>
             {/* Luck balance display */}
-            <AuroraGlowCard
+            <IconBgCard
+              icon={CloverIcon}
               glowColor="#C5A572"
-              glowIntensity={0.15}
+              glowIntensity={0.22}
+              iconSize={140}
+              iconOpacity={0.08}
+              iconPosition="top-right"
               className="mt-4 p-4 inline-flex items-center gap-3 relative overflow-hidden"
             >
               <CloverPNG
@@ -219,12 +223,12 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
                 <div className="flex items-baseline gap-2">
                   <NumberTicker
                     value={user.luckBalance}
-                    className="serif-display text-[1.75rem] text-[#C5A572] tabular-nums leading-none"
+                    className="serif-display text-[2rem] text-[#C5A572] tabular-nums leading-none"
                   />
                   <span className="text-[12px] text-[#9C9489]">Luck in your account</span>
                 </div>
               </div>
-            </AuroraGlowCard>
+            </IconBgCard>
           </div>
 
           {/* Ways to Earn — 3 AuroraGlowCards */}
@@ -260,26 +264,30 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
             <div className="text-[12px] text-[#9C9489] font-medium mb-3 uppercase tracking-wide">{t("luck_what_buys")}</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {FEATURE_COSTS.map(({ feature, cost, icon: Icon }) => (
-                <AuroraGlowCard key={feature} glowColor="#C5A572" glowIntensity={0.06} className="p-3">
+                <IconBgCard key={feature} icon={Icon} glowColor="#C5A572" glowIntensity={0.1} iconSize={100} iconOpacity={0.05} iconPosition="top-right" className="p-4">
                   <div className="flex items-baseline justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <Icon className="w-3.5 h-3.5 text-[#6B6358] shrink-0" />
                       <span className="text-[12px] text-[#9C9489] truncate">{feature}</span>
                     </div>
-                    <span className="flex items-center gap-1 serif-display text-[1.1rem] text-[#E8E2D5] tabular-nums shrink-0">
+                    <span className="flex items-center gap-1 serif-display text-[1.25rem] text-[#E8E2D5] tabular-nums shrink-0">
                       <CloverIcon className="w-3 h-3 text-[#C5A572]" aria-label="Luck" />
                       {cost}
                     </span>
                   </div>
-                </AuroraGlowCard>
+                </IconBgCard>
               ))}
             </div>
           </div>
 
-          {/* Referral Program — AuroraGlowCard with CloverPNG watermark */}
-          <AuroraGlowCard
+          {/* Referral Program — IconBgCard with CloverPNG watermark */}
+          <IconBgCard
+            icon={BaydinGift}
             glowColor="#7A8B6F"
-            glowIntensity={0.12}
+            glowIntensity={0.18}
+            iconSize={170}
+            iconOpacity={0.07}
+            iconPosition="top-right"
             className="p-5 mb-6 relative overflow-hidden"
           >
             <CloverPNG
@@ -308,7 +316,7 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
                 <BaydinShare className="w-3.5 h-3.5" /> Share
               </button>
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
 
           {/* Luck Packs — regular tiers */}
           <div className="mb-6">
@@ -351,15 +359,19 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
             </div>
           )}
 
-          {/* Payment panel — AuroraGlowCard */}
+          {/* Payment panel — IconBgCard */}
           {selectedTier && (() => {
             const selectedCampaign = findCampaignForTier(selectedTier, tiers.campaigns);
             const expiryDays = daysUntilExpiry(selectedCampaign?.validUntil);
             const expiringSoon = expiryDays !== null && expiryDays >= 0 && expiryDays <= 3;
             return (
-            <AuroraGlowCard
+            <IconBgCard
+              icon={CloverIcon}
               glowColor={expiringSoon ? "#D8788A" : "#C5A572"}
-              glowIntensity={0.14}
+              glowIntensity={0.2}
+              iconSize={170}
+              iconOpacity={0.06}
+              iconPosition="top-right"
               className="p-5 mb-6"
             >
               <div className="flex items-center justify-between mb-3">
@@ -458,7 +470,7 @@ export function LuckStoreView({ onAuth }: { onAuth: () => void }) {
                   {buying ? "Processing…" : "Confirm purchase"}
                 </ShimmerButton>
               </div>
-            </AuroraGlowCard>
+            </IconBgCard>
             );
           })}
         </div>
@@ -485,7 +497,7 @@ function EarnMethodCard({
   color: string;
 }) {
   return (
-    <AuroraGlowCard glowColor={color} glowIntensity={0.1} className="p-5 flex flex-col gap-3">
+    <IconBgCard icon={Icon} glowColor={color} glowIntensity={0.16} iconSize={130} iconOpacity={0.07} iconPosition="top-right" className="p-5 flex flex-col gap-3">
       <div
         className="w-9 h-9 rounded-sm flex items-center justify-center"
         style={{ background: `${color}1A`, border: `1px solid ${color}40` }}
@@ -497,7 +509,7 @@ function EarnMethodCard({
         <div className="text-[12px] text-[#9C9489] leading-[1.6]">{body}</div>
       </div>
       <div className="text-[11px] text-[#C5A572] serif-italic mt-auto">{cta}</div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -522,9 +534,13 @@ function TierCard({
   const expiryDays = daysUntilExpiry(campaign?.validUntil);
   const expiringSoon = expiryDays !== null && expiryDays >= 0 && expiryDays <= 3;
   return (
-    <AuroraGlowCard
+    <IconBgCard
+      icon={CloverIcon}
       glowColor={selected ? "#C5A572" : "#9C9489"}
-      glowIntensity={selected ? 0.18 : 0.06}
+      glowIntensity={selected ? 0.22 : 0.06}
+      iconSize={150}
+      iconOpacity={selected ? 0.1 : 0.05}
+      iconPosition="bottom-right"
       className={cn(
         "p-5 relative overflow-hidden cursor-pointer transition",
         selected ? "border-[#C5A572]/60" : "",
@@ -614,6 +630,6 @@ function TierCard({
           <BaydinCheck className="w-3 h-3 text-[#0A0908]" />
         </div>
       )}
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }

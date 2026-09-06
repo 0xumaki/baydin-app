@@ -5,8 +5,8 @@ import {
   StarField,
 } from "@/components/lumina/primitives";
 import {
-  AuroraGlowCard,
   GlowPill,
+  IconBgCard,
   LiquidMetalText,
   NumberTicker,
   ShimmerButton,
@@ -172,7 +172,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 
         {/* ===== Loading state ===== */}
         {loading && (
-          <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.12} className="p-5 mb-5">
+          <IconBgCard icon={BaydinLoader} glowColor="#9E8AC9" glowIntensity={0.18} iconSize={180} iconOpacity={0.07} iconPosition="top-right" className="p-5 mb-5">
             <div className="animate-pulse space-y-3">
               <div className="flex items-center gap-2">
                 <div className="h-3 w-24 bg-white/5 rounded" />
@@ -188,13 +188,13 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
                 <div className="h-14 bg-white/[0.03] rounded" />
               </div>
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
         )}
 
         {/* ===== Main reading ===== */}
         {horoscope && !loading && (
           <div className="space-y-5">
-            <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.18} className="p-5">
+            <IconBgCard icon={BaydinMoon} glowColor="#9E8AC9" glowIntensity={0.22} iconSize={220} iconOpacity={0.08} iconPosition="top-right" className="p-6">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <GlowPill color="#9E8AC9"><BaydinMoon className="w-3 h-3" /> {SIGN_LABELS[horoscope.sign] || SIGN_LABELS[sign]} · {horoscope.type}</GlowPill>
                 {horoscope.personalized && (
@@ -211,7 +211,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
               <div className="serif prose-editorial text-[14px] text-[#E8E2D5]/90 leading-[1.75]">
                 <ReactMarkdown>{horoscope.content}</ReactMarkdown>
               </div>
-            </AuroraGlowCard>
+            </IconBgCard>
 
             {/* ===== Lucky elements grid ===== */}
             <LuckyElementsGrid horoscope={horoscope} />
@@ -221,7 +221,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 
             {/* ===== Highlights ===== */}
             {Array.isArray(horoscope.highlights) && horoscope.highlights.length > 0 && (
-              <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.15} className="p-5">
+              <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.18} iconSize={170} iconOpacity={0.07} iconPosition="top-right" className="p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Highlights</span>
@@ -234,7 +234,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
                     </li>
                   ))}
                 </ul>
-              </AuroraGlowCard>
+              </IconBgCard>
             )}
 
             {/* ===== Transit summary ===== */}
@@ -244,7 +244,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 
         {/* ===== Empty state ===== */}
         {!horoscope && !loading && (
-          <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.1} className="p-8 text-center">
+          <IconBgCard icon={BaydinMoon} glowColor="#9E8AC9" glowIntensity={0.16} iconSize={180} iconOpacity={0.08} iconPosition="center" className="p-8 text-center">
             <div className="flex justify-center mb-4">
               <div className="w-12 h-12 rounded-full border border-[#C5A572]/30 bg-[#C5A572]/5 flex items-center justify-center">
                 <BaydinMoon className="w-6 h-6 text-[#C5A572]" />
@@ -257,7 +257,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
             <ShimmerButton onClick={() => fetchH()} disabled={loading}>
               <BaydinMoon className="w-4 h-4" /> Reveal today's reading
             </ShimmerButton>
-          </AuroraGlowCard>
+          </IconBgCard>
         )}
       </div>
     </div>
@@ -290,16 +290,16 @@ function LuckyElementsGrid({ horoscope }: { horoscope: any }) {
         <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
         <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Lucky Elements</span>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {items.map((it) => {
           const Icon = it.icon;
           return (
-            <AuroraGlowCard key={it.label} glowColor={it.accent} glowIntensity={0.18} className="p-4">
+            <IconBgCard key={it.label} icon={Icon} glowColor={it.accent} glowIntensity={0.2} iconSize={120} iconOpacity={0.07} iconPosition="top-right" className="p-5">
               <div className="flex items-center justify-between mb-2">
                 <Icon className="w-4 h-4" style={{ color: it.accent }} />
               </div>
               <div className="text-[10px] uppercase tracking-wide text-[#9C9489] mb-1">{it.label}</div>
-              <div className="text-[14px] text-[#E8E2D5] font-medium truncate">
+              <div className="text-[16px] text-[#E8E2D5] font-medium truncate">
                 {it.value ? (
                   typeof it.value === "string" && /^\d+$/.test(it.value) ? (
                     <NumberTicker value={parseInt(it.value, 10)} />
@@ -310,7 +310,7 @@ function LuckyElementsGrid({ horoscope }: { horoscope: any }) {
                   <span className="text-[#6B6358] text-[12px]">—</span>
                 )}
               </div>
-            </AuroraGlowCard>
+            </IconBgCard>
           );
         })}
       </div>
@@ -340,8 +340,8 @@ function DoDontLists({ horoscope }: { horoscope: any }) {
         <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
         <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Guidance</span>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.18} className="p-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <IconBgCard icon={BaydinCheck} glowColor="#7A8B6F" glowIntensity={0.22} iconSize={140} iconOpacity={0.07} iconPosition="bottom-right" className="p-5">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-6 h-6 rounded-full bg-[#7A8B6F]/15 border border-[#7A8B6F]/30 flex items-center justify-center shrink-0">
               <BaydinCheck className="w-3.5 h-3.5 text-[#7A8B6F]" />
@@ -360,9 +360,9 @@ function DoDontLists({ horoscope }: { horoscope: any }) {
           ) : (
             <div className="text-[12px] text-[#6B6358] serif-italic">Lean into what feels alive today.</div>
           )}
-        </AuroraGlowCard>
+        </IconBgCard>
 
-        <AuroraGlowCard glowColor="#C26B5C" glowIntensity={0.18} className="p-5">
+        <IconBgCard icon={BaydinX} glowColor="#C26B5C" glowIntensity={0.22} iconSize={140} iconOpacity={0.07} iconPosition="bottom-right" className="p-5">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-6 h-6 rounded-full bg-[#C26B5C]/15 border border-[#C26B5C]/30 flex items-center justify-center shrink-0">
               <BaydinX className="w-3.5 h-3.5 text-[#C26B5C]" />
@@ -381,7 +381,7 @@ function DoDontLists({ horoscope }: { horoscope: any }) {
           ) : (
             <div className="text-[12px] text-[#6B6358] serif-italic">No sharp edges to avoid — proceed gently.</div>
           )}
-        </AuroraGlowCard>
+        </IconBgCard>
       </div>
     </div>
   );
@@ -400,7 +400,7 @@ function TransitSummary({ horoscope }: { horoscope: any }) {
   if (!moonSign && !natalAspect) return null;
 
   return (
-    <AuroraGlowCard glowColor="#5FA9C7" glowIntensity={0.16} className="p-5">
+    <IconBgCard icon={BaydinBreath} glowColor="#5FA9C7" glowIntensity={0.2} iconSize={150} iconOpacity={0.06} iconPosition="top-right" className="p-5">
       <div className="flex items-center gap-2 mb-3">
         <BaydinBreath className="w-4 h-4 text-[#5FA9C7]" />
         <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Transit Summary</span>
@@ -427,7 +427,7 @@ function TransitSummary({ horoscope }: { horoscope: any }) {
           </div>
         )}
       </div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 

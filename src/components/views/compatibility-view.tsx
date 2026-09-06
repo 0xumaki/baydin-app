@@ -3,14 +3,14 @@
 import * as React from "react";
 import { StarField } from "@/components/lumina/primitives";
 import {
-  AuroraGlowCard,
   GlowPill,
+  IconBgCard,
   LiquidMetalText,
   NumberTicker,
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon, BaydinUsers, BaydinStar, BaydinMoon, BaydinHeart, BaydinLoader, BaydinChevronRight, BaydinArrowLeft } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinUsers, BaydinStar, BaydinMoon, BaydinHeart, BaydinLoader, BaydinChevronRight, BaydinArrowLeft, BaydinCompatibility } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,7 +52,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
           <StarField count={30} />
         </div>
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
-          <AuroraGlowCard glowColor="#D876A0" glowIntensity={0.18} className="p-8 text-center">
+          <IconBgCard icon={BaydinUsers} glowColor="#D876A0" glowIntensity={0.22} iconSize={220} iconOpacity={0.08} iconPosition="center" className="p-8 text-center">
             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[#D876A0]/15 border border-[#D876A0]/30 flex items-center justify-center">
               <BaydinUsers className="w-6 h-6 text-[#D876A0]" />
             </div>
@@ -61,7 +61,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
               Vedic Ashtakoota (8-fold /36) + Venus synastry + Mahabote weekday.
             </p>
             <ShimmerButton onClick={onAuth}>Sign in</ShimmerButton>
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
       </div>
     );
@@ -85,7 +85,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
           </button>
 
           {/* Score card */}
-          <AuroraGlowCard glowColor={verdict.color} glowIntensity={0.22} className="p-6 mb-4 relative overflow-hidden">
+          <IconBgCard icon={BaydinHeart} glowColor={verdict.color} glowIntensity={0.28} iconSize={240} iconOpacity={0.08} iconPosition="top-right" className="p-6 mb-4 relative overflow-hidden">
             <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ background: `radial-gradient(80% 60% at 50% 0%, ${verdict.color}40 0%, transparent 70%)` }} />
             <div className="relative flex items-center gap-6">
               {/* Score ring */}
@@ -96,7 +96,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
                     strokeDasharray={`${(pct / 100) * 264} 264`} style={{ transition: "stroke-dasharray 1s ease" }} />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <div className="text-[24px] font-light tabular-nums" style={{ color: verdict.color }}>
+                  <div className="text-[28px] font-light tabular-nums" style={{ color: verdict.color }}>
                     <NumberTicker value={score} />
                     <span className="text-[12px] text-[#9C9489]">/{max}</span>
                   </div>
@@ -104,14 +104,14 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
               </div>
               <div className="flex-1 min-w-0">
                 <GlowPill color={verdict.color} className="text-[10px] mb-2">Ashtakoota Score</GlowPill>
-                <div className="text-[20px] font-light mb-1" style={{ color: verdict.color }}>{verdict.label}</div>
+                <div className="text-[22px] font-light mb-1" style={{ color: verdict.color }}>{verdict.label}</div>
                 <div className="text-[12px] text-[#9C9489]">{result.person_a.moon_sign} ♡ {result.person_b.moon_sign}</div>
               </div>
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
 
           {/* Breakdown */}
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-5 mb-4">
+          <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.18} iconSize={150} iconOpacity={0.06} iconPosition="top-right" className="p-5 mb-4">
             <div className="text-[12px] text-[#9C9489] mb-3 flex items-center gap-2"><BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" /> 8-Fold Compatibility Breakdown</div>
             <div className="space-y-2">
               {result.ashtakoota.breakdown.map((b: any, i: number) => {
@@ -130,23 +130,23 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
                 );
               })}
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
 
           {/* Synastry + Mahabote */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-            <AuroraGlowCard glowColor="#D876A0" glowIntensity={0.12} className="p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <IconBgCard icon={BaydinHeart} glowColor="#D876A0" glowIntensity={0.18} iconSize={130} iconOpacity={0.07} iconPosition="top-right" className="p-5">
               <div className="text-[10px] uppercase tracking-wide text-[#9C9489] mb-1">Venus Synastry</div>
-              <div className="text-[14px] text-[#C5A572] capitalize">{result.synastry.venus_aspect}</div>
+              <div className="text-[16px] text-[#C5A572] capitalize">{result.synastry.venus_aspect}</div>
               <div className="text-[11px] text-[#9C9489] tabular-nums">orb {result.synastry.venus_orb}°</div>
-            </AuroraGlowCard>
-            <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.12} className="p-4">
+            </IconBgCard>
+            <IconBgCard icon={BaydinMoon} glowColor="#9E8AC9" glowIntensity={0.18} iconSize={130} iconOpacity={0.07} iconPosition="top-right" className="p-5">
               <div className="text-[10px] uppercase tracking-wide text-[#9C9489] mb-1">Mahabote Weekday</div>
-              <div className="text-[14px] text-[#C5A572] capitalize">{result.mahabote.replace("-", " ")}</div>
-            </AuroraGlowCard>
+              <div className="text-[16px] text-[#C5A572] capitalize">{result.mahabote.replace("-", " ")}</div>
+            </IconBgCard>
           </div>
 
           {/* Interpretation */}
-          <AuroraGlowCard glowColor={verdict.color} glowIntensity={0.18} className="p-6">
+          <IconBgCard icon={BaydinHeart} glowColor={verdict.color} glowIntensity={0.24} iconSize={220} iconOpacity={0.07} iconPosition="top-right" className="p-6">
             <GlowPill color={verdict.color} className="text-[10px] mb-3"><BaydinHeart className="w-2.5 h-2.5" /> Interpretation</GlowPill>
             <div className="serif prose-editorial text-[14px] text-[#E8E2D5]/90 leading-relaxed">
               <ReactMarkdown>{result.interpretation}</ReactMarkdown>
@@ -166,7 +166,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
                 </ul>
               </div>
             )}
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
       </div>
     );
@@ -181,14 +181,14 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
           <StarField count={30} />
         </div>
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden flex items-center justify-center">
-          <AuroraGlowCard glowColor="#D876A0" glowIntensity={0.2} className="p-8 text-center">
+          <IconBgCard icon={BaydinHeart} glowColor="#D876A0" glowIntensity={0.24} iconSize={220} iconOpacity={0.08} iconPosition="center" className="p-8 text-center">
             <div className="relative w-20 h-20 mx-auto mb-4">
               <BaydinHeart className="w-20 h-20 text-[#D876A0]/20 absolute" />
               <BaydinHeart className="w-20 h-20 text-[#D876A0] absolute animate-pulse" style={{ clipPath: "polygon(0 0, 50% 0, 50% 100%, 0 100%)" }} />
             </div>
             <LiquidMetalText as="div" className="text-[16px] mb-1">Reading your compatibility…</LiquidMetalText>
             <div className="text-[11px] text-[#9C9489] mt-1">Computing Ashtakoota + Venus synastry</div>
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
       </div>
     );
@@ -214,7 +214,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
         </div>
 
         {!user.birthData ? (
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-6 text-center">
+          <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.18} iconSize={200} iconOpacity={0.07} iconPosition="center" className="p-6 text-center">
             <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#C5A572]/10 border border-[#C5A572]/30 flex items-center justify-center">
               <BaydinStar className="w-6 h-6 text-[#C5A572]" />
             </div>
@@ -222,9 +222,9 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
             <p className="text-[12px] text-[#9C9489]">
               Open your profile (top-right settings icon) and add your birth date, time, and place first.
             </p>
-          </AuroraGlowCard>
+          </IconBgCard>
         ) : (
-          <AuroraGlowCard glowColor="#D876A0" glowIntensity={0.15} className="p-5">
+          <IconBgCard icon={BaydinCompatibility} glowColor="#D876A0" glowIntensity={0.2} iconSize={200} iconOpacity={0.07} iconPosition="top-right" className="p-5">
             <div className="text-[13px] text-[#E8E2D5] mb-4 flex items-center gap-2">
               <BaydinHeart className="w-4 h-4 text-[#D876A0]" /> Partner's birth details
             </div>
@@ -284,7 +284,7 @@ export function CompatibilityView({ onAuth }: { onAuth: () => void }) {
             <ShimmerButton onClick={run} disabled={!partner.dob} className="w-full">
               <BaydinUsers className="w-4 h-4" /> Analyze compatibility
             </ShimmerButton>
-          </AuroraGlowCard>
+          </IconBgCard>
         )}
       </div>
     </div>

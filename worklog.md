@@ -3552,3 +3552,119 @@ function BaydinLoader({ className, ...props }: BaydinIconProps) {
    `PlanetRahu` eyes, `BaydinLunarCalendar` full moon, `BaydinAdmin` star)
    always render as gold accents regardless of the `filled` prop on the
    parent icon — useful for emphasizing specific design elements.
+
+---
+
+## GRAND-DESIGN — Icon-as-Background Luxury Card Redesign (10 views)
+
+**Task ID:** GRAND-DESIGN · **Agent:** z.ai-code · **Date:** 2025-09-05
+**Files touched:** `src/components/lumina/premium-ui.tsx` (+110),
+`src/components/views/{today,horoscope,frequency,numerology,insights,compatibility,profile,analytics-dashboard,luck-store,reseller}-view.tsx` (10 files)
+
+### What shipped
+
+Added a new `IconBgCard` primitive to `premium-ui.tsx` and applied it across
+**all 10 designated views**, replacing the prior `AuroraGlowCard` wrappers
+with a 21st.dev-style "stacked card with icon watermark" pattern.
+
+### `IconBgCard` component
+
+```tsx
+<IconBgCard
+  icon={BaydinTarot}
+  glowColor="#C5A572"
+  glowIntensity={0.22}
+  iconSize={220}
+  iconOpacity={0.08}
+  iconPosition="top-right"  // | "bottom-right" | "bottom-left" | "center"
+  className="p-6"
+>
+  {/* content overlaid on z-10, watermark behind on z-0 */}
+</IconBgCard>
+```
+
+Features:
+- **Background icon watermark** — large semi-transparent Baydin icon
+  rendered at the configured position; `iconOpacity` default 0.06 (0.05–0.10
+  range used across views).
+- **Top gold accent line** — `linear-gradient(90deg, transparent, glowColor, transparent)` at the top edge (opacity 30%).
+- **Gold hover glow** — radial gradient `radial-gradient(60% 60% at 50% 0%, glowColor@10%, transparent)` fades in on `group-hover:opacity-100`.
+- **Spring hover lift** — `whileHover={{ y: -2 }}` via framer-motion `motion.div`.
+- **Custom shadow halo** — `0 0 ${glowIntensity * 100}px ${glowColor@12%}`.
+- **Border transitions** — base `border-[#2A2722]`, hover `border-[#C5A572]/30`.
+- **Backdrop blur** — `bg-[#0A0908]/80 backdrop-blur-sm` for depth.
+- **Typed props** — `IconBgCardIcon` type accepts any Baydin icon (which extends
+  `React.SVGProps<SVGSVGElement>` with `filled?` + `strokeWidth?`).
+- **`filled` prop** — passes through to the icon, default `true` for richer watermarks.
+
+### Per-view changes
+
+| View | Cards converted | Icon watermark used |
+|---|---|---|
+| **today-view** | Daily reward, weekly practice summary, Card of Day, Transits, Gemstones, Mantras, Luck balance, 7-day heatmap, Lucky numbers, RecommendedNext (active + complete), Recommended practice | `BaydinGift`, `BaydinTrending`, `BaydinTarot` (220px), `BaydinSun`, `BaydinStar`, `BaydinRitual`, `CloverIcon`, `BaydinFlame` |
+| **horoscope-view** | Loading state, Main reading (220px), Lucky elements grid (4), Do/Don't (2), Highlights, Transit summary, Empty state (center watermark) | `BaydinLoader`, `BaydinMoon`, `Palette/BaydinNumerology/BaydinClock/BaydinCalendar`, `BaydinCheck`, `BaydinX`, `BaydinStar`, `BaydinBreath` |
+| **frequency-view** | Now playing (260px), frequency grid (8 cards), BreathingPacer, Gate | `BaydinFrequency` everywhere — frequency dial overlays a giant faded icon |
+| **numerology-view** | Sign-in, 8 number cards (center watermark, 150px), Synthesis, 3 LuckyCards, Lucky numbers (center, 180px), Form, Free preview, History rows, NumberDetail (220px) | `BaydinNumerology`, `CloverIcon`, `BaydinClock`, `Palette`, `Gem` |
+| **insights-view** | Sign-in, Insight header, Loading, Result (220px), Luck balance pill, Query input, 12-skill grid, NeedsBirthData | `BaydinInsights`, `BaydinStar`, `BaydinLoader`, `CloverIcon` |
+| **compatibility-view** | Sign-in, Score card (240px, with ring overlay), Breakdown, Venus synastry, Mahabote, Interpretation (220px), Loading, Form (BaydinCompatibility) | `BaydinUsers`, `BaydinHeart`, `BaydinStar`, `BaydinMoon`, `BaydinCompatibility` |
+| **profile-view** | 4 LifetimeStat cards, 6 PracticeStat cards, Referral earnings card (220px watermark + CloverPNG overlay) | per-stat icons (CloverIcon, BaydinCalendar, BaydinStar, BaydinFlame, BaydinAstrologer, BaydinMoon, BaydinManifest, BaydinHeart, BaydinUsers) |
+| **analytics-dashboard-view** | Empty state, 8 StatCards, Luck Economy (220px CloverPNG watermark + CloverIcon), Ritual streak, Practice activity heatmap, Dreams by mood, Dreams by moon phase, Top dream symbols, Tarot spreads, Mood trend | per-stat Baydin icons + `CloverIcon` for the Luck Economy card |
+| **luck-store-view** | Luck balance pill, 8 "What Luck buys" feature cards, Referral program, 8 TierCards (bottom-right CloverIcon watermark), Payment panel, EarnMethodCard | `CloverIcon`, `BaydinGift`, per-feature icons |
+| **reseller-view** | 4 StatCards, 6-month sales chart (2-col span), Revenue card, Buy more, Sell Luck form, Transfer history, TopUpBalanceBanner (220px), PartnerResources, 3 certificate cards, Recent certificates list | `Package`, `BaydinWallet`, `BaydinTrending`, `BaydinStore`, `BaydinSend`, `Activity`, `BaydinGift`, `Award` |
+
+### Design system rules applied
+
+1. **Every** former `AuroraGlowCard` → `IconBgCard` — no card left behind.
+2. **Larger headings**:
+   - Today view greeting: `text-[1.75rem]` → `text-[2rem] sm:text-[2.5rem]` (LiquidMetalText)
+   - Luck balance: `text-[32px]` → `text-[36px]`
+   - Numerology active number: `text-[56px]` → `text-[64px]`
+   - Number cards in numerology grid: `text-[2.5rem]` → `text-[3rem]`
+   - Stat numbers in analytics/profile: `text-[2rem]` → `text-[2.5rem]`
+3. **More whitespace**:
+   - `p-3`/`p-4` → `p-5`/`p-6` on most cards
+   - `gap-3` → `gap-4` on most grids
+   - Frequency cards: `p-3` → `p-4`
+4. **Icon watermark sizes** tuned per card role:
+   - Hero cards (Card of Day, Frequency dial, Score, Synthesis): 220–260px
+   - Stat cards: 130–150px
+   - Small feature cards: 100–130px
+   - Center-positioned watermarks for empty states + huge-number cards: opacity 0.08
+5. **Hover effect**: spring `y: -2` lift + gold border glow (transition 300ms).
+6. **Top gold accent line**: every card has a 1px gold gradient at the top edge.
+
+### Preservation guarantees
+
+- ✓ All API calls preserved (fetch endpoints unchanged)
+- ✓ All state management preserved (useState, useQueryClient, etc.)
+- ✓ All component logic preserved (claim daily reward, run horoscope, etc.)
+- ✓ All existing Baydin icon imports still work (barrel `export { … }`)
+- ✓ Removed `AuroraGlowCard` import from 9 views where it's no longer used
+  (kept in `profile-view.tsx` because BirthDataCard and a few sub-components
+  still use it elsewhere — but those weren't in the redesign scope).
+
+### Quality gates
+
+| Check | Result |
+|---|---|
+| `bunx tsc --noEmit` (excluding stale `.next/dev/types/`) | ✅ 0 errors in src/ |
+| `bun run lint` | ✅ exit 0, 0 errors, 0 warnings |
+| Dev server recompile | ✅ `✓ Compiled in 192ms`, all routes 200 |
+| Icon imports (`IconBgCard`, `BaydinTarot`, `BaydinRitual`, `BaydinCompatibility`, etc.) | ✅ all resolvable via barrel |
+
+### Notes for downstream agents
+
+1. **Import `IconBgCard`** from `@/components/lumina/premium-ui`:
+   ```tsx
+   import { IconBgCard, GlowPill, NumberTicker, ShimmerButton } from "@/components/lumina/premium-ui";
+   <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.2} iconSize={150} iconOpacity={0.07} iconPosition="top-right" className="p-5">
+     …
+   </IconBgCard>
+   ```
+2. **Icon prop type**: `IconBgCardIcon = React.ComponentType<{ className?: string; style?: React.CSSProperties; filled?: boolean }>`. All Baydin icons satisfy this.
+3. **Position options**: `top-right` (default), `bottom-right`, `bottom-left`, `center`. Use `center` for empty-state cards and big-number overlays.
+4. **iconSize scales with card**: 100–130 for small grid cells, 150–170 for stat cards, 220–260 for hero/feature cards.
+5. **Glow intensity**: 0.06–0.10 for subtle cards, 0.16–0.22 for prominent cards, 0.24–0.30 for hero/CTA cards.
+6. **`filled` prop** controls whether the watermark icon renders as a solid shape (true) or outline (false). Default `true` for richer watermarks.
+7. **CloverPNG watermarks** in `profile-view`, `analytics-dashboard-view`, `luck-store-view`, `reseller-view` coexist with `IconBgCard` — both watermarks layer at low opacity (0.06–0.08) and don't conflict.
+8. **Existing AuroraGlowCard** is still exported from `premium-ui.tsx` — other views (birth-chart, life-report, manifest, etc.) still use it. Only the 10 designated views were migrated.

@@ -4,8 +4,8 @@ import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { GlassCard, Pill, ShellCard, StarField } from "@/components/lumina/primitives";
 import {
-  AuroraGlowCard,
   GlowPill,
+  IconBgCard,
   LiquidMetalText,
   NumberTicker,
   ShimmerButton,
@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import {
   BaydinStar, BaydinMoon, BaydinSun, BaydinFlame, BaydinGift, BaydinChevronRight,
   BaydinHeart, BaydinCalendar, BaydinTrending, BaydinManifest, BaydinInsights,
-  BaydinLifeReport, BaydinShare, BaydinClock,
+  BaydinLifeReport, BaydinShare, BaydinClock, BaydinTarot, BaydinRitual,
 } from "@/components/lumina/baydin-icons";
 import { BaydinStar as Snowflake } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
@@ -266,7 +266,15 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
         </div>
 
         {/* Daily reward claim */}
-        <AuroraGlowCard glowColor="#C5A572" glowIntensity={alreadyClaimedToday ? 0.1 : 0.25} className="p-4 mb-5 lum-reveal">
+        <IconBgCard
+          icon={BaydinGift}
+          glowColor="#C5A572"
+          glowIntensity={alreadyClaimedToday ? 0.1 : 0.25}
+          iconSize={160}
+          iconOpacity={alreadyClaimedToday ? 0.05 : 0.08}
+          iconPosition="top-right"
+          className="p-5 mb-5 lum-reveal"
+        >
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-full bg-[#C5A572]/15 border border-[#C5A572]/30 flex items-center justify-center shrink-0">
               <BaydinGift className="w-5 h-5 text-[#C5A572]" />
@@ -305,7 +313,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               )}
             </ShimmerButton>
           </div>
-        </AuroraGlowCard>
+        </IconBgCard>
 
         {/* Recommended practice (personalized) */}
         <RecommendedPractice
@@ -318,9 +326,9 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
         />
 
         {/* Quick actions grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <QuickAction icon={BaydinStar} label="Ask Astrologer" desc="Chat" onClick={() => setView("chat")} />
-          <QuickAction icon={BaydinStar} label="Draw Tarot" desc="Free daily" onClick={() => setView("tarot")} />
+          <QuickAction icon={BaydinTarot} label="Draw Tarot" desc="Free daily" onClick={() => setView("tarot")} />
           <QuickAction icon={BaydinMoon} label="Horoscope" desc="Daily stars" onClick={() => setView("horoscope")} />
           <QuickAction icon={BaydinManifest} label="Manifest" desc="Confirm goals" onClick={() => setView("manifest")} badge={goals.filter((g) => !g.confirmedToday).length} />
         </div>
@@ -330,22 +338,24 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
           <div className="lg:col-span-2 space-y-4">
             {/* Weekly practice summary */}
             {activity.length > 0 && (
-              <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.15} className="p-4 flex items-center gap-4">
-                <div className="flex items-center gap-2 shrink-0">
-                  <BaydinTrending className="w-4 h-4 text-[#7A8B6F]" />
-                  <span className="text-[11px] uppercase tracking-[0.15em] text-[#9C9489] hidden sm:inline">This Week</span>
+              <IconBgCard icon={BaydinTrending} glowColor="#7A8B6F" glowIntensity={0.18} iconSize={130} iconOpacity={0.07} iconPosition="top-right" className="p-5">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <BaydinTrending className="w-4 h-4 text-[#7A8B6F]" />
+                    <span className="text-[11px] uppercase tracking-[0.15em] text-[#9C9489] hidden sm:inline">This Week</span>
+                  </div>
+                  <div className="flex items-center gap-4 flex-1 overflow-x-auto lum-no-scrollbar">
+                    <WeeklyStat label="Actions" value={activity.reduce((s: number, d: any) => s + (d?.total ?? 0), 0)} color="#C5A87C" />
+                    <WeeklyStat label="Active days" value={activity.filter((d: any) => (d?.total ?? 0) > 0).length} color="#B5CD7E" />
+                    <WeeklyStat label="Tarot" value={activity.reduce((s: number, d: any) => s + (d?.activities?.tarot ?? 0), 0)} color="#9E8AC9" />
+                    <WeeklyStat label="Chat" value={activity.reduce((s: number, d: any) => s + (d?.activities?.chat ?? 0), 0)} color="#5FA9C7" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 flex-1 overflow-x-auto lum-no-scrollbar">
-                  <WeeklyStat label="Actions" value={activity.reduce((s: number, d: any) => s + (d?.total ?? 0), 0)} color="#C5A87C" />
-                  <WeeklyStat label="Active days" value={activity.filter((d: any) => (d?.total ?? 0) > 0).length} color="#B5CD7E" />
-                  <WeeklyStat label="Tarot" value={activity.reduce((s: number, d: any) => s + (d?.activities?.tarot ?? 0), 0)} color="#9E8AC9" />
-                  <WeeklyStat label="Chat" value={activity.reduce((s: number, d: any) => s + (d?.activities?.chat ?? 0), 0)} color="#5FA9C7" />
-                </div>
-              </AuroraGlowCard>
+              </IconBgCard>
             )}
 
             {/* Card of the day */}
-            <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-6 relative overflow-hidden">
+            <IconBgCard icon={BaydinTarot} glowColor="#C5A572" glowIntensity={0.22} iconSize={220} iconOpacity={0.08} iconPosition="bottom-right" className="p-6 relative overflow-hidden">
               <div className="relative">
                 {loadingCard ? (
                   <div className="animate-pulse space-y-3">
@@ -365,11 +375,11 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                   <div className="text-[13px] text-[#9C9489] py-4 text-center">Could not load card of the day.</div>
                 )}
               </div>
-            </AuroraGlowCard>
+            </IconBgCard>
 
             {/* Today's planetary transits */}
             {transits?.positions?.length > 0 && (
-              <GlassCard className="p-5">
+              <IconBgCard icon={BaydinSun} glowColor="#C5A572" glowIntensity={0.18} iconSize={160} iconOpacity={0.06} iconPosition="top-right" className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <BaydinSun className="w-4 h-4 text-[#C5A572]" />
@@ -396,12 +406,12 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                     </div>
                   </div>
                 )}
-              </GlassCard>
+              </IconBgCard>
             )}
 
             {/* Gemstone recommendations */}
             {gemstones?.recommendations?.length > 0 && (
-              <GlassCard className="p-5">
+              <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.16} iconSize={150} iconOpacity={0.06} iconPosition="top-right" className="p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Your Gemstones</span>
@@ -423,12 +433,12 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                     </div>
                   ))}
                 </div>
-              </GlassCard>
+              </IconBgCard>
             )}
 
             {/* Mantra recommendations */}
             {mantras?.recommendations?.length > 0 && (
-              <GlassCard className="p-5">
+              <IconBgCard icon={BaydinRitual} glowColor="#9E8AC9" glowIntensity={0.16} iconSize={150} iconOpacity={0.06} iconPosition="top-right" className="p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Mantras</span>
@@ -445,7 +455,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                     </div>
                   ))}
                 </div>
-              </GlassCard>
+              </IconBgCard>
             )}
 
             {/* Yoga detection */}
@@ -1014,12 +1024,12 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
             </GlassCard>
 
             {/* Luck balance + streak */}
-            <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.2} className="p-5">
+            <IconBgCard icon={CloverIcon} glowColor="#C5A572" glowIntensity={0.25} iconSize={160} iconOpacity={0.07} iconPosition="top-right" className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <CloverIcon className="w-4 h-4 text-[#C5A572]" filled />
                 <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Your Luck</span>
               </div>
-              <div className="text-[32px] font-light text-[#C5A572] leading-none mb-1 flex items-center gap-1.5">
+              <div className="text-[36px] font-light text-[#C5A572] leading-none mb-1 flex items-center gap-1.5">
                 <NumberTicker value={user.luckBalance} />
                 <CloverIcon className="w-5 h-5" />
               </div>
@@ -1039,10 +1049,10 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <ShimmerButton onClick={() => setView("luck-store")} className="w-full py-2 text-[12px]">
                 Top up Luck
               </ShimmerButton>
-            </AuroraGlowCard>
+            </IconBgCard>
 
             {/* 7-day activity heatmap */}
-            <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.15} className="p-4">
+            <IconBgCard icon={BaydinFlame} glowColor="#7A8B6F" glowIntensity={0.2} iconSize={140} iconOpacity={0.06} iconPosition="top-right" className="p-5">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">7-day practice</span>
                 <BaydinFlame className="w-3.5 h-3.5 text-[#7A8B6F]" />
@@ -1067,7 +1077,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
               <div className="text-[10px] text-[#9C9489] mt-2 text-center">
                 <NumberTicker value={activity.reduce((sum: number, d: any) => sum + (d?.total ?? 0), 0)} /> actions this week
               </div>
-            </AuroraGlowCard>
+            </IconBgCard>
 
             {/* Moon phase + Nakshatra */}
             {moon && (
@@ -1200,7 +1210,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
 
             {/* Today's lucky numbers */}
             {lucky && (
-              <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-4">
+              <IconBgCard icon={CloverIcon} glowColor="#C5A572" glowIntensity={0.2} iconSize={150} iconOpacity={0.07} iconPosition="top-right" className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <CloverIcon className="w-3.5 h-3.5 text-[#C5A572]" filled />
@@ -1239,7 +1249,7 @@ export function TodayView({ onAuth }: { onAuth: () => void }) {
                     <div className="text-[#E8E2D5]">{lucky.time}</div>
                   </div>
                 </div>
-              </AuroraGlowCard>
+              </IconBgCard>
             )}
 
             {/* Muhurta (auspicious time) */}
@@ -1617,7 +1627,7 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
 
   if (!next) {
     return (
-      <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.2} className="p-4 mb-5 lum-reveal">
+      <IconBgCard icon={BaydinFlame} glowColor="#7A8B6F" glowIntensity={0.25} iconSize={140} iconOpacity={0.07} iconPosition="top-right" className="p-5 mb-5 lum-reveal">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-leaf/15 border border-leaf/30 flex items-center justify-center shrink-0">
             <BaydinFlame className="w-5 h-5 text-[#7A8B6F]" />
@@ -1627,13 +1637,13 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
             <div className="text-[11px] text-[#9C9489]">You've done everything. Come back tomorrow to keep your <NumberTicker value={streak} />-day streak alive.</div>
           </div>
         </div>
-      </AuroraGlowCard>
+      </IconBgCard>
     );
   }
 
   return (
     <button onClick={() => onNavigate(next.view)} className="block w-full text-left mb-5 lum-reveal group">
-      <AuroraGlowCard glowColor={next.color} glowIntensity={0.18} className="p-4 hover:border-[#C5A572]/30 transition">
+      <IconBgCard icon={next.icon} glowColor={next.color} glowIntensity={0.22} iconSize={150} iconOpacity={0.08} iconPosition="top-right" className="p-5 hover:border-[#C5A572]/30 transition">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border" style={{ background: `${next.color}15`, borderColor: `${next.color}40` }}>
             <next.icon className="w-5 h-5" style={{ color: next.color }} />
@@ -1645,7 +1655,7 @@ function RecommendedPractice({ ritualDone, moodDone, manifestDone, tarotDone, st
           </div>
           <BaydinChevronRight className="w-4 h-4 text-[#9C9489] group-hover:text-[#C5A572] group-hover:translate-x-0.5 transition shrink-0" />
         </div>
-      </AuroraGlowCard>
+      </IconBgCard>
     </button>
   );
 }

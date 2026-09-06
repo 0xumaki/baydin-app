@@ -7,6 +7,7 @@ import {
 import {
   ShimmerButton,
   AuroraGlowCard,
+  IconBgCard,
   GlowPill,
   NumberTicker,
   LiquidMetalText,
@@ -522,7 +523,7 @@ function LifetimeStat({
   showClover?: boolean;
 }) {
   return (
-    <AuroraGlowCard className="p-4" glowColor={accent} glowIntensity={0.1}>
+    <IconBgCard icon={Icon} glowColor={accent} glowIntensity={0.16} iconSize={130} iconOpacity={0.07} iconPosition="top-right" className="p-5">
       <div className="flex items-center gap-1.5 mb-2 text-[10px] uppercase tracking-wide text-[#9C9489]">
         <Icon className="w-3 h-3" style={{ color: accent }} /> {label}
       </div>
@@ -530,11 +531,11 @@ function LifetimeStat({
         {showClover && <CloverIcon className="w-4 h-4 text-[#C5A572] shrink-0" strokeWidth={1.6} aria-label="Luck" />}
         <NumberTicker
           value={value}
-          className="serif-display text-[1.6rem] text-[#E8E2D5] tabular-nums leading-none"
+          className="serif-display text-[2rem] text-[#E8E2D5] tabular-nums leading-none"
         />
       </div>
       <div className="text-[10px] text-[#9C9489] mt-1">{sub}</div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -544,16 +545,16 @@ function LifetimeStat({
 
 function PracticeStat({ icon: Icon, label, value, color }: { icon: any; label: string; value: number; color: string }) {
   return (
-    <AuroraGlowCard className="p-3 text-center" glowColor={color} glowIntensity={0.08}>
+    <IconBgCard icon={Icon} glowColor={color} glowIntensity={0.14} iconSize={110} iconOpacity={0.07} iconPosition="top-right" className="p-4 text-center">
       <div className="flex justify-center mb-1.5">
         <Icon className="w-4 h-4" style={{ color }} />
       </div>
       <NumberTicker
         value={value}
-        className="serif-display text-[1.4rem] text-[#E8E2D5] tabular-nums leading-none block"
+        className="serif-display text-[1.75rem] text-[#E8E2D5] tabular-nums leading-none block"
       />
       <div className="text-[9px] text-[#9C9489] mt-0.5 leading-tight">{label}</div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -888,7 +889,7 @@ function ReferralEarningsCard({ user }: { user: any }) {
   }
 
   return (
-    <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-5 mb-5 relative overflow-hidden">
+    <IconBgCard icon={BaydinUsers} glowColor="#C5A572" glowIntensity={0.18} iconSize={220} iconOpacity={0.06} iconPosition="top-right" className="p-5 mb-5 relative overflow-hidden">
       {/* CloverPNG watermark */}
       <CloverPNG
         aria-hidden
@@ -1000,7 +1001,7 @@ function ReferralEarningsCard({ user }: { user: any }) {
           }}
         />
       </div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 

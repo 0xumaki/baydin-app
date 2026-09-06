@@ -203,6 +203,116 @@ export function AuroraGlowCard({
 }
 
 // ============================================================
+// IconBgCard — luxury card with large faded icon as background
+// watermark, gold glow on hover, and a top accent line.
+//
+// 21st.dev "stacked card" pattern + godly.design editorial
+// typography. The icon (any Baydin icon component) renders as a
+// large semi-transparent watermark behind the content, giving the
+// card a sense of grandeur without overpowering the text.
+//
+// Props:
+//  - icon:      any Baydin icon component (or any SVG-accepting fn)
+//  - glowColor: champagne gold by default; override per-card
+//  - glowIntensity: controls boxShadow halo strength (0–0.5)
+//  - iconSize:  px size of the watermark (default 120)
+//  - iconOpacity: 0–1 fade for the watermark (default 0.06)
+//  - iconPosition: one of "top-right" | "bottom-right" |
+//    "bottom-left" | "center"
+// ============================================================
+
+export type IconBgCardIcon = React.ComponentType<{
+  className?: string;
+  style?: React.CSSProperties;
+  filled?: boolean;
+}>;
+
+export type IconBgCardPosition =
+  | "top-right"
+  | "bottom-right"
+  | "bottom-left"
+  | "center";
+
+export function IconBgCard({
+  children,
+  icon: Icon,
+  glowColor = "#C5A572",
+  glowIntensity = 0.16,
+  className,
+  iconSize = 120,
+  iconOpacity = 0.06,
+  iconPosition = "top-right",
+  filled = true,
+}: {
+  children: React.ReactNode;
+  icon: IconBgCardIcon;
+  glowColor?: string;
+  glowIntensity?: number;
+  className?: string;
+  iconSize?: number;
+  iconOpacity?: number;
+  iconPosition?: IconBgCardPosition;
+  filled?: boolean;
+}) {
+  const positions: Record<IconBgCardPosition, React.CSSProperties> = {
+    "top-right": { top: -iconSize * 0.18, right: -iconSize * 0.18 },
+    "bottom-right": { bottom: -iconSize * 0.18, right: -iconSize * 0.18 },
+    "bottom-left": { bottom: -iconSize * 0.18, left: -iconSize * 0.18 },
+    "center": {
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+    },
+  };
+  const pos = positions[iconPosition];
+  return (
+    <motion.div
+      whileHover={{ y: -2 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className={cn(
+        "group relative overflow-hidden rounded-xl border border-[#2A2722] bg-[#0A0908]/80 backdrop-blur-sm",
+        "transition-all duration-300 hover:border-[#C5A572]/30",
+        className
+      )}
+      style={{
+        boxShadow: `0 0 ${glowIntensity * 100}px ${hexToRgba(glowColor, 0.12)}`,
+      }}
+    >
+      {/* Background icon watermark */}
+      <Icon
+        filled={filled}
+        className="pointer-events-none absolute z-0 select-none"
+        style={{
+          ...pos,
+          width: iconSize,
+          height: iconSize,
+          color: glowColor,
+          opacity: iconOpacity,
+        }}
+      />
+      {/* Gold glow on hover */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(60% 60% at 50% 0%, ${hexToRgba(glowColor, 0.1)} 0%, transparent 70%)`,
+        }}
+      />
+      {/* Top gold line accent */}
+      <div
+        aria-hidden
+        className="absolute left-0 right-0 top-0 z-0 h-px opacity-30"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${glowColor} 50%, transparent)`,
+        }}
+      />
+      {/* Content on top */}
+      <div className="relative z-10 min-w-0 overflow-hidden">{children}</div>
+    </motion.div>
+  );
+}
+
+// ============================================================
 // GlowPill — badge with soft gold glow shadow.
 // ============================================================
 
