@@ -233,7 +233,7 @@ interface ChimeEngine {
 function createChime(): ChimeEngine | null {
   if (typeof window === "undefined") return null;
   try {
-    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (!Ctx) return null;
     const ctx = new Ctx();
     const play = (freq = 440, duration = 0.6) => {

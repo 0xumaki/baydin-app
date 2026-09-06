@@ -134,7 +134,7 @@ export function AppShell() {
   }
 
   return (
-    <div className="relative h-[100dvh] flex flex-col bg-background baydin-starry-bg overflow-hidden">
+    <div className="relative h-[100dvh] flex flex-col bg-background overflow-hidden">
       {/* Mobile top bar */}
       <header className="lg:hidden sticky top-0 z-30 bg-[#0A0908] border-b border-[#2A2722] px-4 py-3 flex items-center justify-between lum-pt-safe">
         <button onClick={() => setSidebarOpen(true)} aria-label="Open navigation menu" className="p-2 -ml-2 text-[#7A756E] hover:text-[#E8E2D5] transition">

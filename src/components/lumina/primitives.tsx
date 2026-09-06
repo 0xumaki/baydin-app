@@ -170,14 +170,19 @@ export function Divider({ className }: { className?: string }) {
 export function StarField({ count = 24 }: { count?: number }) {
   const stars = React.useMemo(
     () =>
-      Array.from({ length: count }, (_, i) => ({
-        id: i,
-        top: Math.random() * 100,
-        left: Math.random() * 100,
-        size: Math.random() * 2.5 + 1,
-        delay: Math.random() * 4,
-        dur: Math.random() * 3 + 2,
-      })),
+      Array.from({ length: count }, (_, i) => {
+        const isGold = Math.random() > 0.6;
+        return {
+          id: i,
+          top: Math.random() * 100,
+          left: Math.random() * 100,
+          size: Math.random() * 2.5 + 0.8,
+          delay: Math.random() * 5,
+          dur: Math.random() * 4 + 2,
+          opacity: Math.random() * 0.4 + 0.3,
+          isGold,
+        };
+      }),
     [count]
   );
   return (
@@ -185,13 +190,15 @@ export function StarField({ count = 24 }: { count?: number }) {
       {stars.map((s) => (
         <span
           key={s.id}
-          className="absolute rounded-full bg-white"
+          className="absolute rounded-full"
           style={{
             top: `${s.top}%`,
             left: `${s.left}%`,
             width: s.size,
             height: s.size,
-            opacity: 0.6,
+            background: s.isGold ? "#C5A572" : "#E8E2D5",
+            opacity: s.opacity,
+            boxShadow: s.isGold ? `0 0 ${s.size * 2}px rgba(197,165,114,0.4)` : "none",
             animation: `lum-twinkle ${s.dur}s ease-in-out ${s.delay}s infinite`,
           }}
         />

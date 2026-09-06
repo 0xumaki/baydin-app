@@ -13,7 +13,7 @@ import {
 } from "@/components/lumina/premium-ui";
 import { CloverIcon, BaydinFlame, BaydinFrequency, BaydinManifest, BaydinStar, BaydinCheck, BaydinLoader, BaydinChevronRight, BaydinCalendar, BaydinClock } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
-import { useStore } from "@/lib/store";
+import { useStore, type AppView } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { BaydinStar as Crown } from "@/components/lumina/baydin-icons";
 import { toast } from "sonner";
@@ -241,7 +241,7 @@ export function RitualView({ onAuth }: { onAuth: () => void }) {
                         </ShimmerButton>
                       )}
                       <button
-                        onClick={() => setView(step.action as any)}
+                        onClick={() => setView(step.action as AppView)}
                         className="px-3 py-1.5 rounded-full text-[11px] text-[#9C9489] hover:text-[#C5A572] transition flex items-center gap-0.5 focus-ring"
                       >
                         {step.cta} <BaydinChevronRight className="w-3 h-3" />
