@@ -101,20 +101,20 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
             <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
             <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Choose your sign</span>
           </div>
-          <div className="flex gap-1.5 overflow-x-auto lum-no-scrollbar pb-2 -mx-1 px-1">
+          <div className="grid grid-cols-6 sm:grid-cols-12 gap-2 mb-3">
             {SIGNS.map((s, i) => (
               <button
                 key={s}
                 onClick={() => changeSign(s)}
                 aria-pressed={sign === s}
                 title={SIGN_LABELS[s]}
-                className={`shrink-0 w-11 h-11 rounded-sm border flex flex-col items-center justify-center transition focus-ring ${
+                className={`aspect-square rounded-lg border flex flex-col items-center justify-center transition-all duration-300 hover:scale-110 focus-ring ${
                   sign === s
-                    ? "border-[#C5A572]/60 bg-[#C5A572]/10 text-[#C5A572]"
-                    : "border-[#2A2722] bg-white/[0.02] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#4A4540]"
+                    ? "border-[#C5A572] bg-gradient-to-br from-[#C5A572]/20 to-transparent text-[#C5A572] shadow-[0_0_12px_rgba(197,165,114,0.3)]"
+                    : "border-[#2A2722] bg-white/[0.02] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#C5A572]/30"
                 }`}
               >
-                <ZodiacIcon sign={s} className="w-[18px] h-[18px]" />
+                <ZodiacIcon sign={s} className="w-7 h-7 sm:w-8 sm:h-8" />
               </button>
             ))}
           </div>
