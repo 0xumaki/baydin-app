@@ -6,13 +6,13 @@ import { StarField } from "@/components/lumina/primitives";
 import {
   ShimmerButton,
   OrnamentDivider,
-  AuroraGlowCard,
+  IconBgCard,
   GlowPill,
   LiquidMetalText,
   NumberTicker,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon, LotusIcon, StarGlyphIcon, BaydinBreath, BaydinPlay, BaydinPause, BaydinBell, BaydinRefresh, BaydinCheck } from "@/components/lumina/baydin-icons";
+import { CloverIcon, LotusIcon, StarGlyphIcon, BaydinBreath, BaydinPlay, BaydinPause, BaydinBell, BaydinRefresh, BaydinCheck, BaydinClock } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/use-t";
@@ -438,18 +438,18 @@ export function BreathView({ onAuth }: { onAuth: () => void }) {
           <StarField count={30} />
         </div>
         <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden flex items-center justify-center">
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.15} className="max-w-sm w-full p-10 text-center">
+          <IconBgCard icon={BaydinBreath} glowColor="#C5A572" glowIntensity={0.2} iconSize={220} iconOpacity={0.08} iconPosition="center" className="max-w-sm w-full p-10 text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 border border-[#C5A572]/30" style={{ background: "#C5A57210" }}>
               <CloverIcon className="w-7 h-7 text-[#C5A572]" />
             </div>
             <LiquidMetalText as="h1" className="serif-display text-[1.75rem] block mb-2">
               Sign in to begin your breath practice
             </LiquidMetalText>
-            <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">
+            <p className="text-[13px] text-[#A8A096] mb-6 leading-relaxed">
               A calm pacer for the nervous system. Choose a pattern, settle in, and follow the circles.
             </p>
             <ShimmerButton onClick={onAuth} className="w-full">{t("sign_in")}</ShimmerButton>
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
       </div>
     );
@@ -526,7 +526,7 @@ function WelcomeScreen({
           <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-2">
             Breathwork
           </LiquidMetalText>
-          <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch]">
+          <p className="text-[13px] text-[#A8A096] leading-[1.7] max-w-[55ch]">
             A calm pacer for the nervous system. Choose a pattern, settle in, and follow the circles.
           </p>
         </div>
@@ -536,16 +536,20 @@ function WelcomeScreen({
         {/* Pattern picker */}
         <div className="mb-6">
           <div className="text-[11px] uppercase tracking-[0.2em] text-[#6B6358] mb-3">Pattern</div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {PATTERNS.map((p) => {
               const selected = p.id === state.patternId;
               const Glyph = p.glyph === "clover" ? CloverIcon : p.glyph === "lotus" ? LotusIcon : StarGlyphIcon;
               return (
-                <AuroraGlowCard
+                <IconBgCard
                   key={p.id}
+                  icon={BaydinBreath}
                   glowColor={selected ? p.color : "#2A2722"}
-                  glowIntensity={selected ? 0.18 : 0.05}
-                  className="p-4"
+                  glowIntensity={selected ? 0.22 : 0.05}
+                  iconSize={150}
+                  iconOpacity={selected ? 0.08 : 0.04}
+                  iconPosition="top-right"
+                  className="p-5 hover:scale-[1.02] transition-all duration-300"
                 >
                   <button
                     onClick={() => dispatch({ type: "set_pattern", patternId: p.id })}
@@ -553,21 +557,21 @@ function WelcomeScreen({
                   >
                     <div className="flex items-start gap-3">
                       <div
-                        className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                        className="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
                         style={{ background: `${p.color}1A`, color: p.color, border: `1px solid ${p.color}33` }}
                       >
-                        <Glyph className="w-[18px] h-[18px]" />
+                        <Glyph className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline justify-between gap-2">
-                          <span className="text-[14px] text-[#E8E2D5] font-medium leading-tight">{p.name}</span>
+                          <span className="serif-display text-[16px] text-[#E8E2D5] font-medium tracking-tight leading-tight">{p.name}</span>
                           <GlowPill color={p.color} className="text-[10px]">{p.subtitle}</GlowPill>
                         </div>
-                        <p className="text-[11px] text-[#9C9489] mt-1 leading-snug">{p.description}</p>
+                        <p className="text-[11px] text-[#A8A096] mt-1 leading-snug">{p.description}</p>
                       </div>
                     </div>
                   </button>
-                </AuroraGlowCard>
+                </IconBgCard>
               );
             })}
           </div>
@@ -575,7 +579,7 @@ function WelcomeScreen({
 
         {/* Duration + audio toggles */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-4">
+          <IconBgCard icon={BaydinClock} glowColor="#C5A572" glowIntensity={0.14} iconSize={140} iconOpacity={0.06} iconPosition="top-right" className="p-5">
             <div className="text-[11px] uppercase tracking-[0.2em] text-[#6B6358] mb-3">Duration</div>
             <div className="grid grid-cols-4 gap-2">
               {DURATIONS.map((d) => (
@@ -586,16 +590,16 @@ function WelcomeScreen({
                     "py-3 rounded-sm border text-[13px] transition focus-ring",
                     state.durationSec === d
                       ? "border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572]"
-                      : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5] hover:border-white/15"
+                      : "border-[#2A2722] text-[#A8A096] hover:text-[#E8E2D5] hover:border-white/15"
                   )}
                 >
                   {d < 60 ? `${d}s` : `${d / 60}m`}
                 </button>
               ))}
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
 
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-4">
+          <IconBgCard icon={BaydinBreath} glowColor="#C5A572" glowIntensity={0.14} iconSize={140} iconOpacity={0.06} iconPosition="top-right" className="p-5">
             <div className="text-[11px] uppercase tracking-[0.2em] text-[#6B6358] mb-3">Audio</div>
             <div className="flex flex-col gap-2">
               <ToggleRow
@@ -613,11 +617,11 @@ function WelcomeScreen({
                 hint="Drone via Tone.js (uses data)"
               />
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
 
         {/* Selected pattern summary */}
-        <AuroraGlowCard glowColor={pattern.color} glowIntensity={0.15} className="p-5 mb-6 relative overflow-hidden">
+        <IconBgCard icon={BaydinBreath} glowColor={pattern.color} glowIntensity={0.22} iconSize={180} iconOpacity={0.08} iconPosition="top-right" className="p-6 mb-6 relative overflow-hidden">
           <StarField count={14} />
           <div className="relative flex items-center gap-5">
             <motion.div
@@ -637,14 +641,14 @@ function WelcomeScreen({
               <LiquidMetalText as="div" className="serif-display text-[1.125rem] block">
                 {pattern.name}
               </LiquidMetalText>
-              <div className="text-[12px] text-[#9C9489] mt-0.5 flex items-center gap-2">
+              <div className="text-[12px] text-[#A8A096] mt-0.5 flex items-center gap-2">
                 <GlowPill color={pattern.color} className="text-[10px]">{pattern.phases.map((p) => p.sec).join("-")}</GlowPill>
                 <span>·</span>
                 <span><NumberTicker value={Math.floor(state.durationSec / 60)} suffix="m" /> session</span>
               </div>
             </div>
           </div>
-        </AuroraGlowCard>
+        </IconBgCard>
 
         {/* Begin button */}
         <div className="flex flex-col items-center gap-3 pb-6">
@@ -685,7 +689,7 @@ function ToggleRow({
         "w-full flex items-center gap-3 px-3 py-2 rounded-sm border transition text-left",
         active
           ? "border-[#C5A572]/30 bg-[#C5A572]/[0.06] text-[#E8E2D5]"
-          : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5] hover:border-white/15"
+          : "border-[#2A2722] text-[#A8A096] hover:text-[#E8E2D5] hover:border-white/15"
       )}
     >
       <span className={cn("shrink-0", active ? "text-[#C5A572]" : "text-[#6B6358]")}>{icon}</span>
@@ -763,10 +767,10 @@ function ActiveScreen({
       <div className="relative z-10 flex items-center justify-between px-4 lg:px-8 py-4 border-b border-[#2A2722]">
         <div className="flex items-center gap-2">
           <CloverIcon className="w-3.5 h-3.5 text-[#C5A572]" filled />
-          <span className="text-[12px] text-[#9C9489]">{pattern.name}</span>
+          <span className="text-[12px] text-[#A8A096]">{pattern.name}</span>
           <GlowPill color={pattern.color} className="text-[10px]">{pattern.subtitle}</GlowPill>
         </div>
-        <div className="flex items-center gap-3 text-[11px] text-[#9C9489] tabular-nums">
+        <div className="flex items-center gap-3 text-[11px] text-[#A8A096] tabular-nums">
           <span className="flex items-center gap-1">
             <BaydinBreath className="w-3 h-3 text-[#C5A572]" />
             <NumberTicker value={Math.floor(totalRemaining / 60)} suffix=":" />
@@ -895,14 +899,14 @@ function ActiveScreen({
       <div className="flex items-center justify-center gap-3 px-4 py-6 border-t border-[#2A2722]">
         <button
           onClick={onTogglePause}
-          className="w-11 h-11 rounded-full border border-[#2A2722] flex items-center justify-center text-[#9C9489] hover:text-[#E8E2D5] hover:border-white/15 transition"
+          className="w-12 h-12 rounded-full border border-[#C5A572]/30 flex items-center justify-center text-[#C5A572] hover:border-[#C5A572]/60 hover:bg-[#C5A572]/5 transition"
           aria-label={state.paused ? "Resume breathing" : "Pause breathing"}
         >
-          {state.paused ? <BaydinPlay className="w-4 h-4" /> : <BaydinPause className="w-4 h-4" />}
+          {state.paused ? <BaydinPlay className="w-5 h-5" /> : <BaydinPause className="w-5 h-5" />}
         </button>
         <button
           onClick={onEnd}
-          className="px-5 h-11 rounded-full border border-[#2A2722] text-[12px] text-[#9C9489] hover:text-[#E8E2D5] hover:border-white/15 transition"
+          className="px-5 h-12 rounded-full border border-[#2A2722] text-[12px] text-[#A8A096] hover:text-[#E8E2D5] hover:border-[#4A4540] transition"
         >
           End session
         </button>
@@ -953,30 +957,30 @@ function CompleteScreen({
         <LiquidMetalText as="h1" className="serif-display text-[1.5rem] block mb-2">
           Session complete
         </LiquidMetalText>
-        <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[45ch] mb-6">
+        <p className="text-[13px] text-[#A8A096] leading-[1.7] max-w-[45ch] mb-6">
           Take a moment before moving on. Notice the quiet inside the breath.
         </p>
 
         <OrnamentDivider className="mb-6" />
 
         {/* Summary stats */}
-        <div className="grid grid-cols-3 gap-3 w-full max-w-md mb-6">
-          <AuroraGlowCard glowColor={pattern.color} glowIntensity={0.12} className="p-4">
+        <div className="grid grid-cols-3 gap-4 w-full max-w-md mb-6">
+          <IconBgCard icon={BaydinBreath} glowColor={pattern.color} glowIntensity={0.18} iconSize={120} iconOpacity={0.06} iconPosition="top-right" className="p-5 text-center hover:scale-[1.02] transition-all duration-300">
             <div className="text-[10px] uppercase tracking-[0.2em] text-[#6B6358] mb-1">Breaths</div>
-            <div className="text-[24px] font-light text-[#E8E2D5] tabular-nums">
+            <div className="serif-display text-[32px] font-light text-[#E8E2D5] tabular-nums leading-none mt-1">
               <NumberTicker value={state.breathCount} />
             </div>
-          </AuroraGlowCard>
-          <AuroraGlowCard glowColor={pattern.color} glowIntensity={0.12} className="p-4">
+          </IconBgCard>
+          <IconBgCard icon={BaydinBreath} glowColor={pattern.color} glowIntensity={0.18} iconSize={120} iconOpacity={0.06} iconPosition="top-right" className="p-5 text-center hover:scale-[1.02] transition-all duration-300">
             <div className="text-[10px] uppercase tracking-[0.2em] text-[#6B6358] mb-1">Minutes</div>
-            <div className="text-[24px] font-light text-[#E8E2D5] tabular-nums">
+            <div className="serif-display text-[32px] font-light text-[#E8E2D5] tabular-nums leading-none mt-1">
               <NumberTicker value={durationDisplay} suffix={durationSuffix} />
             </div>
-          </AuroraGlowCard>
-          <AuroraGlowCard glowColor={pattern.color} glowIntensity={0.12} className="p-4">
+          </IconBgCard>
+          <IconBgCard icon={BaydinBreath} glowColor={pattern.color} glowIntensity={0.18} iconSize={120} iconOpacity={0.06} iconPosition="top-right" className="p-5 text-center hover:scale-[1.02] transition-all duration-300">
             <div className="text-[10px] uppercase tracking-[0.2em] text-[#6B6358] mb-1">Pattern</div>
-            <GlowPill color={pattern.color} className="text-[12px] mt-1">{pattern.subtitle}</GlowPill>
-          </AuroraGlowCard>
+            <GlowPill color={pattern.color} className="text-[12px] mt-2">{pattern.subtitle}</GlowPill>
+          </IconBgCard>
         </div>
 
         <div className="text-[11px] text-[#6B6358] mb-6 flex items-center gap-1">

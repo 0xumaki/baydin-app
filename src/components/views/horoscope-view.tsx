@@ -178,7 +178,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 
         {/* ===== Loading state ===== */}
         {loading && (
-          <IconBgCard icon={BaydinLoader} glowColor="#9E8AC9" glowIntensity={0.18} iconSize={180} iconOpacity={0.07} iconPosition="top-right" className="p-5 mb-6">
+          <IconBgCard icon={BaydinLoader} glowColor="#9E8AC9" glowIntensity={0.18} iconSize={200} iconOpacity={0.07} iconPosition="top-right" className="p-6 mb-6">
             <div className="animate-pulse space-y-3">
               <div className="flex items-center gap-2">
                 <div className="h-3 w-24 bg-white/5 rounded" />
@@ -200,7 +200,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
         {/* ===== Main reading ===== */}
         {horoscope && !loading && (
           <div className="space-y-6">
-            <IconBgCard icon={BaydinMoon} glowColor="#9E8AC9" glowIntensity={0.22} iconSize={220} iconOpacity={0.08} iconPosition="top-right" className="p-5">
+            <IconBgCard icon={BaydinMoon} glowColor="#9E8AC9" glowIntensity={0.24} iconSize={240} iconOpacity={0.09} iconPosition="top-right" className="p-6">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <GlowPill color="#9E8AC9"><BaydinMoon className="w-3 h-3" /> {SIGN_LABELS[horoscope.sign] || SIGN_LABELS[sign]} · {horoscope.type}</GlowPill>
                 {horoscope.personalized && (
@@ -227,7 +227,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 
             {/* ===== Highlights ===== */}
             {Array.isArray(horoscope.highlights) && horoscope.highlights.length > 0 && (
-              <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.18} iconSize={170} iconOpacity={0.07} iconPosition="top-right" className="p-5">
+              <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.2} iconSize={190} iconOpacity={0.08} iconPosition="top-right" className="p-6">
                 <div className="flex items-center gap-2 mb-3">
                   <BaydinStar className="w-4 h-4 text-[#C5A572]" />
                   <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Highlights</span>
@@ -250,7 +250,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 
         {/* ===== Empty state ===== */}
         {!horoscope && !loading && (
-          <IconBgCard icon={BaydinMoon} glowColor="#9E8AC9" glowIntensity={0.16} iconSize={180} iconOpacity={0.08} iconPosition="center" className="p-8 text-center">
+          <IconBgCard icon={BaydinMoon} glowColor="#9E8AC9" glowIntensity={0.18} iconSize={200} iconOpacity={0.08} iconPosition="center" className="p-8 text-center">
             <div className="flex justify-center mb-4">
               <div className="w-12 h-12 rounded-full border border-[#C5A572]/30 bg-[#C5A572]/5 flex items-center justify-center">
                 <BaydinMoon className="w-6 h-6 text-[#C5A572]" />
@@ -292,15 +292,16 @@ function LuckyElementsGrid({ horoscope }: { horoscope: any }) {
 
   return (
     <div>
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-4">
         <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
-        <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Lucky Elements</span>
+        <span className="text-[12px] uppercase tracking-[0.2em] text-[#B5ADA2]">Lucky Elements</span>
+        <span aria-hidden className="h-px flex-1 bg-gradient-to-r from-[#C5A572]/30 to-transparent" />
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {items.map((it) => {
           const Icon = it.icon;
           return (
-            <IconBgCard key={it.label} icon={Icon} glowColor={it.accent} glowIntensity={0.2} iconSize={120} iconOpacity={0.07} iconPosition="top-right" className="p-5">
+            <IconBgCard key={it.label} icon={Icon} glowColor={it.accent} glowIntensity={0.22} iconSize={140} iconOpacity={0.08} iconPosition="top-right" className="p-5 hover:scale-[1.02] transition-all duration-300">
               <div className="flex items-center justify-between mb-2">
                 <Icon className="w-4 h-4" style={{ color: it.accent }} />
               </div>
@@ -342,12 +343,13 @@ function DoDontLists({ horoscope }: { horoscope: any }) {
 
   return (
     <div>
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-4">
         <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
-        <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Today's Guidance</span>
+        <span className="text-[12px] uppercase tracking-[0.2em] text-[#B5ADA2]">Today's Guidance</span>
+        <span aria-hidden className="h-px flex-1 bg-gradient-to-r from-[#C5A572]/30 to-transparent" />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <IconBgCard icon={BaydinCheck} glowColor="#7A8B6F" glowIntensity={0.22} iconSize={140} iconOpacity={0.07} iconPosition="bottom-right" className="p-5">
+        <IconBgCard icon={BaydinCheck} glowColor="#7A8B6F" glowIntensity={0.24} iconSize={150} iconOpacity={0.07} iconPosition="bottom-right" className="p-6 hover:scale-[1.01] transition-all duration-300">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-6 h-6 rounded-full bg-[#7A8B6F]/15 border border-[#7A8B6F]/30 flex items-center justify-center shrink-0">
               <BaydinCheck className="w-3.5 h-3.5 text-[#7A8B6F]" />
@@ -368,7 +370,7 @@ function DoDontLists({ horoscope }: { horoscope: any }) {
           )}
         </IconBgCard>
 
-        <IconBgCard icon={BaydinX} glowColor="#C26B5C" glowIntensity={0.22} iconSize={140} iconOpacity={0.07} iconPosition="bottom-right" className="p-5">
+        <IconBgCard icon={BaydinX} glowColor="#C26B5C" glowIntensity={0.24} iconSize={150} iconOpacity={0.07} iconPosition="bottom-right" className="p-6 hover:scale-[1.01] transition-all duration-300">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-6 h-6 rounded-full bg-[#C26B5C]/15 border border-[#C26B5C]/30 flex items-center justify-center shrink-0">
               <BaydinX className="w-3.5 h-3.5 text-[#C26B5C]" />
@@ -406,7 +408,7 @@ function TransitSummary({ horoscope }: { horoscope: any }) {
   if (!moonSign && !natalAspect) return null;
 
   return (
-    <IconBgCard icon={BaydinBreath} glowColor="#5FA9C7" glowIntensity={0.2} iconSize={150} iconOpacity={0.06} iconPosition="top-right" className="p-5">
+    <IconBgCard icon={BaydinBreath} glowColor="#5FA9C7" glowIntensity={0.22} iconSize={170} iconOpacity={0.07} iconPosition="top-right" className="p-6">
       <div className="flex items-center gap-2 mb-3">
         <BaydinBreath className="w-4 h-4 text-[#5FA9C7]" />
         <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Transit Summary</span>

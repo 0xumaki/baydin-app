@@ -8,13 +8,14 @@ import { TarotCardFace, TarotCardBack } from "@/components/tarot-card-face";
 import { CardDetailModal } from "@/components/card-detail-modal";
 import { StarField } from "@/components/lumina/primitives";
 import {
-  AuroraGlowCard,
   GlowPill,
+  IconBgCard,
   LiquidMetalText,
+  NumberTicker,
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon, BaydinStar, BaydinShuffle, BaydinShare, BaydinSave, BaydinBookmark, BaydinLoader, BaydinRefresh, BaydinMoon } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinStar, BaydinShuffle, BaydinShare, BaydinSave, BaydinBookmark, BaydinLoader, BaydinRefresh, BaydinMoon, BaydinTarot } from "@/components/lumina/baydin-icons";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -179,33 +180,39 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
 
             {/* Question */}
             <div className="mb-6 pb-6 border-b border-[#2A2722]">
-              <label className="block text-[12px] text-[#8A8278] font-medium mb-2">Your question</label>
+              <label className="block text-[12px] text-[#8A8278] font-medium mb-2 uppercase tracking-[0.15em]">Your question</label>
               <input
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && performReading()}
                 placeholder="What weighs on your heart?"
                 maxLength={300}
-                className="w-full bg-transparent border-0 border-b border-[#2A2722] rounded-none px-0 py-2 text-[15px] text-[#E8E2D5] placeholder:text-[#4A4540] focus:outline-none focus:border-[#C5A572] transition"
+                className="w-full bg-transparent border-0 border-b-2 border-[#2A2722] rounded-none px-0 py-3 text-[16px] text-[#E8E2D5] placeholder:text-[#4A4540] focus:outline-none focus:border-[#C5A572] transition-colors duration-200"
               />
+              <div className="mt-1.5 text-[11px] text-[#8A8278] serif-italic">Press Enter or tap Shuffle & Draw below</div>
             </div>
 
             {/* Spread selector */}
-            <div className="mb-3">
-              <div className="flex items-center gap-2 mb-3">
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-4">
                 <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
-                <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Choose a spread</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#B5ADA2]">Choose a spread</span>
+                <span aria-hidden className="h-px flex-1 bg-gradient-to-r from-[#C5A572]/30 to-transparent" />
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
                 {SPREADS.map((s) => {
                   const active = spread === s.id;
                   return (
-                    <AuroraGlowCard
+                    <IconBgCard
                       key={s.id}
+                      icon={BaydinTarot}
                       glowColor={active ? "#C5A572" : "#9E8AC9"}
-                      glowIntensity={active ? 0.22 : 0.1}
+                      glowIntensity={active ? 0.26 : 0.08}
+                      iconSize={120}
+                      iconOpacity={active ? 0.1 : 0.05}
+                      iconPosition="top-right"
                       className={cn(
-                        "p-4 text-left transition cursor-pointer",
+                        "p-5 text-left transition-all duration-300 hover:scale-[1.02] cursor-pointer",
                         active ? "border-[#C5A572]/60" : "border-[#2A2722] hover:border-[#C5A572]/40"
                       )}
                     >
@@ -215,15 +222,15 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                         className="w-full text-left"
                         aria-pressed={active}
                       >
-                        <div className="flex items-center justify-between mb-1">
-                          <div className={cn("text-[13px] font-medium", active ? "text-[#E8E2D5]" : "text-[#B5ADA2]")}>{s.name}</div>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className={cn("text-[14px] font-medium serif-display tracking-tight", active ? "text-[#E8E2D5]" : "text-[#B5ADA2]")}>{s.name}</div>
                           {active && (
                             <GlowPill color="#C5A572" className="text-[11px]">{s.count} card{s.count > 1 ? "s" : ""}</GlowPill>
                           )}
                         </div>
-                        <div className="text-[11px] text-[#8A8278]">{s.desc}</div>
+                        <div className="text-[11px] text-[#8A8278] leading-snug">{s.desc}</div>
                       </button>
-                    </AuroraGlowCard>
+                    </IconBgCard>
                   );
                 })}
               </div>
@@ -292,10 +299,10 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
             className="space-y-6"
           >
             {/* Question display */}
-            <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.15} className="p-5">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2] mb-1">Your question</div>
-              <p className="serif-italic text-[15px] text-[#E8E2D5] leading-[1.6]">"{reading.question}"</p>
-            </AuroraGlowCard>
+            <IconBgCard icon={BaydinStar} glowColor="#9E8AC9" glowIntensity={0.2} iconSize={170} iconOpacity={0.07} iconPosition="top-right" className="p-6">
+              <div className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2] mb-2">Your question</div>
+              <p className="serif-italic text-[16px] text-[#E8E2D5] leading-[1.7]">"{reading.question}"</p>
+            </IconBgCard>
 
             {/* Cards */}
             <div className="flex flex-wrap items-end justify-center gap-4 lg:gap-6">
@@ -309,7 +316,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                       <div className="text-[11px] text-[#8A8278] text-center max-w-[120px] font-medium">{c.position}</div>
                     )}
 
-                    {/* Card — flip animation on reveal */}
+                    {/* Card — flip animation on reveal, premium gold border */}
                     <AnimatePresence mode="wait">
                       {revealed ? (
                         <motion.button
@@ -322,11 +329,17 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                             setDetailReversed(c.reversed);
                             setDetailOpen(true);
                           }}
-                          className="relative group cursor-pointer focus-ring rounded-sm"
+                          className="relative group cursor-pointer focus-ring rounded-md p-[2px]"
                           aria-label={`View details for ${c.card.name}`}
+                          style={{
+                            background: "linear-gradient(135deg, rgba(197,165,114,0.25), rgba(197,165,114,0.05) 50%, rgba(197,165,114,0.18))",
+                            boxShadow: "0 0 20px rgba(197,168,124,0.2)",
+                          }}
                         >
-                          <TarotCardFace card={c.card} reversed={c.reversed} size={isSolo ? "lg" : "md"} />
-                          <div className="absolute inset-0 rounded-[14px] bg-[#C5A572]/0 group-hover:bg-[#C5A572]/10 transition-colors flex items-end justify-center pb-2 opacity-0 group-hover:opacity-100">
+                          <div className="rounded-md overflow-hidden border border-[#C5A572]/30">
+                            <TarotCardFace card={c.card} reversed={c.reversed} size={isSolo ? "lg" : "md"} />
+                          </div>
+                          <div className="absolute inset-0 rounded-md bg-[#C5A572]/0 group-hover:bg-[#C5A572]/10 transition-colors flex items-end justify-center pb-2 opacity-0 group-hover:opacity-100">
                             <span className="text-[11px] tracking-[0.14em] text-[#C5A572] font-medium">Tap for meaning</span>
                           </div>
                         </motion.button>
@@ -357,11 +370,11 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                 transition={{ delay: 0.2 }}
                 className="space-y-4"
               >
-                <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-5">
-                  <div className="flex items-center justify-between mb-3">
+                <IconBgCard icon={BaydinTarot} glowColor="#C5A572" glowIntensity={0.22} iconSize={200} iconOpacity={0.08} iconPosition="top-right" className="p-6">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <BaydinStar className="w-4 h-4 text-[#C5A572]" />
-                      <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">The reading</span>
+                      <span className="text-[12px] uppercase tracking-[0.2em] text-[#B5ADA2]">The reading</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
@@ -394,7 +407,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                       <CloverIcon className="w-3 h-3" /> {reading.luckSpent} Luck spent · {reading.freeRemaining} free readings remaining today
                     </div>
                   )}
-                </AuroraGlowCard>
+                </IconBgCard>
 
                 {/* New reading button */}
                 <ShimmerButton

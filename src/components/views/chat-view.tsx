@@ -469,7 +469,8 @@ function MessageBubble({ msg, streaming }: { msg: Msg; streaming?: boolean }) {
   if (isUser) {
     return (
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-end">
-        <div className="max-w-[80%] px-4 py-2.5 text-[14px] text-[#E8E2D5] leading-[1.6] bg-[#1A1714] border border-[#2A2722] rounded-sm">
+        <div className="max-w-[80%] px-4 py-2.5 text-[14px] text-[#E8E2D5] leading-[1.6] bg-[#1A1714] border border-[#C5A572]/25 rounded-sm relative">
+          <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#C5A572]/40 to-transparent" />
           {msg.content}
         </div>
       </motion.div>
@@ -477,11 +478,12 @@ function MessageBubble({ msg, streaming }: { msg: Msg; streaming?: boolean }) {
   }
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex gap-4">
-      <div className="w-8 h-8 rounded-sm bg-[#1A1714] border border-[#2A2722] flex items-center justify-center text-[#C5A572] shrink-0 mt-0.5">
-        <Star className="w-3.5 h-3.5" />
+      <div className="w-9 h-9 rounded-sm bg-[#1A1714] border border-[#C5A572]/30 flex items-center justify-center text-[#C5A572] shrink-0 mt-0.5 relative">
+        <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#C5A572]/50 to-transparent" />
+        <Star className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="serif text-[15px] text-[#E8E2D5] leading-[1.8] prose-editorial">
+        <div className="serif text-[15px] text-[#E8E2D5] leading-[1.8] prose-editorial border-l border-[#C5A572]/20 pl-4">
           {msg.content ? <ReactMarkdown>{msg.content}</ReactMarkdown> : (streaming ? <span className="text-[#8A8278]">Reading the stars…</span> : null)}
         </div>
         {streaming && msg.content && <span className="inline-block w-1.5 h-4 bg-[#C5A572] ml-0.5 align-middle animate-pulse" />}
@@ -489,7 +491,7 @@ function MessageBubble({ msg, streaming }: { msg: Msg; streaming?: boolean }) {
         {msg.metadata?.highlights?.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-3">
             {msg.metadata.highlights.map((h: string, i: number) => (
-              <span key={i} className="text-[12px] px-3 py-1 text-[#C5A572] serif-italic border border-[#C5A572]/20">{h}</span>
+              <span key={i} className="text-[12px] px-3 py-1 text-[#C5A572] serif-italic border border-[#C5A572]/25 bg-[#C5A572]/5 rounded-sm">{h}</span>
             ))}
           </div>
         )}
@@ -546,7 +548,7 @@ function ModeSelector({ mode, onChange }: { mode: "vedic" | "western" | "mahabot
           key={m.id}
           onClick={() => onChange(m.id)}
           className={cn(
-            "relative px-3 py-1.5 text-[12px] border-b-2 transition focus-ring rounded-sm",
+            "relative px-3 py-1.5 text-[12px] border-b-[3px] transition focus-ring rounded-sm",
             mode === m.id ? "border-[#C5A572] text-[#E8E2D5] font-medium" : "border-transparent text-[#8A8278] hover:text-[#B5ADA2]"
           )}
         >

@@ -3,8 +3,8 @@
 import * as React from "react";
 import { StarField } from "@/components/lumina/primitives";
 import {
-  AuroraGlowCard,
   GlowPill,
+  IconBgCard,
   LiquidMetalText,
   NumberTicker,
   ShimmerButton,
@@ -184,7 +184,7 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
             <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block">
               Dream Journal
             </LiquidMetalText>
-            <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch] mt-2">
+            <p className="text-[13px] text-[#A8A096] leading-[1.7] max-w-[55ch] mt-2">
               Record dreams upon waking. Baydin detects archetypal symbols, computes the lunar context, and offers interpretations grounded in Vedic and Jungian tradition.
             </p>
           </div>
@@ -219,13 +219,13 @@ export function DreamJournalView({ onAuth }: { onAuth: () => void }) {
 
         {/* Entries */}
         {loading ? (
-          <div className="flex items-center justify-center py-16 text-[#9C9489]">
+          <div className="flex items-center justify-center py-16 text-[#A8A096]">
             <BaydinLoader className="w-5 h-5" />
           </div>
         ) : entries.length === 0 ? (
           <EmptyState onCreate={() => setShowForm(true)} />
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {entries.map((entry) => (
               <EntryCard
                 key={entry.id}
@@ -251,17 +251,17 @@ function StatPill({
   value: number;
 }) {
   return (
-    <AuroraGlowCard glowColor={glow} glowIntensity={0.1} className="p-3">
+    <IconBgCard icon={BaydinLifeReport} glowColor={glow} glowIntensity={0.16} iconSize={120} iconOpacity={0.06} iconPosition="top-right" className="p-4 hover:scale-[1.02] transition-all duration-300">
       <div className="flex items-center gap-2.5">
         <span style={{ color: glow }}>{icon}</span>
         <div>
-          <div className="text-[18px] font-light text-[#E8E2D5] leading-none tabular-nums">
+          <div className="serif-display text-[24px] font-light text-[#E8E2D5] leading-none tabular-nums">
             <NumberTicker value={value} />
           </div>
-          <div className="text-[10px] text-[#9C9489] mt-0.5">{label}</div>
+          <div className="text-[10px] text-[#A8A096] mt-1 uppercase tracking-[0.15em]">{label}</div>
         </div>
       </div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -278,7 +278,7 @@ function EntryCard({
 }) {
   const mood = MOODS.find((m) => m.id === entry.mood) || MOODS[5];
   return (
-    <AuroraGlowCard glowColor={mood.color} glowIntensity={0.1} className="p-5">
+    <IconBgCard icon={BaydinMoon} glowColor={mood.color} glowIntensity={0.16} iconSize={170} iconOpacity={0.07} iconPosition="top-right" className="p-6 hover:scale-[1.005] transition-all duration-300">
       <div
         role="button"
         tabIndex={0}
@@ -288,7 +288,7 @@ function EntryCard({
       >
         {/* Mood emoji */}
         <div
-          className="w-11 h-11 rounded-sm flex items-center justify-center shrink-0 text-xl border"
+          className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0 text-2xl border"
           style={{ background: `${mood.color}15`, borderColor: `${mood.color}40` }}
           title={mood.label}
         >
@@ -297,7 +297,7 @@ function EntryCard({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 mb-1 flex-wrap">
-            <div className="serif text-[1.125rem] text-[#E8E2D5] truncate">{entry.title}</div>
+            <div className="serif-display text-[18px] text-[#E8E2D5] truncate tracking-tight">{entry.title}</div>
             {entry.isRecurring && (
               <GlowPill color="#D4A0B8" className="text-[9px]">recurring</GlowPill>
             )}
@@ -307,22 +307,22 @@ function EntryCard({
               </GlowPill>
             )}
           </div>
-          <div className="text-[13px] text-[#9C9489] line-clamp-2 mb-2 leading-[1.6]">{entry.content}</div>
+          <div className="text-[12px] text-[#A8A096] line-clamp-2 mb-3 leading-[1.6] italic serif-italic">{entry.content}</div>
 
-          {/* Date + mood GlowPill + symbols */}
+          {/* Date + mood GlowPill + lunar context + symbols */}
           <div className="flex items-center gap-2 flex-wrap text-[11px] text-[#6B6358]">
-            <GlowPill color={mood.color} className="text-[10px]">
+            <GlowPill color="#C5A572" className="text-[10px]">
               {new Date(entry.dreamDate + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </GlowPill>
             <GlowPill color={mood.color} className="text-[10px]">{mood.label}</GlowPill>
             {entry.lunarContext && (
-              <GlowPill color="#9CB4D1" className="text-[10px]" >
+              <GlowPill color="#9CB4D1" className="text-[10px]">
                 <BaydinMoon className="w-2.5 h-2.5" />
                 {entry.lunarContext.emoji} {entry.lunarContext.nakshatra}
               </GlowPill>
             )}
             {entry.symbols.slice(0, 4).map((s) => (
-              <span key={s} className="text-[#9C9489]">#{s}</span>
+              <span key={s} className="text-[10px] text-[#C5A572] border border-[#C5A572]/25 bg-[#C5A572]/5 rounded-full px-2 py-0.5">#{s}</span>
             ))}
             {entry.symbols.length > 4 && (
               <span className="text-[#6B6358]">+{entry.symbols.length - 4}</span>
@@ -347,7 +347,7 @@ function EntryCard({
           </button>
         </div>
       </div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -356,18 +356,18 @@ function EntryCard({
 // ============================================================
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
-    <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.15} className="p-8 lg:p-12 text-center">
+    <IconBgCard icon={BaydinMoon} glowColor="#9CB4D1" glowIntensity={0.2} iconSize={220} iconOpacity={0.08} iconPosition="center" className="p-8 lg:p-12 text-center hover:scale-[1.005] transition-all duration-300">
       <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 border border-[#9CB4D1]/30" style={{ background: "#9CB4D115" }}>
         <BaydinMoon className="w-7 h-7 text-[#9CB4D1]" />
       </div>
       <LiquidMetalText as="h2" className="serif-display text-[1.5rem] block mb-3">Your dream journal is empty.</LiquidMetalText>
-      <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch] mb-6 mx-auto">
+      <p className="text-[13px] text-[#A8A096] leading-[1.7] max-w-[55ch] mb-6 mx-auto">
         Record your dreams upon waking. Baydin detects archetypal symbols, computes the lunar context, and offers an interpretation grounded in Vedic and Jungian tradition.
       </p>
       <ShimmerButton onClick={onCreate} className="py-3 px-6">
         <BaydinPlus className="w-4 h-4" /> Record your first dream
       </ShimmerButton>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -507,7 +507,7 @@ function EntryForm({
               onChange={(e) => setIsRecurring(e.target.checked)}
               className="w-4 h-4 accent-[#C5A572]"
             />
-            <span className="text-[13px] text-[#9C9489]">This is a recurring dream theme</span>
+            <span className="text-[13px] text-[#A8A096]">This is a recurring dream theme</span>
           </label>
 
           <div className="flex gap-3 pt-2">
@@ -583,16 +583,16 @@ function EntryDetail({
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
         <button
           onClick={onClose}
-          className="text-[12px] text-[#9C9489] hover:text-[#C5A572] transition mb-4 focus-ring rounded-sm inline-flex items-center gap-1"
+          className="text-[12px] text-[#A8A096] hover:text-[#C5A572] transition mb-4 focus-ring rounded-sm inline-flex items-center gap-1"
         >
           <BaydinChevronLeft className="w-3.5 h-3.5" /> Back to journal
         </button>
 
         {/* Header */}
-        <AuroraGlowCard glowColor={mood.color} glowIntensity={0.15} className="p-5 mb-4">
+        <IconBgCard icon={BaydinMoon} glowColor={mood.color} glowIntensity={0.2} iconSize={180} iconOpacity={0.07} iconPosition="top-right" className="p-6 mb-4">
           <div className="flex items-start gap-4">
             <div
-              className="w-14 h-14 rounded-sm flex items-center justify-center shrink-0 text-2xl border"
+              className="w-14 h-14 rounded-lg flex items-center justify-center shrink-0 text-2xl border"
               style={{ background: `${mood.color}15`, borderColor: `${mood.color}40` }}
               title={mood.label}
             >
@@ -617,7 +617,7 @@ function EntryDetail({
             <div className="flex items-center gap-1 shrink-0">
               <button
                 onClick={onToggleFavorite}
-                className="p-2 rounded-sm text-[#9C9489] hover:text-[#C5A572] transition focus-ring"
+                className="p-2 rounded-sm text-[#A8A096] hover:text-[#C5A572] transition focus-ring"
                 title={entry.isFavorite ? "Remove favorite" : "Add to favorites"}
                 aria-label={entry.isFavorite ? "Remove favorite" : "Add to favorites"}
               >
@@ -625,7 +625,7 @@ function EntryDetail({
               </button>
               <button
                 onClick={onDelete}
-                className="p-2 rounded-sm text-[#9C9489] hover:text-[#C26B5C] transition focus-ring"
+                className="p-2 rounded-sm text-[#A8A096] hover:text-[#C26B5C] transition focus-ring"
                 title="Delete"
                 aria-label="Delete dream"
               >
@@ -633,20 +633,20 @@ function EntryDetail({
               </button>
             </div>
           </div>
-        </AuroraGlowCard>
+        </IconBgCard>
 
         {/* Dream narrative */}
-        <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-5 lg:p-6 mb-4">
+        <IconBgCard icon={BaydinLifeReport} glowColor="#C5A572" glowIntensity={0.14} iconSize={150} iconOpacity={0.06} iconPosition="top-right" className="p-6 mb-4">
           <div className="flex items-center gap-2 mb-3">
             <BaydinLifeReport className="w-4 h-4 text-[#C5A572]" />
             <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">The Dream</span>
           </div>
-          <div className="text-[14px] text-[#E8E2D5]/90 leading-relaxed whitespace-pre-wrap">{entry.content}</div>
-        </AuroraGlowCard>
+          <div className="serif-italic text-[14px] text-[#E8E2D5]/90 leading-[1.8] whitespace-pre-wrap">{entry.content}</div>
+        </IconBgCard>
 
         {/* Lunar context */}
         {entry.lunarContext && (
-          <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.12} className="p-5 lg:p-6 mb-4">
+          <IconBgCard icon={BaydinMoon} glowColor="#9CB4D1" glowIntensity={0.18} iconSize={160} iconOpacity={0.07} iconPosition="top-right" className="p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
               <BaydinMoon className="w-4 h-4 text-[#9CB4D1]" />
               <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">Lunar Context</span>
@@ -670,55 +670,55 @@ function EntryDetail({
                 )}
               </div>
             )}
-          </AuroraGlowCard>
+          </IconBgCard>
         )}
 
         {/* Detected symbols */}
         {entry.symbols.length > 0 && (
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.1} className="p-5 lg:p-6 mb-4">
+          <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.14} iconSize={150} iconOpacity={0.06} iconPosition="top-right" className="p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
               <BaydinStar className="w-4 h-4 text-[#C5A572]" />
               <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">Symbols Detected</span>
             </div>
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {entry.symbols.map((kw) => {
                 const sym = detectedSymbols.find((s) => s.keyword === kw);
                 const Icon = sym ? (CATEGORY_ICON[sym.category] || BaydinStar) : BaydinStar;
                 const color = sym ? POLARITY_COLOR[sym.polarity] : "#8B7355";
                 return (
-                  <div key={kw} className="p-3 rounded-sm bg-black/20 border border-[#2A2722]">
+                  <div key={kw} className="p-3 rounded-lg bg-white/[0.02] border border-[#2A2722]">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <Icon className="w-3.5 h-3.5" style={{ color }} />
-                      <span className="text-[13px] text-[#E8E2D5] font-medium">#{kw}</span>
+                      <span className="text-[13px] text-[#C5A572] font-medium">#{kw}</span>
                       {sym && (
                         <GlowPill color={color} className="text-[9px]">{sym.polarity}</GlowPill>
                       )}
                     </div>
                     {sym ? (
-                      <div className="text-[11px] text-[#9C9489] leading-relaxed">
+                      <div className="text-[11px] text-[#A8A096] leading-relaxed">
                         <span className="text-[#C5A572]">Vedic:</span> {sym.vedic}<br />
                         <span className="text-[#C5A572]">Jungian:</span> {sym.jungian}
                       </div>
                     ) : (
-                      <div className="text-[11px] text-[#9C9489]">Tap "Interpret with AI" for the meaning.</div>
+                      <div className="text-[11px] text-[#A8A096]">Tap "Interpret with AI" for the meaning.</div>
                     )}
                   </div>
                 );
               })}
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
         )}
 
         {/* Interpretation */}
         {interpretation ? (
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-5 lg:p-6 mb-4">
+          <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.22} iconSize={180} iconOpacity={0.08} iconPosition="top-right" className="p-6 mb-4">
             <div className="flex items-center gap-2 mb-3">
               <BaydinStar className="w-4 h-4 text-[#C5A572]" />
               <span className="text-[12px] text-[#6B6358] font-medium uppercase tracking-[0.15em]">AI Interpretation</span>
             </div>
-            <div className="text-[13px] text-[#E8E2D5]/90 leading-relaxed whitespace-pre-wrap">{interpretation}</div>
+            <div className="text-[13px] text-[#E8E2D5]/90 leading-relaxed whitespace-pre-wrap serif-italic">{interpretation}</div>
             <div className="mt-4 pt-3 border-t border-[#2A2722] flex items-center justify-between gap-2 flex-wrap">
-              <div className="text-[10px] text-[#9C9489]">Drawn from Vedic symbolism, Jungian psychology, and the lunar context above.</div>
+              <div className="text-[10px] text-[#A8A096]">Drawn from Vedic symbolism, Jungian psychology, and the lunar context above.</div>
               <ShimmerButton
                 onClick={interpret}
                 disabled={loadingInterp}
@@ -733,9 +733,9 @@ function EntryDetail({
                 Re-interpret
               </ShimmerButton>
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
         ) : (
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.15} className="p-6 text-center">
+          <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.2} iconSize={180} iconOpacity={0.07} iconPosition="center" className="p-6 text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-sm mb-3 border border-[#C5A572]/30" style={{ background: "#C5A57210" }}>
               {loadingInterp ? (
                 <BaydinLoader className="w-5 h-5 text-[#C5A572]" />
@@ -744,7 +744,7 @@ function EntryDetail({
               )}
             </div>
             <div className="text-[14px] text-[#E8E2D5] font-medium mb-1">No interpretation yet</div>
-            <div className="text-[12px] text-[#9C9489] mb-4 max-w-md mx-auto">
+            <div className="text-[12px] text-[#A8A096] mb-4 max-w-md mx-auto">
               Get an AI interpretation that draws on the symbols, the lunar context, and your natal chart. Costs{" "}
               <span className="inline-flex items-center gap-1 text-[#C5A572]">
                 <CloverIcon className="w-3 h-3" filled /> {DREAM_INTERPRET_COST} Luck
@@ -761,7 +761,7 @@ function EntryDetail({
                 <><BaydinStar className="w-3.5 h-3.5" /> Interpret with AI · <span className="inline-flex items-center gap-0.5"><CloverIcon className="w-3 h-3" filled /> {DREAM_INTERPRET_COST}</span></>
               )}
             </ShimmerButton>
-          </AuroraGlowCard>
+          </IconBgCard>
         )}
       </div>
     </div>
@@ -773,7 +773,7 @@ function LunarMini({ label, value, sub }: { label: string; value: string; sub?: 
     <div className="p-2.5 rounded-lg bg-black/20 border border-[#2A2722]">
       <div className="text-[11px] text-[#6B6358]">{label}</div>
       <div className="text-[12px] text-[#E8E2D5] mt-0.5 font-medium truncate" title={value}>{value}</div>
-      {sub && <div className="text-[10px] text-[#9C9489]">{sub}</div>}
+      {sub && <div className="text-[10px] text-[#A8A096]">{sub}</div>}
     </div>
   );
 }
@@ -787,16 +787,16 @@ function Gate({ onAuth }: { onAuth: () => void }) {
       </div>
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
         <div className="flex flex-col items-center justify-center text-center py-20">
-          <AuroraGlowCard glowColor="#9CB4D1" glowIntensity={0.15} className="max-w-sm w-full p-10 text-center">
+          <IconBgCard icon={BaydinMoon} glowColor="#9CB4D1" glowIntensity={0.2} iconSize={220} iconOpacity={0.08} iconPosition="center" className="max-w-sm w-full p-10 text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 border border-[#9CB4D1]/30" style={{ background: "#9CB4D110" }}>
               <BaydinMoon className="w-7 h-7 text-[#9CB4D1]" />
             </div>
             <LiquidMetalText as="h1" className="serif-display text-[1.75rem] block mb-2">Sign in to begin</LiquidMetalText>
-            <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">
+            <p className="text-[13px] text-[#A8A096] mb-6 leading-relaxed">
               Record your dreams and reveal their archetypal meaning.
             </p>
             <ShimmerButton onClick={onAuth} className="w-full">Sign in</ShimmerButton>
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
       </div>
     </div>

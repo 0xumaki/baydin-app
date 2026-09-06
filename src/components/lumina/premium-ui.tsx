@@ -505,6 +505,147 @@ export function BackgroundBeams({
 }
 
 // ============================================================
+// LuxSectionHeader — gold gradient divider with serif heading.
+// Editorial section title for premium cards. The divider uses
+// a two-stop gradient (transparent → gold) flanking the label.
+// ============================================================
+
+export function LuxSectionHeader({
+  children,
+  icon: Icon,
+  color = "#C5A572",
+  className,
+  action,
+}: {
+  children: React.ReactNode;
+  icon?: IconBgCardIcon;
+  color?: string;
+  className?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className={cn("flex items-center gap-3 mb-4", className)}>
+      <span
+        aria-hidden
+        className="h-px flex-1 max-w-[20px]"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${hexToRgba(color, 0.6)})`,
+        }}
+      />
+      {Icon && (
+        <Icon
+          className="shrink-0"
+          style={{ width: 16, height: 16, color }}
+          aria-hidden
+        />
+      )}
+      <span
+        className="serif-display text-[16px] tracking-tight"
+        style={{ color: "#E8E2D5" }}
+      >
+        {children}
+      </span>
+      <span
+        aria-hidden
+        className="h-px flex-1"
+        style={{
+          background: `linear-gradient(90deg, ${hexToRgba(color, 0.6)}, transparent 80%)`,
+        }}
+      />
+      {action}
+    </div>
+  );
+}
+
+// ============================================================
+// LuxStatCard — bento-grid stat with large display number,
+// gold accent dot, uppercase tracked label, optional icon
+// watermark. Sits inside any card with relative positioning.
+// ============================================================
+
+export function LuxStatCard({
+  value,
+  label,
+  color = "#C5A572",
+  icon: Icon,
+  suffix,
+  className,
+}: {
+  value: number;
+  label: string;
+  color?: string;
+  icon?: IconBgCardIcon;
+  suffix?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-lg border border-white/[0.06] bg-gradient-to-b from-white/[0.03] to-transparent p-5",
+        "transition-all duration-300 hover:border-[#C5A572]/30 hover:bg-white/[0.05] hover:scale-[1.04]",
+        className
+      )}
+    >
+      {/* Icon watermark */}
+      {Icon && (
+        <Icon
+          aria-hidden
+          className="pointer-events-none absolute -bottom-2 -right-2 select-none"
+          style={{
+            width: 56,
+            height: 56,
+            color,
+            opacity: 0.08,
+          }}
+        />
+      )}
+      {/* Gold accent dot */}
+      <span
+        aria-hidden
+        className="block w-1.5 h-1.5 rounded-full mb-2"
+        style={{ background: color, boxShadow: `0 0 10px ${hexToRgba(color, 0.8)}` }}
+      />
+      {/* Radial gold glow behind number */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
+        style={{
+          width: 80, height: 80,
+          top: 20, right: 10,
+          background: `radial-gradient(circle, ${hexToRgba(color, 0.08)} 0%, transparent 70%)`,
+          borderRadius: '50%',
+        }}
+      />
+      <div
+        className="serif-display text-[42px] leading-none tabular-nums font-light"
+        style={{ color, textShadow: `0 0 30px ${hexToRgba(color, 0.5)}, 0 0 60px ${hexToRgba(color, 0.2)}` }}
+      >
+        <NumberTicker value={value} suffix={suffix} />
+      </div>
+      <div className="mt-2.5 text-[10px] uppercase tracking-[0.2em] text-[#8A8278] font-medium">
+        {label}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// LuxDivider — thin gold gradient line. Editorial separator.
+// ============================================================
+
+export function LuxDivider({ className }: { className?: string }) {
+  return (
+    <div
+      aria-hidden
+      className={cn(
+        "h-px w-full bg-gradient-to-r from-transparent via-[#C5A572]/30 to-transparent",
+        className
+      )}
+    />
+  );
+}
+
+// ============================================================
 // Helpers
 // ============================================================
 

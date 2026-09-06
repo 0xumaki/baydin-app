@@ -4,8 +4,8 @@ import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { StarField } from "@/components/lumina/primitives";
 import {
-  AuroraGlowCard,
   GlowPill,
+  IconBgCard,
   LiquidMetalText,
   NumberTicker,
   ShimmerButton,
@@ -90,7 +90,7 @@ export function ManifestView({ onAuth }: { onAuth: () => void }) {
             <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-2">
               Manifest
             </LiquidMetalText>
-            <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch]">
+            <p className="text-[13px] text-[#A8A096] leading-[1.7] max-w-[55ch]">
               Set intentions. Confirm daily. Watch them grow. Each confirmation earns{" "}
               <span className="inline-flex items-center gap-1 text-[#C5A572]">
                 <CloverIcon className="w-3 h-3" filled /> +1 Luck
@@ -105,70 +105,70 @@ export function ManifestView({ onAuth }: { onAuth: () => void }) {
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-3 gap-2.5 mb-5">
+        <div className="grid grid-cols-3 gap-4 mb-5">
           <StatCard
             icon={<BaydinManifest className="w-4 h-4" />}
             glow="#C5A572"
             label="Active"
-            value={<NumberTicker value={goals.length} className="text-[18px] font-light text-[#E8E2D5] leading-none" />}
+            value={<NumberTicker value={goals.length} className="text-[32px] font-light text-[#E8E2D5] leading-none serif-display tabular-nums" />}
           />
           <StatCard
             icon={<BaydinFlame className="w-4 h-4" />}
             glow="#F09A3D"
             label="Best streak"
-            value={<NumberTicker value={bestStreak} suffix="-day" className="text-[18px] font-light text-[#E8E2D5] leading-none" />}
+            value={<NumberTicker value={bestStreak} suffix="-day" className="text-[32px] font-light text-[#E8E2D5] leading-none serif-display tabular-nums" />}
           />
           <StatCard
             icon={<BaydinCheck className="w-4 h-4" />}
             glow="#7A8B6F"
             label="Done today"
-            value={<NumberTicker value={doneToday} className="text-[18px] font-light text-[#E8E2D5] leading-none" />}
+            value={<NumberTicker value={doneToday} className="text-[32px] font-light text-[#E8E2D5] leading-none serif-display tabular-nums" />}
           />
         </div>
 
         {showForm && (
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-5 mb-4 lum-reveal">
-            <div className="flex items-center justify-between mb-3">
-              <div className="text-[13px] text-[#E8E2D5] flex items-center gap-2">
+          <IconBgCard icon={BaydinManifest} glowColor="#C5A572" glowIntensity={0.18} iconSize={180} iconOpacity={0.07} iconPosition="top-right" className="p-6 mb-4 lum-reveal">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-[14px] text-[#E8E2D5] flex items-center gap-2 serif-display tracking-tight">
                 <BaydinStar className="w-4 h-4 text-[#C5A572]" /> New intention
               </div>
               <button
                 onClick={() => setShowForm(false)}
-                className="text-[#9C9489] hover:text-[#E8E2D5] transition focus-ring rounded-sm p-1"
+                className="text-[#A8A096] hover:text-[#E8E2D5] transition focus-ring rounded-sm p-1"
                 aria-label="Close form"
               >
                 <BaydinX className="w-4 h-4" />
               </button>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <Label className="text-[12px] text-[#9C9489]">What do you want to manifest?</Label>
+                <Label className="text-[12px] text-[#A8A096] uppercase tracking-[0.15em]">What do you want to manifest?</Label>
                 <Input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5 focus-visible:border-[#C5A572]/60"
+                  className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5 focus-visible:border-[#C5A572]/60 focus-visible:ring-1 focus-visible:ring-[#C5A572]/40"
                   placeholder="e.g. A loving, supportive relationship"
                 />
               </div>
               <div>
-                <Label className="text-[12px] text-[#9C9489]">Your affirmation (optional)</Label>
+                <Label className="text-[12px] text-[#A8A096] uppercase tracking-[0.15em]">Your affirmation (optional)</Label>
                 <Textarea
                   value={statement}
                   onChange={(e) => setStatement(e.target.value)}
-                  className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5 min-h-[60px] focus-visible:border-[#C5A572]/60"
+                  className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5 min-h-[60px] focus-visible:border-[#C5A572]/60 focus-visible:ring-1 focus-visible:ring-[#C5A572]/40"
                   placeholder="I am worthy of love and it flows to me effortlessly."
                 />
               </div>
               <div>
-                <Label className="text-[12px] text-[#9C9489]">Daily reminder time (optional)</Label>
+                <Label className="text-[12px] text-[#A8A096] uppercase tracking-[0.15em]">Daily reminder time (optional)</Label>
                 <Input
                   type="time"
                   value={reminderTime}
                   onChange={(e) => setReminderTime(e.target.value)}
-                  className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5 focus-visible:border-[#C5A572]/60"
+                  className="bg-white/[0.03] border-[#2A2722] text-[#E8E2D5] mt-1.5 focus-visible:border-[#C5A572]/60 focus-visible:ring-1 focus-visible:ring-[#C5A572]/40"
                 />
               </div>
-              <div className="flex items-start gap-1.5 text-[11px] text-[#9C9489] leading-relaxed">
+              <div className="flex items-start gap-1.5 text-[11px] text-[#A8A096] leading-relaxed">
                 <BaydinStar className="w-3 h-3 text-[#C5A572] mt-0.5 shrink-0" />
                 <span>
                   Baydin auto-detects the intention and suggests a Solfeggio frequency ({user.language === "my" ? "မြန်မာ" : "Vedic"} wisdom).
@@ -178,11 +178,11 @@ export function ManifestView({ onAuth }: { onAuth: () => void }) {
                 {creating ? "Setting intention…" : "Set intention"}
               </ShimmerButton>
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
         )}
 
         {/* Goals list */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           {goals.map((g) => <GoalCard key={g.id} goal={g} onChange={load} />)}
         </div>
       </div>
@@ -219,23 +219,23 @@ function GoalCard({ goal, onChange }: { goal: any; onChange: () => void }) {
   }
 
   return (
-    <AuroraGlowCard glowColor={intention.color} glowIntensity={0.12} className="p-4">
-      <div className="flex items-start gap-3">
+    <IconBgCard icon={BaydinManifest} glowColor={intention.color} glowIntensity={0.18} iconSize={170} iconOpacity={0.07} iconPosition="top-right" className="p-6 hover:scale-[1.005] transition-all duration-300">
+      <div className="flex items-start gap-4">
         <div
-          className="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0 border"
+          className="w-12 h-12 rounded-lg flex items-center justify-center text-xl shrink-0 border"
           style={{ background: `${intention.color}15`, borderColor: `${intention.color}40`, color: intention.color }}
         >
           {intention.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-            <div className="text-[14px] text-[#E8E2D5] font-medium truncate">{goal.title}</div>
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <div className="text-[15px] text-[#E8E2D5] font-medium serif-display tracking-tight truncate">{goal.title}</div>
             <GlowPill color={intention.color} className="text-[10px]">{intention.label}</GlowPill>
           </div>
           {goal.statement && goal.statement !== goal.title && (
-            <div className="text-[12px] text-[#9C9489] italic mb-2">"{goal.statement}"</div>
+            <div className="text-[12px] text-[#A8A096] serif-italic mb-2 mt-0.5">"{goal.statement}"</div>
           )}
-          <div className="flex items-center gap-3 text-[11px] text-[#9C9489] flex-wrap">
+          <div className="flex items-center gap-3 text-[11px] text-[#A8A096] flex-wrap mt-2">
             {goal.streak > 0 && (
               <span className="flex items-center gap-1 text-[#F09A3D]">
                 <BaydinFlame className="w-3 h-3" />
@@ -270,13 +270,13 @@ function GoalCard({ goal, onChange }: { goal: any; onChange: () => void }) {
           </ShimmerButton>
           <button
             onClick={archive}
-            className="text-[10px] text-[#9C9489] hover:text-[#C26B5C] transition focus-ring rounded-sm px-1 py-0.5"
+            className="text-[10px] text-[#A8A096] hover:text-[#C26B5C] transition focus-ring rounded-sm px-1 py-0.5"
           >
             Archive
           </button>
         </div>
       </div>
-    </AuroraGlowCard>
+    </IconBgCard>
   );
 }
 
@@ -289,11 +289,11 @@ function StatCard({
   glow: string;
 }) {
   return (
-    <AuroraGlowCard glowColor={glow} glowIntensity={0.1} className="p-3 text-center">
-      <div className="flex justify-center mb-1" style={{ color: glow }}>{icon}</div>
+    <IconBgCard icon={BaydinManifest} glowColor={glow} glowIntensity={0.18} iconSize={130} iconOpacity={0.06} iconPosition="top-right" className="p-4 text-center hover:scale-[1.02] transition-all duration-300">
+      <div className="flex justify-center mb-1.5" style={{ color: glow }}>{icon}</div>
       <div className="flex items-center justify-center">{value}</div>
-      <div className="text-[10px] text-[#9C9489] mt-0.5">{label}</div>
-    </AuroraGlowCard>
+      <div className="text-[10px] text-[#A8A096] mt-1 uppercase tracking-[0.15em]">{label}</div>
+    </IconBgCard>
   );
 }
 
@@ -306,16 +306,16 @@ function Gate({ onAuth }: { onAuth: () => void }) {
       </div>
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
         <div className="flex flex-col items-center justify-center text-center py-20">
-          <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.15} className="max-w-sm w-full p-10 text-center">
+          <IconBgCard icon={BaydinManifest} glowColor="#C5A572" glowIntensity={0.2} iconSize={200} iconOpacity={0.07} iconPosition="center" className="max-w-sm w-full p-10 text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 border border-[#C5A572]/30" style={{ background: "#C5A57210" }}>
               <BaydinManifest className="w-7 h-7 text-[#C5A572]" />
             </div>
             <LiquidMetalText as="h1" className="serif-display text-[1.75rem] block mb-2">Sign in to manifest</LiquidMetalText>
-            <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">
+            <p className="text-[13px] text-[#A8A096] mb-6 leading-relaxed">
               Set daily intentions, confirm them, and watch the universe conspire with you.
             </p>
             <ShimmerButton onClick={onAuth} className="w-full">Sign in</ShimmerButton>
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
       </div>
     </div>
@@ -331,12 +331,12 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
       </div>
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
         <div className="flex items-center justify-center py-10">
-          <AuroraGlowCard glowColor="#7A8B6F" glowIntensity={0.15} className="max-w-md w-full p-8 text-center">
+          <IconBgCard icon={BaydinManifest} glowColor="#7A8B6F" glowIntensity={0.2} iconSize={220} iconOpacity={0.08} iconPosition="center" className="max-w-md w-full p-8 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 border border-[#7A8B6F]/30" style={{ background: "#7A8B6F15" }}>
               <BaydinManifest className="w-7 h-7 text-[#7A8B6F]" />
             </div>
             <LiquidMetalText as="h2" className="serif-display text-[1.5rem] block mb-2">What do you want to call in?</LiquidMetalText>
-            <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">
+            <p className="text-[13px] text-[#A8A096] mb-6 leading-relaxed">
               Manifestation works through daily repetition. Set an intention, confirm it each day, and watch the universe conspire with you.
             </p>
             <ShimmerButton onClick={onCreate} className="w-full">
@@ -345,7 +345,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
             <div className="mt-3 text-[11px] text-[#7A8B6F] flex items-center justify-center gap-1">
               <CloverIcon className="w-3 h-3" filled /> +1 Luck for every daily confirmation
             </div>
-          </AuroraGlowCard>
+          </IconBgCard>
         </div>
       </div>
     </div>

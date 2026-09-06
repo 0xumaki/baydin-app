@@ -153,7 +153,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
           <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-2">
             Frequencies
           </LiquidMetalText>
-          <p className="text-[13px] text-[#9C9489] leading-[1.7] max-w-[55ch]">
+          <p className="text-[13px] text-[#A8A096] leading-[1.7] max-w-[55ch]">
             Solfeggio tones, binaural beats, and ambient pads via Web Audio. Tune your mind.
             Sessions are free and logged to your practice journal.
           </p>
@@ -182,13 +182,13 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-[#9C9489]">{selected.name}</div>
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-[#A8A096]">{selected.name}</div>
                     <div className="text-[36px] font-light leading-none mt-1" style={{ color: selected.color }}>
                       <NumberTicker value={selected.hz} className="tabular-nums" />
-                      <span className="text-[14px] text-[#9C9489] ml-0.5">Hz</span>
+                      <span className="text-[14px] text-[#A8A096] ml-0.5">Hz</span>
                     </div>
                     {playing && (
-                      <div className="text-[11px] text-[#9C9489] mt-0.5 tabular-nums">
+                      <div className="text-[11px] text-[#A8A096] mt-0.5 tabular-nums">
                         {mins}:{secs.toString().padStart(2, "0")} / {totalMins}:00
                       </div>
                     )}
@@ -211,7 +211,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                 <div className="flex items-center gap-3 mb-3">
                   <button
                     onClick={toggleMute}
-                    className="w-9 h-9 rounded-full border border-[#2A2722] flex items-center justify-center text-[#9C9489] hover:text-[#E8E2D5] transition focus-ring"
+                    className="w-9 h-9 rounded-full border border-[#2A2722] flex items-center justify-center text-[#A8A096] hover:text-[#E8E2D5] transition focus-ring"
                     aria-label={muted ? "Unmute" : "Mute"}
                   >
                     {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
@@ -241,7 +241,7 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                         "px-2.5 py-1 rounded-full text-[10px] border transition focus-ring",
                         mode === m
                           ? "border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572]"
-                          : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5]"
+                          : "border-[#2A2722] text-[#A8A096] hover:text-[#E8E2D5]"
                       )}
                     >
                       {m === "pure" ? "Pure Tone" : m === "binaural" ? "Binaural" : "Ambient Pad"}
@@ -250,21 +250,21 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                 </div>
 
                 {mode === "binaural" && (
-                  <div className="text-[10px] text-[#9C9489] mt-1.5 flex items-center justify-center gap-1">
+                  <div className="text-[10px] text-[#A8A096] mt-1.5 flex items-center justify-center gap-1">
                     <Headphones className="w-3 h-3" /> Use headphones for the binaural effect
                   </div>
                 )}
 
                 {/* Ambient bed selector */}
                 <div className="flex items-center gap-1 mt-2 flex-wrap justify-center">
-                  <span className="text-[9px] text-[#9C9489] mr-1">Ambient:</span>
+                  <span className="text-[9px] text-[#A8A096] mr-1">Ambient:</span>
                   {(["none", "rain", "ocean", "wind", "stream", "river"] as const).map((a) => (
                     <button
                       key={a}
                       onClick={() => { if (playing) stopTone(false); setAmbient(a); }}
                       className={cn(
                         "px-2 py-0.5 rounded-full text-[9px] transition focus-ring",
-                        ambient === a ? "text-[#C5A572]" : "text-[#9C9489] hover:text-[#E8E2D5]"
+                        ambient === a ? "text-[#C5A572]" : "text-[#A8A096] hover:text-[#E8E2D5]"
                       )}
                     >
                       {a === "none" ? "Off" : a}
@@ -274,14 +274,14 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
 
                 {/* Duration */}
                 <div className="flex items-center gap-1 mt-2 flex-wrap justify-center">
-                  <Timer className="w-3 h-3 text-[#9C9489] mr-1" />
+                  <Timer className="w-3 h-3 text-[#A8A096] mr-1" />
                   {[120, 300, 600, 900].map((d) => (
                     <button
                       key={d}
                       onClick={() => setDuration(d)}
                       className={cn(
                         "px-2 py-0.5 rounded-full text-[10px] transition focus-ring",
-                        duration === d ? "text-[#C5A572]" : "text-[#9C9489] hover:text-[#E8E2D5]"
+                        duration === d ? "text-[#C5A572]" : "text-[#A8A096] hover:text-[#E8E2D5]"
                       )}
                     >
                       {d < 60 ? `${d}s` : `${d / 60}m`}
@@ -299,9 +299,9 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <BaydinBreath className="w-3.5 h-3.5 text-[#C5A572]" />
-              <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Choose your intention</span>
+              <span className="text-[11px] uppercase tracking-[0.2em] text-[#A8A096]">Choose your intention</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {FREQUENCIES.map((f) => {
                 const isSelected = selected.id === f.id;
                 return (
@@ -309,24 +309,24 @@ export function FrequencyView({ onAuth }: { onAuth: () => void }) {
                     key={f.id}
                     icon={BaydinFrequency}
                     glowColor={isSelected ? f.color : "#2A2722"}
-                    glowIntensity={isSelected ? 0.22 : 0.06}
-                    iconSize={120}
-                    iconOpacity={isSelected ? 0.1 : 0.05}
+                    glowIntensity={isSelected ? 0.26 : 0.06}
+                    iconSize={140}
+                    iconOpacity={isSelected ? 0.12 : 0.05}
                     iconPosition="top-right"
-                    className="p-4"
+                    className={cn("p-5 hover:scale-[1.02] transition-all duration-300", isSelected && "border-[#C5A572]/40")}
                   >
                     <button
                       onClick={() => { if (playing) stopTone(false); setSelected(f); }}
                       className="w-full text-left"
                     >
-                      <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center justify-between mb-2">
                         <div className="w-2 h-2 rounded-full" style={{ background: f.color }} />
-                        <span className="text-[14px] font-light text-[#E8E2D5] tabular-nums">
+                        <span className="serif-display text-[28px] font-light tabular-nums" style={{ color: isSelected ? f.color : "#E8E2D5" }}>
                           <NumberTicker value={f.hz} suffix="Hz" />
                         </span>
                       </div>
-                      <div className="text-[12px] text-[#E8E2D5] font-medium leading-tight mb-0.5">{f.name}</div>
-                      <div className="text-[10px] text-[#9C9489] leading-tight">{f.description}</div>
+                      <div className="text-[13px] text-[#E8E2D5] font-medium leading-tight mb-0.5 serif-display tracking-tight">{f.name}</div>
+                      <div className="text-[10px] text-[#A8A096] leading-tight mb-2">{f.description}</div>
                       <div className="mt-2">
                         <GlowPill color={f.color} className="text-[9px]">{f.intention}</GlowPill>
                       </div>
@@ -393,7 +393,7 @@ function BreathingPacer({ active, color }: { active: boolean; color: string }) {
   }, [active]);
   const scale = phase === "inhale" ? 1.3 : phase === "exhale" ? 0.7 : phase === "hold" ? 1.3 : 0.7;
   return (
-    <IconBgCard icon={BaydinBreath} glowColor={color} glowIntensity={0.18} iconSize={130} iconOpacity={0.06} iconPosition="top-right" className="p-5">
+    <IconBgCard icon={BaydinBreath} glowColor={color} glowIntensity={0.22} iconSize={160} iconOpacity={0.07} iconPosition="top-right" className="p-6">
       <div className="flex items-center gap-4">
         <div className="relative w-16 h-16 flex items-center justify-center shrink-0">
           <div
@@ -415,7 +415,7 @@ function BreathingPacer({ active, color }: { active: boolean; color: string }) {
               {phase} · <NumberTicker value={count} />
             </div>
           ) : (
-            <div className="text-[11px] text-[#9C9489]">Start a session to activate the pacer (4-4-4-4)</div>
+            <div className="text-[11px] text-[#A8A096]">Start a session to activate the pacer (4-4-4-4)</div>
           )}
         </div>
       </div>
@@ -437,7 +437,7 @@ function Gate({ onAuth }: { onAuth: () => void }) {
               <BaydinFrequency className="w-7 h-7 text-[#9CA8A3]" />
             </div>
             <LiquidMetalText as="h1" className="serif-display text-[1.75rem] block mb-2">Sign in to tune in</LiquidMetalText>
-            <p className="text-[13px] text-[#9C9489] mb-6 leading-relaxed">
+            <p className="text-[13px] text-[#A8A096] mb-6 leading-relaxed">
               Solfeggio frequencies, binaural beats, and ambient pads via Web Audio.
             </p>
             <ShimmerButton onClick={onAuth} className="w-full">Sign in</ShimmerButton>

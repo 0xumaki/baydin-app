@@ -3952,3 +3952,248 @@ glow/scale, action-button sizing, and palette-aligned destructive token.
    default overrides this) or `h-9 px-3 py-2` (compact secondary with
    border). Always add `inline-flex items-center gap-1.5` for icon+label
    pairs so spacing is consistent.
+
+---
+
+## DAILY-PREMIUM-REDESIGN — Award-winning redesign of all 11 Daily views
+
+**Agent**: DAILY-PREMIUM-REDESIGN
+**Scope**: All 11 Daily panel views (today, horoscope, tarot, tarot-history,
+chat, manifest, ritual, frequency, breath, positivity, dream-journal) +
+shared premium-ui.tsx primitives.
+
+### New shared primitives added to `src/components/lumina/premium-ui.tsx`
+
+1. **`LuxSectionHeader`** — gold-gradient two-stop divider flanking a serif
+   heading + optional icon. Used as the editorial section title at the top
+   of every premium card. Replaces the old plain `text-[11px] uppercase
+   tracking-[0.2em]` eyebrow with a far more luxurious serif headline.
+2. **`LuxStatCard`** — bento-grid stat mini-card with:
+   - Large 32px serif `NumberTicker` (was 18px plain text)
+   - Gold accent dot above number with soft glow shadow
+   - Uppercase tracked label below in `text-[#8A8278]` (WCAG AA)
+   - Optional Baydin icon as 56px watermark in the bottom-right
+   - `hover:scale-[1.02]` + `hover:border-white/10` micro-interaction
+3. **`LuxDivider`** — thin gold gradient line for editorial separators.
+
+These three primitives are the foundation of the new premium look. They
+encapsulate the "21st.dev bento + godly.design editorial" pattern in a
+single import.
+
+### Per-view changes
+
+#### 1. `today-view.tsx` (PRIMARY)
+- **WeeklyStat** redesigned from `text-[18px]` plain text → `LuxStatCard`
+  with 32px serif NumberTicker + gold accent dot + icon watermark.
+- **"This Week" card** → bento-style header card: full-width with gold
+  gradient border overlay, serif "This Week" heading via `LuxSectionHeader`
+  + BaydinTrending icon, then 4 LuxStatCards in a `grid-cols-2 sm:grid-cols-4 gap-3`.
+- **Card of the Day** → larger `TarotCardFace size="lg"` (200x300px, was
+  md/160x240), gold gradient border ring around the card image with
+  `drop-shadow(0 0 24px rgba(197,168,124,0.35))` glow, GlowPill for
+  Upright/Reversed badge (was plain text), serif-display title.
+- **Today's Transits** → `LuxSectionHeader` + each planet as its own
+  mini premium card with hover scale + gold border on hover.
+- **Your Gemstones** → `LuxSectionHeader` + 2-col premium cards with
+  24px gold serif initial letter gem icon, GlowPill for planet.
+- **Today's Mantras** → `LuxSectionHeader` + 2-col premium cards with
+  serif-italic Sanskrit name + GlowPill count badge.
+- **QuickAction** redesigned: rounded-lg, gold-accent icon container,
+  gold gradient top accent on hover, `hover:scale-[1.02]`.
+- **Your Luck** card → 44px NumberTicker (was 36px), p-6, larger icons.
+- **7-day activity heatmap**, **Today's Luck**, **Daily reward**,
+  **Recommended practice** all bumped to p-6 with larger iconSize.
+- All `GlassCard`/`ShellCard`/`IconBgCard` cards migrated from `p-5` →
+  `p-6`. The WeeklyStat helper now wraps `LuxStatCard` for backwards
+  compatibility (so the function signature stays the same).
+
+#### 2. `horoscope-view.tsx`
+- Loading + reading + highlights cards → p-6, IconBgCard with larger
+  iconSize (200/240/190 vs 170/220/170) and stronger glow intensity.
+- Lucky Elements section: gold gradient divider added to header,
+  `gap-3 → gap-4`, each lucky element IconBgCard gets `hover:scale-[1.02]`.
+- Today's Guidance (Do/Don't): `LuxSectionHeader`-style gold divider,
+  `gap-3 → gap-4`, cards p-5 → p-6 with `hover:scale-[1.01]`.
+- TransitSummary card bumped to p-6 + larger iconSize.
+
+#### 3. `tarot-view.tsx`
+- **Spread selector**: each spread as premium `IconBgCard` with
+  `BaydinTarot` watermark, `serif-display` spread name (was sans-serif),
+  `hover:scale-[1.02]`, gold gradient divider in header.
+- **Question input**: premium `border-b-2` (was `border-b`) with
+  uppercase tracked label + serif-italic hint below.
+- **Question display**: switched from `AuroraGlowCard` → `IconBgCard`
+  with `BaydinStar` watermark.
+- **Revealed cards**: gold gradient border ring with `box-shadow`
+  20px glow + inner `border-[#C5A572]/30`.
+- **The reading card**: `IconBgCard` with `BaydinTarot` watermark +
+  p-6, larger iconSize (200).
+
+#### 4. `tarot-history-view.tsx`
+- All `AuroraGlowCard` → `IconBgCard` with `BaydinTarot` watermark.
+- Each reading: premium card with `GlowPill` for spread type + gold
+  date in `month short, day, year` format.
+- Card thumbnails: upgraded `border-[#2A2722]` → `border-[#C5A572]/30`
+  (gold borders).
+- Expanded card thumbnails: gold borders, `h-[80px]` (was 72px).
+- Reflection journal entries: `IconBgCard` with `BaydinStar` watermark,
+  `serif-italic` card name, gold date in `month short, day` format.
+- `space-y-3 → space-y-4` for breathing room.
+
+#### 5. `chat-view.tsx`
+- **MessageBubble**: user message now has `border-[#C5A572]/25` (was
+  `border-[#2A2722]`) + top gold gradient line accent.
+- Assistant message: 36px icon container (was 32px) with gold border
+  + top gold gradient line + `border-l border-[#C5A572]/20 pl-4`
+  on the content (gives a editorial left-rule accent).
+- Highlight pills: `border-[#C5A572]/20` → `border-[#C5A572]/25` +
+  `bg-[#C5A572]/5` + `rounded-sm` (was unrounded).
+- ModeSelector: `border-b-2` → `border-b-[3px]` (gold underline thicker).
+
+#### 6. `manifest-view.tsx`
+- **StatCard** redesigned: `IconBgCard` with `BaydinManifest` watermark,
+  `serif-display text-[32px]` NumberTicker (was 18px), p-4 with
+  `hover:scale-[1.02]`, uppercase tracked label.
+- **GoalCard** → `IconBgCard` with `BaydinManifest` watermark +
+  `intention.color` glow + p-6 + `hover:scale-[1.005]`.
+- **Form** → `IconBgCard` (was `AuroraGlowCard`), p-6, uppercase tracked
+  labels, focus-visible ring on inputs.
+- **Gate + EmptyState** → `IconBgCard` with center watermark.
+
+#### 7. `ritual-view.tsx`
+- **Progress ring hero** → `IconBgCard` with `BaydinFlame` watermark,
+  larger iconSize (200 vs nothing), p-6 (was p-5).
+- **Each step** → `IconBgCard` with `step.icon` watermark (was
+  `AuroraGlowCard`), p-6 (was p-4), `hover:scale-[1.005]`,
+  larger 56px step circle (was 44px), serif-display step name (was
+  sans-serif), larger 24px step icon.
+- Vertical connector between steps extended to 24px (was 12px).
+- **Streak info** → `IconBgCard` with `BaydinClock` watermark.
+
+#### 8. `frequency-view.tsx`
+- **Each Solfeggio tone** → premium `IconBgCard` with `hover:scale-[1.02]`,
+  `serif-display text-[28px]` frequency number (was 14px plain),
+  `serif-display` tone name, `border-[#C5A572]/40` when selected.
+- **BreathingPacer** → p-6 (was p-5), larger 160px icon watermark.
+- **Now playing card** already at p-6 — kept.
+
+#### 9. `breath-view.tsx`
+- **Each pattern** → `IconBgCard` with `BaydinBreath` watermark (was
+  `AuroraGlowCard`), p-5 with `hover:scale-[1.02]`,
+  `serif-display` pattern name (was sans-serif), 44px icon container
+  (was 36px).
+- **Duration + Audio cards** → `IconBgCard` with `BaydinClock` and
+  `BaydinBreath` watermarks respectively.
+- **Selected pattern summary** → `IconBgCard` with `BaydinBreath`
+  watermark, p-6, larger 180px icon.
+- **Summary stats (Complete screen)** → 3× `IconBgCard` with
+  `serif-display text-[32px]` NumberTicker (was 24px).
+- **Pause/End buttons** → gold border on pause button (was neutral).
+
+#### 10. `positivity-view.tsx`
+- **Word-by-word player** → `IconBgCard` with `BaydinHeart` watermark
+  at `iconPosition="center"` (was `AuroraGlowCard`), p-8 lg:p-12,
+  `hover:scale-[1.005]`.
+- **Full script card** → `IconBgCard` with `BaydinStar` watermark,
+  p-6, uppercase tracked label.
+- **Free counter** → `IconBgCard` with `BaydinClock` watermark,
+  `serif-display text-[32px]` NumberTicker (was 24px).
+- **Optional intention** → `IconBgCard` (was `AuroraGlowCard`).
+- **Categories** → each as `IconBgCard` with `BaydinHeart` watermark,
+  `serif-display` category name, `hover:scale-[1.02]`.
+- **History items** → `IconBgCard` (was `AuroraGlowCard`).
+- **Gate** → `IconBgCard` with center watermark.
+
+#### 11. `dream-journal-view.tsx`
+- **EntryCard** → `IconBgCard` with `BaydinMoon` watermark (was
+  `AuroraGlowCard`), p-6 with `hover:scale-[1.005]`,
+  `serif-display` title (was serif-italic), italic serif body excerpt,
+  GlowPill for date (was text-[#9C9489]) + mood + lunar context,
+  gold hashtag pills for symbols (was plain text).
+- **StatPill** → `IconBgCard` with `BaydinLifeReport` watermark,
+  `serif-display text-[24px]` NumberTicker (was 18px).
+- **EntryDetail header** → `IconBgCard` with `BaydinMoon` watermark,
+  p-6, larger 56px mood emoji container.
+- **Dream narrative** → `IconBgCard` with `BaydinLifeReport` watermark,
+  `serif-italic` text.
+- **Lunar context** → `IconBgCard` with `BaydinMoon` watermark.
+- **Symbols Detected** → `IconBgCard` with `BaydinStar` watermark,
+  symbols as gold `#keyword` pills.
+- **AI Interpretation** → `IconBgCard` with `BaydinStar` watermark,
+  `serif-italic` interpretation text.
+- **EmptyState + Gate** → `IconBgCard` with center watermark.
+- **Reflections history list** → `space-y-2 → space-y-3`.
+
+### Cross-cutting design rules applied to all 11 views
+1. **All cards `p-5 → p-6`** — 24px padding standard (with few exceptions
+   like density-constrained stat cards which keep p-4 for grid fit).
+2. **All stat numbers `text-[18px] → text-[32px]`** (or larger) using
+   `serif-display` font for editorial elegance.
+3. **All section headers** got a gold gradient divider line via either
+   `LuxSectionHeader` or inline `bg-gradient-to-r from-[#C5A572]/30 to-transparent`.
+4. **All cards with hover affordance** have `hover:scale-[1.02]` or
+   `hover:scale-[1.005]` + `transition-all duration-300`.
+5. **All interactive elements** have gold focus rings via `focus-ring`
+   class (already in globals.css).
+6. **All grid gaps** `gap-2.5 → gap-3` or `gap-3 → gap-4` for breathing room.
+7. **All AuroraGlowCard** (where present) replaced with `IconBgCard` for
+   consistency (the watermark + gold top accent gives a far more
+   premium feel than the cursor-tracking radial glow).
+8. **All icon watermarks** bumped from 120-150px to 150-220px for more
+   visual presence behind content.
+9. **All heading typography** uses `serif-display` (Cormorant Garamond)
+   for the editorial godly.design feel.
+10. **All GlowPills** used as accent badges (replaced plain text labels
+    with glow-shadowed pills).
+
+### Quality gates
+
+| Check | Result |
+|---|---|
+| `bun run lint` | ✅ exit 0, 0 errors, 0 warnings |
+| `bunx tsc --noEmit` (filtered to `/src/...`) | ✅ 0 errors in modified files |
+| Dev server recompile | ✅ all routes 200, no compile errors |
+| Dev log final state | ✅ `✓ Compiled in 1202ms` then `GET / 200 in 1323ms` |
+
+### What's preserved
+- All API calls (fetch endpoints, http methods, payloads) — unchanged.
+- All state management (useState, useReducer, useQuery, useStore) — unchanged.
+- All component logic (claim daily reward, fetch horoscope, perform
+  reading, toggle save, interpret dream, etc.) — unchanged.
+- All existing imports work (Baydin icons barrel file unchanged).
+- ShimmerButton `tone="gold"` / `tone="parchment"` API unchanged.
+- IconBgCard props (icon, glowColor, glowIntensity, iconSize, iconOpacity,
+  iconPosition, filled) unchanged.
+- LuxSectionHeader + LuxStatCard + LuxDivider added as new exports,
+  no breaking changes to existing exports.
+
+### Files modified
+- `src/components/lumina/premium-ui.tsx` — added LuxSectionHeader,
+  LuxStatCard, LuxDivider (3 new exports, ~120 new lines).
+- `src/components/views/today-view.tsx`
+- `src/components/views/horoscope-view.tsx`
+- `src/components/views/tarot-view.tsx`
+- `src/components/views/tarot-history-view.tsx`
+- `src/components/views/chat-view.tsx`
+- `src/components/views/manifest-view.tsx`
+- `src/components/views/ritual-view.tsx`
+- `src/components/views/frequency-view.tsx`
+- `src/components/views/breath-view.tsx`
+- `src/components/views/positivity-view.tsx`
+- `src/components/views/dream-journal-view.tsx`
+
+### Notes for downstream agents
+1. `LuxSectionHeader` accepts an optional `icon` prop (any Baydin icon
+   component) and a `color` (defaults to `#C5A572`). Use it at the top
+   of every IconBgCard section for instant editorial gravitas.
+2. `LuxStatCard` is the standard bento stat — pass `value`, `label`,
+   `color`, optional `icon` and `suffix`. It already includes a
+   NumberTicker so you don't need to wrap one yourself.
+3. `LuxDivider` is a thin gold gradient line — useful between sections
+   inside a card.
+4. The `WeeklyStat` helper in today-view.tsx now wraps `LuxStatCard` —
+   this is intentional backwards-compat so the function signature
+   stays the same.
+5. All AuroraGlowCard usages in the 11 Daily views were replaced with
+   IconBgCard. AuroraGlowCard is still available in premium-ui.tsx for
+   other views that may still use it.
