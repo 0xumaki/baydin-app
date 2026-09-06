@@ -14,10 +14,9 @@ import {
 } from "@/components/lumina/premium-ui";
 import { CloverIcon, ZodiacIcon, BaydinMoon, BaydinStar, BaydinLoader, BaydinCheck, BaydinX, BaydinCalendar, BaydinClock, BaydinSun, BaydinBreath, BaydinNumerology } from "@/components/lumina/baydin-icons";
 import { useMe, api } from "@/lib/api-client";
-import { BaydinStar as Palette } from "@/components/lumina/baydin-icons";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
-import { ZODIAC_SYMBOLS, ZODIAC_MY } from "@/lib/astrology";
+import { ZODIAC_MY } from "@/lib/astrology";
 
 const SIGNS = [
   "aries", "taurus", "gemini", "cancer", "leo", "virgo",
@@ -276,7 +275,7 @@ function LuckyElementsGrid({ horoscope }: { horoscope: any }) {
   const day = g?.lucky_day ?? g?.luckyDay ?? new Date().toLocaleDateString("en-US", { weekday: "long" });
 
   const items = [
-    { label: "Lucky color", value: color, icon: Palette, accent: "#C5A572" },
+    { label: "Lucky color", value: color, icon: BaydinStar, accent: "#C5A572" },
     { label: "Lucky number", value: number !== undefined && number !== null ? String(number) : null, icon: BaydinNumerology, accent: "#9E8AC9" },
     { label: "Lucky time", value: time, icon: BaydinClock, accent: "#B5CD7E" },
     { label: "Lucky day", value: day, icon: BaydinCalendar, accent: "#D876A0" },

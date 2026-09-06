@@ -14,7 +14,7 @@ import {
   ShimmerButton,
   AnimatedGradientBackground,
 } from "@/components/lumina/premium-ui";
-import { CloverIcon, BaydinStar, BaydinShuffle, BaydinShare, BaydinSave, BaydinBookmark, BaydinLoader, BaydinRefresh, BaydinMoon, BaydinTarot } from "@/components/lumina/baydin-icons";
+import { CloverIcon, BaydinStar, BaydinShuffle, BaydinShare, BaydinSave, BaydinBookmark, BaydinLoader, BaydinRefresh, BaydinMoon } from "@/components/lumina/baydin-icons";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -55,14 +55,18 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
     setRevealedIdx(0);
     setSaved(false);
 
-    // Minimum shuffle time for ritual feel (2.2s)
-    const minDelay = new Promise((r) => setTimeout(r, 2200));
+    // Track timeout IDs for cleanup if component unmounts mid-reading
+    const timeoutIds: ReturnType<typeof setTimeout>[] = [];
+    const trackedDelay = (ms: number) => new Promise<void>((r) => {
+      const id = setTimeout(() => r(), ms);
+      timeoutIds.push(id);
+    });
 
     try {
       const res = await api<{ reading: any; error?: string }>("/api/tarot/read", {
         method: "POST", json: { question, spreadType: spread },
       });
-      await minDelay;
+      await trackedDelay(2200);
 
       if (res.error) {
         setPhase("ask");
@@ -77,10 +81,10 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
       // Reveal cards one by one with stagger
       const total = res.reading.cards.length;
       for (let i = 0; i < total; i++) {
-        await new Promise((r) => setTimeout(r, 650));
+        await trackedDelay(650);
         setRevealedIdx(i + 1);
       }
-      await new Promise((r) => setTimeout(r, 400));
+      await trackedDelay(400);
       setPhase("result");
     } catch (e: any) {
       setPhase("ask");
