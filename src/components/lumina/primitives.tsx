@@ -174,7 +174,7 @@ export function StarField({ count = 24 }: { count?: number }) {
         id: i,
         top: Math.random() * 100,
         left: Math.random() * 100,
-        size: Math.random() * 2 + 0.5,
+        size: Math.random() * 2.5 + 1,
         delay: Math.random() * 4,
         dur: Math.random() * 3 + 2,
       })),
@@ -191,7 +191,7 @@ export function StarField({ count = 24 }: { count?: number }) {
             left: `${s.left}%`,
             width: s.size,
             height: s.size,
-            opacity: 0.4,
+            opacity: 0.6,
             animation: `lum-twinkle ${s.dur}s ease-in-out ${s.delay}s infinite`,
           }}
         />

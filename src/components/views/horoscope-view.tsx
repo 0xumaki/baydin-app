@@ -82,20 +82,27 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
 
         {/* ===== Hero ===== */}
-        <div className="mb-6 lum-reveal">
-          <GlowPill className="mb-3">
+        <div className="mb-6 lum-reveal relative">
+          {/* Zodiac wheel background image */}
+          <img
+            src="/images/zodiac/zodiac-all-signs.png"
+            alt="Zodiac signs wheel"
+            aria-hidden
+            className="pointer-events-none absolute -top-8 -right-8 w-48 h-48 opacity-10 rotate-12"
+          />
+          <GlowPill className="mb-3 relative z-10">
             <BaydinStar className="w-3 h-3" /> Daily guidance
           </GlowPill>
-          <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-3">
+          <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-3 relative z-10">
             Your Horoscope
           </LiquidMetalText>
-          <p className="t-body text-[#B5ADA2] leading-[1.7] max-w-[55ch]">
+          <p className="t-body text-[#B8B0A4] leading-[1.7] max-w-[55ch] relative z-10">
             Written by Gemini from live transit data. Personalized readings draw from your natal chart — costs {LUCK_COST_PERSONALIZED} Luck each. Generic sun-sign guidance is free.
           </p>
         </div>
 
         {/* ===== Sign selector ===== */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="flex items-center gap-2 mb-3">
             <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
             <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Choose your sign</span>
@@ -124,7 +131,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
         </div>
 
         {/* ===== Period tabs ===== */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="flex gap-2 border-b border-[#2A2722]">
             {PERIODS.map((p) => {
               const active = type === p.id;

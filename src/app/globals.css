@@ -442,3 +442,12 @@ button, a, [role="button"] { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) {
   .lum-reveal { animation: none; }
 }
+
+/* Starry night background — applied to all views via .baydin-starry-bg class */
+.baydin-starry-bg {
+  background-image: url("/images/starry-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}

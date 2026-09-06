@@ -438,7 +438,7 @@ export function AnimatedGradientBackground({
             left: `${-10 + i * 35}%`,
             borderRadius: "50%",
             filter: "blur(80px)",
-            opacity: 0.12,
+            opacity: 0.18,
             mixBlendMode: "screen",
             position: "absolute",
             pointerEvents: "none",
