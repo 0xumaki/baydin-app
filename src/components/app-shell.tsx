@@ -137,19 +137,19 @@ export function AppShell() {
     <div className="relative h-[100dvh] flex flex-col bg-background overflow-hidden">
       {/* Mobile top bar */}
       <header className="lg:hidden sticky top-0 z-30 bg-[#0A0908] border-b border-[#2A2722] px-4 py-3 flex items-center justify-between lum-pt-safe">
-        <button onClick={() => setSidebarOpen(true)} aria-label="Open navigation menu" className="p-2 -ml-2 text-[#6B6358] hover:text-[#E8E2D5] transition">
+        <button onClick={() => setSidebarOpen(true)} aria-label="Open navigation menu" className="p-2 -ml-2 text-[#7A756E] hover:text-[#E8E2D5] transition">
           <BaydinMenu className="w-5 h-5" />
         </button>
         <div className="serif-display text-[1.125rem] text-[#E8E2D5] leading-none">Baydin</div>
         {user ? (
-          <button onClick={() => setProfileOpen(true)} className="flex items-center gap-1.5 text-[12px] text-[#9C9489]">
+          <button onClick={() => setProfileOpen(true)} className="flex items-center gap-1.5 px-2 py-1 rounded-sm text-[12px] text-[#B5ADA2] hover:bg-[#1A1714] transition">
             {user.role === "admin" && (
-              <span className="text-[10px] text-[#C5A572]">admin</span>
+              <span className="text-[11px] text-[#C5A572] font-medium">admin</span>
             )}
             <span className="tabular-nums">{user.luckBalance}</span>
           </button>
         ) : (
-          <button onClick={() => setAuthOpen(true)} className="text-[13px] text-[#9C9489] hover:text-[#E8E2D5] transition">{t("sign_in")}</button>
+          <button onClick={() => setAuthOpen(true)} className="px-2 py-1 text-[13px] text-[#B5ADA2] hover:text-[#E8E2D5] transition rounded-sm">{t("sign_in")}</button>
         )}
       </header>
 
@@ -171,34 +171,34 @@ export function AppShell() {
         {/* Main area */}
         <main className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
           {/* Desktop top bar — quiet, no glass, no sparkle */}
-          <div className="hidden lg:flex items-center justify-between px-8 py-4 border-b border-[#2A2722] bg-[#0A0908]">
+          <div className="hidden lg:flex items-center justify-between px-6 lg:px-8 py-4 border-b border-[#2A2722] bg-[#0A0908]">
             <div className="flex items-baseline gap-3">
               <span className="serif-display text-[1.125rem] text-[#E8E2D5]">Baydin</span>
-              <span className="text-[11px] text-[#6B6358] hidden xl:inline">Astrology, tarot, ritual</span>
+              <span className="text-[11px] text-[#8A8278] hidden xl:inline">Astrology, tarot, ritual</span>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {user ? (
                 <>
                   {user.role === "admin" && (
-                    <span className="text-[11px] text-[#C5A572]" title="Admin bypass active">
+                    <span className="px-2 py-1 text-[11px] text-[#C5A572] font-medium border border-[#C5A572]/20 rounded-sm" title="Admin bypass active">
                       admin
                     </span>
                   )}
                   <DailyRewardBadge />
-                  <button onClick={() => setProfileOpen(true)} className="text-[12px] text-[#9C9489] hover:text-[#E8E2D5] transition tabular-nums">
+                  <button onClick={() => setProfileOpen(true)} className="px-2 py-1 text-[12px] text-[#B5ADA2] hover:text-[#E8E2D5] hover:bg-[#1A1714] transition tabular-nums rounded-sm">
                     {user.luckBalance} Luck
                   </button>
                   <ThemeToggle />
-                  <button onClick={() => setProfileOpen(true)} aria-label="Open profile and settings" className="w-8 h-8 rounded-sm flex items-center justify-center text-[#6B6358] hover:text-[#E8E2D5] transition focus-ring">
+                  <button onClick={() => setProfileOpen(true)} aria-label="Open profile and settings" className="w-9 h-9 rounded-sm flex items-center justify-center text-[#7A756E] hover:text-[#E8E2D5] hover:bg-[#1A1714] transition focus-ring">
                     <Settings className="w-4 h-4" />
                   </button>
                 </>
               ) : (
                 <>
-                  <GhostButton onClick={() => setAuthOpen(true)} className="py-2 px-4 text-[12px]">{t("sign_in")}</GhostButton>
+                  <GhostButton onClick={() => setAuthOpen(true)} className="h-9 px-4 py-2 text-[12px]">{t("sign_in")}</GhostButton>
                   <button
                     onClick={() => setAuthOpen(true)}
-                    className="py-2 px-4 text-[13px] bg-[#E8E2D5] text-[#0A0908] hover:bg-white transition rounded-sm focus-ring"
+                    className="h-9 px-4 py-2 text-[13px] bg-[#E8E2D5] text-[#0A0908] hover:bg-white transition rounded-sm focus-ring"
                   >
                     {t("begin")}
                   </button>
@@ -293,9 +293,9 @@ function Sidebar(props: {
         <div className="flex items-center justify-between px-5 pt-6 pb-4">
           <div className="leading-tight">
             <div className="serif-display text-[1.5rem] text-[#E8E2D5] leading-none">Baydin</div>
-            <div className="text-[11px] text-[#6B6358] mt-1">Fortune, stars, ritual</div>
+            <div className="text-[11px] text-[#8A8278] mt-1">Fortune, stars, ritual</div>
           </div>
-          <button onClick={props.onClose} aria-label="Close navigation menu" className="lg:hidden p-1 text-[#6B6358] hover:text-[#E8E2D5] transition">
+          <button onClick={props.onClose} aria-label="Close navigation menu" className="lg:hidden p-1 text-[#7A756E] hover:text-[#E8E2D5] transition">
             <BaydinX className="w-5 h-5" />
           </button>
         </div>
@@ -304,7 +304,7 @@ function Sidebar(props: {
         <div className="px-5 pb-4">
           <button
             onClick={props.onNewChat}
-            className="w-full flex items-center gap-2 py-2.5 text-[13px] text-[#E8E2D5] hover:text-[#C5A572] transition border-b border-[#2A2722] focus-ring rounded-sm"
+            className="w-full flex items-center gap-2 h-9 px-2 text-[13px] text-[#E8E2D5] hover:text-[#C5A572] transition border-b border-[#2A2722] focus-ring rounded-sm"
           >
             <BaydinPlus className="w-3.5 h-3.5" /> {t("new_consultation")}
           </button>
@@ -322,17 +322,17 @@ function Sidebar(props: {
             const groupKey = (g: string) => `nav_${g.toLowerCase()}`;
             return order.filter((g) => groups[g]).map((g) => (
               <div key={g} className="mb-5">
-                <div className="px-3 pt-3 pb-1.5 text-[12px] text-[#6B6358] font-medium">{t(groupKey(g))}</div>
+                <div className="px-3 pt-3 pb-1.5 text-[11px] text-[#8A8278] font-medium tracking-wide">{t(groupKey(g))}</div>
                 <div className="space-y-px">
                   {groups[g].map((item) => (
                     <button
                       key={item.view}
                       onClick={() => props.onNav(item)}
                       className={cn(
-                        "group w-full flex items-center gap-3 px-3 py-2 min-h-[36px] rounded-none text-[13px] transition-colors",
+                        "group relative w-full flex items-center gap-3 px-3 py-2 min-h-[36px] text-[13px] transition-colors border-l-2",
                         props.currentView === item.view
-                          ? "text-[#E8E2D5] bg-[#1A1714]"
-                          : "text-[#9C9489] hover:text-[#E8E2D5] hover:bg-[#0F0D0B]"
+                          ? "text-[#E8E2D5] bg-[#C5A572]/[0.08] border-[#C5A572] font-medium"
+                          : "text-[#7A756E] border-transparent hover:text-[#E8E2D5] hover:bg-[#0F0D0B]"
                       )}
                     >
                       {item.customIcon ? (
@@ -355,7 +355,7 @@ function Sidebar(props: {
                         <item.icon className={cn("w-[15px] h-[15px] shrink-0", props.currentView === item.view && "text-[#C5A572]")} />
                       )}
                       <span className="flex-1 text-left">{t(item.labelKey)}</span>
-                      {(() => { const b = badgeFor(item.view); return b ? <span className="text-[10px] text-[#C5A572] tabular-nums">{b}</span> : null; })()}
+                      {(() => { const b = badgeFor(item.view); return b ? <span className="text-[10px] text-[#0A0908] bg-[#C5A572] rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1 font-medium tabular-nums">{b}</span> : null; })()}
                     </button>
                   ))}
                 </div>
@@ -378,17 +378,17 @@ function Sidebar(props: {
               onClick={props.onProfile}
               className="w-full flex items-center gap-3 p-2 rounded-sm hover:bg-[#0F0D0B] transition"
             >
-              <div className="w-8 h-8 rounded-full bg-[#1A1714] border border-[#2A2722] flex items-center justify-center text-[#C5A572] text-[12px] font-medium">
+              <div className="w-9 h-9 rounded-full bg-[#1A1714] border border-[#2A2722] flex items-center justify-center text-[#C5A572] text-[12px] font-medium">
                 {(props.user.email[0] || "B").toUpperCase()}
               </div>
               <div className="flex-1 min-w-0 text-left">
                 <div className="text-[13px] text-[#E8E2D5] truncate">{props.user.name || props.user.email}</div>
-                <div className="text-[11px] text-[#6B6358]">{props.user.luckBalance} Luck</div>
+                <div className="text-[11px] text-[#8A8278]">{props.user.luckBalance} Luck</div>
               </div>
-              <Settings className="w-3.5 h-3.5 text-[#6B6358]" />
+              <Settings className="w-4 h-4 text-[#7A756E]" />
             </button>
           ) : (
-            <GhostButton onClick={props.onAuth} className="w-full py-2.5 text-[13px]">
+            <GhostButton onClick={props.onAuth} className="w-full h-9 py-2 text-[13px]">
               {t("sign_in")}
             </GhostButton>
           )}
@@ -434,13 +434,13 @@ function DailyRewardCard({ compact }: { compact?: boolean }) {
         onClick={claim}
         disabled={claimedBool}
         className={cn(
-          "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] transition border",
+          "flex items-center gap-1.5 h-9 px-2.5 py-1 rounded-full text-[11px] transition border",
           claimedBool
-            ? "border-white/5 text-ink-muted/50"
+            ? "border-white/5 text-[#8A8278]"
             : "border-leaf/30 bg-leaf/10 text-leaf hover:bg-leaf/20"
         )}
       >
-        <BaydinGift className="w-3 h-3" />
+        <BaydinGift className="w-3.5 h-3.5" />
         {claimedBool ? "Claimed" : `+${Math.max(1, amount)} Luck`}
       </button>
     );
@@ -451,19 +451,19 @@ function DailyRewardCard({ compact }: { compact?: boolean }) {
       onClick={claim}
       disabled={claimedBool}
       className={cn(
-        "w-full text-left p-3 rounded-xl border transition-all",
+        "w-full text-left p-5 rounded-xl border transition-all",
         claimedBool
           ? "border-white/5 bg-white/[0.02] opacity-60"
           : "border-leaf/20 bg-leaf/[0.06] hover:bg-leaf/[0.1] hover:border-leaf/30"
       )}
     >
-      <div className="flex items-center gap-2 mb-1">
-        <BaydinGift className={cn("w-4 h-4", claimedBool ? "text-ink-muted" : "text-leaf")} />
-        <span className={cn("text-[12px] font-medium", claimedBool ? "text-ink-muted" : "text-leaf")}>
+      <div className="flex items-center gap-2 mb-2">
+        <BaydinGift className={cn("w-4 h-4", claimedBool ? "text-[#8A8278]" : "text-leaf")} />
+        <span className={cn("text-[13px] font-medium", claimedBool ? "text-[#8A8278]" : "text-leaf")}>
           {claimedBool ? "Today's Luck claimed" : "Claim daily Luck"}
         </span>
       </div>
-      <div className="text-[11px] text-ink-muted">
+      <div className="text-[11px] text-[#8A8278]">
         {claimedBool ? `Come back tomorrow (streak ${streak} days)` : `Streak ${streak} days · next reward +${Math.max(1, amount)} Luck`}
       </div>
     </button>

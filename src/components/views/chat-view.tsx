@@ -185,7 +185,7 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
           {/* Mobile: open sidebar */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-1.5 text-[#6B6358] hover:text-[#E8E2D5] transition focus-ring rounded-sm"
+            className="lg:hidden p-1.5 text-[#7A756E] hover:text-[#E8E2D5] transition focus-ring rounded-sm"
             aria-label="Open conversation list"
           >
             <Menu className="w-5 h-5" />
@@ -197,13 +197,13 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
           {/* Status indicators */}
           <div className="ml-auto flex items-center gap-3 shrink-0 relative z-10">
             {hasBirthData ? (
-              <GlowPill color="#7A8B6F" className="hidden sm:inline-flex normal-case tracking-normal">Birth data set</GlowPill>
+              <GlowPill color="#7A8B6F" className="hidden sm:inline-flex normal-case tracking-normal px-2 py-1">Birth data set</GlowPill>
             ) : (
-              <GlowPill color="#C26B5C" className="hidden sm:inline-flex normal-case tracking-normal">Add birth data</GlowPill>
+              <GlowPill color="#C26B5C" className="hidden sm:inline-flex normal-case tracking-normal px-2 py-1">Add birth data</GlowPill>
             )}
             <button
               onClick={() => setShowPrashna(true)}
-              className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition focus-ring rounded-sm"
+              className="h-9 px-3 py-2 text-[12px] text-[#8A8278] hover:text-[#C5A572] transition focus-ring rounded-sm"
             >
               Prashna
             </button>
@@ -211,13 +211,13 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
               <>
                 <button
                   onClick={() => shareLastReading()}
-                  className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition focus-ring rounded-sm hidden sm:inline"
+                  className="h-9 px-3 py-2 text-[12px] text-[#8A8278] hover:text-[#C5A572] transition focus-ring rounded-sm hidden sm:inline-flex items-center"
                 >
                   Share
                 </button>
                 <button
                   onClick={() => window.open(`/api/conversations/${activeConversationId}/export`, "_blank")}
-                  className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition focus-ring rounded-sm hidden sm:inline"
+                  className="h-9 px-3 py-2 text-[12px] text-[#8A8278] hover:text-[#C5A572] transition focus-ring rounded-sm hidden sm:inline-flex items-center"
                 >
                   Export
                 </button>
@@ -250,7 +250,7 @@ export function ChatView({ onAuth }: { onAuth: () => void }) {
         <div className="border-t border-[#2A2722] p-3 lg:p-4 lum-pb-safe">
           <div className="max-w-3xl mx-auto">
             <Composer inputRef={inputRef} disabled={streaming} onSubmit={send} luckCost={messages.length === 0 ? 0 : 2} balance={user.luckBalance} />
-            <div className="text-center text-[11px] text-[#6B6358] mt-2">
+            <div className="text-center text-[11px] text-[#8A8278] mt-2">
               {messages.length === 0 ? "First turn is free" : "2 Luck per message"} · Use discernment with all guidance.
             </div>
           </div>
@@ -341,7 +341,7 @@ function ChatSidebar({
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-5 pb-3">
         <div className="serif-display text-[1.125rem] text-[#E8E2D5] leading-none">Consultations</div>
-        <button onClick={onClose} aria-label="Close" className="lg:hidden p-1 text-[#6B6358] hover:text-[#E8E2D5] transition">
+        <button onClick={onClose} aria-label="Close" className="lg:hidden p-1 text-[#7A756E] hover:text-[#E8E2D5] transition">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -359,7 +359,7 @@ function ChatSidebar({
       {/* Search */}
       <div className="px-3 pb-3">
         <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#6B6358]" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#8A8278]" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -372,7 +372,7 @@ function ChatSidebar({
       {/* Conversation list */}
       <nav className="px-2 flex-1 overflow-y-auto lumina-scroll">
         {sorted.length === 0 ? (
-          <div className="px-3 py-4 text-[12px] text-[#6B6358] text-center">
+          <div className="px-3 py-4 text-[12px] text-[#8A8278] text-center">
             {search ? `No matches` : "No consultations yet"}
           </div>
         ) : (
@@ -393,7 +393,7 @@ function ChatSidebar({
                     onClick={() => onPick(c.id)}
                     className={cn(
                       "flex-1 text-left px-2.5 py-2 text-[13px] hover:bg-[#0F0D0B] transition truncate rounded-sm",
-                      c.id === activeId ? "text-[#C5A572] bg-[#1A1714]" : "text-[#9C9489]"
+                      c.id === activeId ? "text-[#C5A572] bg-[#1A1714]" : "text-[#8A8278]"
                     )}
                   >
                     {c.pinned && <Pin className="w-2.5 h-2.5 inline mr-1 text-[#C5A572]" />}
@@ -402,7 +402,7 @@ function ChatSidebar({
                   {/* Action buttons — appear on hover */}
                   <button
                     onClick={(e) => startRename(c.id, c.title, e)}
-                    className="p-1 shrink-0 opacity-0 group-hover:opacity-100 transition text-[#6B6358] hover:text-[#9C9489] focus-ring rounded-sm"
+                    className="p-1 shrink-0 opacity-0 group-hover:opacity-100 transition text-[#8A8278] hover:text-[#8A8278] focus-ring rounded-sm"
                     aria-label="Rename"
                   >
                     <Pencil className="w-3 h-3" />
@@ -411,7 +411,7 @@ function ChatSidebar({
                     onClick={(e) => togglePin(c.id, c.pinned, e)}
                     className={cn(
                       "p-1 shrink-0 opacity-0 group-hover:opacity-100 transition focus-ring rounded-sm",
-                      c.pinned ? "text-[#C5A572] opacity-100" : "text-[#6B6358] hover:text-[#9C9489]"
+                      c.pinned ? "text-[#C5A572] opacity-100" : "text-[#8A8278] hover:text-[#8A8278]"
                     )}
                     aria-label={c.pinned ? "Unpin" : "Pin"}
                   >
@@ -419,7 +419,7 @@ function ChatSidebar({
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); setDeleteId(c.id); }}
-                    className="p-1 shrink-0 opacity-0 group-hover:opacity-100 transition text-[#6B6358] hover:text-[#C26B5C] focus-ring rounded-sm"
+                    className="p-1 shrink-0 opacity-0 group-hover:opacity-100 transition text-[#8A8278] hover:text-[#C26B5C] focus-ring rounded-sm"
                     aria-label="Delete"
                   >
                     <Trash2 className="w-3 h-3" />
@@ -447,11 +447,11 @@ function ChatSidebar({
               <Trash2 className="w-5 h-5" />
               <span className="serif text-[15px]">Delete consultation?</span>
             </div>
-            <div className="text-[13px] text-[#9C9489] mb-5 leading-[1.6]">
+            <div className="text-[13px] text-[#8A8278] mb-5 leading-[1.6]">
               This permanently deletes this consultation and all its messages. This cannot be undone.
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 text-[13px] text-[#9C9489] hover:text-[#E8E2D5] border border-[#2A2722] hover:border-[#4A4540] transition rounded-sm">Cancel</button>
+              <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 text-[13px] text-[#8A8278] hover:text-[#E8E2D5] border border-[#2A2722] hover:border-[#4A4540] transition rounded-sm">Cancel</button>
               <button onClick={confirmDelete} className="flex-1 py-2.5 text-[13px] bg-[#C26B5C] text-white hover:brightness-110 active:scale-95 transition rounded-sm">Delete</button>
             </div>
           </div>
@@ -482,7 +482,7 @@ function MessageBubble({ msg, streaming }: { msg: Msg; streaming?: boolean }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="serif text-[15px] text-[#E8E2D5] leading-[1.8] prose-editorial">
-          {msg.content ? <ReactMarkdown>{msg.content}</ReactMarkdown> : (streaming ? <span className="text-[#6B6358]">Reading the stars…</span> : null)}
+          {msg.content ? <ReactMarkdown>{msg.content}</ReactMarkdown> : (streaming ? <span className="text-[#8A8278]">Reading the stars…</span> : null)}
         </div>
         {streaming && msg.content && <span className="inline-block w-1.5 h-4 bg-[#C5A572] ml-0.5 align-middle animate-pulse" />}
         {msg.metadata?.guidance && <GuidanceCard guidance={msg.metadata.guidance} />}
@@ -510,7 +510,7 @@ function GuidanceCard({ guidance }: { guidance: any }) {
   if (items.length === 0) return null;
   return (
     <div className="mt-4">
-      <button onClick={() => setOpen((o) => !o)} className="text-[12px] text-[#6B6358] hover:text-[#C5A572] transition flex items-center gap-1.5 focus-ring rounded-sm">
+      <button onClick={() => setOpen((o) => !o)} className="text-[12px] text-[#8A8278] hover:text-[#C5A572] transition flex items-center gap-1.5 focus-ring rounded-sm">
         <ChevronDown className={cn("w-3 h-3 transition-transform", open && "rotate-180")} />
         {open ? "Hide guidance" : "Show guidance & remedies"}
       </button>
@@ -518,8 +518,8 @@ function GuidanceCard({ guidance }: { guidance: any }) {
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
           {items.map((it, i) => (
             <div key={i} className="p-3 border border-[#2A2722]">
-              <div className="text-[12px] text-[#6B6358] font-medium mb-1.5">{it.label}</div>
-              <div className="text-[13px] text-[#9C9489]">
+              <div className="text-[12px] text-[#8A8278] font-medium mb-1.5">{it.label}</div>
+              <div className="text-[13px] text-[#8A8278]">
                 {Array.isArray(it.value) ? <ul className="space-y-0.5">{it.value.map((v: string, j: number) => <li key={j}>· {v}</li>)}</ul> : it.value}
               </div>
             </div>
@@ -546,8 +546,8 @@ function ModeSelector({ mode, onChange }: { mode: "vedic" | "western" | "mahabot
           key={m.id}
           onClick={() => onChange(m.id)}
           className={cn(
-            "px-3 py-1.5 text-[12px] border-b-2 transition focus-ring rounded-sm",
-            mode === m.id ? "border-[#C5A572] text-[#E8E2D5] font-medium" : "border-transparent text-[#6B6358] hover:text-[#9C9489]"
+            "relative px-3 py-1.5 text-[12px] border-b-2 transition focus-ring rounded-sm",
+            mode === m.id ? "border-[#C5A572] text-[#E8E2D5] font-medium" : "border-transparent text-[#8A8278] hover:text-[#B5ADA2]"
           )}
         >
           {m.label}
@@ -603,18 +603,18 @@ function WelcomeState({ user, onSuggestion, hasBirthData }: { user: any; onSugge
   return (
     <div className="max-w-2xl mx-auto px-6 py-12 lg:py-16">
       <div className="mb-8 lum-reveal">
-        <div className="text-[13px] text-[#6B6358] mb-2">Your astrologer</div>
+        <div className="text-[13px] text-[#8A8278] mb-2">Your astrologer</div>
         <h1 className="serif-display text-[2rem] lg:text-[2.5rem] text-[#E8E2D5] leading-[1.1] tracking-tight mb-3">
           {user.name ? `Welcome, ${user.name.split(" ")[0]}.` : "Welcome."}
         </h1>
-        <p className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch]">
+        <p className="t-body text-[#8A8278] leading-[1.7] max-w-[55ch]">
           {hasBirthData
             ? "Ask me anything about your chart, your day, or what the stars hold for you."
             : "Add your birth details in your profile settings for a full reading of your natal chart."}
         </p>
       </div>
       <div className="pt-8 border-t border-[#2A2722]">
-        <div className="text-[12px] text-[#6B6358] font-medium mb-4">Try asking</div>
+        <div className="text-[12px] text-[#8A8278] font-medium mb-4">Try asking</div>
         <div className="space-y-2">
           {SUGGESTIONS.map((s, i) => (
             <button
@@ -623,8 +623,8 @@ function WelcomeState({ user, onSuggestion, hasBirthData }: { user: any; onSugge
               className="w-full text-left p-3 border border-[#2A2722] hover:border-[#4A4540] hover:bg-[#0F0D0B] transition group focus-ring rounded-sm flex items-center gap-3"
             >
               <s.icon className="w-3.5 h-3.5 text-[#C5A572] shrink-0" />
-              <span className="text-[13px] text-[#9C9489] group-hover:text-[#E8E2D5] transition flex-1">{s.text}</span>
-              <span className="text-[10px] text-[#6B6358] serif-italic">{s.mode}</span>
+              <span className="text-[13px] text-[#8A8278] group-hover:text-[#E8E2D5] transition flex-1">{s.text}</span>
+              <span className="text-[11px] text-[#8A8278] serif-italic">{s.mode}</span>
             </button>
           ))}
         </div>
@@ -641,11 +641,11 @@ function EmptyState({ onAuth, t }: { onAuth: () => void; t: (k: string) => strin
     <div className="h-full overflow-hidden">
       <div className="max-w-2xl mx-auto px-6 py-12 lg:py-16">
         <div className="lum-reveal">
-          <div className="text-[13px] text-[#6B6358] mb-2">Your astrologer</div>
+          <div className="text-[13px] text-[#8A8278] mb-2">Your astrologer</div>
           <h1 className="serif-display text-[2.5rem] sm:text-[3rem] text-[#E8E2D5] leading-[1.05] tracking-tight mb-4">
             Consult the stars.
           </h1>
-          <p className="t-body-lg text-[#9C9489] leading-[1.7] max-w-[55ch] mb-8">
+          <p className="t-body-lg text-[#8A8278] leading-[1.7] max-w-[55ch] mb-8">
             Vedic, Western, and Myanmar Mahabote readings drawn from your birth chart and the moon overhead. Each consultation turn costs 2 Luck. The first turn is free.
           </p>
           <button
@@ -654,7 +654,7 @@ function EmptyState({ onAuth, t }: { onAuth: () => void; t: (k: string) => strin
           >
             {t("begin")}
           </button>
-          <div className="mt-3 text-[12px] text-[#6B6358]">5 Luck free on signup · No card required</div>
+          <div className="mt-3 text-[12px] text-[#8A8278]">5 Luck free on signup · No card required</div>
         </div>
       </div>
     </div>
@@ -693,12 +693,12 @@ function PrashnaModal({ onClose }: { onClose: () => void }) {
       <div className="bg-[#0A0908] border border-[#2A2722] p-6 max-w-md w-full rounded-sm" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <div className="serif-display text-[1.25rem] text-[#E8E2D5]">Prashna — Horary</div>
-          <button onClick={onClose} aria-label="Close" className="text-[#6B6358] hover:text-[#E8E2D5] transition"><X className="w-4 h-4" /></button>
+          <button onClick={onClose} aria-label="Close" className="text-[#8A8278] hover:text-[#E8E2D5] transition"><X className="w-4 h-4" /></button>
         </div>
 
         {!result && !loading && (
           <>
-            <div className="text-[13px] text-[#9C9489] mb-4 leading-[1.6]">
+            <div className="text-[13px] text-[#8A8278] mb-4 leading-[1.6]">
               Ask a Yes/No question. The answer is determined by casting a chart at this exact moment.
             </div>
             <input
@@ -722,48 +722,48 @@ function PrashnaModal({ onClose }: { onClose: () => void }) {
         {loading && (
           <div className="text-center py-8">
             <Loader2 className="w-6 h-6 text-[#C5A572] animate-spin mx-auto mb-3" />
-            <div className="text-[13px] text-[#6B6358]">Casting the Prashna chart…</div>
+            <div className="text-[13px] text-[#8A8278]">Casting the Prashna chart…</div>
           </div>
         )}
 
         {result && !loading && (
           <div>
             <div className="text-center mb-4">
-              <div className="text-[12px] text-[#6B6358] mb-1">Your question</div>
+              <div className="text-[12px] text-[#8A8278] mb-1">Your question</div>
               <div className="text-[14px] text-[#E8E2D5] mb-4">{result.question}</div>
               <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-3xl font-light mb-2 border-2"
                 style={{ borderColor: answerColor, color: answerColor, background: `${answerColor}15` }}>
                 {answerIcon}
               </div>
               <div className="serif-display text-[1.5rem] capitalize" style={{ color: answerColor }}>{result.answer}</div>
-              <div className="text-[12px] text-[#6B6358] mt-1">{result.confidence}% confidence</div>
+              <div className="text-[12px] text-[#8A8278] mt-1">{result.confidence}% confidence</div>
             </div>
             <div className="p-3 border border-[#2A2722] mb-3">
-              <div className="text-[12px] text-[#6B6358] font-medium mb-1">Reasoning</div>
-              <div className="text-[12px] text-[#9C9489] leading-[1.6]">{result.reasoning}</div>
+              <div className="text-[12px] text-[#8A8278] font-medium mb-1">Reasoning</div>
+              <div className="text-[12px] text-[#8A8278] leading-[1.6]">{result.reasoning}</div>
             </div>
             <div className="text-[12px] text-[#C5A572] serif-italic mb-3">{result.timing}</div>
             <div className="grid grid-cols-2 gap-2 mb-4">
               <div className="p-2 border border-[#2A2722]">
-                <div className="text-[11px] text-[#6B6358]">Lagna</div>
+                <div className="text-[11px] text-[#8A8278]">Lagna</div>
                 <div className="text-[13px] text-[#E8E2D5]">{result.chart.lagnaSign}</div>
               </div>
               <div className="p-2 border border-[#2A2722]">
-                <div className="text-[11px] text-[#6B6358]">Moon</div>
+                <div className="text-[11px] text-[#8A8278]">Moon</div>
                 <div className="text-[13px] text-[#E8E2D5]">{result.chart.moonSign}</div>
               </div>
               <div className="p-2 border border-[#2A2722]">
-                <div className="text-[11px] text-[#6B6358]">Nakshatra</div>
+                <div className="text-[11px] text-[#8A8278]">Nakshatra</div>
                 <div className="text-[13px] text-[#E8E2D5]">{result.chart.moonNakshatra}</div>
               </div>
               <div className="p-2 border border-[#2A2722]">
-                <div className="text-[11px] text-[#6B6358]">Nak Lord</div>
+                <div className="text-[11px] text-[#8A8278]">Nak Lord</div>
                 <div className="text-[13px] text-[#E8E2D5]">{result.chart.nakshatraLord}</div>
               </div>
             </div>
             <button
               onClick={() => { setResult(null); setQuestion(""); }}
-              className="w-full py-3 text-[14px] text-[#9C9489] hover:text-[#E8E2D5] border border-[#2A2722] hover:border-[#4A4540] transition rounded-sm focus-ring"
+              className="w-full py-3 text-[14px] text-[#8A8278] hover:text-[#E8E2D5] border border-[#2A2722] hover:border-[#4A4540] transition rounded-sm focus-ring"
             >
               Ask another question
             </button>

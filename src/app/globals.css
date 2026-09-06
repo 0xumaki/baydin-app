@@ -41,6 +41,7 @@
   --color-surface-2: var(--surface-2);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
+  --color-ink-tertiary: var(--ink-tertiary);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -70,10 +71,10 @@
   --secondary: rgba(255, 255, 255, 0.04);
   --secondary-foreground: #9CA8A3;
   --muted: rgba(156, 168, 163, 0.12);
-  --muted-foreground: #9CA8A3;
+  --muted-foreground: #A8A096;
   --accent: #C5A87C;
   --accent-foreground: #0a0a0a;
-  --destructive: #b5463a;
+  --destructive: #C5A572;
   --destructive-foreground: #ffffff;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.10);
@@ -86,7 +87,8 @@
   --surface: #121815;
   --surface-2: #0C100E;
   --ink: #E8EBE9;
-  --ink-muted: #9CA8A3;
+  --ink-muted: #A8A096;
+  --ink-tertiary: #8A8278;
 
   --shadow-glass: rgba(255, 255, 255, 0.05) 0px 1px 0px 0px inset;
   --shadow-float: rgba(0, 0, 0, 0.9) 0px 40px 80px -20px, rgba(255, 255, 255, 0.08) 0px 2px 4px 0px inset;
@@ -95,6 +97,9 @@
 .dark {
   --background: #000000;
   --foreground: #E8EBE9;
+  --muted-foreground: #A8A096;
+  --ink-muted: #A8A096;
+  --ink-tertiary: #8A8278;
 }
 
 @layer base {
@@ -322,6 +327,7 @@ button, a, [role="button"] { touch-action: manipulation; }
   --surface-2: #100B06;
   --ink: #F5EDD8;
   --ink-muted: #C5A87C;
+  --ink-tertiary: #8E7A52;
 }
 
 /* ============================================================

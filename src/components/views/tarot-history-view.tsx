@@ -70,7 +70,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
           <LiquidMetalText as="h1" className="serif-display text-[1.75rem] text-[#E8E2D5] tracking-tight block mb-2">
             Sign in to view your history
           </LiquidMetalText>
-          <p className="text-[13px] text-[#9C9489] mb-6 max-w-xs">
+          <p className="text-[13px] text-[#B5ADA2] mb-6 max-w-xs">
             Your tarot readings and reflections will appear here.
           </p>
           <GoldButton onClick={onAuth} className="mt-1">Sign in</GoldButton>
@@ -91,19 +91,19 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
           <GlowPill className="mb-3">
             <BaydinLifeReport className="w-3 h-3" /> Your past readings
           </GlowPill>
-          <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.25rem] leading-[1.1] tracking-tight block mb-2">
+          <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.25rem] leading-[1.1] tracking-tight block mb-3">
             Tarot History
           </LiquidMetalText>
-          <p className="t-body text-[#9C9489] leading-[1.6]">
+          <p className="t-body text-[#B5ADA2] leading-[1.6]">
             Browse, bookmark & share your past tarot readings.
           </p>
         </div>
 
         {/* Filter control */}
-        <div className="flex items-center justify-end mb-5">
+        <div className="flex items-center justify-end mb-6">
           <button
             onClick={() => setSavedOnly(!savedOnly)}
-            className={cn("px-3 py-1.5 rounded-full text-[11px] border transition flex items-center gap-1.5 shrink-0", savedOnly ? "border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572]" : "border-[#2A2722] text-[#9C9489] hover:text-[#E8E2D5]")}
+            className={cn("h-9 px-4 py-2 rounded-full text-[11px] border transition flex items-center gap-1.5 shrink-0", savedOnly ? "border-[#C5A572]/30 bg-[#C5A572]/10 text-[#C5A572]" : "border-[#2A2722] text-[#B5ADA2] hover:text-[#E8E2D5] hover:border-[#C5A572]/40")}
           >
             {savedOnly ? <BaydinBookmark className="w-3.5 h-3.5" /> : <BaydinBookmark className="w-3.5 h-3.5" />}
             {savedOnly ? "Saved only" : "All"}
@@ -113,13 +113,13 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
         {loading ? (
           <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.12} className="p-8 text-center">
             <BaydinLoader className="w-6 h-6 text-[#C5A572] mx-auto mb-2" />
-            <div className="text-[13px] text-[#9C9489]">Loading readings…</div>
+            <div className="text-[13px] text-[#B5ADA2]">Loading readings…</div>
           </AuroraGlowCard>
         ) : readings.length === 0 ? (
           <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.12} className="p-8 text-center">
-            <BaydinStar className="w-8 h-8 text-[#9C9489] mx-auto mb-3" />
-            <div className="text-[14px] text-[#E8E2D5] mb-1">{savedOnly ? "No saved readings yet" : "No readings yet"}</div>
-            <div className="text-[12px] text-[#9C9489] mb-4">{savedOnly ? "Bookmark readings you want to keep." : "Draw your first cards from the Tarot tab."}</div>
+            <BaydinStar className="w-8 h-8 text-[#8A8278] mx-auto mb-3" />
+            <div className="text-[14px] text-[#E8E2D5] mb-2">{savedOnly ? "No saved readings yet" : "No readings yet"}</div>
+            <div className="text-[12px] text-[#B5ADA2] mb-5">{savedOnly ? "Bookmark readings you want to keep." : "Draw your first cards from the Tarot tab."}</div>
             <ShimmerButton onClick={() => setView("tarot")}>
               <BaydinStar className="w-3.5 h-3.5" /> Draw your first card
             </ShimmerButton>
@@ -135,7 +135,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                   {/* Header row */}
                   <div
                     onClick={() => setExpanded(isExpanded ? null : r.id)}
-                    className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition cursor-pointer"
+                    className="w-full flex items-center gap-3 p-5 text-left hover:bg-white/[0.02] transition cursor-pointer"
                   >
                     {/* Card thumbnails */}
                     <div className="flex -space-x-2 shrink-0">
@@ -152,7 +152,7 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                         );
                       })}
                       {cards.length > 3 && (
-                        <div className="w-8 h-12 rounded border border-[#2A2722] bg-[#121815] flex items-center justify-center text-[9px] text-[#9C9489]">
+                        <div className="w-8 h-12 rounded border border-[#2A2722] bg-[#121815] flex items-center justify-center text-[11px] text-[#8A8278]">
                           +{cards.length - 3}
                         </div>
                       )}
@@ -161,8 +161,8 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                     <div className="flex-1 min-w-0">
                       <div className="text-[13px] text-[#E8E2D5] truncate">{r.question}</div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <GlowPill color="#9E8AC9" className="text-[9px]">{r.spreadType}</GlowPill>
-                        <span className="text-[10px] text-[#9C9489]">{new Date(r.createdAt).toLocaleDateString()}</span>
+                        <GlowPill color="#9E8AC9" className="text-[11px]">{r.spreadType}</GlowPill>
+                        <span className="text-[11px] text-[#B5ADA2]">{new Date(r.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
 
@@ -170,18 +170,18 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleSave(r.id); }}
-                        className={cn("p-1.5 rounded-full transition", r.saved ? "text-[#C5A572]" : "text-[#9C9489]/40 hover:text-[#9C9489]")}
+                        className={cn("p-1.5 rounded-full transition", r.saved ? "text-[#C5A572]" : "text-[#8A8278] hover:text-[#B5ADA2]")}
                         aria-label={r.saved ? "Remove bookmark" : "Save reading"}
                       >
                         {r.saved ? <BaydinBookmark className="w-4 h-4" /> : <BaydinBookmark className="w-4 h-4" />}
                       </button>
-                      {isExpanded ? <BaydinChevronDown className="w-4 h-4 text-[#9C9489]" /> : <BaydinChevronRight className="w-4 h-4 text-[#9C9489]" />}
+                      {isExpanded ? <BaydinChevronDown className="w-4 h-4 text-[#B5ADA2]" /> : <BaydinChevronRight className="w-4 h-4 text-[#B5ADA2]" />}
                     </div>
                   </div>
 
                   {/* Expanded content */}
                   {isExpanded && (
-                    <div className="px-4 pb-4 border-t border-[#2A2722] pt-3 lum-reveal">
+                    <div className="px-5 pb-5 border-t border-[#2A2722] pt-3 lum-reveal">
                       {/* Full cards */}
                       <div className="flex flex-wrap gap-2 mb-3">
                         {cards.map((c: any, i: number) => {
@@ -191,8 +191,8 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                               <div className={cn("w-12 rounded border border-[#C5A572]/20 bg-gradient-to-br from-[#121815] to-[#0C100E] flex items-center justify-center text-lg p-1", c.reversed && "rotate-180")} style={{ height: "72px" }}>
                                 {card?.symbol || "✦"}
                               </div>
-                              <div className="text-[9px] text-[#E8E2D5] mt-1 text-center max-w-[60px] truncate">{card?.nameShort}</div>
-                              {c.reversed && <div className="text-[8px] text-[#D4A0B8]">℞</div>}
+                              <div className="text-[11px] text-[#E8E2D5] mt-1 text-center max-w-[60px] truncate">{card?.nameShort}</div>
+                              {c.reversed && <div className="text-[11px] text-[#D4A0B8]">℞</div>}
                             </div>
                           );
                         })}
@@ -204,17 +204,17 @@ export function TarotHistoryView({ onAuth }: { onAuth: () => void }) {
                       {/* Share + reflection status */}
                       <div className="mt-3 flex items-center gap-2">
                         {r.saved ? (
-                          <GlowPill color="#7A8B6F" className="text-[9px]">
+                          <GlowPill color="#7A8B6F" className="text-[11px]">
                             <BaydinBookmark className="w-3 h-3" /> Saved
                           </GlowPill>
                         ) : (
-                          <GlowPill color="#9C9489" className="text-[9px]">
+                          <GlowPill color="#8A8278" className="text-[11px]">
                             <BaydinBookmark className="w-3 h-3" /> Unsaved
                           </GlowPill>
                         )}
                         <ShimmerButton
                           onClick={() => shareReading(r)}
-                          className="py-1.5 px-3 text-[11px]"
+                          className="h-9 px-4 py-2 text-[11px]"
                         >
                           <BaydinShare className="w-3 h-3" /> Share this reading
                         </ShimmerButton>
@@ -253,23 +253,23 @@ function ReflectionsHistory() {
     <div className="mt-6">
       <div className="flex items-center gap-2 mb-3">
         <BaydinLifeReport className="w-4 h-4 text-[#C5A572]" />
-        <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Reflection Journal</span>
-        <span className="text-[10px] text-[#9C9489]/50">· {reflections.length} entries</span>
+        <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Reflection Journal</span>
+        <span className="text-[11px] text-[#8A8278]">· {reflections.length} entries</span>
       </div>
       <div className="space-y-2">
         {reflections.map((r) => {
           const card = r.card ? TAROT_DECK.find((t) => t.id === r.card.id) : null;
           return (
-            <AuroraGlowCard key={r.id} glowColor="#9E8AC9" glowIntensity={0.1} className="p-3 flex items-start gap-3">
+            <AuroraGlowCard key={r.id} glowColor="#9E8AC9" glowIntensity={0.1} className="p-5 flex items-start gap-3">
               <div className={cn("w-8 h-12 rounded border border-[#C5A572]/20 bg-gradient-to-br from-[#121815] to-[#0C100E]-2 flex items-center justify-center text-sm shrink-0", r.card?.reversed && "rotate-180")}>
                 {card?.symbol || "✦"}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="text-[11px] text-[#E8E2D5]">{card?.name || "Card of the Day"}</span>
-                  <span className="text-[9px] text-[#9C9489]">{new Date(r.date).toLocaleDateString()}</span>
+                  <span className="text-[11px] text-[#8A8278]">{new Date(r.date).toLocaleDateString()}</span>
                 </div>
-                <div className="text-[11px] text-[#9C9489] leading-relaxed line-clamp-2 italic">"{r.reflection}"</div>
+                <div className="text-[11px] text-[#B5ADA2] leading-relaxed line-clamp-2 italic">"{r.reflection}"</div>
               </div>
             </AuroraGlowCard>
           );

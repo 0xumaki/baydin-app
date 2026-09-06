@@ -138,10 +138,10 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
           <LiquidMetalText as="h1" className="serif-display text-[1.75rem] text-[#E8E2D5] tracking-tight block mb-2">
             Sign in to begin
           </LiquidMetalText>
-          <p className="text-[13px] text-[#9C9489] mb-6 max-w-xs">
+          <p className="text-[13px] text-[#B5ADA2] mb-6 max-w-xs">
             The deck speaks in symbols. Sign in to draw your first cards.
           </p>
-          <ShimmerButton onClick={onAuth} className="px-6 py-2.5">
+          <ShimmerButton onClick={onAuth} className="h-9 px-4 py-2">
             Sign in
           </ShimmerButton>
         </div>
@@ -165,21 +165,21 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
             className="lum-reveal"
           >
             {/* Hero */}
-            <div className="mb-8">
+            <div className="mb-6">
               <GlowPill className="mb-3">
                 <BaydinMoon className="w-3 h-3" /> Rider-Waite-Smith deck
               </GlowPill>
               <LiquidMetalText as="h1" className="serif-display text-[2rem] lg:text-[2.5rem] leading-[1.1] tracking-tight block mb-3">
                 Tarot Reading
               </LiquidMetalText>
-              <p className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch]">
+              <p className="t-body text-[#B5ADA2] leading-[1.7] max-w-[55ch]">
                 The deck speaks in symbols. Ask, and the cards answer. 2 free readings daily, then 1 <CloverIcon className="w-3 h-3" /> Luck each.
               </p>
             </div>
 
             {/* Question */}
             <div className="mb-6 pb-6 border-b border-[#2A2722]">
-              <label className="block text-[12px] text-[#6B6358] font-medium mb-2">Your question</label>
+              <label className="block text-[12px] text-[#8A8278] font-medium mb-2">Your question</label>
               <input
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
@@ -194,7 +194,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
             <div className="mb-3">
               <div className="flex items-center gap-2 mb-3">
                 <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
-                <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Choose a spread</span>
+                <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Choose a spread</span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
                 {SPREADS.map((s) => {
@@ -205,8 +205,8 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                       glowColor={active ? "#C5A572" : "#9E8AC9"}
                       glowIntensity={active ? 0.22 : 0.1}
                       className={cn(
-                        "p-3 text-left transition cursor-pointer",
-                        active ? "border-[#C5A572]/60" : "border-[#2A2722] hover:border-[#4A4540]"
+                        "p-4 text-left transition cursor-pointer",
+                        active ? "border-[#C5A572]/60" : "border-[#2A2722] hover:border-[#C5A572]/40"
                       )}
                     >
                       <button
@@ -216,12 +216,12 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                         aria-pressed={active}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <div className={cn("text-[13px] font-medium", active ? "text-[#E8E2D5]" : "text-[#9C9489]")}>{s.name}</div>
+                          <div className={cn("text-[13px] font-medium", active ? "text-[#E8E2D5]" : "text-[#B5ADA2]")}>{s.name}</div>
                           {active && (
-                            <GlowPill color="#C5A572" className="text-[9px]">{s.count} card{s.count > 1 ? "s" : ""}</GlowPill>
+                            <GlowPill color="#C5A572" className="text-[11px]">{s.count} card{s.count > 1 ? "s" : ""}</GlowPill>
                           )}
                         </div>
-                        <div className="text-[11px] text-[#6B6358]">{s.desc}</div>
+                        <div className="text-[11px] text-[#8A8278]">{s.desc}</div>
                       </button>
                     </AuroraGlowCard>
                   );
@@ -233,16 +233,16 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
             <ShimmerButton
               onClick={performReading}
               disabled={!question.trim()}
-              className="w-full py-3.5 mb-8"
+              className="w-full h-12 mb-6"
             >
               <BaydinShuffle className="w-4 h-4" /> Shuffle & Draw {SPREADS.find(s => s.id === spread)?.count} card{SPREADS.find(s => s.id === spread)!.count > 1 ? "s" : ""}
             </ShimmerButton>
 
             {/* Past readings */}
-            <div className="pt-8 border-t border-[#2A2722]">
+            <div className="pt-6 border-t border-[#2A2722]">
               <button
                 onClick={() => setView("tarot-history")}
-                className="inline-flex items-center gap-2 text-[13px] text-[#9C9489] hover:text-[#C5A572] transition focus-ring rounded-sm"
+                className="inline-flex items-center gap-2 text-[13px] text-[#B5ADA2] hover:text-[#C5A572] transition focus-ring rounded-sm"
               >
                 <BaydinBookmark className="w-3.5 h-3.5" /> View past readings
               </button>
@@ -280,7 +280,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
               <BaydinLoader className="w-4 h-4" />
               <span className="text-[13px] tracking-[0.04em]">Shuffling the deck…</span>
             </div>
-            <p className="text-[12px] text-[#6B6358] mt-2 serif-italic">Breathe. Hold your question lightly.</p>
+            <p className="text-[12px] text-[#8A8278] mt-2 serif-italic">Breathe. Hold your question lightly.</p>
           </motion.div>
         )}
 
@@ -292,8 +292,8 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
             className="space-y-6"
           >
             {/* Question display */}
-            <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.15} className="p-4">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489] mb-1">Your question</div>
+            <AuroraGlowCard glowColor="#9E8AC9" glowIntensity={0.15} className="p-5">
+              <div className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2] mb-1">Your question</div>
               <p className="serif-italic text-[15px] text-[#E8E2D5] leading-[1.6]">"{reading.question}"</p>
             </AuroraGlowCard>
 
@@ -306,7 +306,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                   <div key={i} className="flex flex-col items-center gap-2">
                     {/* Position label */}
                     {c.position && (
-                      <div className="text-[11px] text-[#6B6358] text-center max-w-[120px] font-medium">{c.position}</div>
+                      <div className="text-[11px] text-[#8A8278] text-center max-w-[120px] font-medium">{c.position}</div>
                     )}
 
                     {/* Card — flip animation on reveal */}
@@ -327,7 +327,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                         >
                           <TarotCardFace card={c.card} reversed={c.reversed} size={isSolo ? "lg" : "md"} />
                           <div className="absolute inset-0 rounded-[14px] bg-[#C5A572]/0 group-hover:bg-[#C5A572]/10 transition-colors flex items-end justify-center pb-2 opacity-0 group-hover:opacity-100">
-                            <span className="text-[9px] tracking-[0.14em] text-[#C5A572] font-medium">Tap for meaning</span>
+                            <span className="text-[11px] tracking-[0.14em] text-[#C5A572] font-medium">Tap for meaning</span>
                           </div>
                         </motion.button>
                       ) : (
@@ -358,29 +358,29 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                 className="space-y-4"
               >
                 <AuroraGlowCard glowColor="#C5A572" glowIntensity={0.18} className="p-5">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <BaydinStar className="w-4 h-4 text-[#C5A572]" />
-                      <span className="text-[12px] uppercase tracking-[0.2em] text-[#9C9489]">The reading</span>
+                      <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">The reading</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={shareReading}
-                        className="text-[12px] text-[#9C9489] hover:text-[#E8E2D5] transition focus-ring rounded-sm px-3 py-1.5 border border-[#2A2722] hover:border-[#4A4540]"
+                        className="h-9 px-3 py-2 text-[12px] text-[#B5ADA2] hover:text-[#E8E2D5] transition focus-ring rounded-sm border border-[#2A2722] hover:border-[#C5A572]/40 inline-flex items-center gap-1.5"
                       >
-                        <BaydinShare className="w-3 h-3 inline mr-1" /> Share
+                        <BaydinShare className="w-3 h-3" /> Share
                       </button>
                       <button
                         onClick={saveReading}
                         disabled={saved}
                         className={cn(
-                          "text-[12px] transition focus-ring rounded-sm px-3 py-1.5 border",
+                          "h-9 px-3 py-2 text-[12px] transition focus-ring rounded-sm border inline-flex items-center gap-1.5",
                           saved
                             ? "text-[#C5A572] border-[#C5A572]/30 bg-[#C5A572]/5 cursor-default"
-                            : "text-[#9C9489] hover:text-[#E8E2D5] border-[#2A2722] hover:border-[#4A4540]"
+                            : "text-[#B5ADA2] hover:text-[#E8E2D5] border-[#2A2722] hover:border-[#C5A572]/40"
                         )}
                       >
-                        {saved ? <><BaydinSave className="w-3 h-3 inline mr-1" /> Saved</> : <><BaydinSave className="w-3 h-3 inline mr-1" /> Save</>}
+                        {saved ? <><BaydinSave className="w-3 h-3" /> Saved</> : <><BaydinSave className="w-3 h-3" /> Save</>}
                       </button>
                     </div>
                   </div>
@@ -390,7 +390,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
 
                   {/* Luck info */}
                   {reading.luckSpent > 0 && (
-                    <div className="mt-6 text-[11px] text-[#6B6358] flex items-center gap-1.5">
+                    <div className="mt-6 text-[11px] text-[#8A8278] flex items-center gap-1.5">
                       <CloverIcon className="w-3 h-3" /> {reading.luckSpent} Luck spent · {reading.freeRemaining} free readings remaining today
                     </div>
                   )}
@@ -400,7 +400,7 @@ export function TarotView({ onAuth }: { onAuth: () => void }) {
                 <ShimmerButton
                   onClick={reset}
                   tone="parchment"
-                  className="py-3 px-6"
+                  className="h-9 px-4 py-2"
                 >
                   <BaydinRefresh className="w-3.5 h-3.5" /> Ask another question
                 </ShimmerButton>

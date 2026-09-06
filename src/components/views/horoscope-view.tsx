@@ -82,49 +82,49 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
       <div className="max-w-3xl mx-auto px-4 py-6 lg:py-10 relative z-10 min-w-0 overflow-hidden">
 
         {/* ===== Hero ===== */}
-        <div className="mb-7 lum-reveal">
+        <div className="mb-6 lum-reveal">
           <GlowPill className="mb-3">
             <BaydinStar className="w-3 h-3" /> Daily guidance
           </GlowPill>
-          <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-2">
+          <LiquidMetalText as="h1" className="serif-display text-[2rem] sm:text-[2.5rem] leading-[1.05] tracking-tight block mb-3">
             Your Horoscope
           </LiquidMetalText>
-          <p className="t-body text-[#9C9489] leading-[1.7] max-w-[55ch]">
+          <p className="t-body text-[#B5ADA2] leading-[1.7] max-w-[55ch]">
             Written by Gemini from live transit data. Personalized readings draw from your natal chart — costs {LUCK_COST_PERSONALIZED} Luck each. Generic sun-sign guidance is free.
           </p>
         </div>
 
         {/* ===== Sign selector ===== */}
-        <div className="mb-5">
-          <div className="flex items-center gap-2 mb-2.5">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
             <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
-            <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Choose your sign</span>
+            <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Choose your sign</span>
           </div>
-          <div className="grid grid-cols-6 sm:grid-cols-12 gap-2 mb-3">
+          <div className="grid grid-cols-6 sm:grid-cols-12 gap-3 mb-3">
             {SIGNS.map((s, i) => (
               <button
                 key={s}
                 onClick={() => changeSign(s)}
                 aria-pressed={sign === s}
                 title={SIGN_LABELS[s]}
-                className={`aspect-square rounded-lg border flex flex-col items-center justify-center transition-all duration-300 hover:scale-110 focus-ring ${
+                className={`aspect-square rounded-lg border flex flex-col items-center justify-center transition-all duration-300 focus-ring ${
                   sign === s
-                    ? "border-[#C5A572] bg-gradient-to-br from-[#C5A572]/20 to-transparent text-[#C5A572] shadow-[0_0_12px_rgba(197,165,114,0.3)]"
-                    : "border-[#2A2722] bg-white/[0.02] text-[#9C9489] hover:text-[#E8E2D5] hover:border-[#C5A572]/30"
+                    ? "scale-105 border-[#C5A572] bg-gradient-to-br from-[#C5A572]/15 to-[#C5A572]/5 text-[#C5A572] shadow-[0_0_16px_rgba(197,165,114,0.4)]"
+                    : "border-[#2A2722] bg-white/[0.02] text-[#B5ADA2] hover:text-[#E8E2D5] hover:border-[#C5A572]/40 hover:bg-[#C5A572]/5 hover:scale-105"
                 }`}
               >
                 <ZodiacIcon sign={s} className="w-7 h-7 sm:w-8 sm:h-8" />
               </button>
             ))}
           </div>
-          <div className="mt-1.5 text-[11px] text-[#9C9489]">
+          <div className="mt-2 text-[11px] text-[#B5ADA2]">
             Selected · <span className="text-[#C5A572]">{SIGN_LABELS[sign]}</span>
-            <span className="text-[#9C9489]/60"> · {ZODIAC_MY[SIGNS.indexOf(sign as typeof SIGNS[number])]}</span>
+            <span className="text-[#8A8278]"> · {ZODIAC_MY[SIGNS.indexOf(sign as typeof SIGNS[number])]}</span>
           </div>
         </div>
 
         {/* ===== Period tabs ===== */}
-        <div className="mb-5">
+        <div className="mb-6">
           <div className="flex gap-2 border-b border-[#2A2722]">
             {PERIODS.map((p) => {
               const active = type === p.id;
@@ -132,15 +132,15 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
                 <button
                   key={p.id}
                   onClick={() => changeType(p.id)}
-                  className={`relative px-4 py-2 text-[12px] font-medium transition focus-ring ${
-                    active ? "text-[#C5A572]" : "text-[#9C9489] hover:text-[#E8E2D5]"
+                  className={`relative px-4 py-2 text-[12px] transition focus-ring ${
+                    active ? "font-medium text-[#E8E2D5]" : "text-[#8A8278] hover:text-[#B5ADA2]"
                   }`}
                 >
                   {p.label}
                   {active && (
                     <span
                       aria-hidden
-                      className="absolute left-0 right-0 -bottom-px h-[2px] bg-gradient-to-r from-transparent via-[#C5A572] to-transparent"
+                      className="absolute left-0 right-0 -bottom-px h-[3px] bg-gradient-to-r from-transparent via-[#C5A572] to-transparent"
                     />
                   )}
                 </button>
@@ -153,7 +153,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
         <ShimmerButton
           onClick={() => fetchH()}
           disabled={loading}
-          className="w-full mb-5 py-3"
+          className="w-full mb-6 py-3"
         >
           {loading ? (
             <><BaydinLoader className="w-4 h-4" /> Reading the stars…</>
@@ -171,7 +171,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 
         {/* ===== Loading state ===== */}
         {loading && (
-          <IconBgCard icon={BaydinLoader} glowColor="#9E8AC9" glowIntensity={0.18} iconSize={180} iconOpacity={0.07} iconPosition="top-right" className="p-5 mb-5">
+          <IconBgCard icon={BaydinLoader} glowColor="#9E8AC9" glowIntensity={0.18} iconSize={180} iconOpacity={0.07} iconPosition="top-right" className="p-5 mb-6">
             <div className="animate-pulse space-y-3">
               <div className="flex items-center gap-2">
                 <div className="h-3 w-24 bg-white/5 rounded" />
@@ -192,8 +192,8 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
 
         {/* ===== Main reading ===== */}
         {horoscope && !loading && (
-          <div className="space-y-5">
-            <IconBgCard icon={BaydinMoon} glowColor="#9E8AC9" glowIntensity={0.22} iconSize={220} iconOpacity={0.08} iconPosition="top-right" className="p-6">
+          <div className="space-y-6">
+            <IconBgCard icon={BaydinMoon} glowColor="#9E8AC9" glowIntensity={0.22} iconSize={220} iconOpacity={0.08} iconPosition="top-right" className="p-5">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <GlowPill color="#9E8AC9"><BaydinMoon className="w-3 h-3" /> {SIGN_LABELS[horoscope.sign] || SIGN_LABELS[sign]} · {horoscope.type}</GlowPill>
                 {horoscope.personalized && (
@@ -223,7 +223,7 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
               <IconBgCard icon={BaydinStar} glowColor="#C5A572" glowIntensity={0.18} iconSize={170} iconOpacity={0.07} iconPosition="top-right" className="p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <BaydinStar className="w-4 h-4 text-[#C5A572]" />
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Highlights</span>
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Highlights</span>
                 </div>
                 <ul className="space-y-2">
                   {horoscope.highlights.map((h: string, i: number) => (
@@ -249,8 +249,8 @@ export function HoroscopeView({ onAuth }: { onAuth: () => void }) {
                 <BaydinMoon className="w-6 h-6 text-[#C5A572]" />
               </div>
             </div>
-            <div className="serif-display text-[16px] text-[#E8E2D5] mb-1">The stars are quiet — for now.</div>
-            <p className="text-[12px] text-[#9C9489] leading-[1.6] max-w-xs mx-auto mb-5">
+            <div className="serif-display text-[16px] text-[#E8E2D5] mb-2">The stars are quiet — for now.</div>
+            <p className="text-[12px] text-[#B5ADA2] leading-[1.6] max-w-xs mx-auto mb-5">
               Select your sign above and tap <span className="text-[#C5A572]">Read horoscope</span> to receive today's guidance.
             </p>
             <ShimmerButton onClick={() => fetchH()} disabled={loading}>
@@ -287,9 +287,9 @@ function LuckyElementsGrid({ horoscope }: { horoscope: any }) {
     <div>
       <div className="flex items-center gap-2 mb-3">
         <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
-        <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Lucky Elements</span>
+        <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Lucky Elements</span>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {items.map((it) => {
           const Icon = it.icon;
           return (
@@ -297,7 +297,7 @@ function LuckyElementsGrid({ horoscope }: { horoscope: any }) {
               <div className="flex items-center justify-between mb-2">
                 <Icon className="w-4 h-4" style={{ color: it.accent }} />
               </div>
-              <div className="text-[10px] uppercase tracking-wide text-[#9C9489] mb-1">{it.label}</div>
+              <div className="text-[11px] uppercase tracking-wide text-[#8A8278] mb-1">{it.label}</div>
               <div className="text-[16px] text-[#E8E2D5] font-medium truncate">
                 {it.value ? (
                   typeof it.value === "string" && /^\d+$/.test(it.value) ? (
@@ -306,7 +306,7 @@ function LuckyElementsGrid({ horoscope }: { horoscope: any }) {
                     it.value
                   )
                 ) : (
-                  <span className="text-[#6B6358] text-[12px]">—</span>
+                  <span className="text-[#8A8278] text-[12px]">—</span>
                 )}
               </div>
             </IconBgCard>
@@ -337,7 +337,7 @@ function DoDontLists({ horoscope }: { horoscope: any }) {
     <div>
       <div className="flex items-center gap-2 mb-3">
         <BaydinStar className="w-3.5 h-3.5 text-[#C5A572]" />
-        <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Today's Guidance</span>
+        <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Today's Guidance</span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <IconBgCard icon={BaydinCheck} glowColor="#7A8B6F" glowIntensity={0.22} iconSize={140} iconOpacity={0.07} iconPosition="bottom-right" className="p-5">
@@ -357,7 +357,7 @@ function DoDontLists({ horoscope }: { horoscope: any }) {
               ))}
             </ul>
           ) : (
-            <div className="text-[12px] text-[#6B6358] serif-italic">Lean into what feels alive today.</div>
+            <div className="text-[13px] text-[#8A8278] serif-italic">Lean into what feels alive today.</div>
           )}
         </IconBgCard>
 
@@ -378,7 +378,7 @@ function DoDontLists({ horoscope }: { horoscope: any }) {
               ))}
             </ul>
           ) : (
-            <div className="text-[12px] text-[#6B6358] serif-italic">No sharp edges to avoid — proceed gently.</div>
+            <div className="text-[13px] text-[#8A8278] serif-italic">No sharp edges to avoid — proceed gently.</div>
           )}
         </IconBgCard>
       </div>
@@ -402,14 +402,14 @@ function TransitSummary({ horoscope }: { horoscope: any }) {
     <IconBgCard icon={BaydinBreath} glowColor="#5FA9C7" glowIntensity={0.2} iconSize={150} iconOpacity={0.06} iconPosition="top-right" className="p-5">
       <div className="flex items-center gap-2 mb-3">
         <BaydinBreath className="w-4 h-4 text-[#5FA9C7]" />
-        <span className="text-[11px] uppercase tracking-[0.2em] text-[#9C9489]">Transit Summary</span>
+        <span className="text-[11px] uppercase tracking-[0.2em] text-[#B5ADA2]">Transit Summary</span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {moonSign && (
           <div className="p-3 rounded-sm border border-[#2A2722] bg-white/[0.02]">
             <div className="flex items-center gap-2 mb-1.5">
               <BaydinMoon className="w-3.5 h-3.5 text-[#5FA9C7]" />
-              <span className="text-[10px] uppercase tracking-wide text-[#9C9489]">Moon</span>
+              <span className="text-[11px] uppercase tracking-wide text-[#8A8278]">Moon</span>
             </div>
             <div className="text-[13px] text-[#E8E2D5]">in {moonSign}</div>
           </div>
@@ -418,9 +418,9 @@ function TransitSummary({ horoscope }: { horoscope: any }) {
           <div className="p-3 rounded-sm border border-[#2A2722] bg-white/[0.02]">
             <div className="flex items-center gap-2 mb-1.5">
               <BaydinSun className="w-3.5 h-3.5 text-[#C5A572]" />
-              <span className="text-[10px] uppercase tracking-wide text-[#9C9489]">Natal Aspect</span>
+              <span className="text-[11px] uppercase tracking-wide text-[#8A8278]">Natal Aspect</span>
             </div>
-            <div className="text-[12px] text-[#E8E2D5] leading-[1.5]">
+            <div className="text-[13px] text-[#E8E2D5] leading-[1.5]">
               {typeof natalAspect === "string" ? natalAspect : (natalAspect?.description || JSON.stringify(natalAspect))}
             </div>
           </div>
